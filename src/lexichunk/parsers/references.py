@@ -136,11 +136,14 @@ class ReferenceDetector:
             filled in where a match was found.  Unresolvable references keep
             ``target_chunk_index=None``.
         """
-        # Build normalised identifier → chunk index lookup.
+        # Build normalised identifier → chunk index lookup and a parallel
+        # mapping of chunk_index → raw identifier for partial matching.
         index_map: dict[str, int] = {}
+        raw_identifiers: dict[int, str] = {}
         for chunk_index, (_refs, identifier) in enumerate(chunks_with_refs):
             if not identifier:
                 continue
+            raw_identifiers[chunk_index] = identifier
             norm = self._normalise_identifier(identifier)
             if norm and norm not in index_map:
                 index_map[norm] = chunk_index
@@ -167,6 +170,13 @@ class ReferenceDetector:
                         target_index = index_map.get(variant)
                         if target_index is not None:
                             break
+                if target_index is None:
+                    # Partial matching fallback: find the first chunk whose
+                    # raw identifier starts with the ref's identifier + ".".
+                    # This lets a ref to "4" resolve to "4.1" (first child).
+                    target_index = self._partial_match(
+                        ref.target_identifier, raw_identifiers
+                    )
                 updated.append(
                     CrossReference(
                         raw_text=ref.raw_text,
@@ -181,6 +191,50 @@ class ReferenceDetector:
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
+
+    @staticmethod
+    def _strip_label(identifier: str) -> str:
+        """Strip leading label words from an identifier string.
+
+        E.g. ``"Article VII"`` → ``"VII"``, ``"Section 4.1"`` → ``"4.1"``,
+        ``"4.1"`` → ``"4.1"`` (unchanged).
+        """
+        lower = identifier.lower().strip()
+        for label in _LABEL_WORDS:
+            prefix = label + " "
+            if lower.startswith(prefix):
+                return identifier.strip()[len(prefix):]
+        return identifier.strip()
+
+    def _partial_match(
+        self,
+        raw_target: str,
+        raw_identifiers: dict[int, str],
+    ) -> Optional[int]:
+        """Find the first chunk whose identifier is a child of *raw_target*.
+
+        A "child" identifier starts with the bare target followed by a dot.
+        E.g. target ``"4"`` matches ``"4.1"`` but not ``"14"`` or ``"41"``.
+
+        Args:
+            raw_target: The raw target_identifier from the CrossReference.
+            raw_identifiers: Mapping of chunk_index → raw identifier string
+                for each chunk.
+
+        Returns:
+            The chunk index of the first matching child, or ``None``.
+        """
+        bare_target = self._strip_label(raw_target).lower()
+        prefix = bare_target + "."
+
+        best_index: Optional[int] = None
+        for chunk_idx, raw_id in raw_identifiers.items():
+            bare_id = self._strip_label(raw_id).lower()
+            if bare_id.startswith(prefix) and len(bare_id) > len(bare_target):
+                if best_index is None or chunk_idx < best_index:
+                    best_index = chunk_idx
+
+        return best_index
 
     def _normalise_identifier(self, raw: str) -> str:
         """Normalise an identifier for lookup (lowercase, strip punctuation).

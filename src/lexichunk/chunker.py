@@ -90,7 +90,9 @@ class LegalChunker:
         self._document_id = document_id
 
         # Instantiate pipeline components.
-        self._structure_parser = StructureParser(self._jurisdiction)
+        self._structure_parser = StructureParser(
+            self._jurisdiction, doc_type=self._doc_type
+        )
         self._definitions_extractor = DefinitionsExtractor(self._jurisdiction)
         self._reference_detector = ReferenceDetector(self._jurisdiction)
         self._clause_type_classifier = ClauseTypeClassifier()

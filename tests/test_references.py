@@ -99,14 +99,13 @@ def test_detect_contextual_ref():
 
 
 def test_deduplication():
-    """The same (raw_text, target_identifier) pair is never duplicated.
+    """Deduplication by normalised target_identifier — no duplicate identifiers.
 
-    The detector deduplicates on (raw_text, target_identifier).  A text
-    containing 'Clause 4.1' twice may produce multiple CrossReference
-    objects because the base pattern produces 'Clause 4.1'/'4.1' while the
-    extended contextual patterns produce 'subject to Clause 4.1'/'4.1'.
-    What must NOT happen is the identical (raw_text, target_identifier)
-    pair appearing more than once.
+    The detector deduplicates by normalised target_identifier, so even when
+    multiple patterns match different raw_text strings that resolve to the
+    same identifier, only the first match is kept.  This test verifies that
+    no two CrossReference objects share the same (raw_text, target_identifier)
+    pair.
     """
     text = (
         "Subject to Clause 4.1, the party shall comply. "
@@ -194,3 +193,116 @@ def test_resolve_unresolvable_ref_keeps_none():
     ]
     resolved = detector.resolve(pairs)
     assert resolved[0][0].target_chunk_index is None
+
+
+# ---------------------------------------------------------------------------
+# Trailing period edge-case tests (regression for commit 8225642)
+# ---------------------------------------------------------------------------
+
+
+def test_trailing_period_not_captured():
+    """'See Section 3.2.' → identifier should be '3.2', not '3.2.'."""
+    text = "See Section 3.2."
+    refs = _uk_detector().detect(text)
+    assert len(refs) >= 1
+    ids = _identifiers(refs)
+    assert "3.2" in ids, f"Expected '3.2'; got {ids}"
+    assert "3.2." not in ids, f"Trailing period should not be captured; got {ids}"
+
+
+def test_trailing_period_multi_level():
+    """'Subject to Clause 1.2.3.' → identifier '1.2.3', no trailing period."""
+    text = "Subject to Clause 1.2.3."
+    refs = _uk_detector().detect(text)
+    ids = _identifiers(refs)
+    assert any(i == "1.2.3" for i in ids), f"Expected '1.2.3'; got {ids}"
+    assert not any(i.endswith(".") for i in ids), f"No identifier should end with '.'; got {ids}"
+
+
+def test_trailing_period_with_subclause():
+    """'Per Section 4.1(a).' → identifier '4.1(a)', no trailing period."""
+    text = "Per Section 4.1(a)."
+    refs = _us_detector().detect(text)
+    ids = _identifiers(refs)
+    assert any("4.1(a)" in i for i in ids), f"Expected '4.1(a)'; got {ids}"
+
+
+# ---------------------------------------------------------------------------
+# Deduplication tests
+# ---------------------------------------------------------------------------
+
+
+def test_deduplication_by_target_identifier():
+    """Two different raw_text forms with the same target_identifier → exactly 1 CrossReference.
+
+    The detector deduplicates by normalised target_identifier, so 'Clause 4.1'
+    and 'subject to Clause 4.1' both yield target_identifier '4.1' and only the
+    first match is kept.
+    """
+    text = "Clause 4.1 applies. As set forth subject to Clause 4.1 of this Agreement."
+    detector = _uk_detector()
+    refs = detector.detect(text)
+    ids = _identifiers(refs)
+    count_4_1 = sum(1 for i in ids if i == "4.1")
+    assert count_4_1 == 1, (
+        f"Expected exactly 1 CrossReference for target '4.1'; got {count_4_1}. refs={refs}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Partial matching fallback tests
+# ---------------------------------------------------------------------------
+
+
+def test_partial_match_parent_resolves_to_first_child():
+    """Ref to '4' resolves to chunk containing '4.1' (first child) via partial match."""
+    detector = _uk_detector()
+    ref = CrossReference(raw_text="Clause 4", target_identifier="4")
+    pairs = [
+        ([ref], "1.1"),  # chunk 0
+        ([], "4.1"),     # chunk 1 — first child of '4'
+        ([], "4.2"),     # chunk 2
+    ]
+    resolved = detector.resolve(pairs)
+    assert resolved[0][0].target_chunk_index == 1, (
+        f"Expected partial match to first child (index 1); "
+        f"got {resolved[0][0].target_chunk_index}"
+    )
+
+
+def test_partial_match_does_not_match_unrelated():
+    """Ref to '4' must NOT resolve to '14' or '41' — only children like '4.X'."""
+    detector = _uk_detector()
+    ref = CrossReference(raw_text="Clause 4", target_identifier="4")
+    pairs = [
+        ([ref], "1.1"),
+        ([], "14"),
+        ([], "41"),
+    ]
+    resolved = detector.resolve(pairs)
+    assert resolved[0][0].target_chunk_index is None
+
+
+# ---------------------------------------------------------------------------
+# US Article Roman numeral resolution tests
+# ---------------------------------------------------------------------------
+
+
+def test_detect_article_roman_numeral():
+    """'Article VII' is detected as a cross-reference with identifier 'VII'."""
+    text = "The indemnification obligations are as set forth in Article VII."
+    refs = _us_detector().detect(text)
+    ids = _identifiers(refs)
+    assert any("VII" in i for i in ids), f"Expected 'VII' in identifiers; got {ids}"
+
+
+def test_resolve_article_roman_numeral():
+    """Ref to 'Article VII' resolves to the chunk with identifier 'Article VII'."""
+    detector = _us_detector()
+    ref = CrossReference(raw_text="Article VII", target_identifier="VII")
+    pairs = [
+        ([ref], "Article I"),    # chunk 0
+        ([], "Article VII"),     # chunk 1
+    ]
+    resolved = detector.resolve(pairs)
+    assert resolved[0][0].target_chunk_index == 1

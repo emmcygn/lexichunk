@@ -188,6 +188,28 @@ CLAUSE_SIGNALS: dict[ClauseType, list[str]] = {
         "costs and expenses",
         "no partnership",
     ],
+    ClauseType.ACCEPTABLE_USE: [
+        "acceptable use",
+        "prohibited content",
+        "prohibited use",
+        "prohibited activities",
+    ],
+    ClauseType.USER_RESTRICTIONS: [
+        "restrictions on use",
+        "reverse engineer",
+        "decompile",
+        "disassemble",
+        "derivative works",
+        "sublicense",
+    ],
+    ClauseType.ACCOUNT_SECURITY: [
+        "account security",
+        "login credentials",
+        "multi-factor authentication",
+        "unauthorized access",
+        "password",
+        "account credentials",
+    ],
     ClauseType.UNKNOWN: [],
 }
 

@@ -139,8 +139,11 @@ class StructureParser:
             print(clause.identifier, clause.document_section)
     """
 
-    def __init__(self, jurisdiction: Jurisdiction) -> None:
+    def __init__(
+        self, jurisdiction: Jurisdiction, doc_type: str = "contract"
+    ) -> None:
         self._jurisdiction = jurisdiction
+        self._doc_type = doc_type
         self._detect_level: Callable[[str], tuple[int, str] | None] = (
             get_detect_level(jurisdiction)
         )
@@ -391,17 +394,23 @@ class StructureParser:
             A :class:`~lexichunk.models.DocumentSection` member.
         """
         combined = (identifier + ' ' + title).lower()
+        is_tc = self._doc_type == "terms_conditions"
 
         # Schedules / Exhibits are identified purely by level.
         if level in (-1, -2):
             return DocumentSection.SCHEDULES
 
-        # Signature blocks.
-        if any(kw in combined for kw in ('signature', 'execution', 'in witness', 'signed')):
+        # Signature blocks — skip for T&C documents (false positives).
+        if not is_tc and any(
+            kw in combined
+            for kw in ('signature', 'execution', 'in witness', 'signed')
+        ):
             return DocumentSection.SIGNATURES
 
-        # Recitals / background.
-        if any(kw in combined for kw in ('recital', 'background', 'whereas')):
+        # Recitals / background — skip for T&C documents (false positives).
+        if not is_tc and any(
+            kw in combined for kw in ('recital', 'background', 'whereas')
+        ):
             return DocumentSection.RECITALS
 
         # Definitions sections.
@@ -420,16 +429,22 @@ class StructureParser:
 # ---------------------------------------------------------------------------
 
 
-def parse_structure(text: str, jurisdiction: Jurisdiction) -> list[ParsedClause]:
+def parse_structure(
+    text: str,
+    jurisdiction: Jurisdiction,
+    doc_type: str = "contract",
+) -> list[ParsedClause]:
     """Parse a legal document into a flat list of :class:`ParsedClause` objects.
 
     This is a thin convenience wrapper around
-    :class:`StructureParser`\ ``.parse()``.
+    :class:`StructureParser` ``.parse()``.
 
     Args:
         text: The full legal document as a plain-text string.
         jurisdiction: The :class:`~lexichunk.models.Jurisdiction` to use for
             clause-header detection.
+        doc_type: Document type hint — ``"contract"`` or
+            ``"terms_conditions"``.
 
     Returns:
         Flat list of :class:`ParsedClause` objects in document order
@@ -442,7 +457,7 @@ def parse_structure(text: str, jurisdiction: Jurisdiction) -> list[ParsedClause]
 
         clauses = parse_structure(contract_text, Jurisdiction.UK)
     """
-    return StructureParser(jurisdiction).parse(text)
+    return StructureParser(jurisdiction, doc_type=doc_type).parse(text)
 
 
 __all__ = [
