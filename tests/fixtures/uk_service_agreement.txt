@@ -1,0 +1,484 @@
+SERVICES AGREEMENT
+
+This Services Agreement (the "Agreement") is entered into as of 1 March 2024 between:
+
+(1)  PINNACLE TECHNOLOGY SOLUTIONS LIMITED, a company incorporated in England and Wales
+     with registered number 09847231 and whose registered office is at 12 Finsbury Square,
+     London, EC2A 1AB (the "Supplier"); and
+
+(2)  HARTWELL FINANCIAL SERVICES PLC, a company incorporated in England and Wales with
+     registered number 04312876 and whose registered office is at One Canada Square,
+     Canary Wharf, London, E14 5AB (the "Client").
+
+BACKGROUND
+
+(A)  The Supplier carries on the business of providing software development, consultancy
+     and managed technology services.
+
+(B)  The Client wishes to engage the Supplier to provide the Services on the terms and
+     conditions set out in this Agreement.
+
+IT IS AGREED as follows:
+
+1.   Definitions and interpretation
+
+1.1  In this Agreement, the following terms shall have the meanings set out below:
+
+     "Affiliate" means any entity that directly or indirectly controls, is controlled by,
+     or is under common control with a party, where "control" means the ownership of more
+     than fifty percent (50%) of the voting securities or other ownership interests of
+     an entity or the power to direct or cause the direction of the management and policies
+     of an entity.
+
+     "Authorised Users" means the employees, agents and independent contractors of the
+     Client who are authorised by the Client to access and use the Services in accordance
+     with the terms of this Agreement.
+
+     "Business Day" means any day other than a Saturday, Sunday or public holiday in
+     England and Wales on which banks in London are open for business.
+
+     "Commencement Date" means 1 April 2024.
+
+     "Confidential Information" means any information disclosed by one party (the
+     "Disclosing Party") to the other party (the "Receiving Party"), whether orally or in
+     writing, that is designated as confidential or that reasonably should be understood
+     to be confidential given the nature of the information and the circumstances of
+     disclosure, including without limitation business plans, financial information,
+     technical data, trade secrets, software, product plans, customer lists and
+     marketing strategies.
+
+     "Data Protection Legislation" means the UK General Data Protection Regulation as
+     it forms part of the law of England and Wales, Scotland and Northern Ireland by
+     virtue of section 3 of the European Union (Withdrawal) Act 2018, as amended from
+     time to time (the "UK GDPR"), the Data Protection Act 2018, and all other applicable
+     laws and regulations relating to the processing of personal data and privacy.
+
+     "Fees" means the fees payable by the Client to the Supplier as set out in Schedule 2
+     (Fees and Payment Terms), as may be amended by agreement of the parties in writing
+     from time to time.
+
+     "Intellectual Property Rights" means all patents, utility models, rights to
+     inventions, copyright and neighbouring and related rights, moral rights, trade marks
+     and service marks, business names and domain names, rights in get-up and trade dress,
+     goodwill and the right to sue for passing off or unfair competition, rights in
+     designs, rights in computer software, database rights, rights to use and protect the
+     confidentiality of confidential information (including know-how and trade secrets),
+     and all other intellectual property rights, in each case whether registered or
+     unregistered and including all applications and rights to apply for and be granted,
+     renewals or extensions of, and rights to claim priority from, such rights and all
+     similar or equivalent rights or forms of protection which subsist or will subsist now
+     or in the future in any part of the world.
+
+     "Services" means the services to be provided by the Supplier to the Client as more
+     particularly described in Schedule 1 (Services Description), together with any
+     additional services agreed in writing between the parties from time to time.
+
+     "Service Levels" means the performance standards and service level commitments set
+     out in Schedule 3 (Service Levels), as may be updated by agreement of the parties
+     in writing from time to time.
+
+     "Term" means the period commencing on the Commencement Date and continuing until
+     terminated in accordance with clause 6 of this Agreement.
+
+1.2  In this Agreement, unless the context otherwise requires:
+
+     (a)  references to clauses, schedules and paragraphs are to clauses of, schedules to
+          and paragraphs of this Agreement;
+
+     (b)  the singular includes the plural and vice versa and words importing any gender
+          include all other genders;
+
+     (c)  a reference to a statute or statutory provision includes any subordinate
+          legislation made under that statute or statutory provision and includes any
+          modification, amendment, extension, consolidation or re-enactment of it in
+          force from time to time;
+
+     (d)  a reference to a "person" includes any individual, company, partnership,
+          joint venture, association, corporation, unincorporated association, trust,
+          government body or any other entity, whether or not having separate legal
+          personality;
+
+     (e)  any phrase introduced by the terms "including", "include", "in particular" or
+          any similar expression shall be construed as illustrative and shall not limit
+          the sense of the words preceding those terms.
+
+2.   Services
+
+2.1  With effect from the Commencement Date and throughout the Term, the Supplier shall
+     provide the Services to the Client in accordance with the terms of this Agreement,
+     the Service Levels and any applicable Statement of Work agreed between the parties.
+
+2.2  The Supplier shall provide the Services with reasonable care and skill and in
+     accordance with good industry practice applicable to the provision of services of a
+     similar nature to the Services.
+
+2.3  The Supplier shall procure that sufficient personnel with appropriate qualifications,
+     skills and experience are assigned to the performance of the Services, and shall use
+     reasonable endeavours to ensure continuity of key personnel. The Supplier shall
+     notify the Client as soon as reasonably practicable of any significant changes to
+     the key personnel assigned to the Services.
+
+2.4  The Supplier shall comply with all applicable laws and regulations in the performance
+     of the Services, including without limitation the Data Protection Legislation where
+     applicable to the processing of personal data in connection with the Services.
+
+2.5  The Client shall:
+
+     (a)  provide the Supplier with such information, materials, access and cooperation
+          as the Supplier reasonably requires in order to perform the Services;
+
+     (b)  ensure that all information provided to the Supplier is accurate, complete and
+          not misleading in any material respect;
+
+     (c)  be responsible for the acts and omissions of the Authorised Users in relation
+          to the Services and for ensuring that the Authorised Users comply with the
+          terms of this Agreement; and
+
+     (d)  promptly notify the Supplier of any changes in the Client's requirements that
+          may affect the provision of the Services.
+
+2.6  The Supplier shall not be responsible for any failure or delay in the performance of
+     the Services to the extent that such failure or delay arises from the Client's failure
+     to comply with its obligations under clause 2.5 above.
+
+2.7  The parties may agree additional services by way of a Statement of Work in the form
+     set out in Schedule 4, executed by authorised representatives of each party. Each
+     Statement of Work shall form part of and be governed by this Agreement. In the event
+     of any conflict or inconsistency between a Statement of Work and this Agreement, the
+     terms of this Agreement shall prevail unless the Statement of Work expressly
+     provides otherwise.
+
+3.   Fees and payment
+
+3.1  In consideration of the provision of the Services, the Client shall pay the Fees to
+     the Supplier in accordance with the payment terms set out in this clause 3 and in
+     Schedule 2.
+
+3.2  The Supplier shall submit invoices to the Client monthly in arrears (or at such other
+     intervals as agreed in Schedule 2), setting out in reasonable detail the Services
+     performed and the Fees payable in respect of that period.
+
+3.3  The Client shall pay each undisputed invoice within thirty (30) days of the date of
+     receipt (the "Payment Due Date").
+
+3.4  If the Client fails to pay any invoice by the Payment Due Date, the Supplier may,
+     without prejudice to any other right or remedy it may have:
+
+     (a)  charge interest on the overdue amount at the rate of four percent (4%) per
+          annum above the base rate of the Bank of England from time to time, accruing
+          daily from the Payment Due Date until the date of actual payment, whether before
+          or after judgment; and
+
+     (b)  after giving the Client not less than fifteen (15) Business Days' written notice,
+          suspend the provision of the Services until payment in full is received.
+
+3.5  All Fees quoted and payable under this Agreement are exclusive of value added tax
+     (VAT) or any other applicable sales or goods and services taxes, which shall be
+     payable by the Client in addition to the Fees at the rate and in the manner
+     prescribed by law from time to time.
+
+3.6  If the Client disputes in good faith any element of an invoice, the Client shall:
+
+     (a)  pay the undisputed portion of such invoice by the Payment Due Date;
+
+     (b)  notify the Supplier in writing of the grounds for the dispute within ten (10)
+          Business Days of receipt of the invoice; and
+
+     (c)  co-operate in good faith with the Supplier to resolve the dispute expeditiously.
+
+3.7  The Supplier shall be entitled to review and increase the Fees annually on each
+     anniversary of the Commencement Date by giving the Client not less than sixty (60)
+     days' prior written notice, provided that any such increase shall not exceed the
+     greater of (i) five percent (5%) or (ii) the percentage increase in the UK Consumer
+     Price Index over the relevant twelve-month period.
+
+4.   Confidentiality
+
+4.1  Each party undertakes to keep confidential and not to disclose to any third party
+     any Confidential Information of the other party without the prior written consent of
+     the Disclosing Party, except as expressly permitted by this clause 4.
+
+4.2  Each party may disclose the other party's Confidential Information:
+
+     (a)  to its employees, officers, directors, Affiliates, agents or professional
+          advisers who have a need to know the Confidential Information for the purposes
+          of this Agreement, provided that such persons are bound by obligations of
+          confidentiality no less onerous than those set out in this clause 4; and
+
+     (b)  to the extent required by applicable law, any governmental or regulatory
+          authority or any court or other tribunal of competent jurisdiction, provided
+          that (where permitted by law) the Receiving Party gives the Disclosing Party
+          as much prior written notice as reasonably practicable and cooperates with the
+          Disclosing Party in seeking any available protective order or equivalent relief.
+
+4.3  The obligations of confidentiality in clause 4.1 shall not apply to information that:
+
+     (a)  is or becomes generally available to the public other than as a result of any
+          breach of this Agreement;
+
+     (b)  was already known to the Receiving Party prior to disclosure by the Disclosing
+          Party, as evidenced by written records predating such disclosure;
+
+     (c)  is received by the Receiving Party from a third party who is not under any
+          obligation of confidentiality in relation to such information; or
+
+     (d)  is independently developed by the Receiving Party without use of or reference
+          to the Disclosing Party's Confidential Information.
+
+4.4  Each party shall take all reasonable steps to protect the other party's Confidential
+     Information and prevent its unauthorised use or disclosure, applying at minimum the
+     same degree of care as it applies to its own confidential information of similar
+     importance but in no circumstances less than a reasonable standard of care.
+
+4.5  The provisions of this clause 4 shall survive the expiry or termination of this
+     Agreement for a period of five (5) years.
+
+5.   Limitation of liability
+
+5.1  Nothing in this Agreement shall limit or exclude either party's liability for:
+
+     (a)  death or personal injury caused by its negligence or the negligence of its
+          employees, agents or subcontractors;
+
+     (b)  fraud or fraudulent misrepresentation; or
+
+     (c)  any other liability that cannot be limited or excluded as a matter of English law.
+
+5.2  Subject to clause 5.1, neither party shall be liable to the other under or in
+     connection with this Agreement, whether in contract, tort (including negligence),
+     breach of statutory duty or otherwise, for any:
+
+     (a)  loss of profits, revenue or income;
+
+     (b)  loss of business or contracts;
+
+     (c)  loss of anticipated savings;
+
+     (d)  loss of goodwill or reputation;
+
+     (e)  loss or corruption of data or information; or
+
+     (f)  any indirect or consequential loss,
+
+     in each case whether or not such losses were foreseeable and whether or not a party
+     had been advised of the possibility of such losses.
+
+5.3  Subject to clauses 5.1 and 5.2, each party's total aggregate liability to the other
+     under or in connection with this Agreement, whether arising in contract, tort
+     (including negligence), breach of statutory duty or otherwise, shall not exceed an
+     amount equal to one hundred and twenty percent (120%) of the total Fees paid or
+     payable by the Client to the Supplier during the twelve (12) month period immediately
+     preceding the event giving rise to the claim.
+
+5.4  In no event shall the Supplier's liability for any claims arising in connection with
+     this Agreement exceed, in the aggregate, the amount specified in clause 5.3 above.
+     The existence of more than one claim shall not enlarge or extend this limit.
+
+5.5  The Client acknowledges that the Fees have been calculated on the basis of, and
+     reflect, the allocation of risk set out in this clause 5, and that the Supplier would
+     not have entered into this Agreement on the same terms in the absence of such
+     allocation.
+
+6.   Term and termination
+
+6.1  This Agreement shall commence on the Commencement Date and shall continue for an
+     initial period of two (2) years (the "Initial Term"), unless terminated earlier in
+     accordance with this clause 6.
+
+6.2  Following the expiry of the Initial Term, this Agreement shall automatically renew
+     for successive periods of one (1) year each (each a "Renewal Term"), unless either
+     party gives the other party not less than ninety (90) days' written notice prior to
+     the expiry of the then-current Initial Term or Renewal Term (as applicable).
+
+6.3  Either party may terminate this Agreement with immediate effect by giving written
+     notice to the other party if:
+
+     (a)  the other party commits a material breach of any term of this Agreement and
+          (where such breach is capable of remedy) fails to remedy such breach within
+          thirty (30) days of being given written notice specifying the breach and
+          requiring it to be remedied;
+
+     (b)  the other party becomes insolvent or is unable to pay its debts as they fall
+          due within the meaning of section 123 of the Insolvency Act 1986, enters
+          administration, is wound up (voluntarily or by order of a court) or has a
+          receiver or administrator appointed over any of its assets; or
+
+     (c)  the other party undergoes a change of control, where "change of control" has
+          the meaning given in section 1124 of the Corporation Tax Act 2010.
+
+6.4  The Supplier may terminate this Agreement in accordance with clause 3.4(b) above
+     following the Client's failure to pay undisputed Fees in accordance with clause 3.
+
+6.5  On expiry or termination of this Agreement for any reason:
+
+     (a)  the Client shall immediately cease to use the Services and shall promptly
+          return to the Supplier or destroy (at the Supplier's election) all Confidential
+          Information of the Supplier in its possession or control, subject to any
+          retention obligations under applicable law;
+
+     (b)  the Supplier shall promptly return to the Client or destroy (at the Client's
+          election) all Confidential Information of the Client in its possession or
+          control, subject to any legal or regulatory obligation to retain such information;
+
+     (c)  each party shall pay to the other all sums outstanding and due at the date of
+          termination; and
+
+     (d)  any provisions of this Agreement that expressly or by their nature are intended
+          to survive termination (including clauses 4, 5, 7 and 8) shall continue in
+          full force and effect.
+
+6.6  Termination or expiry of this Agreement shall not affect any rights, remedies,
+     obligations or liabilities of the parties that have accrued up to the date of
+     termination or expiry.
+
+7.   Governing law and jurisdiction
+
+7.1  This Agreement and any dispute or claim (including non-contractual disputes or
+     claims) arising out of or in connection with it or its subject matter or formation
+     shall be governed by and construed in accordance with the law of England and Wales.
+
+7.2  Each party irrevocably agrees that the courts of England and Wales shall have
+     exclusive jurisdiction to settle any dispute or claim (including non-contractual
+     disputes or claims) arising out of or in connection with this Agreement or its
+     subject matter or formation.
+
+8.   General
+
+8.1  This Agreement, together with the Schedules and any Statements of Work entered into
+     pursuant to clause 2.7, constitutes the entire agreement between the parties in
+     relation to its subject matter and supersedes all prior agreements, representations,
+     warranties, negotiations and understandings between the parties, whether oral or
+     written, relating to the same subject matter.
+
+8.2  Each party acknowledges that, in entering into this Agreement, it does not rely on
+     any statement, representation, assurance or warranty (whether made innocently or
+     negligently) that is not set out in this Agreement.
+
+8.3  No variation of this Agreement shall be effective unless it is in writing and signed
+     by duly authorised representatives of each of the parties.
+
+8.4  No failure or delay by either party in exercising any right, power or remedy under
+     this Agreement shall operate as a waiver of that right, power or remedy. A single
+     or partial exercise of any right, power or remedy shall not preclude any further or
+     other exercise of it or the exercise of any other right, power or remedy.
+
+8.5  If any provision or part-provision of this Agreement is or becomes invalid, illegal
+     or unenforceable, it shall be deemed deleted, but that shall not affect the validity
+     and enforceability of the rest of this Agreement. If any provision or part-provision
+     of this Agreement is deemed deleted, the parties shall negotiate in good faith to
+     agree a replacement provision that, to the greatest extent possible, achieves the
+     intended commercial result of the original provision.
+
+8.6  This Agreement may be executed in any number of counterparts, each of which when
+     executed shall constitute a duplicate original, and all the counterparts shall
+     together constitute one agreement.
+
+8.7  Nothing in this Agreement shall constitute or be deemed to constitute a partnership,
+     joint venture or agency relationship between the parties. The Supplier is an
+     independent contractor and nothing in this Agreement shall be construed as creating
+     an employment relationship between the Supplier (or any of its personnel) and the
+     Client.
+
+8.8  Neither party may assign, novate or otherwise transfer any of its rights or
+     obligations under this Agreement without the prior written consent of the other
+     party, such consent not to be unreasonably withheld, conditioned or delayed, except
+     that either party may assign this Agreement without consent to an Affiliate or in
+     connection with a merger, acquisition or sale of all or substantially all of its
+     assets, provided that the assignee assumes all of the assignor's obligations under
+     this Agreement.
+
+8.9  Any notice given under or in connection with this Agreement shall be in writing and
+     shall be delivered by hand, sent by pre-paid first-class post or other next working
+     day delivery service, or sent by email, to the relevant party at the address set out
+     at the beginning of this Agreement (or such other address as that party may notify
+     to the other in writing from time to time). A notice shall be deemed to have been
+     received at the time of delivery if delivered by hand or email, or two (2) Business
+     Days after posting if sent by post.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written
+above.
+
+Signed for and on behalf of
+PINNACLE TECHNOLOGY SOLUTIONS LIMITED:
+
+Signature: ___________________________
+Name:      ___________________________
+Title:     ___________________________
+Date:      ___________________________
+
+Signed for and on behalf of
+HARTWELL FINANCIAL SERVICES PLC:
+
+Signature: ___________________________
+Name:      ___________________________
+Title:     ___________________________
+Date:      ___________________________
+
+
+SCHEDULE 1 — SERVICES DESCRIPTION
+
+1.   Overview of Services
+
+1.1  The Supplier shall provide the following categories of services to the Client during
+     the Term (collectively, the "Services"):
+
+     (a)  Software Development Services: bespoke software design, development, testing
+          and deployment services as agreed in individual Statements of Work issued
+          pursuant to clause 2.7 of the Agreement;
+
+     (b)  Managed Support Services: ongoing second-line and third-line technical support
+          for the Client's technology infrastructure, including incident management,
+          problem management and change management in accordance with the Service Levels
+          set out in Schedule 3; and
+
+     (c)  Consultancy Services: technology advisory and consultancy services to assist
+          the Client with its digital transformation programme.
+
+2.   Software development methodology
+
+2.1  The Supplier shall deliver all Software Development Services using an agile
+     development methodology, with two-week sprint cycles and regular sprint reviews
+     attended by nominated representatives of the Client.
+
+2.2  The Supplier shall maintain a prioritised product backlog in a project management
+     tool agreed between the parties, to which the Client shall have full read access
+     at all times.
+
+3.   Support service parameters
+
+3.1  The Managed Support Services shall be provided during the following hours:
+
+     (a)  Core Support Hours: 08:00 to 18:00 London time on Business Days; and
+
+     (b)  Out-of-Hours Emergency Support: 24 hours per day, 7 days per week, for
+          Priority 1 incidents only as defined in Schedule 3.
+
+3.2  The Supplier shall provide the Client with access to a named account manager who
+     shall be the primary point of contact for all service delivery matters.
+
+
+SCHEDULE 2 — FEES AND PAYMENT TERMS
+
+1.   Software Development Services
+
+1.1  Software Development Services shall be charged at the daily rates set out below,
+     based on a standard working day of eight (8) hours:
+
+     (a)  Principal Consultant:     £1,250 per day (exclusive of VAT)
+     (b)  Senior Developer:         £950 per day (exclusive of VAT)
+     (c)  Mid-Level Developer:      £750 per day (exclusive of VAT)
+     (d)  Quality Assurance Lead:   £700 per day (exclusive of VAT)
+
+2.   Managed Support Services
+
+2.1  Managed Support Services shall be charged at a fixed monthly retainer of
+     £18,500 per month (exclusive of VAT), covering up to 120 hours of support
+     activity per calendar month. Hours in excess of 120 per month shall be charged
+     at the applicable daily rates set out in paragraph 1.1 above on a pro-rata basis.
+
+3.   Expenses
+
+3.1  The Client shall reimburse the Supplier for all reasonable and properly documented
+     out-of-pocket expenses incurred by the Supplier in the performance of the Services,
+     provided that any individual expense item or group of related expenses exceeding
+     £500 shall be subject to the Client's prior written approval.

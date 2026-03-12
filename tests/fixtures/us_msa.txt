@@ -1,0 +1,422 @@
+MASTER SERVICES AGREEMENT
+
+This Master Services Agreement (this "Agreement") is entered into as of February 15, 2024
+(the "Effective Date") by and between:
+
+NEXUS CLOUD TECHNOLOGIES, INC., a Delaware corporation with its principal place of
+business at 2500 Sand Hill Road, Suite 300, Menlo Park, California 94025 ("Provider");
+
+and
+
+MERIDIAN BANCORP HOLDINGS, LLC, a Delaware limited liability company with its principal
+place of business at 300 Park Avenue, New York, New York 10022 ("Customer").
+
+Each of Provider and Customer may be referred to individually as a "Party" and
+collectively as the "Parties."
+
+RECITALS
+
+WHEREAS, Provider is in the business of providing technology services, software solutions,
+and related professional services;
+
+WHEREAS, Customer desires to engage Provider to perform certain services, and Provider
+desires to perform such services for Customer, in each case on the terms and conditions
+set forth in this Agreement;
+
+NOW, THEREFORE, in consideration of the mutual covenants and agreements herein contained,
+and for other good and valuable consideration, the receipt and sufficiency of which are
+hereby acknowledged, the Parties agree as follows:
+
+ARTICLE I
+DEFINITIONS
+
+Section 1.01  Definitions. As used in this Agreement, the following terms shall have the
+meanings set forth below:
+
+     (a)  "Affiliate" means, with respect to any Person, any other Person that directly
+          or indirectly controls, is controlled by, or is under common control with, such
+          Person. For purposes of this definition, "control" means the direct or indirect
+          ownership of more than fifty percent (50%) of the outstanding voting securities
+          or other equity interests of a Person, or the power to direct the management
+          and policies of a Person by contract or otherwise.
+
+     (b)  "Authorized User" means any employee, contractor, or agent of Customer or its
+          Affiliates who is authorized by Customer to access or use the Services and has
+          agreed to the terms of an acceptable use policy no less restrictive than the
+          requirements set forth herein.
+
+     (c)  "Confidential Information" means any information disclosed by one Party (the
+          "Disclosing Party") to the other Party (the "Receiving Party"), whether
+          disclosed orally or in writing, that is designated as confidential or that
+          reasonably should be known to be confidential given the nature of the
+          information and circumstances of disclosure. Confidential Information shall
+          not include information that: (i) is or becomes generally available to the
+          public through no fault of the Receiving Party; (ii) was already known to the
+          Receiving Party prior to disclosure; (iii) is received by the Receiving Party
+          from a third party without restriction on disclosure; or (iv) is independently
+          developed by the Receiving Party without use of the Disclosing Party's
+          Confidential Information.
+
+     (d)  "Documentation" means the technical and functional specifications, user
+          manuals, and other written materials relating to the Services that Provider
+          makes generally available to its customers, as updated from time to time.
+
+     (e)  "Intellectual Property Rights" means all forms of intellectual property
+          rights throughout the world, including patents, patent applications, copyrights,
+          copyright registrations, trade secrets, trademarks, service marks, trade names,
+          domain names, mask works, moral rights, know-how, and all other intellectual
+          property rights, whether registered or unregistered.
+
+     (f)  "Order Form" means a written order form, purchase order, or statement of work
+          executed by both Parties that references this Agreement and sets forth the
+          specific Services to be provided, applicable fees, and other relevant terms.
+          Each Order Form shall be incorporated into and governed by this Agreement.
+
+     (g)  "Provider Technology" means the Services, software, hardware, products,
+          processes, algorithms, user interfaces, know-how, techniques, designs, and
+          other tangible or intangible technical material, information, or work product
+          developed or provided by Provider in connection with this Agreement, together
+          with all Intellectual Property Rights therein.
+
+     (h)  "Services" means the services, software, and deliverables to be provided by
+          Provider to Customer as described in each Order Form or Exhibit A attached
+          hereto and incorporated herein by reference, together with any related
+          professional services, implementation, training, or support services agreed
+          in writing by the Parties.
+
+     (i)  "Statement of Work" or "SOW" means an Order Form that describes in detail
+          professional services, deliverables, timelines, acceptance criteria, and any
+          project-specific terms applicable to a discrete engagement.
+
+     (j)  "Term" means the period commencing on the Effective Date and continuing until
+          this Agreement is terminated in accordance with Article VIII hereof.
+
+Section 1.02  Interpretation. In this Agreement, unless the context requires otherwise:
+(a) words in the singular include the plural and vice versa; (b) the words "include,"
+"includes," and "including" shall be deemed to be followed by the words "without
+limitation"; (c) reference to any law shall include all regulations promulgated thereunder
+and all amendments, modifications, or replacements thereof; and (d) headings are for
+convenience only and shall not affect interpretation.
+
+ARTICLE II
+SERVICES
+
+Section 2.01  Provision of Services. Provider shall provide the Services to Customer in
+accordance with this Agreement and the applicable Order Form. Provider shall perform the
+Services in a professional and workmanlike manner consistent with generally accepted
+industry standards.
+
+Section 2.02  Statements of Work. The Parties may enter into one or more Statements of
+Work setting forth specific deliverables, timelines, personnel requirements, and
+acceptance criteria for particular engagements. Each SOW shall be subject to the terms
+of this Agreement. In the event of any conflict between the terms of a SOW and this
+Agreement, the terms of this Agreement shall control unless the SOW expressly states
+that it supersedes a specific provision of this Agreement.
+
+Section 2.03  Change Orders. Either Party may request changes to the scope of a SOW
+by submitting a written change request to the other Party. No change to the scope or
+fees under a SOW shall be effective unless documented in a written change order signed
+by authorized representatives of both Parties.
+
+Section 2.04  Customer Responsibilities. Customer shall: (a) provide Provider with
+timely access to Customer's systems, data, personnel, and facilities as reasonably
+required for Provider to perform the Services; (b) designate a project manager with
+authority to make decisions and approvals on Customer's behalf; (c) ensure that all
+information provided to Provider is accurate and complete in all material respects; and
+(d) comply with all applicable laws and regulations in connection with Customer's use
+of the Services. Provider shall not be liable for any deficiency in Services resulting
+from Customer's failure to fulfill its obligations under this Section 2.04.
+
+Section 2.05  Subcontractors. Provider may engage subcontractors to perform portions
+of the Services, provided that Provider shall remain responsible for all Services
+performed by its subcontractors and shall ensure that such subcontractors are bound by
+confidentiality and intellectual property obligations at least as protective as those
+set forth in Article IV and Article V of this Agreement.
+
+ARTICLE III
+FEES AND PAYMENT
+
+Section 3.01  Fees. Customer shall pay Provider the fees set forth in each applicable
+Order Form (the "Fees") in accordance with this Article III. Unless otherwise specified
+in the applicable Order Form, all Fees are stated in United States dollars and are
+non-refundable.
+
+Section 3.02  Invoicing and Payment. Provider shall invoice Customer monthly in arrears
+for Fees accrued during the preceding month, or as otherwise set forth in the applicable
+Order Form. Customer shall pay each invoice within thirty (30) days of receipt (the
+"Payment Due Date"). All payments shall be made in United States dollars by wire transfer
+or ACH to the account designated by Provider.
+
+Section 3.03  Late Payments. Any amounts not paid by Customer by the applicable Payment
+Due Date shall accrue interest at the lesser of one and one-half percent (1.5%) per month
+or the maximum rate permitted by applicable law, calculated from the Payment Due Date
+until the date of actual payment. Provider reserves the right to suspend the Services
+upon fifteen (15) days' prior written notice if any undisputed payment is more than
+thirty (30) days past due.
+
+Section 3.04  Taxes. The Fees do not include any applicable federal, state, local, or
+foreign taxes, levies, duties, or similar governmental assessments, including sales,
+use, value-added, or withholding taxes (collectively, "Taxes"). Customer is responsible
+for all Taxes associated with its purchases hereunder. If Provider is required to pay or
+collect any Taxes on behalf of Customer, Customer shall reimburse Provider for all such
+Taxes. For the avoidance of doubt, Provider shall be responsible for taxes on its own
+income and for taxes based on Provider's net income.
+
+Section 3.05  Fee Adjustments. Provider may adjust the Fees for Services upon renewal
+of any Order Form by providing Customer with written notice not less than sixty (60)
+days prior to the effective date of such adjustment. Customer's continued use of the
+Services after the effective date of any fee adjustment shall constitute acceptance of
+the adjusted Fees.
+
+ARTICLE IV
+CONFIDENTIALITY
+
+Section 4.01  Confidentiality Obligations. Each Party agrees to: (a) hold the other
+Party's Confidential Information in strict confidence using the same degree of care
+it uses to protect its own confidential information, but in no event less than
+reasonable care; (b) not disclose the other Party's Confidential Information to any
+third party without the prior written consent of the Disclosing Party, except as
+permitted under Section 4.02; and (c) use the Disclosing Party's Confidential
+Information solely for the purposes of performing its obligations or exercising its
+rights under this Agreement.
+
+Section 4.02  Permitted Disclosures. A Receiving Party may disclose Confidential
+Information: (a) to its employees, Affiliates, contractors, and professional advisors
+who have a need to know such information and who are bound by confidentiality obligations
+no less protective than those contained in this Article IV; and (b) pursuant to a court
+order or as otherwise required by applicable law or regulation, provided that the
+Receiving Party, to the extent permitted by law, provides the Disclosing Party with
+prompt written notice and cooperates with the Disclosing Party's efforts to obtain
+a protective order or other available relief.
+
+Section 4.03  Survival. The obligations of this Article IV shall survive the expiration
+or termination of this Agreement for a period of five (5) years; provided, however,
+that obligations with respect to trade secrets shall continue for so long as such
+information remains a trade secret under applicable law.
+
+ARTICLE V
+INTELLECTUAL PROPERTY
+
+Section 5.01  Provider Ownership. As between the Parties, Provider owns all right, title,
+and interest in and to the Provider Technology, including all Intellectual Property
+Rights therein. Except as expressly set forth in this Agreement, no license to the
+Provider Technology is granted to Customer hereunder.
+
+Section 5.02  License Grant. Subject to the terms and conditions of this Agreement,
+including Customer's timely payment of all Fees, Provider grants to Customer a limited,
+non-exclusive, non-transferable, non-sublicensable license during the Term to access and
+use the Services and Documentation solely for Customer's internal business purposes.
+
+Section 5.03  Customer Data. As between the Parties, Customer owns all right, title, and
+interest in and to all data submitted by Customer or its Authorized Users to the Services
+("Customer Data"). Customer hereby grants Provider a limited, non-exclusive, worldwide
+license to access, process, transmit, and store the Customer Data solely as necessary
+to provide the Services and as otherwise permitted under this Agreement. Provider shall
+not sell, rent, or use Customer Data for any purpose other than providing the Services
+without Customer's prior written consent.
+
+Section 5.04  Deliverables. Unless otherwise expressly agreed in a Statement of Work,
+all custom deliverables developed by Provider specifically for Customer pursuant to a
+SOW (excluding any Provider Technology incorporated therein) shall, upon full payment
+of all applicable Fees, be deemed works made for hire owned by Customer, and to the
+extent any such deliverables do not qualify as works made for hire, Provider hereby
+assigns to Customer all right, title, and interest therein.
+
+Section 5.05  Feedback. If Customer provides Provider with any suggestions, comments,
+or other feedback regarding the Services ("Feedback"), Customer grants Provider a
+perpetual, irrevocable, royalty-free, fully paid-up, worldwide license to incorporate
+and use such Feedback in any manner without restriction or obligation to Customer.
+
+ARTICLE VI
+LIMITATION OF LIABILITY
+
+Section 6.01  Exclusion of Consequential Damages. IN NO EVENT SHALL EITHER PARTY BE
+LIABLE TO THE OTHER PARTY FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL,
+OR PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS, LOSS OF REVENUE, LOSS OF BUSINESS,
+LOSS OF DATA, OR COST OF SUBSTITUTE SERVICES, ARISING OUT OF OR IN CONNECTION WITH THIS
+AGREEMENT, WHETHER BASED ON CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR
+ANY OTHER LEGAL OR EQUITABLE THEORY, EVEN IF SUCH PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES AND NOTWITHSTANDING THE FAILURE OF ESSENTIAL PURPOSE OF
+ANY LIMITED REMEDY.
+
+Section 6.01(b)  Cap on Liability. SUBJECT TO SECTION 6.02, EACH PARTY'S TOTAL
+CUMULATIVE LIABILITY TO THE OTHER PARTY ARISING OUT OF OR IN CONNECTION WITH THIS
+AGREEMENT, WHETHER IN CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR
+OTHERWISE, SHALL NOT EXCEED THE TOTAL FEES ACTUALLY PAID BY CUSTOMER TO PROVIDER
+DURING THE TWELVE (12) MONTH PERIOD IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO
+THE CLAIM, OR, IF THE CLAIM ARISES DURING THE FIRST TWELVE MONTHS OF THE TERM, THE
+TOTAL FEES PAID AS OF THE DATE OF THE CLAIM.
+
+Section 6.02  Exceptions to Limitations. The limitations set forth in Section 6.01 shall
+not apply to: (a) either Party's indemnification obligations under Article VII; (b) either
+Party's breach of its confidentiality obligations under Article IV; (c) Customer's
+obligation to pay Fees in accordance with Article III; (d) either Party's liability for
+gross negligence or willful misconduct; or (e) any liability that cannot be excluded or
+limited under applicable law.
+
+ARTICLE VII
+INDEMNIFICATION
+
+Section 7.01  Indemnification by Provider. Provider shall defend, indemnify, and hold
+harmless Customer and its officers, directors, employees, and agents (collectively,
+"Customer Indemnitees") from and against any third-party claims, suits, actions,
+proceedings, damages, losses, costs, and expenses (including reasonable attorneys' fees)
+(collectively, "Losses") arising out of or related to: (a) any allegation that the
+Services, as provided by Provider and used in accordance with this Agreement, infringe
+any third party's Intellectual Property Rights; or (b) Provider's gross negligence or
+willful misconduct in connection with the Services.
+
+Section 7.02  Indemnification by Customer. Customer shall defend, indemnify, and hold
+harmless Provider and its officers, directors, employees, and agents (collectively,
+"Provider Indemnitees") from and against any Losses arising out of or related to:
+(a) Customer's breach of this Agreement; (b) Customer's violation of applicable law;
+(c) Customer Data, including any allegation that Customer Data infringes any third
+party's rights; or (d) Customer's gross negligence or willful misconduct.
+
+Section 7.03  Indemnification Procedure. The Party seeking indemnification (the
+"Indemnified Party") shall: (a) promptly notify the indemnifying party (the "Indemnifying
+Party") in writing of any claim for which indemnification is sought; (b) give the
+Indemnifying Party sole control over the defense and settlement of the claim, provided
+that the Indemnifying Party shall not settle any claim in a manner that imposes any
+obligation, restriction, or liability on the Indemnified Party without the Indemnified
+Party's prior written consent; and (c) provide the Indemnifying Party with reasonable
+cooperation and assistance in the defense of such claim at the Indemnifying Party's
+expense. The Indemnified Party shall have the right to participate in the defense of
+any claim at its own expense with counsel of its choice.
+
+ARTICLE VIII
+TERM AND TERMINATION
+
+Section 8.01  Term. This Agreement shall commence on the Effective Date and shall
+continue in full force and effect until terminated as provided in this Article VIII.
+
+Section 8.02  Termination for Convenience. Either Party may terminate this Agreement
+for convenience upon ninety (90) days' prior written notice to the other Party;
+provided, however, that no such termination shall affect any Order Form then in effect,
+which shall continue to be governed by this Agreement until the expiration or termination
+of such Order Form.
+
+Section 8.03  Termination for Cause. Either Party may terminate this Agreement or any
+Order Form immediately upon written notice to the other Party if: (a) the other Party
+materially breaches this Agreement and fails to cure such breach within thirty (30) days
+after receiving written notice thereof from the non-breaching Party; or (b) the other
+Party becomes insolvent, makes a general assignment for the benefit of creditors, has a
+receiver appointed, or becomes subject to a voluntary or involuntary bankruptcy
+proceeding that is not dismissed within sixty (60) days of filing.
+
+Section 8.04  Effect of Termination. Upon the expiration or termination of this Agreement
+or any Order Form for any reason: (a) all licenses granted hereunder with respect to the
+terminated Services shall immediately terminate; (b) each Party shall promptly return or
+destroy the other Party's Confidential Information, as directed by the other Party, subject
+to applicable legal retention requirements; (c) Customer shall promptly pay all outstanding
+Fees through the date of termination; and (d) the following provisions shall survive:
+Article I, Section 3.01 through 3.04, Article IV, Article V (Sections 5.01, 5.03, and 5.05),
+Article VI, Article VII, this Section 8.04, and Article IX.
+
+ARTICLE IX
+MISCELLANEOUS
+
+Section 9.01  Governing Law. This Agreement shall be governed by and construed in
+accordance with the laws of the State of Delaware, without regard to its conflict of
+laws principles. Each Party irrevocably submits to the exclusive jurisdiction of the
+state and federal courts located in Wilmington, Delaware for resolution of any disputes
+arising under this Agreement.
+
+Section 9.02  Entire Agreement. This Agreement, together with all Order Forms and
+exhibits attached hereto and incorporated herein by reference, constitutes the entire
+agreement between the Parties with respect to the subject matter hereof and supersedes
+all prior and contemporaneous negotiations, representations, warranties, agreements,
+and understandings between the Parties, whether oral or written, relating to the subject
+matter hereof. No modification or amendment to this Agreement shall be binding unless
+set forth in a written document signed by authorized representatives of both Parties.
+
+Section 9.03  Severability. If any provision of this Agreement is held to be invalid,
+illegal, or unenforceable under applicable law, such provision shall be modified to the
+minimum extent necessary to make it valid and enforceable, and the validity and
+enforceability of the remaining provisions shall not in any way be affected or impaired.
+
+Section 9.04  Notices. All notices required or permitted under this Agreement shall be
+in writing and shall be delivered: (a) personally; (b) by nationally recognized overnight
+courier; (c) by certified or registered mail, return receipt requested, postage prepaid;
+or (d) by email with written confirmation of receipt, to the addresses set forth on the
+signature page or such other address as a Party may designate in writing. Notices shall
+be deemed given upon personal delivery, one (1) business day after deposit with a courier,
+three (3) business days after mailing, or on the date sent by email (with confirmation).
+
+Section 9.05  Assignment. Neither Party may assign, delegate, or transfer this Agreement
+or any of its rights or obligations hereunder without the prior written consent of the
+other Party, which shall not be unreasonably withheld, conditioned, or delayed; provided,
+however, that either Party may assign this Agreement without consent to: (a) an Affiliate;
+or (b) a successor entity in connection with a merger, acquisition, corporate
+reorganization, or sale of all or substantially all of such Party's assets, provided
+that the successor assumes all obligations hereunder in writing. Any purported assignment
+in violation of this Section 9.05 shall be null and void.
+
+Section 9.06  Waiver. No failure or delay by either Party to exercise any right under
+this Agreement shall operate as a waiver thereof. No waiver of any provision of this
+Agreement shall be effective unless made in writing and signed by the waiving Party.
+
+Section 9.07  Force Majeure. Neither Party shall be liable for any failure or delay in
+performance under this Agreement to the extent such failure or delay is caused by
+circumstances beyond such Party's reasonable control, including acts of God, natural
+disasters, war, terrorism, civil unrest, government actions, or internet or
+telecommunications outages not caused by such Party ("Force Majeure Event"), provided
+that the affected Party gives prompt written notice and uses commercially reasonable
+efforts to resume performance. If a Force Majeure Event continues for more than sixty
+(60) days, either Party may terminate this Agreement upon written notice.
+
+Section 9.08  Counterparts. This Agreement may be executed in one or more counterparts,
+each of which shall be deemed an original, and all of which together shall constitute one
+and the same instrument. Electronic signatures shall be deemed valid and binding.
+
+[SIGNATURE PAGE FOLLOWS]
+
+IN WITNESS WHEREOF, the Parties have executed this Master Services Agreement as of the
+Effective Date first written above.
+
+NEXUS CLOUD TECHNOLOGIES, INC.             MERIDIAN BANCORP HOLDINGS, LLC
+
+By: ___________________________            By: ___________________________
+Name: _________________________            Name: _________________________
+Title: ________________________            Title: ________________________
+Date: _________________________            Date: _________________________
+
+
+EXHIBIT A — STATEMENT OF WORK NO. 1
+
+1.   Description of Services
+
+     Provider shall deliver the following services during the initial term commencing
+     on April 1, 2024 (the "SOW Effective Date"):
+
+     (a)  Cloud Infrastructure Migration: Migration of Customer's existing on-premises
+          data warehouse environment to Provider's managed cloud platform, including
+          data mapping, schema conversion, testing, and cutover support;
+
+     (b)  API Integration Services: Design, development, and testing of RESTful API
+          integrations between the migrated platform and Customer's core banking systems,
+          including real-time data feed connectivity; and
+
+     (c)  Training and Enablement: Delivery of up to twenty (20) hours of end-user
+          training sessions for up to fifty (50) of Customer's Authorized Users.
+
+2.   Deliverables and milestones
+
+     Milestone 1:  Infrastructure assessment and migration plan — due 30 days from
+                   SOW Effective Date.
+     Milestone 2:  Development environment deployment — due 60 days from SOW Effective Date.
+     Milestone 3:  User acceptance testing completion — due 120 days from SOW Effective Date.
+     Milestone 4:  Production cutover and go-live — due 150 days from SOW Effective Date.
+
+3.   Fees (Exhibit A)
+
+     The total fixed fee for the Services described in this Exhibit A shall be
+     USD $485,000, payable in milestone-based installments as follows:
+
+          (i)   USD $97,000 upon execution of this Exhibit A;
+          (ii)  USD $97,000 upon completion of Milestone 2;
+          (iii) USD $145,500 upon completion of Milestone 3; and
+          (iv)  USD $145,500 upon completion of Milestone 4.
+
+     Out-of-pocket expenses shall be reimbursed in accordance with Section 3.01 of
+     the Agreement, subject to a cap of USD $25,000 for the engagement.

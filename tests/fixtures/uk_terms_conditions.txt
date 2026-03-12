@@ -1,0 +1,316 @@
+TERMS AND CONDITIONS
+
+CloudVault Analytics Platform
+
+Version 3.2 — Effective Date: 1 February 2024
+
+These Terms and Conditions (these "Terms") govern the access to and use of the CloudVault
+Analytics Platform and related services (together, the "Platform") provided by CloudVault
+Limited, a company incorporated in England and Wales with registered number 11736492 and
+whose registered office is at 50 Broadway, London, SW1H 0BL ("CloudVault", "we", "us",
+"our"). Please read these Terms carefully before using the Platform.
+
+By clicking "I Accept", executing an Order Form that references these Terms, or otherwise
+accessing or using the Platform, the entity or individual identified in the applicable
+Order Form ("Customer", "you", "your") agrees to be bound by these Terms. If you are
+accepting these Terms on behalf of a company or other legal entity, you represent and
+warrant that you have the authority to bind that entity to these Terms.
+
+1.   Definitions
+
+1.1  In these Terms, the following words and expressions shall have the meanings given
+     to them below:
+
+     "Account" means the Customer's account for accessing the Platform, created upon
+     registration in accordance with clause 2.
+
+     "Authorised Users" means those employees or contractors of the Customer who are
+     authorised by the Customer to use the Platform under the subscription purchased,
+     as more particularly set out in the Order Form.
+
+     "Customer Data" means any data, content, or information uploaded, submitted, or
+     otherwise transmitted by the Customer or its Authorised Users to the Platform.
+
+     "Data Protection Legislation" means: (a) the UK General Data Protection Regulation
+     (as it forms part of domestic law in England and Wales by virtue of section 3 of
+     the European Union (Withdrawal) Act 2018) ("UK GDPR"); (b) the Data Protection
+     Act 2018; and (c) all other applicable laws relating to the processing of personal
+     data and privacy in force from time to time.
+
+     "Documentation" means the user guides, technical specifications, and other written
+     or electronic materials made available by CloudVault from time to time describing
+     the features and functionality of the Platform.
+
+     "Fees" means the subscription fees and any other charges payable by the Customer
+     as set out in the applicable Order Form, together with any interest accrued in
+     accordance with clause 5.
+
+     "Intellectual Property Rights" means all patents, trade marks, service marks, trade
+     names, domain names, copyright, rights in databases, design rights, rights in
+     confidential information and know-how, and all other intellectual property rights of
+     any nature whether registered or unregistered.
+
+     "Order Form" means a written or electronic order form agreed between CloudVault
+     and the Customer setting out, among other things, the subscription tier, number of
+     Authorised Users, applicable Fees, and any other relevant commercial terms.
+
+     "Personal Data" has the meaning given to it in the UK GDPR.
+
+     "Permitted Purpose" means the Customer's internal business purposes only, excluding
+     any use of the Platform to provide services to third parties or to develop competing
+     products or services.
+
+     "Subscription Term" means the subscription period specified in the applicable Order
+     Form, commencing on the date of activation of the Customer's Account.
+
+1.2  References to clauses are to clauses of these Terms. Clause headings are for
+     convenience only and shall not affect the interpretation of these Terms.
+
+1.3  In the event of any conflict between these Terms and an Order Form, the Order Form
+     shall take precedence to the extent of such conflict, unless expressly stated otherwise.
+
+2.   Access to the Platform
+
+2.1  Subject to these Terms and the Customer's timely payment of Fees, CloudVault grants
+     to the Customer a limited, non-exclusive, non-transferable, revocable licence during
+     the Subscription Term to access and use the Platform solely for the Permitted Purpose
+     and in accordance with the Documentation.
+
+2.2  The Customer shall procure that each Authorised User keeps their login credentials
+     confidential and does not share them with any other person. The Customer shall be
+     responsible for all activity that occurs under its Account, whether or not authorised
+     by the Customer.
+
+2.3  The Customer shall notify CloudVault immediately at security@cloudvault.io upon
+     becoming aware of any unauthorised access to or use of the Platform or any
+     compromise of any Authorised User's login credentials.
+
+2.4  CloudVault reserves the right to suspend access to the Platform without liability
+     where it reasonably suspects a security breach or material violation of these Terms,
+     provided that CloudVault shall notify the Customer as soon as reasonably practicable
+     following any such suspension and shall restore access promptly once the issue has
+     been resolved to CloudVault's reasonable satisfaction.
+
+3.   Acceptable use
+
+3.1  The Customer shall not, and shall ensure that its Authorised Users do not, use
+     the Platform to:
+
+     (a)  upload, store, process, or transmit any data or content that is unlawful,
+          harmful, threatening, abusive, defamatory, obscene, or otherwise objectionable;
+
+     (b)  infringe or misappropriate the Intellectual Property Rights, privacy rights,
+          or other rights of any third party;
+
+     (c)  introduce any virus, worm, Trojan horse, spyware, ransomware, or other malicious
+          code or material that is designed to adversely affect the operation of any
+          computer software, hardware, or network;
+
+     (d)  attempt to gain unauthorised access to any part of the Platform or to any
+          systems or networks connected to the Platform;
+
+     (e)  use the Platform in any way that imposes a disproportionate or unreasonable
+          load on the Platform's infrastructure;
+
+     (f)  reverse engineer, decompile, disassemble, or attempt to derive the source code
+          of any element of the Platform, except to the extent expressly permitted by
+          applicable law notwithstanding contractual prohibition; or
+
+     (g)  use the Platform for any purpose other than the Permitted Purpose, including
+          providing the Platform or its functionality as a service to third parties.
+
+3.2  CloudVault may, at its sole discretion and without prior notice, remove or disable
+     access to any Customer Data that CloudVault reasonably believes violates clause 3.1
+     above or applicable law. CloudVault shall notify the Customer as soon as reasonably
+     practicable following any such action.
+
+4.   Data protection
+
+4.1  Each party shall comply with the Data Protection Legislation in respect of any
+     Personal Data processed in connection with the Platform.
+
+4.2  To the extent CloudVault processes Personal Data contained within Customer Data on
+     the Customer's behalf, it shall do so only as a data processor acting on the
+     Customer's instructions. In such circumstances, the parties shall enter into a
+     data processing agreement in a form to be agreed between the parties and
+     incorporating the terms required under Article 28 of the UK GDPR.
+
+4.3  The Customer acts as data controller in respect of Personal Data submitted via
+     the Platform and is responsible for ensuring that it has an appropriate lawful basis
+     under the UK GDPR for transmitting such Personal Data to CloudVault.
+
+4.4  CloudVault shall implement and maintain appropriate technical and organisational
+     measures designed to protect Personal Data against accidental or unlawful
+     destruction, loss, alteration, unauthorised disclosure, or access, in accordance
+     with its security policy as published at https://cloudvault.io/security and updated
+     from time to time.
+
+4.5  CloudVault shall notify the Customer without undue delay upon becoming aware of a
+     Personal Data breach (as defined in the UK GDPR) affecting Customer Data, and shall
+     provide such information as the Customer reasonably requires to comply with its own
+     notification obligations under the UK GDPR and the Data Protection Act 2018.
+
+5.   Fees, billing and payment
+
+5.1  The Customer shall pay the Fees in advance on the billing cycle set out in the
+     Order Form (monthly or annual, as applicable). All Fees are quoted exclusive of VAT
+     or any other applicable taxes, which shall be payable in addition at the rate
+     prescribed by law.
+
+5.2  CloudVault shall collect payment via the payment method specified in the Order Form.
+     Where payment is by credit or debit card, the Customer authorises CloudVault to
+     charge the applicable Fees to that card on each billing cycle automatically.
+
+5.3  If any payment is not received by the due date (whether because a payment method
+     fails or otherwise), CloudVault may suspend the Customer's access to the Platform
+     upon five (5) Business Days' prior written notice, and interest shall accrue on
+     all overdue amounts at the rate of 8% per annum above the Bank of England's base
+     rate pursuant to the Late Payment of Commercial Debts (Interest) Act 1998.
+
+5.4  CloudVault may increase the Fees at the start of each Renewal Term by giving the
+     Customer not less than sixty (60) days' prior written notice. If the Customer does
+     not wish to accept the revised Fees, it may terminate the subscription by giving
+     written notice to CloudVault before the end of the current Subscription Term, and
+     no termination fee shall be payable in such circumstances.
+
+5.5  All Fees paid are non-refundable except as expressly set out in these Terms or
+     required by applicable law.
+
+6.   Intellectual property
+
+6.1  All Intellectual Property Rights in the Platform, the Documentation, and all
+     software, algorithms, interfaces, and other materials created or provided by
+     CloudVault in connection with these Terms shall vest in and remain the property
+     of CloudVault or its licensors. These Terms do not transfer any ownership of
+     Intellectual Property Rights to the Customer.
+
+6.2  Subject to clause 6.1, all Intellectual Property Rights in the Customer Data shall
+     vest in and remain the property of the Customer or its licensors. The Customer
+     grants CloudVault a limited, non-exclusive, royalty-free licence to access, process,
+     and store the Customer Data during the Subscription Term solely to the extent
+     necessary to provide the Platform to the Customer.
+
+6.3  CloudVault may use aggregated, anonymised, and de-identified data derived from
+     the Customer's use of the Platform for the purposes of improving the Platform
+     and generating analytics insights, provided that such data cannot reasonably be
+     used to identify the Customer or any individual.
+
+7.   Limitation of liability
+
+7.1  Nothing in these Terms shall limit or exclude either party's liability for:
+
+     (a)  death or personal injury resulting from negligence;
+
+     (b)  fraud or fraudulent misrepresentation; or
+
+     (c)  any liability which cannot be limited or excluded by English law.
+
+7.2  Subject to clause 7.1, to the maximum extent permitted by applicable law, neither
+     CloudVault nor the Customer shall be liable to the other, whether in contract, tort
+     (including negligence), breach of statutory duty, or otherwise, for any:
+
+     (a)  loss of revenue, profits, or business;
+
+     (b)  loss of anticipated savings;
+
+     (c)  loss of data or information;
+
+     (d)  loss of goodwill; or
+
+     (e)  indirect, consequential, or special loss,
+
+     arising under or in connection with these Terms, whether or not such losses were
+     foreseeable or a party had been advised of the possibility of such losses.
+
+7.3  Subject to clauses 7.1 and 7.2, CloudVault's total aggregate liability to the
+     Customer under or in connection with these Terms, however arising, shall not exceed
+     the total Fees paid by the Customer to CloudVault in the twelve (12) month period
+     immediately preceding the event giving rise to the claim.
+
+7.4  The Customer acknowledges that the Fees reflect the allocation of risk set out in
+     this clause 7, and that CloudVault would not enter into these Terms on equivalent
+     commercial terms without these limitations.
+
+8.   Term and termination
+
+8.1  These Terms shall commence on the date the Customer accepts them in accordance with
+     the introduction above and shall continue for the Subscription Term and any
+     subsequent Renewal Terms (as defined in the applicable Order Form), unless
+     terminated earlier in accordance with this clause 8.
+
+8.2  Unless either party gives written notice to terminate not less than thirty (30) days
+     before the end of the then-current Subscription Term, the subscription shall
+     automatically renew for a further Subscription Term of the same length.
+
+8.3  Either party may terminate these Terms immediately by written notice if:
+
+     (a)  the other party commits a material breach of these Terms and (where remediable)
+          fails to remedy that breach within thirty (30) days of written notice requiring
+          it to do so; or
+
+     (b)  the other party enters into liquidation, administration, or receivership, or
+          makes any arrangement with its creditors generally, or is unable to pay its
+          debts as they fall due.
+
+8.4  CloudVault may terminate these Terms immediately and without liability to the
+     Customer if the Customer or any Authorised User commits a material breach of
+     clause 3 (Acceptable Use) of these Terms.
+
+8.5  On termination or expiry of these Terms for any reason:
+
+     (a)  the Customer's right to access and use the Platform shall immediately cease;
+
+     (b)  the Customer shall export any Customer Data it requires within thirty (30) days
+          of the date of termination, after which CloudVault may permanently delete all
+          Customer Data without further notice, subject to any overriding legal obligation
+          to retain such data; and
+
+     (c)  clauses 1, 4, 6.1, 7, 9, and 10 shall continue in full force and effect after
+          termination.
+
+9.   Governing law and dispute resolution
+
+9.1  These Terms and any dispute or claim (including non-contractual disputes or claims)
+     arising out of or in connection with them or their subject matter shall be governed
+     by and construed in accordance with English law.
+
+9.2  The parties shall use their reasonable endeavours to negotiate in good faith to
+     resolve any dispute that arises between them under or in connection with these Terms.
+     If a dispute is not resolved within thirty (30) days of written notice of the dispute
+     being given by one party to the other, either party may submit the dispute to the
+     exclusive jurisdiction of the courts of England and Wales.
+
+10.  General
+
+10.1 These Terms, together with any Order Form and any data processing agreement entered
+     into pursuant to clause 4.2, constitute the entire agreement between the parties
+     in relation to the Platform and supersede all prior representations, agreements,
+     negotiations, and understandings between the parties relating to the same subject
+     matter.
+
+10.2 No failure or delay by either party to enforce any right or provision of these
+     Terms shall constitute a waiver of that right or provision. A waiver is only
+     effective if given in writing.
+
+10.3 If any provision of these Terms is found by a court of competent jurisdiction to be
+     invalid, void, or unenforceable, that provision shall be severed and the remainder
+     of these Terms shall continue in full force and effect.
+
+10.4 The Customer may not assign, novate, or transfer its rights or obligations under
+     these Terms without CloudVault's prior written consent, which shall not be
+     unreasonably withheld. CloudVault may assign these Terms to any Affiliate or to a
+     successor entity in connection with a merger, acquisition, or sale of all or
+     substantially all of its assets.
+
+10.5 CloudVault may update these Terms from time to time by posting revised Terms on its
+     website and notifying the Customer by email. Continued use of the Platform after
+     the effective date of any updated Terms constitutes acceptance of those changes.
+     If the Customer does not accept the changes, it may terminate in accordance with
+     clause 8.3(a), treating the change as a material breach where the change materially
+     prejudices the Customer's rights.
+
+10.6 Nothing in these Terms creates, or shall be construed as creating, any partnership,
+     joint venture, or agency relationship between CloudVault and the Customer.
+
+10.7 CloudVault Limited, registered in England and Wales. Registered office:
+     50 Broadway, London, SW1H 0BL. VAT registration number: GB 312 4487 90.

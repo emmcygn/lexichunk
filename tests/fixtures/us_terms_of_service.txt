@@ -1,0 +1,420 @@
+TERMS OF SERVICE
+
+Strata Software Platform
+
+Last Updated: January 10, 2024
+Effective Date: February 1, 2024
+
+PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA
+SOFTWARE PLATFORM. BY CLICKING "I AGREE," SIGNING AN ORDER FORM, OR OTHERWISE ACCESSING
+OR USING THE PLATFORM, YOU AGREE TO BE BOUND BY THESE TERMS OF SERVICE (THESE "TERMS").
+IF YOU DO NOT AGREE TO THESE TERMS, DO NOT ACCESS OR USE THE PLATFORM.
+
+These Terms are entered into between Strata Technologies, Inc., a Delaware corporation
+("Strata," "we," "us," or "our"), and the person or entity accepting these Terms
+("Customer," "you," or "your"). These Terms govern your access to and use of the Strata
+software-as-a-service platform and related products and services.
+
+Section 1.   Definitions
+
+Section 1.1  "Account" means a Customer-specific account enabling access to the Platform,
+created upon registration and subject to the security obligations in Section 2.3.
+
+Section 1.2  "Authorized Users" means the individuals (employees, agents, or contractors
+of Customer) who Customer permits to access the Platform under Customer's subscription,
+up to the maximum user count specified in the applicable Order Form.
+
+Section 1.3  "Customer Content" means any data, files, documents, information, and other
+content submitted by Customer or its Authorized Users to the Platform, including any
+Personal Information included therein.
+
+Section 1.4  "Documentation" means the technical and user documentation for the Platform
+made available by Strata at docs.strataplatform.io, as updated from time to time in
+Strata's sole discretion.
+
+Section 1.5  "Intellectual Property Rights" means all patents, patent applications,
+copyrights, trade secrets, trademarks, service marks, trade dress, moral rights, rights
+of publicity, and all other intellectual property or proprietary rights recognized in
+any jurisdiction worldwide, whether registered or unregistered.
+
+Section 1.6  "Order Form" means a written or online ordering document or subscription
+agreement that references these Terms, identifies the subscription tier and Authorized
+User count, and sets forth applicable fees and billing terms.
+
+Section 1.7  "Personal Information" means any information that identifies or could
+reasonably be used to identify a natural person, as defined under applicable privacy
+laws including the California Consumer Privacy Act (as amended by the California Privacy
+Rights Act) ("CCPA/CPRA"), and other applicable federal and state privacy statutes.
+
+Section 1.8  "Platform" means Strata's proprietary software-as-a-service platform,
+including all associated software, infrastructure, features, APIs, integrations, and
+related services made available by Strata under these Terms.
+
+Section 1.9  "Professional Services" means any implementation, configuration, training,
+or other professional services provided by Strata as described in a Statement of Work
+executed pursuant to Section 2.5.
+
+Section 1.10 "Subscription Fees" means the recurring fees for access to the Platform as
+specified in the applicable Order Form, excluding any one-time or Professional Services fees.
+
+Section 1.11 "Subscription Term" means the subscription period specified in the Order
+Form, commencing on the date the Account is activated and automatically renewing as
+set forth in Section 7.1.
+
+Section 1.12 "Third-Party Services" means services, applications, or data sources
+provided by parties other than Strata that may interoperate with the Platform through
+integrations or APIs.
+
+Section 2.   License Grant and Access
+
+Section 2.1  License Grant. Subject to Customer's compliance with these Terms and timely
+payment of all Subscription Fees, Strata grants Customer a limited, non-exclusive,
+non-transferable, non-sublicensable, revocable license during the Subscription Term to
+access and use the Platform solely for Customer's internal business purposes and in
+accordance with the Documentation and any usage limits set forth in the Order Form.
+
+Section 2.2  Restrictions. Customer shall not, and shall not permit any Authorized User
+or third party to:
+
+     (a)  copy, modify, adapt, translate, or create derivative works of the Platform or
+          the Documentation;
+
+     (b)  reverse engineer, decompile, disassemble, or attempt to discover the source
+          code, object code, or underlying algorithms of the Platform or any component
+          thereof, except to the extent expressly permitted by applicable law
+          notwithstanding this restriction;
+
+     (c)  sublicense, sell, resell, transfer, assign, or otherwise dispose of the
+          Platform or any rights therein to any third party;
+
+     (d)  use the Platform to provide timesharing, service bureau, or software-as-a-
+          service functionality for the benefit of third parties;
+
+     (e)  remove, alter, or obscure any proprietary notices, labels, or marks on the
+          Platform or Documentation;
+
+     (f)  access the Platform for the purpose of building a competitive product or
+          service or copying its features, functionality, or user interface; or
+
+     (g)  use the Platform in violation of any applicable law or regulation, including
+          any applicable export control laws or regulations.
+
+Section 2.3  Account Security. Customer is responsible for maintaining the security of
+its Account credentials and for all activity conducted through its Account. Customer
+shall: (a) require each Authorized User to use strong, unique passwords; (b) implement
+multi-factor authentication if offered and required by Strata's security policy;
+(c) notify Strata promptly at security@strataplatform.io upon discovering any
+unauthorized access to or use of Customer's Account; and (d) not allow any Authorized
+User to share credentials with any other individual. Strata shall not be liable for any
+loss resulting from Customer's failure to comply with this Section 2.3.
+
+Section 2.4  Acceptable Use Policy. Customer's use of the Platform is also subject to
+Strata's Acceptable Use Policy available at strataplatform.io/aup, which is incorporated
+into these Terms by this reference and may be updated by Strata from time to time upon
+notice to Customer.
+
+Section 2.5  Professional Services. The parties may agree to Professional Services under
+a mutually executed Statement of Work ("SOW") that references these Terms. Each SOW is
+subject to these Terms and, in the event of any conflict, these Terms control unless
+the SOW expressly identifies and modifies a specific provision of these Terms.
+
+Section 2.6  Third-Party Services. The Platform may allow Customer to integrate or
+connect with Third-Party Services. Strata does not control Third-Party Services and
+disclaims all liability arising from or relating to Customer's use of Third-Party
+Services. Customer's use of Third-Party Services is governed solely by the terms of
+agreement between Customer and the applicable third-party provider.
+
+Section 3.   Restrictions on Use
+
+Section 3.1  Prohibited Content. Customer shall not upload, store, process, or transmit
+any Customer Content through the Platform that: (a) is illegal or facilitates illegal
+activity; (b) infringes any third party's Intellectual Property Rights; (c) contains
+malware, viruses, or other harmful or disruptive code; (d) violates any third party's
+privacy rights or applicable data protection laws; or (e) is false, misleading, or
+constitutes unfair competition.
+
+Section 3.2  Usage Limits. Customer's use of the Platform is subject to the usage limits
+(including data storage caps, API call limits, and Authorized User counts) specified in
+the applicable Order Form. Strata reserves the right to assess overage charges for usage
+that exceeds the applicable limits, as set forth in the Order Form.
+
+Section 3.3  Export Compliance. Customer agrees to comply fully with all applicable
+export control laws and regulations, including the Export Administration Regulations
+administered by the U.S. Department of Commerce and the economic sanctions programs
+administered by the U.S. Department of Treasury's Office of Foreign Assets Control.
+Customer represents and warrants that neither Customer nor any Authorized User is
+located in, under the control of, or a national or resident of any embargoed country
+or on any prohibited party list.
+
+Section 4.   Privacy and Data
+
+Section 4.1  Privacy Policy. Strata's collection and use of Personal Information is
+governed by Strata's Privacy Policy at strataplatform.io/privacy, which is incorporated
+into these Terms by reference. By using the Platform, Customer consents to Strata's
+collection and use of Personal Information as described in the Privacy Policy.
+
+Section 4.2  Customer Content Ownership. As between the parties, Customer retains all
+right, title, and interest in and to the Customer Content. Customer hereby grants Strata
+a non-exclusive, worldwide, royalty-free license to access, host, copy, process, and
+display Customer Content solely as necessary to provide and improve the Platform and
+perform Strata's obligations under these Terms.
+
+Section 4.3  Data Processing. To the extent Strata processes Personal Information
+contained in Customer Content on Customer's behalf, the parties shall execute a Data
+Processing Agreement ("DPA") in a form provided by Strata, which governs such processing
+and is hereby incorporated into these Terms by reference. In the event of any conflict
+between the DPA and these Terms with respect to the processing of Personal Information,
+the DPA shall control.
+
+Section 4.4  Data Security. Strata implements industry-standard technical and
+organizational measures designed to protect Customer Content against unauthorized access,
+disclosure, alteration, or destruction. Strata's current security practices are described
+in its Security Overview at strataplatform.io/security. Strata shall notify Customer
+without undue delay following Strata's discovery of any security breach that affects
+Customer Content.
+
+Section 4.5  Data Retention and Deletion. Upon expiration or termination of the
+Subscription Term, Strata will make Customer Content available for export for thirty
+(30) days following termination, after which Strata may delete Customer Content
+from its systems. Strata's backup copies may be retained for up to ninety (90) days
+thereafter in accordance with its standard data retention practices.
+
+Section 5.   Payment Terms
+
+Section 5.1  Subscription Fees. Customer shall pay the Subscription Fees in accordance
+with the billing cycle (monthly or annual) specified in the Order Form. All Subscription
+Fees are due in advance at the start of each billing period.
+
+Section 5.2  Invoicing. Strata will charge Subscription Fees to the payment method on
+file automatically at the start of each billing cycle. For annual subscriptions, Strata
+will send an invoice at least thirty (30) days before the renewal date.
+
+Section 5.3  Late Payments. If any payment is not received when due, Strata may: (a)
+suspend Customer's access to the Platform after providing five (5) days' written notice
+to Customer; and (b) charge interest on all overdue amounts at the rate of 1.5% per
+month, or the maximum rate permitted by applicable law, whichever is less, from the
+date such amounts were due until paid in full.
+
+Section 5.4  Taxes. The Subscription Fees do not include any applicable sales, use,
+value-added, withholding, or similar taxes or levies. Customer is solely responsible
+for all taxes associated with purchases under these Terms, excluding taxes based on
+Strata's net income.
+
+Section 5.5  Fee Increases. Strata may increase Subscription Fees upon renewal of any
+Order Form by providing Customer with at least sixty (60) days' prior written notice.
+Customer's continued use of the Platform after the renewal date constitutes acceptance
+of the revised Subscription Fees. If Customer does not agree to the increase, Customer
+may elect not to renew its subscription in accordance with Section 7.2.
+
+Section 5.6  No Refunds. Except as expressly provided in these Terms or required by
+applicable law, all fees paid are non-refundable. No refunds or credits will be issued
+for partial months of service, unused Authorized User seats, or early termination by
+Customer, except as set forth in Section 7.4.
+
+Section 6.   Intellectual Property
+
+Section 6.1  Strata Ownership. Strata and its licensors own all right, title, and
+interest in and to the Platform, Documentation, and all improvements, modifications,
+and derivative works thereof, including all Intellectual Property Rights therein.
+These Terms do not transfer to Customer any ownership interest in the Platform or
+any Intellectual Property Rights of Strata.
+
+Section 6.2  Feedback. If Customer or any Authorized User provides Strata with any
+suggestions, enhancement requests, recommendations, corrections, or other feedback
+("Feedback"), Customer hereby grants Strata a royalty-free, worldwide, perpetual,
+irrevocable, and fully sublicensable license to use, reproduce, modify, and incorporate
+the Feedback into the Platform and related products without restriction or compensation
+to Customer.
+
+Section 6.3  Usage Data. Strata may collect and use aggregated, anonymized data
+regarding Customer's use of the Platform ("Usage Data") for purposes of product
+development, analytics, marketing, and other business purposes. Usage Data will not
+include Customer Content or personally identifiable information unless de-identified
+in accordance with applicable law.
+
+Section 7.   Term and Termination
+
+Section 7.1  Term. These Terms commence on the Effective Date and continue until all
+Order Forms hereunder have expired or been terminated. Each Order Form shall specify
+its Subscription Term and shall automatically renew for successive periods equal to
+the initial Subscription Term unless either party provides written notice of non-renewal
+not less than thirty (30) days before the end of the then-current Subscription Term.
+
+Section 7.2  Termination for Convenience. Either party may terminate these Terms or
+any Order Form upon thirty (30) days' prior written notice to the other party, provided
+that Customer shall not be entitled to any refund of prepaid Subscription Fees for any
+unused portion of the Subscription Term following termination for convenience.
+
+Section 7.3  Termination for Cause. Either party may terminate these Terms or any
+Order Form immediately upon written notice if: (a) the other party materially breaches
+these Terms or any Order Form and fails to cure such breach within thirty (30) days
+after receiving written notice of the breach; (b) the other party becomes the subject
+of a bankruptcy, insolvency, reorganization, receivership, or assignment for the benefit
+of creditors proceeding, or if Customer ceases to operate in the normal course of
+business; or (c) Customer violates Section 2.2 or Section 3.1 of these Terms.
+
+Section 7.4  Refunds on Termination for Cause by Customer. If Customer terminates these
+Terms pursuant to Section 7.3 due to Strata's material breach, Strata shall refund to
+Customer a pro-rata portion of prepaid Subscription Fees corresponding to the unused
+portion of the Subscription Term following the effective date of termination.
+
+Section 7.5  Effect of Termination. Upon expiration or termination of these Terms for
+any reason: (a) all licenses granted to Customer under these Terms shall immediately
+terminate; (b) Customer shall promptly export its Customer Content pursuant to Section
+4.5; (c) all outstanding Subscription Fees for the remainder of the then-current
+Subscription Term (if termination is due to Customer's breach under Section 7.3) shall
+become immediately due and payable; and (d) the following Sections shall survive:
+Section 1, Section 3, Section 4.5, Section 5 (with respect to amounts owed), Section 6,
+Section 7.5, Section 8, Section 9, Section 10, and Section 11.
+
+Section 8.   Disclaimer of Warranties
+
+Section 8.1  AS IS. THE PLATFORM AND ALL RELATED SERVICES ARE PROVIDED "AS IS" AND "AS
+AVAILABLE" WITHOUT WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE
+LAW, STRATA AND ITS AFFILIATES, LICENSORS, SERVICE PROVIDERS, EMPLOYEES, AGENTS,
+OFFICERS, AND DIRECTORS EXPRESSLY DISCLAIM ALL WARRANTIES, WHETHER EXPRESS, IMPLIED,
+STATUTORY, OR OTHERWISE, INCLUDING ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+
+Section 8.2  No Guarantee of Availability. STRATA DOES NOT WARRANT THAT THE PLATFORM
+WILL BE UNINTERRUPTED, ERROR-FREE, SECURE, OR FREE OF VIRUSES OR OTHER HARMFUL
+COMPONENTS. STRATA DOES NOT WARRANT THAT THE RESULTS OBTAINED FROM USE OF THE PLATFORM
+WILL BE ACCURATE OR RELIABLE. WITHOUT WARRANTY OF ANY KIND, THE CUSTOMER ASSUMES ALL
+RISK FROM USE OF THE PLATFORM, INCLUDING ALL RISKS RELATING TO DATA LOSS OR CORRUPTION.
+
+Section 8.3  Third-Party Disclaimer. STRATA MAKES NO WARRANTY REGARDING ANY
+THIRD-PARTY SERVICES OR THIRD-PARTY CONTENT ACCESSIBLE THROUGH THE PLATFORM AND
+DISCLAIMS ALL LIABILITY THEREFOR.
+
+Section 9.   Limitation of Liability
+
+Section 9.1  Exclusion of Consequential Damages. IN NO EVENT SHALL STRATA OR ITS
+AFFILIATES, LICENSORS, SERVICE PROVIDERS, EMPLOYEES, AGENTS, OFFICERS, OR DIRECTORS
+BE LIABLE TO CUSTOMER FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL,
+OR PUNITIVE DAMAGES, INCLUDING DAMAGES FOR LOSS OF PROFITS, LOSS OF REVENUE, LOSS OF
+BUSINESS, LOSS OF GOODWILL, LOSS OF DATA, LOSS OF USE, OR COST OF SUBSTITUTE SERVICES,
+EVEN IF STRATA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND REGARDLESS OF
+WHETHER SUCH DAMAGES ARE BASED ON CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT
+LIABILITY, STATUTE, OR ANY OTHER LEGAL OR EQUITABLE THEORY.
+
+Section 9.2  Cap on Liability. IN NO EVENT SHALL STRATA'S TOTAL CUMULATIVE LIABILITY
+TO CUSTOMER ARISING OUT OF OR RELATING TO THESE TERMS OR THE PLATFORM, WHETHER IN
+CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR OTHERWISE, EXCEED THE
+GREATER OF: (A) THE TOTAL SUBSCRIPTION FEES ACTUALLY PAID BY CUSTOMER TO STRATA
+DURING THE TWELVE (12) MONTH PERIOD IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO
+THE CLAIM; OR (B) ONE HUNDRED U.S. DOLLARS ($100). THE PARTIES ACKNOWLEDGE THAT THE
+SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA
+WOULD NOT PROVIDE THE PLATFORM WITHOUT THESE LIMITATIONS.
+
+Section 9.3  Exceptions. The limitations in Section 9.1 and Section 9.2 shall not
+apply to: (a) Customer's payment obligations under Section 5; (b) either party's
+indemnification obligations under Section 10; (c) either party's breach of its
+confidentiality obligations; (d) any liability arising from a party's gross negligence
+or willful misconduct; or (e) any liability that cannot be excluded or limited under
+applicable law.
+
+Section 9.4  Essential Basis. THE PARTIES ACKNOWLEDGE THAT THE LIMITATIONS OF LIABILITY
+IN THIS SECTION 9 ARE AN ESSENTIAL ELEMENT OF THE BASIS OF THE BARGAIN BETWEEN THE
+PARTIES, WITHOUT WHICH STRATA WOULD NOT HAVE ENTERED INTO THESE TERMS.
+
+Section 10.  Indemnification
+
+Section 10.1 Indemnification by Strata. Strata shall defend, indemnify, and hold
+harmless Customer and its officers, directors, employees, and agents ("Customer
+Indemnitees") from and against any third-party claims, demands, suits, and proceedings,
+and all associated losses, costs, damages, and expenses (including reasonable attorneys'
+fees) ("Claims"), to the extent arising from any allegation that the Platform, as
+provided by Strata and used by Customer in accordance with these Terms, infringes
+any U.S. patent, copyright, trademark, or trade secret right of a third party. If the
+Platform becomes or is likely to become the subject of an infringement claim, Strata
+may, at its option and expense: (a) procure for Customer the right to continue using the
+Platform; (b) modify the Platform to make it non-infringing; or (c) terminate Customer's
+access to the infringing portion and refund a pro-rata portion of prepaid Subscription
+Fees. Strata shall have no obligation under this Section 10.1 if the alleged
+infringement arises from: (i) Customer Content; (ii) modification of the Platform by
+Customer; (iii) use of the Platform in combination with third-party products or services
+not approved by Strata; or (iv) Customer's violation of these Terms.
+
+Section 10.2 Indemnification by Customer. Customer shall defend, indemnify, and hold
+harmless Strata and its officers, directors, employees, and agents ("Strata Indemnitees")
+from and against any Claims arising from: (a) Customer Content, including any allegation
+that Customer Content infringes any third-party rights; (b) Customer's breach of these
+Terms; (c) Customer's violation of applicable law; (d) Customer's use of Third-Party
+Services; or (e) Customer's gross negligence or willful misconduct.
+
+Section 10.3 Indemnification Procedure. The Indemnified Party shall: (a) promptly notify
+the Indemnifying Party in writing of any Claim; (b) give the Indemnifying Party sole
+control of the defense and settlement of the Claim, provided that any settlement that
+imposes liability or restriction on the Indemnified Party requires the Indemnified
+Party's prior written consent; and (c) provide the Indemnifying Party with reasonable
+assistance at the Indemnifying Party's expense. The Indemnified Party may participate
+in its defense at its own expense.
+
+Section 11.  General Provisions
+
+Section 11.1 Governing Law. These Terms shall be governed by and construed in accordance
+with the laws of the State of California, without giving effect to any choice-of-law or
+conflict-of-law provisions. Any legal action or proceeding arising under these Terms
+shall be brought exclusively in the federal or state courts located in San Francisco
+County, California, and each party irrevocably consents to the personal jurisdiction
+and venue of such courts.
+
+Section 11.2 Entire Agreement. These Terms, together with all Order Forms, the Privacy
+Policy, the Acceptable Use Policy, and any executed DPA or SOW, constitute the entire
+agreement between the parties with respect to the subject matter hereof and supersede
+all prior or contemporaneous agreements, negotiations, representations, and
+understandings, whether oral or written, relating to such subject matter. In the event
+of any conflict between these Terms and an Order Form, these Terms shall control unless
+the Order Form expressly identifies and modifies a specific provision.
+
+Section 11.3 Modifications. Strata may modify these Terms from time to time by posting
+revised Terms on its website and providing Customer with thirty (30) days' prior written
+notice. If Customer objects to any modification, Customer's sole remedy is to terminate
+its subscription before the effective date of the modification in accordance with Section
+7.2. Continued use of the Platform after the effective date of any modification
+constitutes acceptance of the modified Terms.
+
+Section 11.4 Assignment. Customer may not assign, transfer, or delegate these Terms or
+any of its rights or obligations hereunder, whether by operation of law or otherwise,
+without Strata's prior written consent, which may be withheld in Strata's sole
+discretion. Strata may assign these Terms or any rights hereunder without Customer's
+consent to an Affiliate or to a successor entity in connection with a merger,
+acquisition, or sale of all or substantially all of Strata's assets. Any purported
+assignment by Customer in violation of this Section 11.4 shall be null and void.
+
+Section 11.5 Severability. If any provision of these Terms is held invalid, illegal, or
+unenforceable, it shall be enforced to the maximum extent permissible, and the validity
+and enforceability of the remaining provisions shall not be affected.
+
+Section 11.6 Waiver. No failure or delay by either party in exercising any right under
+these Terms shall constitute a waiver of that right. Any waiver must be in writing and
+signed by an authorized representative of the waiving party.
+
+Section 11.7 Notices. Notices to Strata shall be sent to Strata Technologies, Inc.,
+Attention: Legal Department, 345 California Street, Suite 1200, San Francisco,
+California 94104, with a copy to legal@strataplatform.io. Notices to Customer shall
+be sent to the address or email address associated with Customer's Account or Order Form.
+Notices shall be deemed effective upon personal delivery, one (1) business day after
+deposit with an overnight courier, or when sent by email with electronic confirmation.
+
+Section 11.8 Force Majeure. Neither party shall be in default or liable for any delay
+or failure to perform under these Terms to the extent that such failure is caused by
+circumstances beyond such party's reasonable control, including acts of God, fires,
+floods, earthquakes, riots, war, epidemics, pandemics, government actions, or internet
+or power outages not caused by such party, provided that the delayed party provides
+prompt written notice and uses commercially reasonable efforts to resume performance.
+
+Section 11.9 Relationship of the Parties. The parties are independent contractors.
+Nothing in these Terms creates a partnership, joint venture, agency, franchise,
+or employment relationship between the parties. Neither party has authority to bind
+the other or incur any obligation on the other's behalf.
+
+Section 11.10 Counterparts; Electronic Signatures. These Terms may be accepted and
+executed in counterparts. Electronic signatures, clickwrap acceptances, and other
+electronic forms of agreement shall be deemed valid and binding to the same extent as
+original ink signatures.
+
+[END OF TERMS OF SERVICE]
+
+Strata Technologies, Inc. | 345 California Street, Suite 1200 | San Francisco, CA 94104
+legal@strataplatform.io | strataplatform.io

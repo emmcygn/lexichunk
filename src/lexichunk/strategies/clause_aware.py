@@ -1,0 +1,405 @@
+"""Clause-aware chunking strategy — primary chunking logic.
+
+This module provides :class:`ClauseAwareChunker`, which converts the flat list
+of :class:`~lexichunk.parsers.structure.ParsedClause` objects produced by
+:class:`~lexichunk.parsers.structure.StructureParser` into a list of
+:class:`~lexichunk.models.LegalChunk` objects.  Chunks respect clause
+boundaries: a clause is never split mid-way unless it exceeds the configured
+token limit.
+"""
+
+from __future__ import annotations
+
+import re
+from typing import Optional
+
+from ..models import (
+    ClauseType,
+    HierarchyNode,
+    Jurisdiction,
+    LegalChunk,
+)
+from ..parsers.structure import ParsedClause
+
+
+# ---------------------------------------------------------------------------
+# Token approximation
+# ---------------------------------------------------------------------------
+
+
+def _approx_tokens(text: str) -> int:
+    """Approximate token count using a fixed character-to-token ratio.
+
+    Uses the heuristic that one token is approximately four characters.  This
+    avoids any external dependency on a real tokeniser.
+
+    Args:
+        text: The string whose token count is to be estimated.
+
+    Returns:
+        An integer token estimate, always at least 1.
+    """
+    return max(1, len(text) // 4)
+
+
+# ---------------------------------------------------------------------------
+# Main chunker
+# ---------------------------------------------------------------------------
+
+
+class ClauseAwareChunker:
+    """Chunk a legal document at clause boundaries.
+
+    Operates on the flat list of :class:`~lexichunk.parsers.structure.ParsedClause`
+    objects produced by :class:`~lexichunk.parsers.structure.StructureParser`.
+    Respects clause boundaries — never splits mid-clause unless the clause
+    exceeds ``max_chunk_size``.
+
+    Args:
+        jurisdiction: UK or US.
+        max_chunk_size: Maximum chunk size in approximate tokens (default 512).
+        min_chunk_size: Minimum chunk size; smaller clauses are merged with
+            the next sibling (default 64).
+        document_id: Optional document identifier attached to every chunk.
+    """
+
+    def __init__(
+        self,
+        jurisdiction: Jurisdiction,
+        max_chunk_size: int = 512,
+        min_chunk_size: int = 64,
+        document_id: Optional[str] = None,
+    ) -> None:
+        self._jurisdiction = jurisdiction
+        self._max_chunk_size = max_chunk_size
+        self._min_chunk_size = min_chunk_size
+        self._document_id = document_id
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def chunk(
+        self,
+        clauses: list[ParsedClause],
+        original_text: str,
+    ) -> list[LegalChunk]:
+        """Convert parsed clauses into :class:`~lexichunk.models.LegalChunk` objects.
+
+        Algorithm:
+
+        1. For each :class:`~lexichunk.parsers.structure.ParsedClause`, compute
+           its approximate token size.
+        2. If ``size < min_chunk_size`` → mark for merging with the next sibling.
+        3. If ``size > max_chunk_size`` → split at sub-clause boundaries.
+        4. Otherwise → emit as a single :class:`~lexichunk.models.LegalChunk`.
+        5. Assign sequential ``index`` values.
+        6. Build ``hierarchy_path`` for each chunk.
+
+        Preamble clauses (``level == -99``) that contain only whitespace are
+        skipped.  Non-empty preambles are included as their own chunk.
+
+        Args:
+            clauses: Flat list from
+                :meth:`~lexichunk.parsers.structure.StructureParser.parse`,
+                in document order.
+            original_text: The original document text (used for char offsets).
+
+        Returns:
+            List of :class:`~lexichunk.models.LegalChunk` objects in document
+            order.
+        """
+        # Build a fast identifier → ParsedClause lookup for hierarchy walking.
+        clause_map: dict[str, ParsedClause] = {c.identifier: c for c in clauses}
+
+        # ------------------------------------------------------------------
+        # Step 1: Filter and expand clauses into groups.
+        #
+        # Each "group" is a list[ParsedClause] that will eventually become a
+        # single LegalChunk.  Oversized clauses are expanded into multiple
+        # sub-groups here.
+        # ------------------------------------------------------------------
+        groups: list[list[ParsedClause]] = []
+
+        for clause in clauses:
+            # Skip empty preamble clauses.
+            if clause.level == -99 and not clause.content.strip():
+                continue
+
+            tokens = _approx_tokens(clause.content)
+
+            if tokens > self._max_chunk_size:
+                # Split into smaller pieces.
+                sub_clauses = self._split_oversized_clause(clause, clauses)
+                # Each sub-clause becomes its own initial group.
+                for sub in sub_clauses:
+                    groups.append([sub])
+            else:
+                groups.append([clause])
+
+        # ------------------------------------------------------------------
+        # Step 2: Merge groups that are below min_chunk_size.
+        # ------------------------------------------------------------------
+        groups = self._merge_small_clauses(groups)
+
+        # ------------------------------------------------------------------
+        # Step 3: Convert each group into a LegalChunk.
+        # ------------------------------------------------------------------
+        legal_chunks: list[LegalChunk] = []
+
+        for idx, group in enumerate(groups):
+            chunk = self._group_to_chunk(group, idx, clause_map)
+            legal_chunks.append(chunk)
+
+        return legal_chunks
+
+    # ------------------------------------------------------------------
+    # Hierarchy path
+    # ------------------------------------------------------------------
+
+    def _build_hierarchy_path(
+        self,
+        clause: ParsedClause,
+        clause_map: dict[str, ParsedClause],
+    ) -> str:
+        """Build a human-readable hierarchy path string.
+
+        Walks up the ``parent_identifier`` chain using *clause_map* to collect
+        ancestor nodes, reverses them, then joins with ``" > "``.
+
+        If a node has a title it is formatted as ``"identifier — title"``
+        (e.g. ``"Article VII — Indemnification"``); otherwise just the
+        identifier is used.
+
+        Args:
+            clause: The clause to build the path for.
+            clause_map: Dict mapping ``identifier`` → :class:`ParsedClause`.
+
+        Returns:
+            Hierarchy path string, e.g.
+            ``"Article VII — Indemnification > Section 7.2 > (a)"``.
+        """
+        parts: list[str] = []
+        current: Optional[ParsedClause] = clause
+
+        while current is not None:
+            if current.title:
+                label = f"{current.identifier} \u2014 {current.title}"
+            else:
+                label = current.identifier
+            parts.append(label)
+
+            parent_id = current.parent_identifier
+            if parent_id is None:
+                break
+            current = clause_map.get(parent_id)
+
+        parts.reverse()
+        return " > ".join(parts)
+
+    # ------------------------------------------------------------------
+    # Oversized clause splitting
+    # ------------------------------------------------------------------
+
+    def _split_oversized_clause(
+        self,
+        clause: ParsedClause,
+        all_clauses: list[ParsedClause],
+    ) -> list[ParsedClause]:
+        """Split an oversized clause into smaller pieces.
+
+        Strategy (in order):
+
+        1. Find child clauses in *all_clauses* whose ``parent_identifier``
+           equals ``clause.identifier``.  If children exist, return them as
+           the split pieces — they are already separate
+           :class:`~lexichunk.parsers.structure.ParsedClause` objects in the
+           flat list.
+        2. If no children (leaf clause), fall back to sentence-boundary
+           splitting.  Sentences are accumulated until ``max_chunk_size`` is
+           reached, then a synthetic
+           :class:`~lexichunk.parsers.structure.ParsedClause` is emitted for
+           each group.
+
+        Args:
+            clause: The oversized :class:`~lexichunk.parsers.structure.ParsedClause`.
+            all_clauses: Full flat list (used to look up children).
+
+        Returns:
+            List of :class:`~lexichunk.parsers.structure.ParsedClause` objects
+            (sub-clauses or sentence-split synthetics).
+        """
+        # Strategy 1: use existing child clauses.
+        children = [
+            c for c in all_clauses if c.parent_identifier == clause.identifier
+        ]
+        if children:
+            return children
+
+        # Strategy 2: sentence-boundary splitting.
+        sentences = re.split(r'(?<=[.!?])\s+', clause.content)
+
+        result: list[ParsedClause] = []
+        current_sentences: list[str] = []
+        current_tokens = 0
+        part_index = 0
+
+        # Running character offset within the original content.
+        char_cursor = clause.char_start
+
+        def _flush(sentences_buf: list[str], start: int, end: int, part_idx: int) -> ParsedClause:
+            text = ' '.join(sentences_buf)
+            return ParsedClause(
+                identifier=f"{clause.identifier}.__part{part_idx}",
+                title=clause.title,
+                content=text,
+                level=clause.level,
+                parent_identifier=clause.parent_identifier,
+                document_section=clause.document_section,
+                char_start=start,
+                char_end=end,
+                children=[],
+            )
+
+        sentence_char_start = char_cursor
+
+        for sentence in sentences:
+            sentence_tokens = _approx_tokens(sentence)
+
+            if current_sentences and (current_tokens + sentence_tokens > self._max_chunk_size):
+                # Flush the current accumulation.
+                group_text = ' '.join(current_sentences)
+                group_end = sentence_char_start  # approximate
+                result.append(_flush(current_sentences, sentence_char_start - len(group_text), group_end, part_index))
+                part_index += 1
+                current_sentences = []
+                current_tokens = 0
+                sentence_char_start = group_end
+
+            current_sentences.append(sentence)
+            current_tokens += sentence_tokens
+
+        # Flush any remaining sentences.
+        if current_sentences:
+            result.append(
+                _flush(current_sentences, sentence_char_start, clause.char_end, part_index)
+            )
+
+        # If splitting yielded nothing useful, return the clause as-is.
+        return result if result else [clause]
+
+    # ------------------------------------------------------------------
+    # Small-clause merging
+    # ------------------------------------------------------------------
+
+    def _merge_small_clauses(
+        self,
+        groups: list[list[ParsedClause]],
+    ) -> list[list[ParsedClause]]:
+        """Merge groups that fall below ``min_chunk_size`` with their neighbours.
+
+        Groups are lists of :class:`~lexichunk.parsers.structure.ParsedClause`
+        that will be combined into one chunk.  A small group is merged
+        *forward* into the next group when possible; if it is the last group
+        it is merged *backward* into the previous group.
+
+        Args:
+            groups: List of clause groups (each group → one chunk).
+
+        Returns:
+            Merged list of groups; each group will contain one or more
+            :class:`~lexichunk.parsers.structure.ParsedClause` objects.
+        """
+        if not groups:
+            return groups
+
+        def _group_tokens(group: list[ParsedClause]) -> int:
+            return _approx_tokens('\n'.join(c.content for c in group))
+
+        merged: list[list[ParsedClause]] = []
+
+        i = 0
+        while i < len(groups):
+            group = groups[i]
+            tokens = _group_tokens(group)
+
+            if tokens < self._min_chunk_size:
+                if i + 1 < len(groups):
+                    # Merge forward: combine with the next group.
+                    groups[i + 1] = group + groups[i + 1]
+                    i += 1
+                    continue
+                elif merged:
+                    # Last group: merge backward into the previous one.
+                    merged[-1].extend(group)
+                    i += 1
+                    continue
+                # Only one group total and it's small — keep it as-is.
+
+            merged.append(group)
+            i += 1
+
+        return merged
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _group_to_chunk(
+        self,
+        group: list[ParsedClause],
+        index: int,
+        clause_map: dict[str, ParsedClause],
+    ) -> LegalChunk:
+        """Convert a group of clauses into a single :class:`~lexichunk.models.LegalChunk`.
+
+        For a group spanning multiple merged clauses, their ``content`` strings
+        are concatenated with a newline separator.  ``char_start`` is taken
+        from the first clause and ``char_end`` from the last clause.
+        ``document_section`` is taken from the first clause (merged clauses are
+        expected to be siblings sharing the same section).
+
+        Args:
+            group: Non-empty list of :class:`~lexichunk.parsers.structure.ParsedClause`
+                objects to combine.
+            index: Sequential chunk index (0-based).
+            clause_map: Dict mapping ``identifier`` →
+                :class:`~lexichunk.parsers.structure.ParsedClause`, used for
+                hierarchy path construction.
+
+        Returns:
+            A fully populated :class:`~lexichunk.models.LegalChunk`.
+        """
+        first = group[0]
+        last = group[-1]
+
+        content = '\n'.join(c.content for c in group)
+
+        hierarchy = HierarchyNode(
+            level=first.level,
+            identifier=first.identifier,
+            title=first.title,
+            parent=first.parent_identifier,
+        )
+
+        hierarchy_path = self._build_hierarchy_path(first, clause_map)
+
+        return LegalChunk(
+            content=content,
+            index=index,
+            hierarchy=hierarchy,
+            hierarchy_path=hierarchy_path,
+            document_section=first.document_section,
+            clause_type=ClauseType.UNKNOWN,
+            jurisdiction=self._jurisdiction,
+            cross_references=[],
+            defined_terms_used=[],
+            defined_terms_context={},
+            context_header="",
+            document_id=self._document_id,
+            char_start=first.char_start,
+            char_end=last.char_end,
+        )
+
+
+__all__ = ["ClauseAwareChunker"]
