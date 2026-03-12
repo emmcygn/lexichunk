@@ -2,9 +2,10 @@
 
 **Intelligent legal document chunking for RAG pipelines.**
 
-![PyPI version](https://img.shields.io/badge/pypi-v0.1.0-blue)
-![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
-![License: MIT](https://img.shields.io/badge/license-MIT-green)
+![PyPI version](https://img.shields.io/pypi/v/lexichunk)
+![Python 3.10+](https://img.shields.io/pypi/pyversions/lexichunk)
+![License: MIT](https://img.shields.io/github/license/emmcygn/lexichunk)
+![CI](https://img.shields.io/github/actions/workflow/status/emmcygn/lexichunk/ci.yml?label=tests)
 
 ---
 
@@ -79,7 +80,7 @@ Every call to `chunker.chunk()` returns a `list[LegalChunk]`. Each `LegalChunk` 
 | `hierarchy` | `HierarchyNode` | Clause position: `level`, `identifier`, `title`, `parent`. |
 | `hierarchy_path` | `str` | Human-readable path, e.g. `"Article VII > Section 7.2 > (a)"`. |
 | `document_section` | `DocumentSection` | High-level section: `PREAMBLE`, `DEFINITIONS`, `OPERATIVE`, `SCHEDULES`, `SIGNATURES`. |
-| `clause_type` | `ClauseType` | Classified type: `INDEMNIFICATION`, `CONFIDENTIALITY`, `TERMINATION`, etc. (24 types). |
+| `clause_type` | `ClauseType` | Classified type: `INDEMNIFICATION`, `CONFIDENTIALITY`, `TERMINATION`, `ACCEPTABLE_USE`, `USER_RESTRICTIONS`, `ACCOUNT_SECURITY`, etc. (27 types). |
 | `jurisdiction` | `Jurisdiction` | `UK` or `US`. |
 | `cross_references` | `list[CrossReference]` | Every detected reference to another clause. Each has `raw_text`, `target_identifier`, and `target_chunk_index` (resolved after chunking where possible). |
 | `defined_terms_used` | `list[str]` | Capitalised defined terms found in this chunk's text. |
@@ -258,7 +259,7 @@ for node in nodes:
 Issues and pull requests are welcome. Please open an issue before submitting large changes.
 
 ```bash
-git clone https://github.com/lexichunk/lexichunk
+git clone https://github.com/emmcygn/lexichunk
 cd lexichunk
 pip install -e ".[dev]"
 pytest
