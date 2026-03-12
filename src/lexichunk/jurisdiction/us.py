@@ -58,7 +58,7 @@ class USPatterns:
     ))
 
     cross_ref: re.Pattern = field(default_factory=lambda: re.compile(
-        r'\b(?:Section|Article|Exhibit|Schedule|Clause)\s+([\d.]+(?:\([a-z]+\))*(?:\([ivxlc]+\))*)',
+        r'\b(?:Section|Article|Exhibit|Schedule|Clause)\s+(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*)',
         re.IGNORECASE
     ))
 

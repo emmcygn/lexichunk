@@ -19,12 +19,12 @@ EXTENDED_PATTERNS: list[re.Pattern[str]] = [
         r'\b(?:as defined in|pursuant to|subject to|in accordance with|'
         r'set forth in|described in|referred to in|specified in)\s+'
         r'(?:Section|Clause|Article|paragraph|Schedule|Exhibit)\s+'
-        r'([\d.]+(?:\([a-z]+\))*(?:\([ivxlc]+\))*)',
+        r'(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*)',
         re.IGNORECASE,
     ),
     # "this Section X" / "this Clause X"
     re.compile(
-        r'\bthis\s+(?:Section|Clause|Article)\s+([\d.]+(?:\([a-z]+\))*)',
+        r'\bthis\s+(?:Section|Clause|Article)\s+(\d+(?:\.\d+)*(?:\([a-z]+\))*)',
         re.IGNORECASE,
     ),
 ]
@@ -73,8 +73,9 @@ class ReferenceDetector:
         Each compiled pattern is applied to *text*.  For patterns that embed
         the identifier in capturing group 1 the full matched string is used as
         ``raw_text`` and group 1 as ``target_identifier``.  Results are
-        deduplicated so that the same (raw_text, target_identifier) pair
-        appears at most once per call.
+        deduplicated by normalised ``target_identifier`` — so that "Clause 3.2"
+        and "subject to Clause 3.2" both pointing at identifier ``"3.2"``
+        produce only one ``CrossReference`` (the first match wins).
 
         Args:
             text: Chunk or document text to scan.
@@ -83,7 +84,7 @@ class ReferenceDetector:
             List of ``CrossReference`` objects with ``target_chunk_index=None``
             at this stage.
         """
-        seen: set[tuple[str, str]] = set()
+        seen: set[str] = set()  # normalised target_identifiers already emitted
         refs: list[CrossReference] = []
 
         for pattern in self._patterns:
@@ -96,9 +97,9 @@ class ReferenceDetector:
                     match.group(1) if match.lastindex and match.lastindex >= 1
                     else raw_text
                 )
-                key: tuple[str, str] = (raw_text, target_identifier)
-                if key not in seen:
-                    seen.add(key)
+                norm = self._normalise_identifier(target_identifier)
+                if norm and norm not in seen:
+                    seen.add(norm)
                     refs.append(
                         CrossReference(
                             raw_text=raw_text,
