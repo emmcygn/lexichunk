@@ -17,12 +17,14 @@ from __future__ import annotations
 
 import logging
 import re
+import unicodedata
 from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 from .enrichment.clause_type import ClauseTypeClassifier
 from .enrichment.context import ContextEnricher
+from .exceptions import ConfigurationError, InputError
 from .models import (
     DefinedTerm,
     HierarchyNode,
@@ -84,35 +86,48 @@ class LegalChunker:
         include_context_header: bool = True,
         document_id: Optional[str] = None,
         chars_per_token: int = 4,
+        extra_abbreviations: list[str] | None = None,
     ) -> None:
         # Normalise jurisdiction to enum.
         if isinstance(jurisdiction, str):
-            self._jurisdiction = Jurisdiction(jurisdiction.lower())
+            try:
+                self._jurisdiction = Jurisdiction(jurisdiction.lower())
+            except ValueError as exc:
+                raise ConfigurationError(str(exc)) from exc
         else:
             self._jurisdiction = jurisdiction
 
         if doc_type not in self._VALID_DOC_TYPES:
-            raise ValueError(
+            raise ConfigurationError(
                 f"Unknown doc_type {doc_type!r}. "
                 f"Supported: {', '.join(sorted(self._VALID_DOC_TYPES))}"
             )
         self._doc_type = doc_type
 
+        if max_chunk_size < 1:
+            raise ConfigurationError(
+                f"max_chunk_size ({max_chunk_size}) must be >= 1"
+            )
+        if min_chunk_size < 0:
+            raise ConfigurationError(
+                f"min_chunk_size ({min_chunk_size}) must be >= 0"
+            )
         if max_chunk_size < min_chunk_size:
-            raise ValueError(
+            raise ConfigurationError(
                 f"max_chunk_size ({max_chunk_size}) must be >= "
                 f"min_chunk_size ({min_chunk_size})"
             )
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
         if chars_per_token < 1:
-            raise ValueError(
+            raise ConfigurationError(
                 f"chars_per_token ({chars_per_token}) must be >= 1"
             )
         self._chars_per_token = chars_per_token
         self._include_definitions = include_definitions
         self._include_context_header = include_context_header
         self._document_id = document_id
+        self._extra_abbreviations = extra_abbreviations
 
         # Instantiate pipeline components.
         self._structure_parser = StructureParser(
@@ -122,6 +137,25 @@ class LegalChunker:
         self._reference_detector = ReferenceDetector(self._jurisdiction)
         self._clause_type_classifier = ClauseTypeClassifier()
         self._context_enricher = ContextEnricher()
+
+    # ------------------------------------------------------------------
+    # Input sanitization
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _sanitize_input(text: str) -> str:
+        """Sanitize raw input text before processing.
+
+        - Strips UTF-8 BOM (``\\ufeff``)
+        - Normalizes ``\\r\\n`` → ``\\n``, stray ``\\r`` → ``\\n``
+        - Removes null bytes (``\\x00``)
+        - Applies Unicode NFC normalization
+        """
+        text = text.replace("\ufeff", "")
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        text = text.replace("\x00", "")
+        text = unicodedata.normalize("NFC", text)
+        return text
 
     # ------------------------------------------------------------------
     # Primary public API
@@ -149,11 +183,13 @@ class LegalChunker:
             List of :class:`~lexichunk.models.LegalChunk` objects in document
             order with all metadata populated.
         """
+        text = self._sanitize_input(text)
+
         if not text or not text.strip():
             return []
 
         if len(text) > self._MAX_INPUT_CHARS:
-            raise ValueError(
+            raise InputError(
                 f"Input text too large ({len(text)} chars). "
                 f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
             )
@@ -193,6 +229,7 @@ class LegalChunker:
                 min_chunk_size=self._min_chunk_size,
                 document_id=doc_id,
                 chars_per_token=self._chars_per_token,
+                extra_abbreviations=self._extra_abbreviations,
             )
             chunks = fallback.chunk(text)
 
@@ -256,7 +293,7 @@ class LegalChunker:
         Returns:
             Dict mapping term name to :class:`~lexichunk.models.DefinedTerm`.
         """
-        return self._definitions_extractor.extract(text)
+        return self._definitions_extractor.extract(self._sanitize_input(text))
 
     def parse_structure(self, text: str) -> list[HierarchyNode]:
         """Return the parsed document structure as a list of hierarchy nodes.
@@ -271,7 +308,7 @@ class LegalChunker:
             List of :class:`~lexichunk.models.HierarchyNode` objects in
             document order.
         """
-        return self._structure_parser.parse_structure(text)
+        return self._structure_parser.parse_structure(self._sanitize_input(text))
 
 
 # ---------------------------------------------------------------------------

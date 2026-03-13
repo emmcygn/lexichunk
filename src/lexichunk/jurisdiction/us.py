@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from ..exceptions import ParsingError
+
 _ROMAN = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
 
 
@@ -22,11 +24,11 @@ def roman_to_int(s: str) -> int:
         ValueError: If *s* is empty or contains non-Roman characters.
     """
     if not s:
-        raise ValueError("Empty string is not a valid Roman numeral")
+        raise ParsingError("Empty string is not a valid Roman numeral")
     s = s.upper()
     for ch in s:
         if ch not in _ROMAN:
-            raise ValueError(
+            raise ParsingError(
                 f"Invalid Roman numeral character: {ch!r} in {s!r}"
             )
     result, prev = 0, 0

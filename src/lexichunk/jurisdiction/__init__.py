@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Callable, Optional
 
+from ..exceptions import ConfigurationError
 from ..models import Jurisdiction
 from .uk import UK_PATTERNS, UKPatterns
 from .uk import detect_level as uk_detect_level
@@ -27,7 +28,7 @@ def get_patterns(jurisdiction: Jurisdiction) -> UKPatterns | USPatterns:
         return UK_PATTERNS
     if jurisdiction == Jurisdiction.US:
         return US_PATTERNS
-    raise ValueError(f"Unsupported jurisdiction: {jurisdiction}")
+    raise ConfigurationError(f"Unsupported jurisdiction: {jurisdiction}")
 
 
 def get_detect_level(jurisdiction: Jurisdiction) -> Callable[[str], Optional[tuple[int, str]]]:
@@ -43,7 +44,7 @@ def get_detect_level(jurisdiction: Jurisdiction) -> Callable[[str], Optional[tup
         return uk_detect_level
     if jurisdiction == Jurisdiction.US:
         return us_detect_level
-    raise ValueError(f"Unsupported jurisdiction: {jurisdiction}")
+    raise ConfigurationError(f"Unsupported jurisdiction: {jurisdiction}")
 
 
 __all__ = [

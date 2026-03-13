@@ -1,6 +1,12 @@
 """lexichunk — Legal document chunking SDK for RAG pipelines."""
 
 from .chunker import LegalChunker
+from .exceptions import (
+    ConfigurationError,
+    InputError,
+    LexichunkError,
+    ParsingError,
+)
 from .models import (
     ClauseType,
     CrossReference,
@@ -11,7 +17,7 @@ from .models import (
     LegalChunk,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __all__ = [
     "LegalChunker",
     "LegalChunk",
@@ -21,4 +27,8 @@ __all__ = [
     "ClauseType",
     "DocumentSection",
     "Jurisdiction",
+    "LexichunkError",
+    "ConfigurationError",
+    "ParsingError",
+    "InputError",
 ]
