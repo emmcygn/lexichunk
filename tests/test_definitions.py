@@ -204,3 +204,66 @@ def test_mixed_quotes():
     result = extractor.extract(text)
     assert "Term One" in result, f"Missing 'Term One'; got {list(result.keys())}"
     assert "Term Two" in result, f"Missing 'Term Two'; got {list(result.keys())}"
+
+
+# ---------------------------------------------------------------------------
+# Inline / parenthetical definition tests
+# ---------------------------------------------------------------------------
+
+
+def test_inline_parenthetical_definition():
+    """Inline parenthetical: '(each a "Party")' extracts 'Party'."""
+    text = 'The Buyer and the Seller (each a "Party" and together the "Parties") agree.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Party" in result, f"Missing 'Party'; got {list(result.keys())}"
+    assert "Parties" in result, f"Missing 'Parties'; got {list(result.keys())}"
+
+
+def test_inline_parenthetical_single_term():
+    """Inline parenthetical with a single quoted term."""
+    text = 'This agreement (the "Agreement") is entered into.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Agreement" in result, f"Missing 'Agreement'; got {list(result.keys())}"
+
+
+def test_parenthetical_backref():
+    """Parenthetical back-reference: 'the Borrower (as defined in Section 1.1)'."""
+    text = "the Borrower (as defined in Section 1.1) shall pay the fees."
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Borrower" in result, f"Missing 'Borrower'; got {list(result.keys())}"
+
+
+def test_shall_have_the_meaning():
+    """'shall have the meaning' trigger phrase extracts the term."""
+    text = '"Term" shall have the meaning set forth in Section 2.1.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Term" in result, f"Missing 'Term'; got {list(result.keys())}"
+
+
+# ---------------------------------------------------------------------------
+# Skip list tests
+# ---------------------------------------------------------------------------
+
+
+def test_skip_list_rejects_common_words():
+    """Common false-positive words like 'Each', 'Any', 'Such' are rejected."""
+    from lexichunk.parsers.definitions import _SKIP_TERMS
+
+    reject_words = ["Each", "Any", "Such", "All", "No", "If", "Where", "When",
+                     "Upon", "In", "For", "By", "At", "On", "To", "Of", "Or",
+                     "And", "But", "Not", "It", "We", "You", "They", "Our",
+                     "Your", "Its"]
+    for word in reject_words:
+        assert word in _SKIP_TERMS, f"'{word}' should be in _SKIP_TERMS"
+
+
+def test_skip_list_rejects_each_in_extraction():
+    """'Each' should not be extracted even when it appears in definition form."""
+    text = '"Each" means every individual party to this agreement.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Each" not in result

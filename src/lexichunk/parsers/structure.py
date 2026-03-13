@@ -12,9 +12,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
-from ..models import DocumentSection, HierarchyNode, Jurisdiction
 from ..jurisdiction import get_detect_level
-
+from ..models import DocumentSection, HierarchyNode, Jurisdiction
 
 # ---------------------------------------------------------------------------
 # Public dataclass

@@ -17,10 +17,7 @@ Typical usage::
 
 from __future__ import annotations
 
-from typing import Optional
-
 from ..models import ClauseType, LegalChunk
-
 
 # ---------------------------------------------------------------------------
 # Internal helpers
@@ -75,7 +72,8 @@ def generate_context_header(chunk: LegalChunk) -> str:
     segments: list[str] = []
 
     if chunk.document_id is not None:
-        segments.append(f"[Document: {chunk.document_id}]")
+        safe_id = chunk.document_id.replace("]", "\\]")
+        segments.append(f"[Document: {safe_id}]")
 
     segments.append(f"[Section: {chunk.hierarchy_path}]")
     segments.append(f"[Type: {_format_clause_type(chunk.clause_type)}]")

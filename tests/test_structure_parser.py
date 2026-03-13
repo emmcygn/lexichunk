@@ -137,6 +137,25 @@ def test_us_detect_level_section():
     assert "1.01" in identifier
 
 
+def test_us_all_caps_header_detected():
+    """'REPRESENTATIONS AND WARRANTIES' → detected as a level-0 clause header."""
+    result = us_detect_level("REPRESENTATIONS AND WARRANTIES")
+    assert result is not None
+    level, identifier = result
+    assert level == 0
+    assert identifier == "REPRESENTATIONS AND WARRANTIES"
+
+
+def test_us_mixed_case_not_caps_header():
+    """'Representations and Warranties' → not an ALL-CAPS header.
+
+    Mixed-case text should not match the ALL-CAPS pattern; it returns
+    None (handled by existing patterns only if it matches ARTICLE/Section/etc.).
+    """
+    result = us_detect_level("Representations and Warranties")
+    assert result is None
+
+
 def test_us_detect_level_exhibit():
     """'Exhibit A' → level -2."""
     result = us_detect_level("Exhibit A")

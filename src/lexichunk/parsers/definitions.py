@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import bisect
 import logging
 import re
 from typing import Union
@@ -14,7 +15,13 @@ from ..jurisdiction.us import USPatterns
 from ..models import DefinedTerm, Jurisdiction
 
 # Terms that should be filtered out even if capitalised.
-_SKIP_TERMS: frozenset[str] = frozenset({"The", "A", "An", "This", "That"})
+_SKIP_TERMS: frozenset[str] = frozenset({
+    "The", "A", "An", "This", "That",
+    "Each", "Any", "All", "Such", "No",
+    "If", "Where", "When", "Upon",
+    "In", "For", "By", "At", "On", "To", "Of", "Or", "And", "But", "Not",
+    "It", "We", "You", "They", "Our", "Your", "Its",
+})
 
 # Regex matching a blank line (zero or more spaces, then newline).
 _BLANK_LINE: re.Pattern[str] = re.compile(r"^\s*$", re.MULTILINE)
@@ -27,6 +34,33 @@ _DEFINITION_SINGLE: re.Pattern[str] = re.compile(
 )
 _DEFINITION_SINGLE_CURLY: re.Pattern[str] = re.compile(
     r"\u2018([A-Z][A-Za-z\s\-]{1,60})\u2019\s+(?:means|shall mean|has the meaning|is defined as|refers to)",
+    re.MULTILINE,
+)
+
+# "shall have the meaning" form (straight + curly quotes).
+# e.g. "Term" shall have the meaning set forth in Section 1.1
+_DEFINITION_SHALL_HAVE_MEANING: re.Pattern[str] = re.compile(
+    r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]\s+shall have the meaning',
+    re.MULTILINE,
+)
+
+# Inline parenthetical definitions.
+# e.g. (each a "Party" and together the "Parties")
+# e.g. (the "Effective Date")
+# First, find parenthetical groups that contain at least one quoted term.
+_INLINE_PAREN_GROUP: re.Pattern[str] = re.compile(
+    r'\([^)]*?["\u201c][A-Z][A-Za-z\s\-]{1,60}["\u201d][^)]*?\)',
+    re.MULTILINE,
+)
+# Then, extract individual quoted terms within a parenthetical group.
+_INLINE_PAREN_TERM: re.Pattern[str] = re.compile(
+    r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]',
+)
+
+# Parenthetical back-reference definitions.
+# e.g. the Borrower (as defined in Section 1.1)
+_PARENTHETICAL_BACKREF: re.Pattern[str] = re.compile(
+    r'the\s+([A-Z][A-Za-z\s\-]{1,60}?)\s*\(\s*as\s+defined\s+in\b',
     re.MULTILINE,
 )
 
@@ -283,7 +317,13 @@ class DefinitionsExtractor:
         # positions so we can process them in document order.
         raw_matches: list[tuple[int, int, str]] = []  # (start, end, term)
 
-        for pattern in (self._patterns.definition, self._patterns.definition_curly, _DEFINITION_SINGLE, _DEFINITION_SINGLE_CURLY):  # type: ignore[attr-defined]
+        for pattern in (
+            self._patterns.definition,
+            self._patterns.definition_curly,
+            _DEFINITION_SINGLE,
+            _DEFINITION_SINGLE_CURLY,
+            _DEFINITION_SHALL_HAVE_MEANING,
+        ):  # type: ignore[attr-defined]
             for m in pattern.finditer(text):
                 term = m.group(1).strip()
                 raw_matches.append((m.start(), m.end(), term))
@@ -315,6 +355,37 @@ class DefinitionsExtractor:
                 results[term] = DefinedTerm(
                     term=term,
                     definition=body,
+                    source_clause=clause,
+                )
+
+        # --- Inline parenthetical definitions ---
+        # These don't have a "means" body; the context is the surrounding
+        # sentence.  Extract all quoted terms inside parentheses.
+        for group_m in _INLINE_PAREN_GROUP.finditer(text):
+            paren_text = group_m.group(0)
+            clause = self._nearest_clause_label(clause_labels, group_m.start()) or source_clause or "preamble"
+            for term_m in _INLINE_PAREN_TERM.finditer(paren_text):
+                term = term_m.group(1).strip()
+                if not self._is_valid_term(term):
+                    continue
+                if term not in results:
+                    results[term] = DefinedTerm(
+                        term=term,
+                        definition=paren_text.strip(),
+                        source_clause=clause,
+                    )
+
+        # --- Parenthetical back-reference definitions ---
+        # e.g. "the Borrower (as defined in Section 1.1)"
+        for m in _PARENTHETICAL_BACKREF.finditer(text):
+            term = m.group(1).strip()
+            if not self._is_valid_term(term):
+                continue
+            if term not in results:
+                clause = self._nearest_clause_label(clause_labels, m.start()) or source_clause or "preamble"
+                results[term] = DefinedTerm(
+                    term=term,
+                    definition=m.group(0).strip(),
                     source_clause=clause,
                 )
 
@@ -421,8 +492,7 @@ class DefinitionsExtractor:
     ) -> str | None:
         """Return the clause label immediately preceding ``pos``.
 
-        Performs a linear scan from the end to find the last label whose
-        offset is strictly less than ``pos``.
+        Uses ``bisect`` for O(log n) lookup instead of a linear scan.
 
         Args:
             labels: Sorted list of ``(offset, label)`` tuples.
@@ -431,13 +501,14 @@ class DefinitionsExtractor:
         Returns:
             The label string, or ``None`` if no label precedes ``pos``.
         """
-        result: str | None = None
-        for offset, label in labels:
-            if offset < pos:
-                result = label
-            else:
-                break
-        return result
+        if not labels:
+            return None
+        # bisect_left on the offset component; labels is sorted by offset.
+        idx = bisect.bisect_left(labels, (pos,))
+        # idx is the first label with offset >= pos; we want the one before it.
+        if idx == 0:
+            return None
+        return labels[idx - 1][1]
 
     def _infer_clause_label(self, section_text: str) -> str | None:
         """Infer a clause identifier from the first line of a section.

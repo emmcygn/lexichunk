@@ -144,4 +144,15 @@ def detect_level(line: str) -> tuple[int, str] | None:
     if m:
         return (4, f'({m.group(1)})')
 
+    # Standalone ALL-CAPS header (e.g. "REPRESENTATIONS AND WARRANTIES").
+    # Must be at least 2 characters, all uppercase letters/spaces, with at
+    # least one letter, and not already caught by ARTICLE/SECTION above.
+    stripped = s.strip()
+    if (
+        len(stripped) >= 2
+        and re.fullmatch(r'[A-Z][A-Z \t]+', stripped)
+        and not stripped.startswith(('ARTICLE', 'SECTION', 'EXHIBIT', 'SCHEDULE'))
+    ):
+        return (0, stripped)
+
     return None

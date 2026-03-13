@@ -112,3 +112,12 @@ def test_enrich_single_chunk():
     result = enricher.enrich(chunk)
     assert result is chunk
     assert chunk.context_header != ""
+
+
+def test_document_id_with_brackets_escaped():
+    """document_id containing ] is escaped in the header."""
+    chunk = _make_chunk(document_id="doc]123")
+    header = generate_context_header(chunk)
+    assert "[Document: doc\\]123]" in header
+    # Ensure the raw unescaped form does NOT appear.
+    assert "[Document: doc]123]" not in header
