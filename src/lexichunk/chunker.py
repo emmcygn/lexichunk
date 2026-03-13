@@ -83,6 +83,12 @@ class LegalChunker:
             self._jurisdiction = jurisdiction
 
         self._doc_type = doc_type
+
+        if max_chunk_size < min_chunk_size:
+            raise ValueError(
+                f"max_chunk_size ({max_chunk_size}) must be >= "
+                f"min_chunk_size ({min_chunk_size})"
+            )
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
         self._include_definitions = include_definitions

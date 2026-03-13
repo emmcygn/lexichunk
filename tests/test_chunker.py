@@ -238,6 +238,18 @@ def test_document_id_from_init(uk_service_agreement):
 # ---------------------------------------------------------------------------
 
 
+def test_invalid_jurisdiction_raises_error():
+    """Passing an unrecognised jurisdiction string must raise ValueError."""
+    with pytest.raises(ValueError):
+        LegalChunker(jurisdiction="french")
+
+
+def test_jurisdiction_enum_accepted():
+    """Passing a Jurisdiction enum value directly must be accepted."""
+    chunker = LegalChunker(jurisdiction=Jurisdiction.UK)
+    assert chunker._jurisdiction == Jurisdiction.UK
+
+
 def test_empty_text_returns_empty(uk_chunker):
     """chunk('') must return an empty list."""
     result = uk_chunker.chunk("")
@@ -314,3 +326,26 @@ def test_context_headers_empty_when_disabled(uk_service_agreement):
             f"Expected empty context_header when disabled; "
             f"got {chunk.context_header!r} on chunk {chunk.index}"
         )
+
+
+# ---------------------------------------------------------------------------
+# Input validation
+# ---------------------------------------------------------------------------
+
+
+def test_invalid_jurisdiction_raises_error():
+    """Passing an unsupported jurisdiction string raises ValueError."""
+    with pytest.raises(ValueError):
+        LegalChunker(jurisdiction="french")
+
+
+def test_jurisdiction_enum_accepted():
+    """Passing a Jurisdiction enum value directly works."""
+    chunker = LegalChunker(jurisdiction=Jurisdiction.UK)
+    assert chunker._jurisdiction == Jurisdiction.UK
+
+
+def test_max_lt_min_chunk_size_raises_error():
+    """max_chunk_size < min_chunk_size raises ValueError."""
+    with pytest.raises(ValueError, match="max_chunk_size.*must be >= min_chunk_size"):
+        LegalChunker(max_chunk_size=64, min_chunk_size=512)

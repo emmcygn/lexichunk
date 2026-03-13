@@ -9,11 +9,29 @@ _ROMAN = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
 
 
 def roman_to_int(s: str) -> int:
-    """Convert a Roman numeral string to an integer."""
+    """Convert a Roman numeral string to an integer.
+
+    Args:
+        s: A string containing only valid Roman numeral characters
+            (I, V, X, L, C, D, M — case-insensitive).
+
+    Returns:
+        The integer value of the Roman numeral.
+
+    Raises:
+        ValueError: If *s* is empty or contains non-Roman characters.
+    """
+    if not s:
+        raise ValueError("Empty string is not a valid Roman numeral")
     s = s.upper()
+    for ch in s:
+        if ch not in _ROMAN:
+            raise ValueError(
+                f"Invalid Roman numeral character: {ch!r} in {s!r}"
+            )
     result, prev = 0, 0
     for ch in reversed(s):
-        val = _ROMAN.get(ch, 0)
+        val = _ROMAN[ch]
         if val < prev:
             result -= val
         else:

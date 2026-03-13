@@ -3,7 +3,7 @@
 import pytest
 
 from lexichunk.jurisdiction.uk import detect_level as uk_detect_level
-from lexichunk.jurisdiction.us import detect_level as us_detect_level
+from lexichunk.jurisdiction.us import detect_level as us_detect_level, roman_to_int
 from lexichunk.models import DocumentSection, Jurisdiction
 from lexichunk.parsers.structure import ParsedClause, StructureParser
 
@@ -221,3 +221,42 @@ def test_structure_parser_no_headers():
     assert len(result) == 1
     assert result[0].identifier == "preamble"
     assert result[0].document_section == DocumentSection.PREAMBLE
+
+
+# ---------------------------------------------------------------------------
+# roman_to_int tests
+# ---------------------------------------------------------------------------
+
+
+def test_roman_to_int_valid():
+    """Standard Roman numerals convert correctly."""
+    assert roman_to_int("I") == 1
+    assert roman_to_int("IV") == 4
+    assert roman_to_int("VII") == 7
+    assert roman_to_int("IX") == 9
+    assert roman_to_int("XL") == 40
+    assert roman_to_int("XCIX") == 99
+
+
+def test_roman_to_int_case_insensitive():
+    """Lowercase input is accepted."""
+    assert roman_to_int("vii") == 7
+    assert roman_to_int("xlii") == 42
+
+
+def test_roman_to_int_invalid_char_raises():
+    """Non-Roman characters raise ValueError."""
+    with pytest.raises(ValueError, match="Invalid Roman numeral character"):
+        roman_to_int("ABCD")
+
+
+def test_roman_to_int_empty_raises():
+    """Empty string raises ValueError."""
+    with pytest.raises(ValueError, match="Empty string"):
+        roman_to_int("")
+
+
+def test_roman_to_int_mixed_invalid_raises():
+    """String mixing valid and invalid chars raises ValueError."""
+    with pytest.raises(ValueError, match="Invalid Roman numeral character"):
+        roman_to_int("XIV2")
