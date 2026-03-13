@@ -27,19 +27,17 @@ from ..parsers.structure import ParsedClause
 # ---------------------------------------------------------------------------
 
 
-def _approx_tokens(text: str) -> int:
-    """Approximate token count using a fixed character-to-token ratio.
-
-    Uses the heuristic that one token is approximately four characters.  This
-    avoids any external dependency on a real tokeniser.
+def _approx_tokens(text: str, chars_per_token: int = 4) -> int:
+    """Approximate token count using a configurable character-to-token ratio.
 
     Args:
         text: The string whose token count is to be estimated.
+        chars_per_token: Number of characters per token.  Defaults to 4.
 
     Returns:
         An integer token estimate, always at least 1.
     """
-    return max(1, len(text) // 4)
+    return max(1, len(text) // chars_per_token)
 
 
 # ---------------------------------------------------------------------------
@@ -61,6 +59,8 @@ class ClauseAwareChunker:
         min_chunk_size: Minimum chunk size; smaller clauses are merged with
             the next sibling (default 64).
         document_id: Optional document identifier attached to every chunk.
+        chars_per_token: Number of characters per token for the approximation
+            heuristic.  Defaults to 4.
     """
 
     def __init__(
@@ -69,11 +69,13 @@ class ClauseAwareChunker:
         max_chunk_size: int = 512,
         min_chunk_size: int = 64,
         document_id: Optional[str] = None,
+        chars_per_token: int = 4,
     ) -> None:
         self._jurisdiction = jurisdiction
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
         self._document_id = document_id
+        self._chars_per_token = chars_per_token
 
     # ------------------------------------------------------------------
     # Public API
@@ -126,7 +128,7 @@ class ClauseAwareChunker:
             if clause.level == -99 and not clause.content.strip():
                 continue
 
-            tokens = _approx_tokens(clause.content)
+            tokens = _approx_tokens(clause.content, self._chars_per_token)
 
             if tokens > self._max_chunk_size:
                 # Split into smaller pieces.
@@ -264,7 +266,7 @@ class ClauseAwareChunker:
         sentence_char_start = char_cursor
 
         for sentence in sentences:
-            sentence_tokens = _approx_tokens(sentence)
+            sentence_tokens = _approx_tokens(sentence, self._chars_per_token)
 
             if current_sentences and (current_tokens + sentence_tokens > self._max_chunk_size):
                 # Flush the current accumulation.
@@ -314,7 +316,7 @@ class ClauseAwareChunker:
             return groups
 
         def _group_tokens(group: list[ParsedClause]) -> int:
-            return _approx_tokens('\n'.join(c.content for c in group))
+            return _approx_tokens('\n'.join(c.content for c in group), self._chars_per_token)
 
         merged: list[list[ParsedClause]] = []
 

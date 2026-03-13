@@ -270,6 +270,29 @@ def test_partial_match_parent_resolves_to_first_child():
     )
 
 
+def test_partial_match_picks_first_of_three_children():
+    """Ref to '4' with 3 children resolves to the child with the lowest chunk index.
+
+    Children are deliberately out of identifier-sort order (4.3, 4.1, 4.2) to
+    prove that ``_partial_match`` selects by lowest chunk_index, not by
+    lexicographic identifier order.  Chunk 1 (identifier "4.3") has the lowest
+    index among the three children, so it must win.
+    """
+    detector = _uk_detector()
+    ref = CrossReference(raw_text="Clause 4", target_identifier="4")
+    pairs = [
+        ([ref], "1.1"),  # chunk 0 — contains the reference
+        ([], "4.3"),     # chunk 1 — child of 4, lowest index
+        ([], "4.1"),     # chunk 2 — child of 4
+        ([], "4.2"),     # chunk 3 — child of 4
+    ]
+    resolved = detector.resolve(pairs)
+    assert resolved[0][0].target_chunk_index == 1, (
+        f"Expected partial match to pick lowest chunk index (1, id='4.3'); "
+        f"got {resolved[0][0].target_chunk_index}"
+    )
+
+
 def test_partial_match_does_not_match_unrelated():
     """Ref to '4' must NOT resolve to '14' or '41' — only children like '4.X'."""
     detector = _uk_detector()

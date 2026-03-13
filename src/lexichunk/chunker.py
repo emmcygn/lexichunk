@@ -55,6 +55,8 @@ class LegalChunker:
             every chunk.  Defaults to ``True``.
         document_id: Optional document identifier embedded in every chunk and
             in the context header.
+        chars_per_token: Number of characters per token used for the
+            approximate token count heuristic.  Defaults to 4.
 
     Example::
 
@@ -75,6 +77,7 @@ class LegalChunker:
         include_definitions: bool = True,
         include_context_header: bool = True,
         document_id: Optional[str] = None,
+        chars_per_token: int = 4,
     ) -> None:
         # Normalise jurisdiction to enum.
         if isinstance(jurisdiction, str):
@@ -91,6 +94,11 @@ class LegalChunker:
             )
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
+        if chars_per_token < 1:
+            raise ValueError(
+                f"chars_per_token ({chars_per_token}) must be >= 1"
+            )
+        self._chars_per_token = chars_per_token
         self._include_definitions = include_definitions
         self._include_context_header = include_context_header
         self._document_id = document_id
@@ -149,6 +157,7 @@ class LegalChunker:
                 max_chunk_size=self._max_chunk_size,
                 min_chunk_size=self._min_chunk_size,
                 document_id=doc_id,
+                chars_per_token=self._chars_per_token,
             )
             chunks = chunker.chunk(clauses, text)
         else:
@@ -158,6 +167,7 @@ class LegalChunker:
                 max_chunk_size=self._max_chunk_size,
                 min_chunk_size=self._min_chunk_size,
                 document_id=doc_id,
+                chars_per_token=self._chars_per_token,
             )
             chunks = fallback.chunk(text)
 

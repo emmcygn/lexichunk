@@ -36,16 +36,17 @@ _SENTENCE_BOUNDARY = re.compile(r'(?<=[.!?])\s+(?=[A-Z])')
 _NUMBER_DOT = re.compile(r'\d+\.\d')
 
 
-def _approx_tokens(text: str) -> int:
-    """Approximate token count: 1 token ≈ 4 characters.
+def _approx_tokens(text: str, chars_per_token: int = 4) -> int:
+    """Approximate token count using a configurable character-to-token ratio.
 
     Args:
         text: Any string whose token count should be estimated.
+        chars_per_token: Number of characters per token.  Defaults to 4.
 
     Returns:
         A positive integer approximation of the token count.
     """
-    return max(1, len(text) // 4)
+    return max(1, len(text) // chars_per_token)
 
 
 # ---------------------------------------------------------------------------
@@ -96,6 +97,8 @@ class FallbackChunker:
         max_chunk_size: Maximum chunk size in approximate tokens.
         min_chunk_size: Minimum chunk size; smaller pieces are merged.
         document_id: Optional document identifier.
+        chars_per_token: Number of characters per token for the approximation
+            heuristic.  Defaults to 4.
     """
 
     def __init__(
@@ -104,11 +107,13 @@ class FallbackChunker:
         max_chunk_size: int = 512,
         min_chunk_size: int = 64,
         document_id: Optional[str] = None,
+        chars_per_token: int = 4,
     ) -> None:
         self._jurisdiction = jurisdiction
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
         self._document_id = document_id
+        self._chars_per_token = chars_per_token
 
     # ------------------------------------------------------------------
     # Public API
@@ -156,7 +161,7 @@ class FallbackChunker:
         current_tokens: int = 0
 
         for sentence, offset in sentences:
-            sentence_tokens = _approx_tokens(sentence)
+            sentence_tokens = _approx_tokens(sentence, self._chars_per_token)
 
             # If adding this sentence would exceed the cap *and* we already
             # have content in the window, flush before adding.
@@ -175,7 +180,8 @@ class FallbackChunker:
         # Merge a tiny trailing window into the previous one.
         if len(windows) > 1:
             last_tokens = _approx_tokens(
-                " ".join(s for s, _ in windows[-1])
+                " ".join(s for s, _ in windows[-1]),
+                self._chars_per_token,
             )
             if last_tokens < self._min_chunk_size:
                 windows[-2].extend(windows[-1])
