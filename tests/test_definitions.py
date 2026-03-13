@@ -1,10 +1,8 @@
 """Tests for DefinitionsExtractor."""
 
-import pytest
 
 from lexichunk.models import DefinedTerm, Jurisdiction
 from lexichunk.parsers.definitions import DefinitionsExtractor
-
 
 # ---------------------------------------------------------------------------
 # Helpers

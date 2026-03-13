@@ -36,18 +36,7 @@ _SENTENCE_BOUNDARY = re.compile(r'(?<=[.!?])\s+(?=[A-Z])')
 _NUMBER_DOT = re.compile(r'\d+\.\d')
 
 
-def _approx_tokens(text: str, chars_per_token: int = 4) -> int:
-    """Approximate token count using a configurable character-to-token ratio.
-
-    Args:
-        text: Any string whose token count should be estimated.
-        chars_per_token: Number of characters per token.  Defaults to 4.
-
-    Returns:
-        A positive integer approximation of the token count.
-    """
-    return max(1, len(text) // chars_per_token)
-
+from ..utils import approx_tokens as _approx_tokens
 
 # ---------------------------------------------------------------------------
 # Module-level convenience function
@@ -215,6 +204,7 @@ class FallbackChunker:
                 char_start=char_start,
                 char_end=char_end,
                 document_id=self._document_id,
+                token_count=_approx_tokens(window_text, self._chars_per_token),
             )
             chunks.append(chunk)
 

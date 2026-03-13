@@ -15,13 +15,15 @@ Orchestrates the full pipeline:
 
 from __future__ import annotations
 
+import logging
 import re
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 from .enrichment.clause_type import ClauseTypeClassifier
 from .enrichment.context import ContextEnricher
 from .models import (
-    ClauseType,
     DefinedTerm,
     HierarchyNode,
     Jurisdiction,
@@ -69,6 +71,9 @@ class LegalChunker:
             print(chunk.clause_type, chunk.hierarchy_path)
     """
 
+    _MAX_INPUT_CHARS = 10_000_000  # ~10 MB, configurable via subclass
+    _VALID_DOC_TYPES = {"contract", "terms_conditions"}
+
     def __init__(
         self,
         jurisdiction: str | Jurisdiction = "uk",
@@ -86,6 +91,11 @@ class LegalChunker:
         else:
             self._jurisdiction = jurisdiction
 
+        if doc_type not in self._VALID_DOC_TYPES:
+            raise ValueError(
+                f"Unknown doc_type {doc_type!r}. "
+                f"Supported: {', '.join(sorted(self._VALID_DOC_TYPES))}"
+            )
         self._doc_type = doc_type
 
         if max_chunk_size < min_chunk_size:
@@ -142,6 +152,17 @@ class LegalChunker:
         if not text or not text.strip():
             return []
 
+        if len(text) > self._MAX_INPUT_CHARS:
+            raise ValueError(
+                f"Input text too large ({len(text)} chars). "
+                f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
+            )
+
+        logger.info(
+            "Chunking document (%d chars, jurisdiction=%s, doc_type=%s)",
+            len(text), self._jurisdiction.value, self._doc_type,
+        )
+
         doc_id = document_id if document_id is not None else self._document_id
 
         # ------------------------------------------------------------------
@@ -163,6 +184,9 @@ class LegalChunker:
             chunks = chunker.chunk(clauses, text)
         else:
             # No structure detected — fall back to sentence-level splitting.
+            logger.warning(
+                "No clause structure detected — falling back to sentence-level splitting"
+            )
             fallback = FallbackChunker(
                 jurisdiction=self._jurisdiction,
                 max_chunk_size=self._max_chunk_size,
@@ -201,6 +225,7 @@ class LegalChunker:
         # ------------------------------------------------------------------
         # Stage 6: Defined terms extraction and attachment
         # ------------------------------------------------------------------
+        defined_terms: dict[str, DefinedTerm] | None = None
         if self._include_definitions:
             defined_terms = self._definitions_extractor.extract(text)
             _attach_defined_terms(chunks, defined_terms)
@@ -209,6 +234,12 @@ class LegalChunker:
         # Stage 7: Cross-reference resolution (second pass)
         # ------------------------------------------------------------------
         resolve_references(chunks, self._jurisdiction)
+
+        logger.debug(
+            "Pipeline complete: %d chunks, %d defined terms",
+            len(chunks),
+            len(defined_terms) if defined_terms else 0,
+        )
 
         return chunks
 

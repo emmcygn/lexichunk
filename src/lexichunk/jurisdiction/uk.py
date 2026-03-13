@@ -40,7 +40,7 @@ class UKPatterns:
 
     # Cross-references
     cross_ref: re.Pattern = field(default_factory=lambda: re.compile(
-        r'\b(?:Clause|Section|paragraph|Schedule)\s+(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*)',
+        r'\b(?:Clauses?|Sections?|paragraphs?|Schedules?)\s+(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*)',
         re.IGNORECASE
     ))
 

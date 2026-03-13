@@ -6,7 +6,7 @@ Install extras:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from ..chunker import LegalChunker
 from ..models import Jurisdiction
@@ -163,37 +163,7 @@ class LegalTextSplitter:
 # ---------------------------------------------------------------------------
 
 
-def _build_metadata(chunk: LegalChunk) -> dict[str, Any]:
-    """Build the shared metadata dict from a :class:`~lexichunk.models.LegalChunk`.
-
-    Args:
-        chunk: A :class:`~lexichunk.models.LegalChunk` instance.
-
-    Returns:
-        Dictionary of metadata ready to attach to a framework document node.
-    """
-    return {
-        "clause_type": chunk.clause_type.value,
-        "jurisdiction": chunk.jurisdiction.value,
-        "document_section": chunk.document_section.value,
-        "hierarchy_path": chunk.hierarchy_path,
-        "hierarchy_identifier": chunk.hierarchy.identifier,
-        "hierarchy_level": chunk.hierarchy.level,
-        "cross_references": [
-            {
-                "raw_text": ref.raw_text,
-                "target_identifier": ref.target_identifier,
-                "target_chunk_index": ref.target_chunk_index,
-            }
-            for ref in chunk.cross_references
-        ],
-        "defined_terms_used": chunk.defined_terms_used,
-        "context_header": chunk.context_header,
-        "char_start": chunk.char_start,
-        "char_end": chunk.char_end,
-        "chunk_index": chunk.index,
-        "document_id": chunk.document_id,
-    }
+from ..utils import build_metadata as _build_metadata
 
 
 def _chunk_to_document(chunk: LegalChunk) -> _LCDocument:

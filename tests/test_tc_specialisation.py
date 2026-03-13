@@ -1,11 +1,9 @@
 """Tests for Terms & Conditions document type specialisation."""
 
-import pytest
 
 from lexichunk import LegalChunker
-from lexichunk.models import ClauseType, DocumentSection, Jurisdiction
 from lexichunk.enrichment.clause_type import classify_clause_type
-
+from lexichunk.models import ClauseType, DocumentSection
 
 # ---------------------------------------------------------------------------
 # End-to-end T&C parsing tests

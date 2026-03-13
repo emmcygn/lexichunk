@@ -1,10 +1,8 @@
 """Tests for ReferenceDetector."""
 
-import pytest
 
 from lexichunk.models import CrossReference, Jurisdiction
 from lexichunk.parsers.references import ReferenceDetector
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -181,7 +179,7 @@ def test_detect_multiple_distinct_refs():
     refs = detector.detect(text)
     ids = _identifiers(refs)
     # We expect refs to "2.1", "5.3", and "1" (schedule).
-    assert len(refs) >= 2, f"Expected at least 2 distinct refs; got {refs}"
+    assert len(ids) >= 2, f"Expected at least 2 distinct refs; got {refs}"
 
 
 def test_resolve_unresolvable_ref_keeps_none():
@@ -329,3 +327,36 @@ def test_resolve_article_roman_numeral():
     ]
     resolved = detector.resolve(pairs)
     assert resolved[0][0].target_chunk_index == 1
+
+
+# ---------------------------------------------------------------------------
+# Conjunctive reference tests (S4)
+# ---------------------------------------------------------------------------
+
+
+def test_conjunctive_sections():
+    """'Sections 3.1, 3.2 and 3.3' detects all three identifiers."""
+    text = "The obligations in Sections 3.1, 3.2 and 3.3 shall apply."
+    refs = _uk_detector().detect(text)
+    ids = _identifiers(refs)
+    assert "3.1" in ids, f"Expected '3.1' in identifiers; got {ids}"
+    assert "3.2" in ids, f"Expected '3.2' in identifiers; got {ids}"
+    assert "3.3" in ids, f"Expected '3.3' in identifiers; got {ids}"
+
+
+def test_conjunctive_clauses():
+    """'Clauses 4.1, 4.2, 4.3 and 4.4' detects all four identifiers."""
+    text = "Subject to Clauses 4.1, 4.2, 4.3 and 4.4 of this Agreement."
+    refs = _uk_detector().detect(text)
+    ids = _identifiers(refs)
+    for expected in ("4.1", "4.2", "4.3", "4.4"):
+        assert expected in ids, f"Expected {expected!r} in identifiers; got {ids}"
+
+
+def test_conjunctive_or():
+    """'Section 2.1 or Section 2.2' detects both."""
+    text = "As defined in Section 2.1 or Section 2.2 of this Agreement."
+    refs = _us_detector().detect(text)
+    ids = _identifiers(refs)
+    assert "2.1" in ids, f"Expected '2.1' in identifiers; got {ids}"
+    assert "2.2" in ids, f"Expected '2.2' in identifiers; got {ids}"

@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import string
 from typing import TYPE_CHECKING, Optional
 
 from ..models import CrossReference, Jurisdiction
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from ..models import LegalChunk
@@ -48,6 +51,14 @@ _LABEL_WORDS: tuple[str, ...] = (
 # identifiers like "3.1(a)".  Only strip the remaining punctuation characters.
 _STRIP_PUNCT = str.maketrans(
     "", "", string.punctuation.replace(".", "").replace("(", "").replace(")", "")
+)
+
+# Pattern matching trailing conjunctive identifiers after a detected ref.
+# Captures sequences like ", 3.2, 3.3 and 3.4" or ", 3.2 or 3.3".
+_CONJUNCTIVE_TAIL = re.compile(
+    r'(?:\s*,\s*|\s+(?:and|or)\s+)'
+    r'(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*)',
+    re.IGNORECASE,
 )
 
 
@@ -114,6 +125,25 @@ class ReferenceDetector:
                         )
                     )
 
+                # Scan for conjunctive tails: ", 3.2, 3.3 and 3.4"
+                tail_pos = match.end()
+                for tail_match in _CONJUNCTIVE_TAIL.finditer(text, tail_pos):
+                    # Only accept tails contiguous with the previous match end.
+                    if tail_match.start() != tail_pos:
+                        break
+                    tail_id = tail_match.group(1)
+                    tail_norm = self._normalise_identifier(tail_id)
+                    if tail_norm and tail_norm not in seen:
+                        seen.add(tail_norm)
+                        refs.append(
+                            CrossReference(
+                                raw_text=tail_match.group(0).strip(" ,"),
+                                target_identifier=tail_id,
+                            )
+                        )
+                    tail_pos = tail_match.end()
+
+        logger.debug("Detected %d cross-references", len(refs))
         return refs
 
     def resolve(

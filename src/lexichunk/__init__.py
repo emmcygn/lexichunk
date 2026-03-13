@@ -2,13 +2,13 @@
 
 from .chunker import LegalChunker
 from .models import (
-    LegalChunk,
-    HierarchyNode,
+    ClauseType,
     CrossReference,
     DefinedTerm,
-    ClauseType,
     DocumentSection,
+    HierarchyNode,
     Jurisdiction,
+    LegalChunk,
 )
 
 __version__ = "0.1.0"

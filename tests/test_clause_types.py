@@ -1,10 +1,8 @@
 """Tests for classify_clause_type."""
 
-import pytest
 
 from lexichunk.enrichment.clause_type import classify_clause_type
 from lexichunk.models import ClauseType, DocumentSection
-
 
 # ---------------------------------------------------------------------------
 # Helper

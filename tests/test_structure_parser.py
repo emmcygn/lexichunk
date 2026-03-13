@@ -3,10 +3,10 @@
 import pytest
 
 from lexichunk.jurisdiction.uk import detect_level as uk_detect_level
-from lexichunk.jurisdiction.us import detect_level as us_detect_level, roman_to_int
+from lexichunk.jurisdiction.us import detect_level as us_detect_level
+from lexichunk.jurisdiction.us import roman_to_int
 from lexichunk.models import DocumentSection, Jurisdiction
 from lexichunk.parsers.structure import ParsedClause, StructureParser
-
 
 # ---------------------------------------------------------------------------
 # UK detect_level tests

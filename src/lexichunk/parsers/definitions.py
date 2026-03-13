@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from typing import Union
 
 from ..jurisdiction import get_patterns
+
+logger = logging.getLogger(__name__)
 from ..jurisdiction.uk import UKPatterns
 from ..jurisdiction.us import USPatterns
 from ..models import DefinedTerm, Jurisdiction
@@ -109,6 +112,7 @@ class DefinitionsExtractor:
         wide_terms = self._extract_definitions_from_text(text, "")
         # Merge: wide provides base, section_terms overwrite where duplicated.
         merged: dict[str, DefinedTerm] = {**wide_terms, **section_terms}
+        logger.debug("Extracted %d defined terms", len(merged))
         return merged
 
     def extract_from_section(

@@ -20,25 +20,7 @@ from ..models import (
     LegalChunk,
 )
 from ..parsers.structure import ParsedClause
-
-
-# ---------------------------------------------------------------------------
-# Token approximation
-# ---------------------------------------------------------------------------
-
-
-def _approx_tokens(text: str, chars_per_token: int = 4) -> int:
-    """Approximate token count using a configurable character-to-token ratio.
-
-    Args:
-        text: The string whose token count is to be estimated.
-        chars_per_token: Number of characters per token.  Defaults to 4.
-
-    Returns:
-        An integer token estimate, always at least 1.
-    """
-    return max(1, len(text) // chars_per_token)
-
+from ..utils import approx_tokens as _approx_tokens
 
 # ---------------------------------------------------------------------------
 # Main chunker
@@ -401,6 +383,7 @@ class ClauseAwareChunker:
             document_id=self._document_id,
             char_start=first.char_start,
             char_end=last.char_end,
+            token_count=_approx_tokens(content, self._chars_per_token),
         )
 
 

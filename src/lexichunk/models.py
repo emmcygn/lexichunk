@@ -111,3 +111,4 @@ class LegalChunk:
     document_id: Optional[str] = None
     char_start: int = 0
     char_end: int = 0
+    token_count: int = 0
