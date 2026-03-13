@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import re
 import string
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from ..models import CrossReference, Jurisdiction
+
+if TYPE_CHECKING:
+    from ..models import LegalChunk
 from ..jurisdiction import get_patterns
 
 # ---------------------------------------------------------------------------
@@ -278,9 +281,9 @@ def detect_references(
 
 
 def resolve_references(
-    chunks: list,  # list[LegalChunk] — avoid circular import by using list
+    chunks: list[LegalChunk],
     jurisdiction: Jurisdiction,
-) -> list:
+) -> list[LegalChunk]:
     """Resolve cross-references across all chunks (second pass).
 
     Builds a ``ReferenceDetector``, collects ``(cross_references, identifier)``

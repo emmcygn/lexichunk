@@ -54,25 +54,62 @@ def test_us_tc_detects_account_security(us_terms_of_service):
     )
 
 
-def test_contract_mode_still_detects_recitals(uk_service_agreement):
-    """Contract mode (default) still detects RECITALS — no regression."""
+def test_contract_mode_still_detects_recitals():
+    """Contract mode detects RECITALS — suppression only applies to T&C.
+
+    Uses synthetic text since the real fixtures may not have recitals.
+    """
+    text = (
+        "1. Background\n\n"
+        "WHEREAS the Supplier has agreed to provide services.\n\n"
+        "2. Services\n\n"
+        "2.1 The Supplier shall provide the services described herein.\n"
+    )
     chunker = LegalChunker(jurisdiction="uk", doc_type="contract")
-    chunks = chunker.chunk(uk_service_agreement)
+    chunks = chunker.chunk(text)
     sections = {c.document_section for c in chunks}
-    # UK service agreement may or may not have recitals depending on fixture,
-    # but at minimum SIGNATURES detection should still work for contracts.
-    # We verify the contract path is unchanged by checking OPERATIVE exists.
-    assert DocumentSection.OPERATIVE in sections
+    assert DocumentSection.RECITALS in sections, (
+        "Contract mode must detect RECITALS — suppression should only apply to T&C"
+    )
 
 
-def test_contract_mode_signatures_not_suppressed(us_msa):
-    """Contract mode still detects SIGNATURES sections — not suppressed."""
-    chunker = LegalChunker(jurisdiction="us", doc_type="contract")
-    chunks = chunker.chunk(us_msa)
-    # Check that the contract pipeline is not affected by T&C suppression.
-    # The US MSA should have OPERATIVE sections at minimum.
+def test_contract_mode_signatures_not_suppressed():
+    """Contract mode detects SIGNATURES — suppression only applies to T&C.
+
+    Uses synthetic text with a "Signature Page" heading that the structure
+    parser will detect as a clause header with signature keywords.
+    """
+    text = (
+        "1. Services\n\n"
+        "1.1 The Supplier shall provide the services described herein.\n\n"
+        "2. Signature Page\n\n"
+        "IN WITNESS WHEREOF the parties have executed this Agreement.\n"
+    )
+    chunker = LegalChunker(
+        jurisdiction="uk", doc_type="contract", min_chunk_size=1
+    )
+    chunks = chunker.chunk(text)
     sections = {c.document_section for c in chunks}
-    assert DocumentSection.OPERATIVE in sections
+    assert DocumentSection.SIGNATURES in sections, (
+        f"Contract mode must detect SIGNATURES — suppression should only apply to T&C. "
+        f"Got sections: {sections}"
+    )
+
+
+def test_tc_mode_suppresses_recitals_on_synthetic():
+    """T&C mode suppresses RECITALS even when the text contains recital keywords."""
+    text = (
+        "1. Background\n\n"
+        "WHEREAS the user has agreed to use the platform.\n\n"
+        "2. Services\n\n"
+        "2.1 The platform provides analytics services.\n"
+    )
+    chunker = LegalChunker(jurisdiction="uk", doc_type="terms_conditions")
+    chunks = chunker.chunk(text)
+    sections = {c.document_section for c in chunks}
+    assert DocumentSection.RECITALS not in sections, (
+        "T&C mode must suppress RECITALS detection"
+    )
 
 
 # ---------------------------------------------------------------------------

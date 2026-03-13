@@ -270,6 +270,42 @@ def test_unknown_for_no_signals():
 # ---------------------------------------------------------------------------
 
 
+def test_tie_breaking_uses_insertion_order():
+    """When two ClauseTypes score equally, the one first in CLAUSE_SIGNALS wins.
+
+    This matters because ``max(scores, key=...)`` breaks ties by returning
+    the *first* key it encounters with the maximum value.  Since ``scores``
+    is built by iterating ``CLAUSE_SIGNALS`` (a dict literal whose insertion
+    order is guaranteed in Python 3.7+), the first clause type in
+    ``CLAUSE_SIGNALS`` with the tied score wins.
+
+    Here both INDEMNIFICATION and TERMINATION score exactly 1 (one single-word
+    signal each: "indemnify" and "terminate").  INDEMNIFICATION appears before
+    TERMINATION in ``CLAUSE_SIGNALS``, so it must be the winner.
+    """
+    from lexichunk.enrichment.clause_type import CLAUSE_SIGNALS, _score
+
+    content = "The obligation to indemnify and to terminate applies here."
+    content_lower = content.lower()
+
+    # Sanity-check that the scores are genuinely tied.
+    scores = _score(content_lower, "")
+    assert scores[ClauseType.INDEMNIFICATION] == scores[ClauseType.TERMINATION], (
+        f"Expected tied scores, got INDEMNIFICATION={scores[ClauseType.INDEMNIFICATION]} "
+        f"vs TERMINATION={scores[ClauseType.TERMINATION]}"
+    )
+
+    # Verify INDEMNIFICATION appears before TERMINATION in CLAUSE_SIGNALS.
+    signal_order = list(CLAUSE_SIGNALS.keys())
+    assert signal_order.index(ClauseType.INDEMNIFICATION) < signal_order.index(
+        ClauseType.TERMINATION
+    ), "Test assumes INDEMNIFICATION precedes TERMINATION in CLAUSE_SIGNALS"
+
+    # The classifier must pick the earlier one.
+    result = classify(content)
+    assert result == ClauseType.INDEMNIFICATION
+
+
 def test_hierarchy_path_bonus():
     """Weak content signals + path containing 'indemnification' → INDEMNIFICATION.
 

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import re
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from ..models import ClauseType, DocumentSection
+
+if TYPE_CHECKING:
+    from ..models import LegalChunk
 
 # ---------------------------------------------------------------------------
 # Signal table
@@ -372,7 +375,7 @@ class ClauseTypeClassifier:
         """
         return classify_clause_type(content, hierarchy_path, document_section)
 
-    def classify_all(self, chunks: list) -> list:
+    def classify_all(self, chunks: list[LegalChunk]) -> list[LegalChunk]:
         """Classify ``clause_type`` on a list of LegalChunk objects in-place.
 
         Iterates over *chunks*, calling :meth:`classify` for each item using

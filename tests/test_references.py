@@ -35,7 +35,7 @@ def test_detect_uk_clause_ref():
     refs = detector.detect(text)
     assert len(refs) >= 1
     ids = _identifiers(refs)
-    assert any("3.2" in i for i in ids), f"Expected '3.2' in identifiers; got {ids}"
+    assert "3.2" in ids, f"Expected '3.2' in identifiers; got {ids}"
 
 
 def test_detect_us_section_ref():
@@ -60,7 +60,7 @@ def test_detect_article_ref():
     refs = detector.detect(text)
     assert len(refs) >= 1
     ids = _identifiers(refs)
-    assert any("7.01" in i for i in ids), f"Expected '7.01' in identifiers; got {ids}"
+    assert "7.01" in ids, f"Expected '7.01' in identifiers; got {ids}"
 
 
 def test_detect_schedule_ref():
@@ -85,7 +85,7 @@ def test_detect_exhibit_ref():
     refs = detector.detect(text)
     assert len(refs) >= 1
     ids = _identifiers(refs)
-    assert any("1" in i for i in ids), f"Expected schedule identifier '1' in refs; got {ids}"
+    assert "1" in ids, f"Expected schedule identifier '1' in refs; got {ids}"
 
 
 def test_detect_contextual_ref():
@@ -95,7 +95,7 @@ def test_detect_contextual_ref():
     refs = detector.detect(text)
     assert len(refs) >= 1
     ids = _identifiers(refs)
-    assert any("2.1" in i for i in ids), f"Expected '2.1' in identifiers; got {ids}"
+    assert "2.1" in ids, f"Expected '2.1' in identifiers; got {ids}"
 
 
 def test_deduplication():
@@ -224,7 +224,7 @@ def test_trailing_period_with_subclause():
     text = "Per Section 4.1(a)."
     refs = _us_detector().detect(text)
     ids = _identifiers(refs)
-    assert any("4.1(a)" in i for i in ids), f"Expected '4.1(a)'; got {ids}"
+    assert "4.1(a)" in ids, f"Expected '4.1(a)'; got {ids}"
 
 
 # ---------------------------------------------------------------------------
@@ -293,7 +293,7 @@ def test_detect_article_roman_numeral():
     text = "The indemnification obligations are as set forth in Article VII."
     refs = _us_detector().detect(text)
     ids = _identifiers(refs)
-    assert any("VII" in i for i in ids), f"Expected 'VII' in identifiers; got {ids}"
+    assert "VII" in ids, f"Expected 'VII' in identifiers; got {ids}"
 
 
 def test_resolve_article_roman_numeral():

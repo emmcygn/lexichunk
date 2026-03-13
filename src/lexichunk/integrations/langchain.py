@@ -6,10 +6,15 @@ Install extras:
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from ..chunker import LegalChunker
 from ..models import Jurisdiction
+
+if TYPE_CHECKING:
+    from langchain_core.documents import Document as _LCDocument
+
+    from ..models import LegalChunk
 
 # ---------------------------------------------------------------------------
 # Optional dependency probe
@@ -101,7 +106,7 @@ class LegalTextSplitter:
     # Primary public API
     # ------------------------------------------------------------------
 
-    def split_text(self, text: str) -> list[Any]:
+    def split_text(self, text: str) -> list[_LCDocument]:
         """Split a legal document into a list of LangChain ``Document`` objects.
 
         Runs the full :class:`~lexichunk.chunker.LegalChunker` pipeline and
@@ -134,7 +139,7 @@ class LegalTextSplitter:
         chunks = self._chunker.chunk(text)
         return [_chunk_to_document(chunk) for chunk in chunks]
 
-    def create_documents(self, texts: list[str]) -> list[Any]:
+    def create_documents(self, texts: list[str]) -> list[_LCDocument]:
         """Split multiple legal documents and return a flat list of ``Document`` objects.
 
         Convenience wrapper that calls :meth:`split_text` for every text in
@@ -147,7 +152,7 @@ class LegalTextSplitter:
             Flat list of ``langchain_core.documents.Document`` objects from all
             input texts, in the order they were processed.
         """
-        documents: list[Any] = []
+        documents: list[_LCDocument] = []
         for text in texts:
             documents.extend(self.split_text(text))
         return documents
@@ -158,7 +163,7 @@ class LegalTextSplitter:
 # ---------------------------------------------------------------------------
 
 
-def _build_metadata(chunk: Any) -> dict[str, Any]:
+def _build_metadata(chunk: LegalChunk) -> dict[str, Any]:
     """Build the shared metadata dict from a :class:`~lexichunk.models.LegalChunk`.
 
     Args:
@@ -191,7 +196,7 @@ def _build_metadata(chunk: Any) -> dict[str, Any]:
     }
 
 
-def _chunk_to_document(chunk: Any) -> Any:
+def _chunk_to_document(chunk: LegalChunk) -> _LCDocument:
     """Convert a :class:`~lexichunk.models.LegalChunk` to a LangChain ``Document``.
 
     Args:
