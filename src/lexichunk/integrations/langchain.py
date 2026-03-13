@@ -176,7 +176,7 @@ def _chunk_to_document(chunk: LegalChunk) -> _LCDocument:
         A ``langchain_core.documents.Document`` with ``page_content`` set to
         the chunk's text and ``metadata`` populated with legal metadata.
     """
-    return _Document(  # type: ignore[misc]
+    return _Document(  # type: ignore[misc,no-any-return]
         page_content=chunk.content,
         metadata=_build_metadata(chunk),
     )

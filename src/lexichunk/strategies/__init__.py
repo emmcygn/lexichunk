@@ -15,7 +15,7 @@ class ChunkingStrategy(Protocol):
     not need to explicitly inherit from it.
     """
 
-    def chunk(self, *args, **kwargs) -> list[LegalChunk]: ...
+    def chunk(self, *args: object, **kwargs: object) -> list[LegalChunk]: ...
 
 
 __all__ = ["ChunkingStrategy"]

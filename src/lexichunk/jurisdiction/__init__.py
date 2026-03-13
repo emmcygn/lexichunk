@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Callable, Optional
+
 from ..models import Jurisdiction
 from .uk import UK_PATTERNS, UKPatterns
 from .uk import detect_level as uk_detect_level
@@ -28,7 +30,7 @@ def get_patterns(jurisdiction: Jurisdiction) -> UKPatterns | USPatterns:
     raise ValueError(f"Unsupported jurisdiction: {jurisdiction}")
 
 
-def get_detect_level(jurisdiction: Jurisdiction):
+def get_detect_level(jurisdiction: Jurisdiction) -> Callable[[str], Optional[tuple[int, str]]]:
     """Return the detect_level function for the given jurisdiction.
 
     Args:

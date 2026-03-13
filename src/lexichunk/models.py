@@ -112,3 +112,4 @@ class LegalChunk:
     char_start: int = 0
     char_end: int = 0
     token_count: int = 0
+    original_header: str = ""

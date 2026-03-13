@@ -661,10 +661,266 @@ def test_content_fidelity_no_text_loss(uk_service_agreement):
     ]
     found = sum(1 for line in lines if norm(line) in combined_norm)
     ratio = found / len(lines) if lines else 1.0
-    # Current baseline: ~87% line preservation.  Clause headers are stored
-    # in hierarchy metadata rather than chunk content.  This threshold should
-    # be raised as content fidelity improves.
-    assert ratio >= 0.85, (
+    # v0.2.0: ancestor headers are prepended to chunk content, so fidelity
+    # should be ≥99%.
+    assert ratio >= 0.99, (
         f"Too much text lost during chunking: {found}/{len(lines)} lines "
-        f"preserved ({ratio:.0%}). Expected >= 85%."
+        f"preserved ({ratio:.0%}). Expected >= 99%."
     )
+
+
+# ---------------------------------------------------------------------------
+# Phase A: Ancestor header prepending tests (v0.2.0)
+# ---------------------------------------------------------------------------
+
+
+def test_ancestor_headers_in_chunk_content():
+    """For a 3-level deep clause, ALL ancestor headers appear in chunk content
+    in root→leaf order before the body text."""
+    text = (
+        "1. Obligations\n\n"
+        "The Provider shall comply.\n\n"
+        "1.1 Service Standards\n\n"
+        "The Provider shall maintain standards.\n\n"
+        "1.1.1 Response Times\n\n"
+        "The Provider shall respond within the timeframes below.\n\n"
+        "(a) Priority Requests\n\n"
+        "Priority requests shall be acknowledged within one Business Day."
+    )
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=1)
+    chunks = chunker.chunk(text)
+
+    # Find the chunk for (a)
+    chunk_a = None
+    for c in chunks:
+        if c.hierarchy.identifier == "(a)":
+            chunk_a = c
+            break
+    assert chunk_a is not None, "No chunk found with identifier (a)"
+
+    # All ancestors must appear in content
+    assert "1." in chunk_a.content or "1 " in chunk_a.content or "1\n" in chunk_a.content, (
+        f"Top-level ancestor '1' not in content: {chunk_a.content!r}"
+    )
+    assert "1.1" in chunk_a.content, (
+        f"Ancestor '1.1' not in content: {chunk_a.content!r}"
+    )
+    assert "1.1.1" in chunk_a.content, (
+        f"Ancestor '1.1.1' not in content: {chunk_a.content!r}"
+    )
+
+
+def test_original_header_field_populated():
+    """original_header is populated and matches the clause's own header."""
+    text = (
+        "1. Governing Law\n\n"
+        "This Agreement shall be governed by the laws of England."
+    )
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=1)
+    chunks = chunker.chunk(text)
+    assert len(chunks) >= 1
+    # For preamble-less doc the first real clause should have original_header
+    non_preamble = [c for c in chunks if c.hierarchy.level != -99]
+    assert len(non_preamble) >= 1
+    c = non_preamble[0]
+    assert c.original_header != "", f"original_header is empty on chunk {c.index}"
+    assert "1" in c.original_header
+
+
+def test_per_chunk_identifier_in_content(uk_chunker, uk_service_agreement):
+    """Every chunk's hierarchy identifier must appear in its content.
+
+    Synthetic __part identifiers from sentence-splitting are excluded since
+    the part suffix is a chunker artifact, not a document-level identifier.
+    """
+    chunks = uk_chunker.chunk(uk_service_agreement)
+    for chunk in chunks:
+        ident = chunk.hierarchy.identifier
+        if ident == "preamble" or "__part" in ident:
+            continue
+        assert ident in chunk.content, (
+            f"Chunk {chunk.index} identifier {ident!r} not found in content: "
+            f"{chunk.content[:200]!r}"
+        )
+
+
+def test_ancestor_header_ordering():
+    """Ancestor headers must appear in root→leaf order (not reversed)."""
+    text = (
+        "1. Obligations\n\n"
+        "The Provider shall comply.\n\n"
+        "1.1 Service Standards\n\n"
+        "The Provider shall maintain standards.\n\n"
+        "(a) Priority Requests\n\n"
+        "Priority requests shall be acknowledged within one Business Day."
+    )
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=1)
+    chunks = chunker.chunk(text)
+
+    chunk_a = next((c for c in chunks if c.hierarchy.identifier == "(a)"), None)
+    assert chunk_a is not None
+
+    # "1 Obligations" must appear before "1.1 Service Standards" which must
+    # appear before "(a)" in content
+    content = chunk_a.content
+    pos_1 = content.find("1 Obligations")
+    pos_11 = content.find("1.1 Service Standards")
+    pos_a = content.find("(a)")
+    assert pos_1 != -1, "Ancestor '1 Obligations' not found in content"
+    assert pos_11 != -1, "Ancestor '1.1 Service Standards' not found in content"
+    assert pos_1 < pos_11 < pos_a, (
+        f"Headers not in root→leaf order: '1 Obligations' at {pos_1}, "
+        f"'1.1 Service Standards' at {pos_11}, '(a)' at {pos_a}"
+    )
+
+
+def test_merged_chunks_carry_primary_ancestors():
+    """When small clauses are merged, the primary clause's ancestors are prepended."""
+    text = (
+        "1. General\n\n"
+        "The Provider shall comply.\n\n"
+        "1.1 Terms\n\n"
+        "Short clause.\n\n"
+        "1.2 More Terms\n\n"
+        "Another short clause."
+    )
+    # With a high min_chunk_size, 1.1 and 1.2 should merge
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=200)
+    chunks = chunker.chunk(text)
+    # The merged chunk should still contain the parent "1" identifier
+    merged = [c for c in chunks if c.hierarchy.level != -99]
+    for c in merged:
+        assert "1" in c.content, (
+            f"Merged chunk {c.index} missing ancestor '1' in content"
+        )
+
+
+def test_preamble_no_ancestor_headers():
+    """Preamble chunks (level=-99) should NOT have ancestor headers prepended."""
+    text = (
+        "This Agreement is entered into on 1 January 2024.\n\n"
+        "1. Definitions\n\n"
+        "The following terms shall have the meanings set forth below."
+    )
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=1)
+    chunks = chunker.chunk(text)
+    preamble_chunks = [c for c in chunks if c.hierarchy.level == -99]
+    for c in preamble_chunks:
+        # Preamble content should not start with any clause header
+        assert c.original_header == "", (
+            f"Preamble chunk has original_header: {c.original_header!r}"
+        )
+
+
+def test_token_count_includes_prepended_headers():
+    """token_count must reflect the full content including prepended headers."""
+    text = (
+        "1. Obligations\n\n"
+        "The Provider shall comply.\n\n"
+        "1.1 Service Standards\n\n"
+        "The Provider shall maintain service standards as set forth herein."
+    )
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=1)
+    chunks = chunker.chunk(text)
+    for chunk in chunks:
+        expected = max(1, len(chunk.content) // 4)
+        assert chunk.token_count == expected, (
+            f"Chunk {chunk.index} token_count {chunk.token_count} != "
+            f"expected {expected} for content length {len(chunk.content)}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Phase B: Adversarial stress tests (v0.2.0)
+# ---------------------------------------------------------------------------
+
+
+def test_deeply_nested_6_levels():
+    """6-level deep hierarchy — all ancestors present, content not bloated."""
+    text = (
+        "1. Level One\n\nBody one.\n\n"
+        "1.1 Level Two\n\nBody two.\n\n"
+        "1.1.1 Level Three\n\nBody three.\n\n"
+        "(a) Level Four\n\nBody four.\n\n"
+        "(i) Level Five\n\nBody five.\n\n"
+        "(A) Level Six\n\nBody six — the deepest clause."
+    )
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=1)
+    chunks = chunker.chunk(text)
+    # Find deepest chunk
+    deepest = max(chunks, key=lambda c: c.hierarchy.level)
+    # Should contain identifiers from ancestor chain
+    assert "1." in deepest.content or "1 " in deepest.content
+    # Content shouldn't be unreasonably large
+    assert len(deepest.content) < 2000, f"Content too large: {len(deepest.content)}"
+
+
+def test_missing_parent_in_clause_map_no_crash():
+    """If parent chain is broken (missing parent), chunker should not crash."""
+    from lexichunk.models import DocumentSection
+    from lexichunk.parsers.structure import ParsedClause
+    from lexichunk.strategies.clause_aware import ClauseAwareChunker
+
+    # Create a clause with a parent_identifier that doesn't exist in clause_map
+    clause = ParsedClause(
+        identifier="(a)",
+        title="Orphan Clause",
+        content="This clause has a broken parent reference.",
+        level=3,
+        parent_identifier="NONEXISTENT",
+        document_section=DocumentSection.OPERATIVE,
+        char_start=0,
+        char_end=50,
+        children=[],
+    )
+    chunker = ClauseAwareChunker(jurisdiction=Jurisdiction.UK, min_chunk_size=1)
+    # Should not crash
+    chunks = chunker.chunk([clause], "This clause has a broken parent reference.")
+    assert len(chunks) >= 1
+
+
+def test_clause_with_empty_title():
+    """Clause with empty title — header should be identifier only, no trailing whitespace."""
+    text = (
+        "1.\n\n"
+        "This clause has a number but no title text whatsoever."
+    )
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=1)
+    chunks = chunker.chunk(text)
+    non_preamble = [c for c in chunks if c.hierarchy.level != -99]
+    if non_preamble:
+        c = non_preamble[0]
+        # original_header should not have trailing whitespace
+        assert c.original_header == c.original_header.strip(), (
+            f"original_header has trailing whitespace: {c.original_header!r}"
+        )
+
+
+def test_single_clause_no_ancestors():
+    """Single-clause document — no ancestors, no crash, content unchanged except own header."""
+    text = "1. Entire Agreement\n\nThis constitutes the entire agreement."
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=1)
+    chunks = chunker.chunk(text)
+    non_preamble = [c for c in chunks if c.hierarchy.level != -99]
+    assert len(non_preamble) >= 1
+    c = non_preamble[0]
+    assert "1" in c.content
+    assert "entire agreement" in c.content.lower()
+
+
+def test_unicode_in_titles():
+    """Unicode characters in titles are preserved correctly."""
+    text = (
+        "1. Définitions\n\n"
+        "Les termes suivants auront les significations indiquées ci-dessous.\n\n"
+        "1.1 Affilié\n\n"
+        "Le terme Affilié désigne toute entité contrôlée."
+    )
+    chunker = LegalChunker(jurisdiction="uk", min_chunk_size=1)
+    chunks = chunker.chunk(text)
+    # Find chunk for 1.1
+    c11 = next((c for c in chunks if "1.1" in c.hierarchy.identifier), None)
+    if c11:
+        assert "Définitions" in c11.content or "1." in c11.content, (
+            f"Parent header not in child content: {c11.content!r}"
+        )

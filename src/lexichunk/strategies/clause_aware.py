@@ -213,14 +213,11 @@ class ClauseAwareChunker:
             List of :class:`~lexichunk.parsers.structure.ParsedClause` objects
             (sub-clauses or sentence-split synthetics).
         """
-        # Strategy 1: use existing child clauses.
-        children = [
-            c for c in all_clauses if c.parent_identifier == clause.identifier
-        ]
-        if children:
-            return children
+        # Note: child clauses are already in the flat list and will be
+        # processed by the main loop.  We only need to split this clause's
+        # *own* content (which excludes children's content).
 
-        # Strategy 2: sentence-boundary splitting.
+        # Sentence-boundary splitting.
         sentences = re.split(r'(?<=[.!?])\s+', clause.content)
 
         result: list[ParsedClause] = []
@@ -357,7 +354,7 @@ class ClauseAwareChunker:
         first = group[0]
         last = group[-1]
 
-        content = '\n'.join(c.content for c in group)
+        raw_content = '\n'.join(c.content for c in group)
 
         hierarchy = HierarchyNode(
             level=first.level,
@@ -367,6 +364,21 @@ class ClauseAwareChunker:
         )
 
         hierarchy_path = self._build_hierarchy_path(first, clause_map)
+
+        # Build original_header for this chunk's own clause.
+        if first.level == -99:
+            original_header = ""
+        elif first.title:
+            original_header = f"{first.identifier} {first.title}".strip()
+        else:
+            original_header = first.identifier.strip()
+
+        # Collect ancestor headers (root→leaf order) and prepend to content.
+        ancestor_headers = self._collect_ancestor_headers(first, clause_map)
+        if ancestor_headers:
+            content = '\n'.join(ancestor_headers) + '\n' + raw_content
+        else:
+            content = raw_content
 
         return LegalChunk(
             content=content,
@@ -384,7 +396,48 @@ class ClauseAwareChunker:
             char_start=first.char_start,
             char_end=last.char_end,
             token_count=_approx_tokens(content, self._chars_per_token),
+            original_header=original_header,
         )
+
+
+    def _collect_ancestor_headers(
+        self,
+        clause: ParsedClause,
+        clause_map: dict[str, ParsedClause],
+    ) -> list[str]:
+        """Collect ancestor header lines in root→leaf order (excluding *clause* itself).
+
+        Walks up the ``parent_identifier`` chain, collects each ancestor's
+        header as ``"identifier title"`` (or just identifier if no title),
+        then reverses to produce root-first ordering.
+
+        Preamble clauses (``level == -99``) return an empty list.
+
+        Args:
+            clause: The clause whose ancestors to collect.
+            clause_map: Dict mapping ``identifier`` → :class:`ParsedClause`.
+
+        Returns:
+            List of header strings in root→leaf order.
+        """
+        if clause.level == -99:
+            return []
+
+        ancestors: list[str] = []
+        parent_id = clause.parent_identifier
+
+        while parent_id is not None:
+            parent = clause_map.get(parent_id)
+            if parent is None:
+                break
+            if parent.title:
+                ancestors.append(f"{parent.identifier} {parent.title}".strip())
+            else:
+                ancestors.append(parent.identifier.strip())
+            parent_id = parent.parent_identifier
+
+        ancestors.reverse()
+        return ancestors
 
 
 __all__ = ["ClauseAwareChunker"]

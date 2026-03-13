@@ -232,7 +232,7 @@ def _chunk_to_text_node(chunk: LegalChunk) -> _LITextNode:
         A ``llama_index.core.schema.TextNode`` with ``text`` set to the
         chunk's content and ``metadata`` populated with legal metadata.
     """
-    return _TextNode(  # type: ignore[misc]
+    return _TextNode(  # type: ignore[misc,no-any-return]
         text=chunk.content,
         metadata=_build_metadata(chunk),
     )

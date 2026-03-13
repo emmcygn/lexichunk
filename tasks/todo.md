@@ -36,7 +36,19 @@
 - [x] `examples/langchain_rag.py`
 - [x] `examples/compare_chunkers.py`
 
-## Review
+## Milestone 0.2.0 — Fidelity ✅
+- [x] Add `original_header` field to `LegalChunk` model
+- [x] Prepend ancestor headers to chunk content in `_group_to_chunk()`
+- [x] Fix `_split_oversized_clause()` dropping parent content when children exist
+- [x] Raise fidelity threshold from 85% → 99%
+- [x] Add 14 new tests (8 Phase A + 6 Phase B adversarial)
+- [x] Add mypy to CI and dev deps
+- [x] Fix 4 mypy type errors across source files
+- [x] Bump version to 0.2.0
+
+**Result**: 223/223 tests passing. ruff clean. mypy 0 errors. Content fidelity ≥99%.
+
+## Review (v0.1.0)
 
 **Result**: 107/107 tests passing in 0.42s. Full pipeline verified end-to-end.
 
