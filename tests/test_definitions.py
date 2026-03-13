@@ -168,3 +168,41 @@ def test_fees_defined_in_uk_fixture(uk_service_agreement):
     extractor = _make_extractor(Jurisdiction.UK)
     result = extractor.extract(uk_service_agreement)
     assert "Fees" in result
+
+
+# ---------------------------------------------------------------------------
+# Single-quote definition tests
+# ---------------------------------------------------------------------------
+
+
+def test_single_quote_definition():
+    """Straight single-quoted term with 'means' keyword is extracted."""
+    text = "'Supplier' means the entity providing services."
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Supplier" in result
+    dt = result["Supplier"]
+    assert isinstance(dt, DefinedTerm)
+    assert dt.term == "Supplier"
+
+
+def test_single_quote_means():
+    """Single-quoted multi-word term with 'means' keyword is extracted."""
+    text = "'Confidential Information' means any information disclosed by either party."
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Confidential Information" in result
+    dt = result["Confidential Information"]
+    assert dt.term == "Confidential Information"
+
+
+def test_mixed_quotes():
+    """Document with both double-quoted and single-quoted definitions extracts both."""
+    text = (
+        '"Term One" means the first defined term.\n\n'
+        "'Term Two' means the second defined term."
+    )
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Term One" in result, f"Missing 'Term One'; got {list(result.keys())}"
+    assert "Term Two" in result, f"Missing 'Term Two'; got {list(result.keys())}"

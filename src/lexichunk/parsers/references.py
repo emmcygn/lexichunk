@@ -44,7 +44,11 @@ _LABEL_WORDS: tuple[str, ...] = (
 )
 
 # Punctuation translation table for identifier normalisation.
-_STRIP_PUNCT = str.maketrans("", "", string.punctuation)
+# Preserve dots and parentheses — they are structurally meaningful in legal
+# identifiers like "3.1(a)".  Only strip the remaining punctuation characters.
+_STRIP_PUNCT = str.maketrans(
+    "", "", string.punctuation.replace(".", "").replace("(", "").replace(")", "")
+)
 
 
 class ReferenceDetector:

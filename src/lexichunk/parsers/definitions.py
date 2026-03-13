@@ -16,6 +16,17 @@ _SKIP_TERMS: frozenset[str] = frozenset({"The", "A", "An", "This", "That"})
 # Regex matching a blank line (zero or more spaces, then newline).
 _BLANK_LINE: re.Pattern[str] = re.compile(r"^\s*$", re.MULTILINE)
 
+# Single-quote definition patterns (straight and curly).
+# ~30-40% of UK contracts use single quotes for defined terms.
+_DEFINITION_SINGLE: re.Pattern[str] = re.compile(
+    r"'([A-Z][A-Za-z\s\-]{1,60})'\s+(?:means|shall mean|has the meaning|is defined as|refers to)",
+    re.MULTILINE,
+)
+_DEFINITION_SINGLE_CURLY: re.Pattern[str] = re.compile(
+    r"\u2018([A-Z][A-Za-z\s\-]{1,60})\u2019\s+(?:means|shall mean|has the meaning|is defined as|refers to)",
+    re.MULTILINE,
+)
+
 # Numbered / lettered clause-header patterns used to detect the start of a new
 # clause when scanning a definition body.
 _UK_CLAUSE_HEADER: re.Pattern[str] = re.compile(
@@ -268,7 +279,7 @@ class DefinitionsExtractor:
         # positions so we can process them in document order.
         raw_matches: list[tuple[int, int, str]] = []  # (start, end, term)
 
-        for pattern in (self._patterns.definition, self._patterns.definition_curly):  # type: ignore[attr-defined]
+        for pattern in (self._patterns.definition, self._patterns.definition_curly, _DEFINITION_SINGLE, _DEFINITION_SINGLE_CURLY):  # type: ignore[attr-defined]
             for m in pattern.finditer(text):
                 term = m.group(1).strip()
                 raw_matches.append((m.start(), m.end(), term))
@@ -330,7 +341,7 @@ class DefinitionsExtractor:
         stop = len(remaining)
 
         # 1. Next definition match.
-        for pat in (self._patterns.definition, self._patterns.definition_curly):  # type: ignore[attr-defined]
+        for pat in (self._patterns.definition, self._patterns.definition_curly, _DEFINITION_SINGLE, _DEFINITION_SINGLE_CURLY):  # type: ignore[attr-defined]
             m = pat.search(remaining)
             if m:
                 stop = min(stop, m.start())

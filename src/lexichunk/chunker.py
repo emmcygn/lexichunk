@@ -15,6 +15,7 @@ Orchestrates the full pipeline:
 
 from __future__ import annotations
 
+import re
 from typing import Optional
 
 from .enrichment.clause_type import ClauseTypeClassifier
@@ -269,7 +270,7 @@ def _attach_defined_terms(
     for chunk in chunks:
         content = chunk.content
         for term, dt in defined_terms.items():
-            if term in content:
+            if re.search(r'\b' + re.escape(term) + r'\b', content):
                 if term not in chunk.defined_terms_used:
                     chunk.defined_terms_used.append(term)
                     chunk.defined_terms_context[term] = dt.definition

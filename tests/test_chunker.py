@@ -425,16 +425,16 @@ def test_context_headers_empty_when_disabled(uk_service_agreement):
 # ---------------------------------------------------------------------------
 
 
-def test_invalid_jurisdiction_raises_error():
+def test_invalid_jurisdiction_string_raises_value_error():
     """Passing an unsupported jurisdiction string raises ValueError."""
     with pytest.raises(ValueError):
         LegalChunker(jurisdiction="french")
 
 
-def test_jurisdiction_enum_accepted():
+def test_jurisdiction_enum_us_accepted():
     """Passing a Jurisdiction enum value directly works."""
-    chunker = LegalChunker(jurisdiction=Jurisdiction.UK)
-    assert chunker._jurisdiction == Jurisdiction.UK
+    chunker = LegalChunker(jurisdiction=Jurisdiction.US)
+    assert chunker._jurisdiction == Jurisdiction.US
 
 
 def test_max_lt_min_chunk_size_raises_error():
