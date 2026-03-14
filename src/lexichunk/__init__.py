@@ -9,6 +9,8 @@ from .exceptions import (
 )
 from .jurisdiction import register_jurisdiction
 from .models import (
+    BatchError,
+    BatchResult,
     ClauseType,
     CrossReference,
     DefinedTerm,
@@ -19,7 +21,7 @@ from .models import (
     LegalChunk,
 )
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 __all__ = [
     "LegalChunker",
     "LegalChunk",
@@ -30,6 +32,8 @@ __all__ = [
     "DocumentSection",
     "Jurisdiction",
     "JurisdictionPatterns",
+    "BatchResult",
+    "BatchError",
     "register_jurisdiction",
     "LexichunkError",
     "ConfigurationError",

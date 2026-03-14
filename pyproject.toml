@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lexichunk"
-version = "0.4.0"
+version = "0.5.0"
 description = "Intelligent text chunking for legal documents in RAG pipelines"
 readme = "README.md"
 license = "MIT"
@@ -31,6 +31,7 @@ llama-index = ["llama-index-core>=0.10.0"]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "pytest-benchmark>=4.0",
     "mypy>=1.0",
     "hypothesis>=6.0",
 ]
@@ -76,3 +77,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+markers = [
+    "benchmark: performance benchmarks (deselect with '-m \"not benchmark\"')",
+]
+addopts = "--benchmark-disable"

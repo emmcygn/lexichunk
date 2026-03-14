@@ -15,10 +15,15 @@ Orchestrates the full pipeline:
 
 from __future__ import annotations
 
+import concurrent.futures
+import hashlib
 import logging
+import os
 import re
+import sys
 import unicodedata
-from typing import Optional
+from dataclasses import dataclass
+from typing import Iterator, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +31,8 @@ from .enrichment.clause_type import ClauseTypeClassifier
 from .enrichment.context import ContextEnricher
 from .exceptions import ConfigurationError, InputError
 from .models import (
+    BatchError,
+    BatchResult,
     ClauseType,
     DefinedTerm,
     HierarchyNode,
@@ -89,6 +96,7 @@ class LegalChunker:
         chars_per_token: int = 4,
         extra_abbreviations: list[str] | None = None,
         extra_clause_signals: dict[ClauseType, list[str]] | None = None,
+        enable_definition_cache: bool = True,
     ) -> None:
         # Normalise jurisdiction: try enum first, then registry lookup.
         if isinstance(jurisdiction, str):
@@ -138,6 +146,8 @@ class LegalChunker:
         self._document_id = document_id
         self._extra_abbreviations = extra_abbreviations
         self._extra_clause_signals = extra_clause_signals
+        self._enable_definition_cache = enable_definition_cache
+        self._definition_cache: dict[str, dict[str, DefinedTerm]] = {}
 
         # Instantiate pipeline components.
         self._structure_parser = StructureParser(
@@ -281,7 +291,16 @@ class LegalChunker:
         # ------------------------------------------------------------------
         defined_terms: dict[str, DefinedTerm] | None = None
         if self._include_definitions:
-            defined_terms = self._definitions_extractor.extract(text)
+            if self._enable_definition_cache:
+                cache_key = hashlib.sha256(text.encode("utf-8")).hexdigest()
+                if cache_key in self._definition_cache:
+                    logger.debug("Definition cache hit (key=%s…)", cache_key[:12])
+                    defined_terms = self._definition_cache[cache_key]
+                else:
+                    defined_terms = self._definitions_extractor.extract(text)
+                    self._definition_cache[cache_key] = defined_terms
+            else:
+                defined_terms = self._definitions_extractor.extract(text)
             _attach_defined_terms(chunks, defined_terms)
 
         # ------------------------------------------------------------------
@@ -326,6 +345,258 @@ class LegalChunker:
             document order.
         """
         return self._structure_parser.parse_structure(self._sanitize_input(text))
+
+    def chunk_iter(
+        self, text: str, document_id: Optional[str] = None
+    ) -> Iterator[LegalChunk]:
+        """Yield chunks from a legal document one at a time.
+
+        This is a convenience wrapper around :meth:`chunk` — it runs the
+        full pipeline first, then yields results.  It does **not** provide
+        true streaming (cross-reference resolution and context enrichment
+        are multi-chunk operations).
+
+        Args:
+            text: Full legal document as a plain-text string.
+            document_id: Override ``document_id`` for this call.
+
+        Yields:
+            :class:`~lexichunk.models.LegalChunk` objects in document order.
+        """
+        yield from self.chunk(text, document_id=document_id)
+
+    def clear_definition_cache(self) -> None:
+        """Clear the definition extraction cache.
+
+        Useful when the same :class:`LegalChunker` instance is reused
+        across different document versions whose definitions may have
+        changed.
+        """
+        self._definition_cache.clear()
+
+    def chunk_batch(
+        self,
+        texts: list[str | tuple[str, str | None]],
+        workers: int | None = None,
+    ) -> BatchResult:
+        """Chunk multiple documents in one call, with optional parallelism.
+
+        Each element of *texts* is either a plain text string or a
+        ``(text, document_id)`` tuple.  Documents that raise during
+        processing are recorded as errors and do not halt the batch.
+
+        Args:
+            texts: List of documents to chunk.
+            workers: Number of parallel worker processes.  Defaults to
+                ``min(cpu_count, len(texts))``.  When *workers* is 1 or
+                the batch has ≤2 documents, processing is serial (no
+                subprocess overhead).
+
+        Returns:
+            :class:`~lexichunk.models.BatchResult` containing per-document
+            chunk lists and any errors.
+
+        Raises:
+            ConfigurationError: If a custom (non-built-in) jurisdiction
+                is used with ``workers > 1``, since custom registrations
+                cannot be pickled to child processes.
+        """
+        if not texts:
+            return BatchResult(results=[], errors=[])
+
+        # Normalize inputs to (text, doc_id) pairs with validation.
+        pairs: list[tuple[str, str | None]] = []
+        early_errors: list[BatchError] = []
+        for i, item in enumerate(texts):
+            if isinstance(item, tuple):
+                if len(item) != 2:
+                    early_errors.append(BatchError(
+                        index=i,
+                        text_preview=repr(item)[:100],
+                        error=f"Tuple must have exactly 2 elements (text, doc_id), got {len(item)}",
+                        error_type="ValueError",
+                    ))
+                    pairs.append(("", None))  # placeholder
+                    continue
+                text_val, doc_id_val = item
+                if not isinstance(text_val, str):
+                    early_errors.append(BatchError(
+                        index=i,
+                        text_preview=repr(text_val)[:100],
+                        error=f"Expected str for text, got {type(text_val).__name__}",
+                        error_type="TypeError",
+                    ))
+                    pairs.append(("", None))
+                    continue
+                pairs.append((text_val, doc_id_val))
+            elif isinstance(item, str):
+                pairs.append((item, None))
+            else:
+                early_errors.append(BatchError(
+                    index=i,
+                    text_preview=repr(item)[:100],
+                    error=f"Expected str or (str, str|None) tuple, got {type(item).__name__}",
+                    error_type="TypeError",
+                ))
+                pairs.append(("", None))  # placeholder
+
+        # Indices that already failed validation — skip during processing.
+        skip_indices = {e.index for e in early_errors}
+
+        # Determine effective worker count.
+        if workers is None:
+            cpu = os.cpu_count() or 1
+            effective_workers = min(cpu, len(pairs))
+        else:
+            if workers < 1:
+                raise ConfigurationError(f"workers ({workers}) must be >= 1")
+            effective_workers = workers
+
+        # Cap to platform limit (Windows: max 61 workers).
+        if sys.platform == "win32":
+            effective_workers = min(effective_workers, 61)
+
+        # Serial fallback for small batches or workers=1.
+        use_parallel = effective_workers > 1 and len(pairs) > 2
+
+        if use_parallel:
+            # Validate: custom jurisdictions can't be pickled.
+            if not isinstance(self._jurisdiction, Jurisdiction):
+                raise ConfigurationError(
+                    f"Custom jurisdiction {self._jurisdiction!r} cannot be used "
+                    f"with workers > 1. Custom jurisdiction registrations are "
+                    f"not inherited by child processes. Use workers=1 instead."
+                )
+            result = self._chunk_batch_parallel(pairs, effective_workers, skip_indices)
+        else:
+            result = self._chunk_batch_serial(pairs, skip_indices)
+
+        # Merge early validation errors.
+        result.errors.extend(early_errors)
+        return result
+
+    # ------------------------------------------------------------------
+    # Batch internals
+    # ------------------------------------------------------------------
+
+    def _chunk_batch_serial(
+        self,
+        pairs: list[tuple[str, str | None]],
+        skip_indices: set[int],
+    ) -> BatchResult:
+        """Process a batch of documents serially."""
+        results: list[list[LegalChunk]] = []
+        errors: list[BatchError] = []
+        for i, (text, doc_id) in enumerate(pairs):
+            if i in skip_indices:
+                results.append([])
+                continue
+            try:
+                chunks = self.chunk(text, document_id=doc_id)
+                results.append(chunks)
+            except Exception as exc:
+                results.append([])
+                errors.append(BatchError(
+                    index=i,
+                    text_preview=text[:100],
+                    error=str(exc),
+                    error_type=type(exc).__qualname__,
+                ))
+        return BatchResult(results=results, errors=errors)
+
+    def _chunk_batch_parallel(
+        self,
+        pairs: list[tuple[str, str | None]],
+        workers: int,
+        skip_indices: set[int],
+    ) -> BatchResult:
+        """Process a batch of documents in parallel using ProcessPoolExecutor."""
+        assert isinstance(self._jurisdiction, Jurisdiction)  # validated by caller
+        config = _ChunkerConfig(
+            jurisdiction=self._jurisdiction,
+            doc_type=self._doc_type,
+            max_chunk_size=self._max_chunk_size,
+            min_chunk_size=self._min_chunk_size,
+            include_definitions=self._include_definitions,
+            include_context_header=self._include_context_header,
+            document_id=self._document_id,
+            chars_per_token=self._chars_per_token,
+            extra_abbreviations=self._extra_abbreviations,
+            extra_clause_signals=self._extra_clause_signals,
+            enable_definition_cache=self._enable_definition_cache,
+        )
+
+        results: list[list[LegalChunk]] = [[] for _ in pairs]
+        errors: list[BatchError] = []
+
+        with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as pool:
+            future_to_idx: dict[concurrent.futures.Future[list[LegalChunk]], int] = {}
+            for i, (text, doc_id) in enumerate(pairs):
+                if i in skip_indices:
+                    continue
+                fut = pool.submit(_chunk_single, config, text, doc_id)
+                future_to_idx[fut] = i
+
+            for fut in concurrent.futures.as_completed(future_to_idx):
+                idx = future_to_idx[fut]
+                try:
+                    results[idx] = fut.result()
+                except Exception as exc:
+                    text_preview = pairs[idx][0][:100]
+                    errors.append(BatchError(
+                        index=idx,
+                        text_preview=text_preview,
+                        error=str(exc),
+                        error_type=type(exc).__qualname__,
+                    ))
+
+        return BatchResult(results=results, errors=errors)
+
+
+# ---------------------------------------------------------------------------
+# Parallel worker config + function
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class _ChunkerConfig:
+    """Serialisable snapshot of LegalChunker configuration for child processes."""
+
+    jurisdiction: Jurisdiction
+    doc_type: str
+    max_chunk_size: int
+    min_chunk_size: int
+    include_definitions: bool
+    include_context_header: bool
+    document_id: str | None
+    chars_per_token: int
+    extra_abbreviations: list[str] | None
+    extra_clause_signals: dict[ClauseType, list[str]] | None
+    enable_definition_cache: bool
+
+
+def _chunk_single(
+    config: _ChunkerConfig, text: str, doc_id: str | None
+) -> list[LegalChunk]:
+    """Worker function for parallel batch processing.
+
+    Creates a fresh :class:`LegalChunker` from the config and processes
+    a single document.  Runs in a child process via ProcessPoolExecutor.
+    """
+    chunker = LegalChunker(
+        jurisdiction=config.jurisdiction,
+        doc_type=config.doc_type,
+        max_chunk_size=config.max_chunk_size,
+        min_chunk_size=config.min_chunk_size,
+        include_definitions=config.include_definitions,
+        include_context_header=config.include_context_header,
+        document_id=config.document_id,
+        chars_per_token=config.chars_per_token,
+        extra_abbreviations=config.extra_abbreviations,
+        extra_clause_signals=config.extra_clause_signals,
+        enable_definition_cache=config.enable_definition_cache,
+    )
+    return chunker.chunk(text, document_id=doc_id)
 
 
 # ---------------------------------------------------------------------------

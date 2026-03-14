@@ -131,3 +131,55 @@ class LegalChunk:
     char_end: int = 0
     token_count: int = 0
     original_header: str = ""
+
+
+@dataclass
+class BatchError:
+    """Error from processing a single document in a batch.
+
+    Args:
+        index: Position of the failed document in the input list.
+        text_preview: First 100 characters of the input text.
+        error: Error message string.
+        error_type: Fully-qualified exception class name.
+    """
+
+    index: int
+    text_preview: str
+    error: str
+    error_type: str
+
+
+@dataclass
+class BatchResult:
+    """Result of :meth:`~lexichunk.chunker.LegalChunker.chunk_batch`.
+
+    Contains per-document chunk lists and any errors that occurred.
+    Documents that errored out have an empty list at their index in
+    ``results``.
+
+    Args:
+        results: Per-document chunk lists, in input order.  Failed documents
+            have an empty list.
+        errors: List of :class:`BatchError` objects for documents that
+            failed processing.
+    """
+
+    results: list[list["LegalChunk"]]
+    errors: list[BatchError]
+
+    @property
+    def total_chunks(self) -> int:
+        """Total number of chunks across all successfully processed documents."""
+        return sum(len(r) for r in self.results)
+
+    @property
+    def success_count(self) -> int:
+        """Number of documents processed without errors."""
+        error_indices = {e.index for e in self.errors}
+        return len(self.results) - len(error_indices)
+
+    @property
+    def error_count(self) -> int:
+        """Number of documents that failed processing."""
+        return len(self.errors)
