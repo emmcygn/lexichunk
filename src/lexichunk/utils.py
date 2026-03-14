@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Any
 
 from .models import LegalChunk
@@ -33,7 +34,7 @@ def build_metadata(chunk: LegalChunk) -> dict[str, Any]:
     """
     return {
         "clause_type": chunk.clause_type.value,
-        "jurisdiction": chunk.jurisdiction.value,
+        "jurisdiction": chunk.jurisdiction.value if isinstance(chunk.jurisdiction, Enum) else chunk.jurisdiction,
         "document_section": chunk.document_section.value,
         "hierarchy_path": chunk.hierarchy_path,
         "hierarchy_identifier": chunk.hierarchy.identifier,

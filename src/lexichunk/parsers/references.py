@@ -69,13 +69,14 @@ class ReferenceDetector:
         jurisdiction: The jurisdiction whose patterns are used for detection.
     """
 
-    def __init__(self, jurisdiction: Jurisdiction) -> None:
+    def __init__(self, jurisdiction: Jurisdiction | str) -> None:
         """Initialise the detector for a given jurisdiction.
 
         Args:
-            jurisdiction: One of ``Jurisdiction.UK`` or ``Jurisdiction.US``.
+            jurisdiction: One of ``Jurisdiction.UK`` or ``Jurisdiction.US``,
+                or a custom jurisdiction string.
         """
-        self.jurisdiction: Jurisdiction = jurisdiction
+        self.jurisdiction: Jurisdiction | str = jurisdiction
         self._patterns: list[re.Pattern[str]] = [
             get_patterns(jurisdiction).cross_ref,
             *EXTENDED_PATTERNS,
@@ -316,7 +317,7 @@ def detect_references(
 
 def resolve_references(
     chunks: list[LegalChunk],
-    jurisdiction: Jurisdiction,
+    jurisdiction: Jurisdiction | str,
 ) -> list[LegalChunk]:
     """Resolve cross-references across all chunks (second pass).
 

@@ -26,6 +26,7 @@ from .enrichment.clause_type import ClauseTypeClassifier
 from .enrichment.context import ContextEnricher
 from .exceptions import ConfigurationError, InputError
 from .models import (
+    ClauseType,
     DefinedTerm,
     HierarchyNode,
     Jurisdiction,
@@ -87,13 +88,21 @@ class LegalChunker:
         document_id: Optional[str] = None,
         chars_per_token: int = 4,
         extra_abbreviations: list[str] | None = None,
+        extra_clause_signals: dict[ClauseType, list[str]] | None = None,
     ) -> None:
-        # Normalise jurisdiction to enum.
+        # Normalise jurisdiction: try enum first, then registry lookup.
         if isinstance(jurisdiction, str):
             try:
-                self._jurisdiction = Jurisdiction(jurisdiction.lower())
-            except ValueError as exc:
-                raise ConfigurationError(str(exc)) from exc
+                self._jurisdiction: Jurisdiction | str = Jurisdiction(jurisdiction.lower())
+            except ValueError:
+                # Not a built-in enum value — check the registry.
+                from .jurisdiction import _JURISDICTION_REGISTRY
+                if jurisdiction.lower().strip() not in _JURISDICTION_REGISTRY:
+                    raise ConfigurationError(
+                        f"Unknown jurisdiction {jurisdiction!r}. "
+                        f"Register it with register_jurisdiction() first."
+                    )
+                self._jurisdiction = jurisdiction.lower().strip()
         else:
             self._jurisdiction = jurisdiction
 
@@ -128,6 +137,7 @@ class LegalChunker:
         self._include_context_header = include_context_header
         self._document_id = document_id
         self._extra_abbreviations = extra_abbreviations
+        self._extra_clause_signals = extra_clause_signals
 
         # Instantiate pipeline components.
         self._structure_parser = StructureParser(
@@ -135,7 +145,9 @@ class LegalChunker:
         )
         self._definitions_extractor = DefinitionsExtractor(self._jurisdiction)
         self._reference_detector = ReferenceDetector(self._jurisdiction)
-        self._clause_type_classifier = ClauseTypeClassifier()
+        self._clause_type_classifier = ClauseTypeClassifier(
+            extra_signals=extra_clause_signals,
+        )
         self._context_enricher = ContextEnricher()
 
     # ------------------------------------------------------------------
@@ -194,9 +206,14 @@ class LegalChunker:
                 f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
             )
 
+        jur_label = (
+            self._jurisdiction.value
+            if isinstance(self._jurisdiction, Jurisdiction)
+            else self._jurisdiction
+        )
         logger.info(
             "Chunking document (%d chars, jurisdiction=%s, doc_type=%s)",
-            len(text), self._jurisdiction.value, self._doc_type,
+            len(text), jur_label, self._doc_type,
         )
 
         doc_id = document_id if document_id is not None else self._document_id

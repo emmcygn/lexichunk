@@ -7,6 +7,7 @@ from .exceptions import (
     LexichunkError,
     ParsingError,
 )
+from .jurisdiction import register_jurisdiction
 from .models import (
     ClauseType,
     CrossReference,
@@ -14,10 +15,11 @@ from .models import (
     DocumentSection,
     HierarchyNode,
     Jurisdiction,
+    JurisdictionPatterns,
     LegalChunk,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __all__ = [
     "LegalChunker",
     "LegalChunk",
@@ -27,6 +29,8 @@ __all__ = [
     "ClauseType",
     "DocumentSection",
     "Jurisdiction",
+    "JurisdictionPatterns",
+    "register_jurisdiction",
     "LexichunkError",
     "ConfigurationError",
     "ParsingError",

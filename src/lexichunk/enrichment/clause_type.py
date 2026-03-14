@@ -234,7 +234,11 @@ _PATH_BONUS: float = 3.0
 # ---------------------------------------------------------------------------
 
 
-def _score(content_lower: str, path_lower: str) -> dict[ClauseType, float]:
+def _score(
+    content_lower: str,
+    path_lower: str,
+    signals: dict[ClauseType, list[str]] | None = None,
+) -> dict[ClauseType, float]:
     """Compute per-ClauseType keyword scores for lowercased inputs.
 
     Each signal match in *content_lower* contributes a weight equal to the
@@ -245,17 +249,19 @@ def _score(content_lower: str, path_lower: str) -> dict[ClauseType, float]:
     Args:
         content_lower: Lowercased chunk content to score.
         path_lower: Lowercased hierarchy path string to score.
+        signals: Signal table to use.  Defaults to ``CLAUSE_SIGNALS``.
 
     Returns:
         A mapping from ClauseType to its accumulated score; only clause
         types with a score greater than zero are included.
     """
+    effective_signals = signals if signals is not None else CLAUSE_SIGNALS
     scores: dict[ClauseType, float] = {}
 
-    for clause_type, signals in CLAUSE_SIGNALS.items():
+    for clause_type, signal_list in effective_signals.items():
         score = 0.0
 
-        for signal in signals:
+        for signal in signal_list:
             if signal in content_lower:
                 # Longer phrases receive higher weight than single words.
                 score += len(signal.split())
@@ -276,10 +282,30 @@ def _score(content_lower: str, path_lower: str) -> dict[ClauseType, float]:
 # ---------------------------------------------------------------------------
 
 
+def _merge_signals(
+    extra_signals: dict[ClauseType, list[str]] | None,
+) -> dict[ClauseType, list[str]] | None:
+    """Merge extra signals into the base ``CLAUSE_SIGNALS`` table.
+
+    Returns ``None`` when there are no extras (so ``_score`` uses its
+    default), or a new merged dict when extras are provided.
+    """
+    if not extra_signals:
+        return None
+    merged = {ct: list(sigs) for ct, sigs in CLAUSE_SIGNALS.items()}
+    for ct, extras in extra_signals.items():
+        if ct in merged:
+            merged[ct] = merged[ct] + extras
+        else:
+            merged[ct] = list(extras)
+    return merged
+
+
 def classify_clause_type(
     content: str,
     hierarchy_path: str = "",
     document_section: Optional[DocumentSection] = None,
+    extra_signals: dict[ClauseType, list[str]] | None = None,
 ) -> ClauseType:
     """Classify a chunk of legal text into a ClauseType.
 
@@ -310,6 +336,8 @@ def classify_clause_type(
             (e.g. ``"Article VII > Section 7.2"``).
         document_section: The document section this chunk belongs to, or
             ``None`` when not known.
+        extra_signals: Additional clause-type keywords to merge with the
+            built-in ``CLAUSE_SIGNALS`` table before scoring.
 
     Returns:
         The most likely :class:`ClauseType`, or
@@ -325,7 +353,8 @@ def classify_clause_type(
     content_lower = content.lower()
     path_lower = hierarchy_path.lower()
 
-    scores = _score(content_lower, path_lower)
+    merged = _merge_signals(extra_signals)
+    scores = _score(content_lower, path_lower, signals=merged)
 
     if not scores:
         return ClauseType.UNKNOWN
@@ -343,10 +372,15 @@ def classify_clause_type(
 
 
 class ClauseTypeClassifier:
-    """Stateless clause type classifier using keyword heuristics.
+    """Clause type classifier using keyword heuristics.
 
     Can be instantiated for repeated use; internally delegates every
     classification decision to :func:`classify_clause_type`.
+
+    Args:
+        extra_signals: Optional dict mapping :class:`ClauseType` to
+            additional keyword strings.  These are merged with the built-in
+            ``CLAUSE_SIGNALS`` table before scoring.
 
     Example::
 
@@ -354,6 +388,12 @@ class ClauseTypeClassifier:
         clause_type = classifier.classify("The Supplier shall indemnify …")
         chunks = classifier.classify_all(chunks)
     """
+
+    def __init__(
+        self,
+        extra_signals: dict[ClauseType, list[str]] | None = None,
+    ) -> None:
+        self._extra_signals = extra_signals
 
     def classify(
         self,
@@ -372,7 +412,10 @@ class ClauseTypeClassifier:
         Returns:
             The most likely :class:`ClauseType` for the given text.
         """
-        return classify_clause_type(content, hierarchy_path, document_section)
+        return classify_clause_type(
+            content, hierarchy_path, document_section,
+            extra_signals=self._extra_signals,
+        )
 
     def classify_all(self, chunks: list[LegalChunk]) -> list[LegalChunk]:
         """Classify ``clause_type`` on a list of LegalChunk objects in-place.

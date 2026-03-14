@@ -2,9 +2,27 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
+from typing import Optional, Protocol, runtime_checkable
+
+
+@runtime_checkable
+class JurisdictionPatterns(Protocol):
+    """Protocol defining the attributes a jurisdiction pattern set must expose.
+
+    Any object with these six attributes structurally conforms — no
+    explicit inheritance required.  Both :class:`UKPatterns` and
+    :class:`USPatterns` satisfy this protocol as-is.
+    """
+
+    cross_ref: re.Pattern[str]
+    definition: re.Pattern[str]
+    definition_curly: re.Pattern[str]
+    definitions_headers: tuple[str, ...]
+    boilerplate_headers: tuple[str, ...]
+    signature_markers: tuple[str, ...]
 
 
 class Jurisdiction(Enum):
@@ -99,7 +117,7 @@ class LegalChunk:
 
     # Legal metadata
     clause_type: ClauseType
-    jurisdiction: Jurisdiction
+    jurisdiction: Jurisdiction | str
 
     # Cross-references and terms
     cross_references: list[CrossReference] = field(default_factory=list)

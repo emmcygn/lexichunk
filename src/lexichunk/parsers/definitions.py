@@ -12,7 +12,7 @@ from ..jurisdiction import get_patterns
 logger = logging.getLogger(__name__)
 from ..jurisdiction.uk import UKPatterns
 from ..jurisdiction.us import USPatterns
-from ..models import DefinedTerm, Jurisdiction
+from ..models import DefinedTerm, Jurisdiction, JurisdictionPatterns
 
 # Terms that should be filtered out even if capitalised.
 _SKIP_TERMS: frozenset[str] = frozenset({
@@ -104,14 +104,15 @@ class DefinitionsExtractor:
         _clause_header_re: Regex identifying clause headers for this jurisdiction.
     """
 
-    def __init__(self, jurisdiction: Jurisdiction) -> None:
+    def __init__(self, jurisdiction: Jurisdiction | str) -> None:
         """Initialise the extractor for a given jurisdiction.
 
         Args:
-            jurisdiction: The legal jurisdiction (UK or US).
+            jurisdiction: The legal jurisdiction (UK or US), or a custom
+                jurisdiction string registered via :func:`register_jurisdiction`.
         """
-        self._jurisdiction: Jurisdiction = jurisdiction
-        self._patterns: Union[UKPatterns, USPatterns] = get_patterns(jurisdiction)
+        self._jurisdiction: Jurisdiction | str = jurisdiction
+        self._patterns: Union[UKPatterns, USPatterns, JurisdictionPatterns] = get_patterns(jurisdiction)
         self._clause_header_re: re.Pattern[str] = (
             _UK_CLAUSE_HEADER if jurisdiction == Jurisdiction.UK else _US_CLAUSE_HEADER
         )

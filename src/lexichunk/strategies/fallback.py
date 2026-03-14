@@ -141,7 +141,7 @@ class FallbackChunker:
 
     def __init__(
         self,
-        jurisdiction: Jurisdiction,
+        jurisdiction: Jurisdiction | str,
         max_chunk_size: int = 512,
         min_chunk_size: int = 64,
         document_id: Optional[str] = None,

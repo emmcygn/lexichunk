@@ -139,7 +139,7 @@ class StructureParser:
     """
 
     def __init__(
-        self, jurisdiction: Jurisdiction, doc_type: str = "contract"
+        self, jurisdiction: Jurisdiction | str, doc_type: str = "contract"
     ) -> None:
         self._jurisdiction = jurisdiction
         self._doc_type = doc_type
