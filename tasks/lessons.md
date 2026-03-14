@@ -155,3 +155,23 @@ Never reverse steps 2 and 3.
 **Rule**: After modifying function logic (especially adding a transformation step), re-read the docstring and verify every claim still holds. Treat docstrings as assertions that need updating when behavior changes.
 
 **Check**: After editing a function body, re-read its docstring line by line. For each factual claim, ask: "Is this still true after my change?"
+
+---
+
+## L016 — Don't compute metrics-only values unconditionally
+
+**Pattern**: In v0.7.0, `ref_count`, `classified`, and `enriched` sums were computed on every `_run_pipeline()` call but only used inside `if collect_metrics` branches. This added unnecessary iterations over all chunks in the `chunk()` hot path, violating the "zero overhead when metrics not requested" design goal.
+
+**Rule**: When adding an instrumented code path gated by a flag (like `collect_metrics`), ensure ALL work that's exclusively for that path is inside the flag guard. Don't let "it's just a sum" slip outside — in a tight loop or large document, these add up.
+
+**Check**: After writing a dual-path method (fast path + instrumented path), grep for every variable that's ONLY referenced inside the flag guard. If it's computed outside the guard, move it inside.
+
+---
+
+## L017 — Never use `assert` for runtime guarantees in library public API
+
+**Pattern**: `chunk_with_metrics()` used `assert metrics is not None` to satisfy the type checker. But `python -O` strips all assert statements, which means the guarantee would vanish in optimized mode — a library has no control over how users run Python.
+
+**Rule**: In public-facing library methods, use explicit `if` checks or type comments/casts instead of `assert`. Reserve `assert` for internal invariants in test code or clearly-internal methods.
+
+**Check**: After writing a public method, search for `assert` in the method body. Ask: "Would this method silently misbehave if run with `python -O`?"
