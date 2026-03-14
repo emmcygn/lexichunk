@@ -124,6 +124,14 @@ class LegalChunk:
     defined_terms_used: list[str] = field(default_factory=list)
     defined_terms_context: dict[str, str] = field(default_factory=dict)
 
+    # Classification accuracy
+    classification_confidence: float = 0.0
+    secondary_clause_type: Optional[ClauseType] = None
+
+    # Cross-reference resolution stats
+    cross_ref_total: int = 0
+    cross_ref_resolved: int = 0
+
     # Retrieval helpers
     context_header: str = ""
     document_id: Optional[str] = None

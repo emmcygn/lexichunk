@@ -47,13 +47,27 @@ Building `lexchunk` — a Python SDK for legal-document-aware text chunking opti
 - Ask yourself: "Would a staff engineer approve this?"
 - Run tests, check logs, demonstrate correctness
 
-### 5. Demand Elegance (Balanced)
+### 5. Adversarial Review (Mandatory, Separate Pass)
+After completing implementation + happy-path tests for any milestone:
+1. **Stop implementing.** Run full test suite green first.
+2. **Switch roles explicitly.** You are now a staff engineer trying to break this.
+3. **Think from the consumer perspective**, not the author perspective:
+   - What can callers DO with returned objects? (mutable containers in frozen dataclasses)
+   - What does documentation PROMISE vs what code DOES? (docstring drift after logic changes)
+   - What flags/options affect MORE than intended? (e.g. `re.IGNORECASE` leaking into capture groups)
+   - What conventions does existing code follow that new code breaks? (log levels, naming)
+4. **Write adversarial tests** from this perspective in `tests/test_adversarial_v{VERSION}.py`
+5. Fix bugs found, re-run full suite, then ship.
+
+**NEVER write adversarial tests in the same pass as implementation.** Same-pass "adversarial" tests are confirmatory, not adversarial — they test what you intended, not what you missed. (Lesson: v0.6.0 shipped 4 bugs that a separate review caught in minutes.)
+
+### 6. Demand Elegance (Balanced)
 - For non-trivial changes: pause and ask "is there a more elegant way?"
 - If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
 - Skip this for simple, obvious fixes — don't over-engineer
 - Challenge your own work before presenting it
 
-### 6. Autonomous Bug Fixing
+### 7. Autonomous Bug Fixing
 - When given a bug report: just fix it. Don't ask for hand-holding
 - Point at logs, errors, failing tests — then resolve them
 - Zero context switching required from the user
@@ -91,9 +105,17 @@ Building `lexchunk` — a Python SDK for legal-document-aware text chunking opti
 
 ### Testing Standards
 - Every regex pattern MUST have at least 3 positive and 2 negative test cases
+- Negative tests for regex: verify what SHOULD NOT match (e.g. lowercase terms when `[A-Z]` is intended)
 - Test against real contract excerpts (use CUAD dataset samples or public domain contracts)
 - Chunk output tests must verify: no orphaned cross-references, hierarchy preserved, metadata populated
 - Integration tests for LangChain/LlamaIndex compatibility
+- Frozen dataclasses with container fields (dict, list, set) MUST have a mutation test that expects `TypeError`
+
+### Code-Level Invariants
+- Frozen dataclasses with mutable containers: wrap in `MappingProxyType` (dict) or `tuple` (list)
+- `re.IGNORECASE` on a pattern: audit EVERY character class — use inline `(?i:...)` if only part should be case-insensitive
+- After modifying function logic: re-read docstring line by line, verify every claim still holds
+- Log levels must match codebase convention — check sibling functions before choosing `info` vs `debug`
 
 ### Code Style
 - Type hints on all public functions

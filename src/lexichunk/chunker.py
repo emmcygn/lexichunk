@@ -148,6 +148,7 @@ class LegalChunker:
         self._extra_clause_signals = extra_clause_signals
         self._enable_definition_cache = enable_definition_cache
         self._definition_cache: dict[str, dict[str, DefinedTerm]] = {}
+        self._last_cross_ref_stats: dict[str, int | float] = {}
 
         # Instantiate pipeline components.
         self._structure_parser = StructureParser(
@@ -308,6 +309,16 @@ class LegalChunker:
         # ------------------------------------------------------------------
         resolve_references(chunks, self._jurisdiction)
 
+        # Populate cross-ref stats for external access.
+        total = sum(c.cross_ref_total for c in chunks)
+        resolved_count = sum(c.cross_ref_resolved for c in chunks)
+        rate = resolved_count / total if total > 0 else 1.0
+        self._last_cross_ref_stats = {
+            "total": total,
+            "resolved": resolved_count,
+            "rate": rate,
+        }
+
         logger.debug(
             "Pipeline complete: %d chunks, %d defined terms",
             len(chunks),
@@ -373,6 +384,24 @@ class LegalChunker:
         changed.
         """
         self._definition_cache.clear()
+
+    @property
+    def cross_ref_resolution_rate(self) -> float:
+        """Resolution rate from the last ``chunk()`` call (0.0–1.0).
+
+        Returns 1.0 if no cross-references were found or if ``chunk()``
+        has not been called yet.
+        """
+        return self._last_cross_ref_stats.get("rate", 1.0)
+
+    @property
+    def cross_ref_stats(self) -> dict[str, int | float]:
+        """Cross-reference stats from the last ``chunk()`` call.
+
+        Returns a dict with ``total``, ``resolved``, and ``rate`` keys.
+        Empty dict if ``chunk()`` has not been called.
+        """
+        return dict(self._last_cross_ref_stats)
 
     def chunk_batch(
         self,

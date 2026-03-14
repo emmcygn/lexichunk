@@ -57,6 +57,18 @@ _INLINE_PAREN_TERM: re.Pattern[str] = re.compile(
     r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]',
 )
 
+# "Hereinafter" definition pattern.
+# e.g. hereinafter referred to as "the Company"
+# Supports straight and curly quotes.  The keyword portion is
+# case-insensitive via inline (?i:...) but the term capture group
+# requires an uppercase initial letter to stay consistent with
+# other definition patterns.
+_DEFINITION_HEREINAFTER: re.Pattern[str] = re.compile(
+    r'(?i:hereinafter\s+(?:referred\s+to\s+as|called|known\s+as))\s+'
+    r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]',
+    re.MULTILINE,
+)
+
 # Parenthetical back-reference definitions.
 # e.g. the Borrower (as defined in Section 1.1)
 _PARENTHETICAL_BACKREF: re.Pattern[str] = re.compile(
@@ -387,6 +399,32 @@ class DefinitionsExtractor:
                 results[term] = DefinedTerm(
                     term=term,
                     definition=m.group(0).strip(),
+                    source_clause=clause,
+                )
+
+        # --- Hereinafter definitions ---
+        # e.g. 'XYZ Corp hereinafter referred to as "the Company"'
+        # The definition body is the text *before* "hereinafter", not after.
+        for m in _DEFINITION_HEREINAFTER.finditer(text):
+            term = m.group(1).strip()
+            if not self._is_valid_term(term):
+                continue
+            if term not in results:
+                clause = self._nearest_clause_label(clause_labels, m.start()) or source_clause or "preamble"
+                # Extract up to ~200 chars preceding context to the last
+                # sentence boundary.
+                preceding = text[max(0, m.start() - 200):m.start()]
+                # Find the last sentence boundary in the preceding text.
+                last_dot = preceding.rfind(".")
+                if last_dot >= 0:
+                    body = preceding[last_dot + 1:].strip()
+                else:
+                    body = preceding.strip()
+                if not body:
+                    body = m.group(0).strip()
+                results[term] = DefinedTerm(
+                    term=term,
+                    definition=re.sub(r"\s+", " ", body),
                     source_clause=clause,
                 )
 

@@ -341,6 +341,22 @@ def resolve_references(
         (c.cross_references, c.hierarchy.identifier) for c in chunks
     ]
     resolved = detector.resolve(pairs)
+
+    total_refs = 0
+    total_resolved = 0
     for chunk, refs in zip(chunks, resolved):
         chunk.cross_references = refs
+        chunk.cross_ref_total = len(refs)
+        chunk.cross_ref_resolved = sum(
+            1 for r in refs if r.target_chunk_index is not None
+        )
+        total_refs += chunk.cross_ref_total
+        total_resolved += chunk.cross_ref_resolved
+
+    rate = total_resolved / total_refs if total_refs > 0 else 1.0
+    logger.debug(
+        "Cross-reference resolution: %d/%d resolved (%.1f%%)",
+        total_resolved, total_refs, rate * 100,
+    )
+
     return chunks

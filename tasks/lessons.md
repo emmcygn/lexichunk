@@ -109,3 +109,49 @@ Never reverse steps 2 and 3.
 **Rule**: Cap `max_workers` to `min(requested, 61)` on `sys.platform == "win32"`. Always test with worker counts that exceed platform limits.
 
 **Check**: After writing any ProcessPoolExecutor usage, test with `workers=100` and verify no crash.
+
+---
+
+## L012 — Frozen dataclasses with mutable container fields
+
+**Pattern**: `ClassificationResult` was `@dataclass(frozen=True)` with `scores: dict[...]`. The frozen decorator prevents attribute reassignment but does NOT prevent mutation of the dict itself. External code could do `result.scores[key] = value` freely, violating the immutability contract.
+
+**Rule**: When a frozen dataclass has a container field (dict, list, set), wrap it in a read-only view: `MappingProxyType` for dicts, `tuple()` for lists. Verify with a test that attempts mutation and expects `TypeError`.
+
+**Check**: For every frozen dataclass, grep for `dict[`, `list[`, `set[` fields. Each one needs either a read-only wrapper or a documented reason why mutation is acceptable.
+
+---
+
+## L013 — Regex IGNORECASE leaks into all character classes
+
+**Pattern**: `_DEFINITION_HEREINAFTER` used `re.IGNORECASE` to make the keyword "hereinafter" case-insensitive. But the flag applied to the entire pattern, making `[A-Z]` in the term capture group also match lowercase — inconsistent with every other definition pattern that enforces uppercase initials.
+
+**Rule**: When a regex needs case-insensitivity for only PART of the pattern, use inline `(?i:...)` around the case-insensitive portion instead of the global `re.IGNORECASE` flag. Always verify character classes still enforce their intended restrictions.
+
+**Check**: After writing a regex with `re.IGNORECASE`, audit every `[A-Z]`, `[a-z]`, or `[A-Za-z]` class in the pattern. Ask: "Should this class be case-sensitive? If yes, use inline `(?i:...)` instead of the global flag."
+
+---
+
+## L014 — Adversarial review must be a separate step, not part of implementation
+
+**Pattern**: In v0.6.0, adversarial tests were written alongside the feature as part of the same implementation pass. All 4 bugs were missed because the tests were confirmatory ("does my code do what I intended?") rather than adversarial ("how can a consumer break or misuse this?"). The v0.5.0 audit worked precisely because it was a separate role switch after implementation.
+
+**Rule**: NEVER write `test_adversarial_v*.py` during implementation. Complete all implementation + happy-path tests first. Then explicitly switch roles: "I am now a staff engineer trying to break this." The role switch forces outside-in thinking (consumer perspective) instead of inside-out (author perspective).
+
+**Adversarial questions to ask from the consumer perspective:**
+1. What can a caller DO with returned objects? (mutation, type abuse)
+2. What does the documentation PROMISE vs what the code DOES? (docstring drift)
+3. What flags/options affect MORE than their intended target? (regex flags, config leaks)
+4. What conventions does the codebase ALREADY follow that new code SHOULD match? (log levels, naming)
+
+**Check**: If you're writing adversarial tests in the same tool call or message as implementation code, STOP. Ship the implementation, run existing tests, then start a fresh adversarial pass.
+
+---
+
+## L015 — Docstrings are contracts, not comments — re-verify after logic changes
+
+**Pattern**: `ClassificationResult.scores` docstring said "Raw per-clause-type scores" but the implementation mutates scores with position boost before storing. The docstring was written at creation time and never updated when the function body changed.
+
+**Rule**: After modifying function logic (especially adding a transformation step), re-read the docstring and verify every claim still holds. Treat docstrings as assertions that need updating when behavior changes.
+
+**Check**: After editing a function body, re-read its docstring line by line. For each factual claim, ask: "Is this still true after my change?"
