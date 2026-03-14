@@ -114,6 +114,31 @@
 
 **Result**: 421 tests passing (58 new). ruff clean. mypy 0 errors. 36 adversarial tests pass. 8 benchmarks run. Bugs found and fixed during adversarial audit: (1) None/non-string batch input crashed, (2) 3-tuple unpacking crashed, (3) workers>61 crashed on Windows, (4) document_id not forwarded to parallel workers.
 
+## Milestone 0.6.0 — Accuracy ✅
+- [x] Add `classification_confidence`, `secondary_clause_type`, `cross_ref_total`, `cross_ref_resolved` to LegalChunk (backward-compatible defaults)
+- [x] Create `ClassificationResult` frozen dataclass with `MappingProxyType` scores
+- [x] Implement `_classify_detailed()` with confidence formula (best_score / sum)
+- [x] Add position-aware scoring: +1.5 bonus for 7 end-of-doc types when position > 0.75
+- [x] Add `ClauseTypeClassifier.classify_detailed()` public method
+- [x] Update `classify_all()` to populate confidence + secondary type with relative_position
+- [x] Cache `_merged_signals` in classifier `__init__`
+- [x] Add `_DEFINITION_HEREINAFTER` regex with inline `(?i:...)` for keyword, `[A-Z]` for term
+- [x] Implement preceding-context extraction (~200 chars to last sentence boundary) for hereinafter
+- [x] Update `resolve_references()` to set `cross_ref_total` / `cross_ref_resolved` per chunk
+- [x] Add `LegalChunker.cross_ref_resolution_rate` and `cross_ref_stats` properties
+- [x] Export `ClassificationResult` from `__init__.py`
+- [x] Version bump to 0.6.0
+- [x] Write `tests/test_classification_confidence.py` — 16 tests
+- [x] Write `tests/test_position_scoring.py` — 12 tests
+- [x] Write `tests/test_crossref_stats.py` — 10 tests
+- [x] Write `tests/test_adversarial_v060.py` — 16 tests (separate pass)
+- [x] Extend `tests/test_definitions.py` — 11 new hereinafter tests
+- [x] Full verification: pytest 497/497 (1 pre-existing deselected), ruff clean, mypy 0 errors
+
+**Result**: 497 tests passing (76 new). ruff clean. mypy 0 errors. Adversarial review (separate pass) caught and fixed 4 bugs: (1) mutable scores dict in frozen ClassificationResult → MappingProxyType, (2) docstring "Raw scores" but values included position boost → corrected, (3) re.IGNORECASE leaked into [A-Z] term capture → inline (?i:...), (4) logger.info vs codebase convention of logger.debug → fixed.
+
+**Process improvement**: Added mandatory "Adversarial Review" workflow step to CLAUDE.md (section 5). Added "Code-Level Invariants" section. Lessons L012–L015 added to tasks/lessons.md.
+
 ## Review (v0.1.0)
 
 **Result**: 107/107 tests passing in 0.42s. Full pipeline verified end-to-end.
