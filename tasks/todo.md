@@ -139,6 +139,30 @@
 
 **Process improvement**: Added mandatory "Adversarial Review" workflow step to CLAUDE.md (section 5). Added "Code-Level Invariants" section. Lessons L012–L015 added to tasks/lessons.md.
 
+## Milestone 0.7.0 — Observability & Docs ✅
+- [x] Create `src/lexichunk/metrics.py` — `StageMetric` and `PipelineMetrics` frozen dataclasses
+- [x] Refactor `chunker.py` — extract `_run_pipeline()` shared by `chunk()` and `chunk_with_metrics()`
+- [x] Add `chunk_with_metrics()` method with per-stage `time.perf_counter()` instrumentation
+- [x] Add per-stage structured logging at DEBUG level (start/done with item counts and timing)
+- [x] Export `PipelineMetrics`, `StageMetric` from `__init__.py`
+- [x] Version bump to 0.7.0 in `__init__.py` and `pyproject.toml`
+- [x] Write `tests/test_metrics.py` — 28 tests (shape, stage names, timing, counts, fallback, frozen mutation, regression, logging, imports)
+- [x] Full verification: pytest 525/525 (1 pre-existing deselected), all passing
+- [x] Write `docs/architecture.md` — 8-stage pipeline diagram, stage details, design decisions
+- [x] Write `docs/extending.md` — custom jurisdictions (Protocol + register), custom clause signals
+- [x] Write `CHANGELOG.md` — release history v0.1.0 → v0.7.0
+
+- [x] Write `tests/test_adversarial_v070.py` — 21 adversarial tests (separate pass)
+- [x] Fix 3 bugs found during adversarial review
+- [x] Full verification: pytest 546/546 (1 pre-existing deselected), ruff clean, mypy 0 errors
+
+**Result**: 546 tests passing (49 new). Pipeline refactored into `_run_pipeline()` with zero behaviour change for `chunk()`. `chunk_with_metrics()` provides per-stage wall-clock timing and item counts. Debug-level structured logging adds zero overhead when not enabled.
+
+**Adversarial review (separate pass) caught and fixed 3 bugs:**
+1. `ref_count`, `classified`, `enriched` computed unconditionally but only needed when `collect_metrics=True` — violates zero-overhead promise → moved inside `if collect_metrics` guards
+2. `assert metrics is not None` in public `chunk_with_metrics()` — stripped by `python -O` → removed assert, used type comment
+3. Docstring said "Identical to chunk()" but logging behavior differs — `chunk_with_metrics()` emits per-stage debug logs that `chunk()` does not → updated docstring
+
 ## Review (v0.1.0)
 
 **Result**: 107/107 tests passing in 0.42s. Full pipeline verified end-to-end.

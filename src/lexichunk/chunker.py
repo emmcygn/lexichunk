@@ -21,6 +21,7 @@ import logging
 import os
 import re
 import sys
+import time
 import unicodedata
 from dataclasses import dataclass
 from typing import Iterator, Optional
@@ -30,6 +31,7 @@ logger = logging.getLogger(__name__)
 from .enrichment.clause_type import ClauseTypeClassifier
 from .enrichment.context import ContextEnricher
 from .exceptions import ConfigurationError, InputError
+from .metrics import PipelineMetrics, StageMetric
 from .models import (
     BatchError,
     BatchResult,
@@ -206,14 +208,79 @@ class LegalChunker:
             List of :class:`~lexichunk.models.LegalChunk` objects in document
             order with all metadata populated.
         """
+        chunks, _ = self._run_pipeline(text, document_id, collect_metrics=False)
+        return chunks
+
+    def chunk_with_metrics(
+        self, text: str, document_id: Optional[str] = None
+    ) -> tuple[list[LegalChunk], PipelineMetrics]:
+        """Chunk a legal document and return pipeline metrics.
+
+        Runs the same pipeline as :meth:`chunk` but additionally
+        instruments each stage with :func:`time.perf_counter`, emits
+        per-stage ``DEBUG``-level log messages, and returns a
+        :class:`~lexichunk.metrics.PipelineMetrics` object alongside
+        the chunks.
+
+        Args:
+            text: Full legal document as a plain-text string.
+            document_id: Override ``document_id`` for this call.  Falls back
+                to the value passed to ``__init__``.
+
+        Returns:
+            A ``(chunks, metrics)`` tuple.
+        """
+        chunks, metrics = self._run_pipeline(text, document_id, collect_metrics=True)
+        # metrics is guaranteed non-None when collect_metrics=True; cast for
+        # type checkers without relying on assert (stripped by python -O).
+        return chunks, metrics  # type: ignore[return-value]
+
+    # ------------------------------------------------------------------
+    # Pipeline internals
+    # ------------------------------------------------------------------
+
+    def _run_pipeline(
+        self,
+        text: str,
+        document_id: Optional[str],
+        collect_metrics: bool,
+    ) -> tuple[list[LegalChunk], PipelineMetrics | None]:
+        """Run the full chunking pipeline.
+
+        Args:
+            text: Raw document text.
+            document_id: Override document ID for this call.
+            collect_metrics: When ``True``, time each stage and return
+                :class:`PipelineMetrics`.
+
+        Returns:
+            ``(chunks, metrics)`` — *metrics* is ``None`` when
+            *collect_metrics* is ``False``.
+        """
+        pipeline_start = time.perf_counter() if collect_metrics else 0.0
+        stage_metrics: list[StageMetric] = []
+
         text = self._sanitize_input(text)
 
         if not text or not text.strip():
-            return []
+            if collect_metrics:
+                return [], PipelineMetrics(
+                    total_duration_ms=(time.perf_counter() - pipeline_start) * 1000,
+                    stage_metrics=(),
+                    chunk_count=0,
+                    defined_term_count=0,
+                    cross_ref_total=0,
+                    cross_ref_resolved=0,
+                    input_chars=0,
+                    fallback_used=False,
+                )
+            return [], None
 
-        if len(text) > self._MAX_INPUT_CHARS:
+        input_chars = len(text)
+
+        if input_chars > self._MAX_INPUT_CHARS:
             raise InputError(
-                f"Input text too large ({len(text)} chars). "
+                f"Input text too large ({input_chars} chars). "
                 f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
             )
 
@@ -228,15 +295,29 @@ class LegalChunker:
         )
 
         doc_id = document_id if document_id is not None else self._document_id
+        fallback_used = False
 
         # ------------------------------------------------------------------
         # Stage 1: Structure parsing
         # ------------------------------------------------------------------
+        if collect_metrics:
+            logger.debug("Stage 1: structure_parsing — start")
+            t0 = time.perf_counter()
         clauses = self._structure_parser.parse(text)
+        if collect_metrics:
+            elapsed = (time.perf_counter() - t0) * 1000
+            logger.debug(
+                "Stage 1: structure_parsing — done (%d items, %.1fms)",
+                len(clauses), elapsed,
+            )
+            stage_metrics.append(StageMetric("structure_parsing", elapsed, len(clauses)))
 
         # ------------------------------------------------------------------
         # Stage 2: Chunking
         # ------------------------------------------------------------------
+        if collect_metrics:
+            logger.debug("Stage 2: chunking — start")
+            t0 = time.perf_counter()
         if clauses:
             chunker = ClauseAwareChunker(
                 jurisdiction=self._jurisdiction,
@@ -251,6 +332,7 @@ class LegalChunker:
             logger.warning(
                 "No clause structure detected — falling back to sentence-level splitting"
             )
+            fallback_used = True
             fallback = FallbackChunker(
                 jurisdiction=self._jurisdiction,
                 max_chunk_size=self._max_chunk_size,
@@ -260,9 +342,27 @@ class LegalChunker:
                 extra_abbreviations=self._extra_abbreviations,
             )
             chunks = fallback.chunk(text)
+        if collect_metrics:
+            elapsed = (time.perf_counter() - t0) * 1000
+            logger.debug(
+                "Stage 2: chunking — done (%d items, %.1fms)",
+                len(chunks), elapsed,
+            )
+            stage_metrics.append(StageMetric("chunking", elapsed, len(chunks)))
 
         if not chunks:
-            return []
+            if collect_metrics:
+                return [], PipelineMetrics(
+                    total_duration_ms=(time.perf_counter() - pipeline_start) * 1000,
+                    stage_metrics=tuple(stage_metrics),
+                    chunk_count=0,
+                    defined_term_count=0,
+                    cross_ref_total=0,
+                    cross_ref_resolved=0,
+                    input_chars=input_chars,
+                    fallback_used=fallback_used,
+                )
+            return [], None
 
         # Propagate document_id (ClauseAwareChunker already sets it, but
         # ensure fallback chunks also carry it).
@@ -273,23 +373,63 @@ class LegalChunker:
         # ------------------------------------------------------------------
         # Stage 3: Cross-reference detection (first pass)
         # ------------------------------------------------------------------
+        if collect_metrics:
+            logger.debug("Stage 3: cross_reference_detection — start")
+            t0 = time.perf_counter()
         for chunk in chunks:
             chunk.cross_references = self._reference_detector.detect(chunk.content)
+        if collect_metrics:
+            ref_count = sum(len(c.cross_references) for c in chunks)
+            elapsed = (time.perf_counter() - t0) * 1000
+            logger.debug(
+                "Stage 3: cross_reference_detection — done (%d items, %.1fms)",
+                ref_count, elapsed,
+            )
+            stage_metrics.append(StageMetric("cross_reference_detection", elapsed, ref_count))
 
         # ------------------------------------------------------------------
         # Stage 4: Clause type classification
         # ------------------------------------------------------------------
+        if collect_metrics:
+            logger.debug("Stage 4: clause_type_classification — start")
+            t0 = time.perf_counter()
         self._clause_type_classifier.classify_all(chunks)
+        if collect_metrics:
+            classified = sum(1 for c in chunks if c.clause_type is not None)
+            elapsed = (time.perf_counter() - t0) * 1000
+            logger.debug(
+                "Stage 4: clause_type_classification — done (%d items, %.1fms)",
+                classified, elapsed,
+            )
+            stage_metrics.append(StageMetric("clause_type_classification", elapsed, classified))
 
         # ------------------------------------------------------------------
         # Stage 5: Context header generation
         # ------------------------------------------------------------------
+        if collect_metrics:
+            logger.debug("Stage 5: context_enrichment — start")
+            t0 = time.perf_counter()
         if self._include_context_header:
             self._context_enricher.enrich_all(chunks)
+        if collect_metrics:
+            enriched = (
+                sum(1 for c in chunks if c.context_header)
+                if self._include_context_header
+                else 0
+            )
+            elapsed = (time.perf_counter() - t0) * 1000
+            logger.debug(
+                "Stage 5: context_enrichment — done (%d items, %.1fms)",
+                enriched, elapsed,
+            )
+            stage_metrics.append(StageMetric("context_enrichment", elapsed, enriched))
 
         # ------------------------------------------------------------------
         # Stage 6: Defined terms extraction and attachment
         # ------------------------------------------------------------------
+        if collect_metrics:
+            logger.debug("Stage 6: defined_terms — start")
+            t0 = time.perf_counter()
         defined_terms: dict[str, DefinedTerm] | None = None
         if self._include_definitions:
             if self._enable_definition_cache:
@@ -303,10 +443,21 @@ class LegalChunker:
             else:
                 defined_terms = self._definitions_extractor.extract(text)
             _attach_defined_terms(chunks, defined_terms)
+        dt_count = len(defined_terms) if defined_terms else 0
+        if collect_metrics:
+            elapsed = (time.perf_counter() - t0) * 1000
+            logger.debug(
+                "Stage 6: defined_terms — done (%d items, %.1fms)",
+                dt_count, elapsed,
+            )
+            stage_metrics.append(StageMetric("defined_terms", elapsed, dt_count))
 
         # ------------------------------------------------------------------
         # Stage 7: Cross-reference resolution (second pass)
         # ------------------------------------------------------------------
+        if collect_metrics:
+            logger.debug("Stage 7: cross_reference_resolution — start")
+            t0 = time.perf_counter()
         resolve_references(chunks, self._jurisdiction)
 
         # Populate cross-ref stats for external access.
@@ -318,14 +469,33 @@ class LegalChunker:
             "resolved": resolved_count,
             "rate": rate,
         }
+        if collect_metrics:
+            elapsed = (time.perf_counter() - t0) * 1000
+            logger.debug(
+                "Stage 7: cross_reference_resolution — done (%d items, %.1fms)",
+                resolved_count, elapsed,
+            )
+            stage_metrics.append(StageMetric("cross_reference_resolution", elapsed, resolved_count))
 
         logger.debug(
             "Pipeline complete: %d chunks, %d defined terms",
-            len(chunks),
-            len(defined_terms) if defined_terms else 0,
+            len(chunks), dt_count,
         )
 
-        return chunks
+        metrics: PipelineMetrics | None = None
+        if collect_metrics:
+            metrics = PipelineMetrics(
+                total_duration_ms=(time.perf_counter() - pipeline_start) * 1000,
+                stage_metrics=tuple(stage_metrics),
+                chunk_count=len(chunks),
+                defined_term_count=dt_count,
+                cross_ref_total=total,
+                cross_ref_resolved=resolved_count,
+                input_chars=input_chars,
+                fallback_used=fallback_used,
+            )
+
+        return chunks, metrics
 
     # ------------------------------------------------------------------
     # Additional public methods

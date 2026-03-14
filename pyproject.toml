@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lexichunk"
-version = "0.6.0"
+version = "0.7.0"
 description = "Intelligent text chunking for legal documents in RAG pipelines"
 readme = "README.md"
 license = "MIT"

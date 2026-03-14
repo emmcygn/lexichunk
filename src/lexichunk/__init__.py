@@ -9,6 +9,7 @@ from .exceptions import (
     ParsingError,
 )
 from .jurisdiction import register_jurisdiction
+from .metrics import PipelineMetrics, StageMetric
 from .models import (
     BatchError,
     BatchResult,
@@ -22,7 +23,7 @@ from .models import (
     LegalChunk,
 )
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 __all__ = [
     "LegalChunker",
     "LegalChunk",
@@ -36,6 +37,8 @@ __all__ = [
     "JurisdictionPatterns",
     "BatchResult",
     "BatchError",
+    "PipelineMetrics",
+    "StageMetric",
     "register_jurisdiction",
     "LexichunkError",
     "ConfigurationError",
