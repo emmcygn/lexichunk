@@ -175,3 +175,13 @@ Never reverse steps 2 and 3.
 **Rule**: In public-facing library methods, use explicit `if` checks or type comments/casts instead of `assert`. Reserve `assert` for internal invariants in test code or clearly-internal methods.
 
 **Check**: After writing a public method, search for `assert` in the method body. Ask: "Would this method silently misbehave if run with `python -O`?"
+
+---
+
+## L018 — Never restore global state from a function that reads global state
+
+**Pattern**: `test_overwrite_builtin` in `test_jurisdiction_registry.py` overwrote `_JURISDICTION_REGISTRY["uk"]` with EU patterns, then "restored" it with `get_detect_level(Jurisdiction.UK)` — which reads from the already-overwritten registry. The restoration silently installed `_eu_detect_level` as the UK detect function for the rest of the test session, causing `test_structure_parser_uk_hierarchy_path` to fail only when run after this test.
+
+**Rule**: When a test modifies global mutable state and needs to restore it, capture the original value BEFORE the mutation, or import the canonical value directly from its source module. Never use a lookup function that reads from the same global state you just modified.
+
+**Check**: In test teardown/restore code, trace the data flow: does the "restore" value come from a function that reads the state you just mutated? If yes, you're restoring the mutated value, not the original.
