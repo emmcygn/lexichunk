@@ -26,8 +26,8 @@ _TextNode: Any = None
 _LlamaDocument: Any = None
 
 try:
-    from llama_index.core.schema import (
-        Document as _LlamaDocument,  # type: ignore[assignment,no-redef]  # noqa: F401
+    from llama_index.core.schema import (  # type: ignore[assignment,no-redef]  # noqa: F401
+        Document as _LlamaDocument,
     )
     from llama_index.core.schema import TextNode as _TextNode  # type: ignore[assignment,no-redef]
 
