@@ -84,7 +84,7 @@
 - [x] Write `tests/test_jurisdiction_registry.py` — 12 tests (protocol conformance, register/retrieve, overwrite, invalid registration, backward compat, E2E)
 - [x] Write `tests/test_extra_clause_signals.py` — 10 tests (extra signal triggers, existing signals work, multiple types, None/empty dict, LegalChunker integration)
 - [x] Write `tests/test_adversarial_extensibility.py` — 40 tests (registry abuse, protocol edge cases, full pipeline custom jurisdiction, extra signals adversarial, combined extensibility, state leak isolation, serialization, definitions with custom jurisdiction)
-- [x] Full verification: pytest 363/363 (1 pre-existing deselected), ruff clean, mypy 0 errors
+- [x] Full verification: pytest 363/363, ruff clean, mypy 0 errors
 
 **Result**: 363/363 tests passing. ruff clean. mypy 0 errors. 40 adversarial tests confirm no state leaks, no CLAUSE_SIGNALS mutation, full pipeline works with custom jurisdictions.
 
@@ -110,7 +110,7 @@
 - [x] Write `benchmarks/conftest.py` + `benchmarks/test_perf_chunk.py` — 8 benchmarks
 - [x] Export `BatchResult`, `BatchError` from `__init__.py`
 - [x] Version bump to 0.5.0 in `__init__.py` and `pyproject.toml`
-- [x] Full verification: pytest 421/421 (1 pre-existing failure), ruff clean, mypy 0 errors
+- [x] Full verification: pytest 421/421, ruff clean, mypy 0 errors
 
 **Result**: 421 tests passing (58 new). ruff clean. mypy 0 errors. 36 adversarial tests pass. 8 benchmarks run. Bugs found and fixed during adversarial audit: (1) None/non-string batch input crashed, (2) 3-tuple unpacking crashed, (3) workers>61 crashed on Windows, (4) document_id not forwarded to parallel workers.
 
@@ -133,7 +133,7 @@
 - [x] Write `tests/test_crossref_stats.py` — 10 tests
 - [x] Write `tests/test_adversarial_v060.py` — 16 tests (separate pass)
 - [x] Extend `tests/test_definitions.py` — 11 new hereinafter tests
-- [x] Full verification: pytest 497/497 (1 pre-existing deselected), ruff clean, mypy 0 errors
+- [x] Full verification: pytest 497/497, ruff clean, mypy 0 errors
 
 **Result**: 497 tests passing (76 new). ruff clean. mypy 0 errors. Adversarial review (separate pass) caught and fixed 4 bugs: (1) mutable scores dict in frozen ClassificationResult → MappingProxyType, (2) docstring "Raw scores" but values included position boost → corrected, (3) re.IGNORECASE leaked into [A-Z] term capture → inline (?i:...), (4) logger.info vs codebase convention of logger.debug → fixed.
 
@@ -147,14 +147,14 @@
 - [x] Export `PipelineMetrics`, `StageMetric` from `__init__.py`
 - [x] Version bump to 0.7.0 in `__init__.py` and `pyproject.toml`
 - [x] Write `tests/test_metrics.py` — 28 tests (shape, stage names, timing, counts, fallback, frozen mutation, regression, logging, imports)
-- [x] Full verification: pytest 525/525 (1 pre-existing deselected), all passing
+- [x] Full verification: pytest 525/525, all passing
 - [x] Write `docs/architecture.md` — 8-stage pipeline diagram, stage details, design decisions
 - [x] Write `docs/extending.md` — custom jurisdictions (Protocol + register), custom clause signals
 - [x] Write `CHANGELOG.md` — release history v0.1.0 → v0.7.0
 
 - [x] Write `tests/test_adversarial_v070.py` — 21 adversarial tests (separate pass)
 - [x] Fix 3 bugs found during adversarial review
-- [x] Full verification: pytest 546/546 (1 pre-existing deselected), ruff clean, mypy 0 errors
+- [x] Full verification: pytest 546/546, ruff clean, mypy 0 errors
 
 **Result**: 546 tests passing (49 new). Pipeline refactored into `_run_pipeline()` with zero behaviour change for `chunk()`. `chunk_with_metrics()` provides per-stage wall-clock timing and item counts. Debug-level structured logging adds zero overhead when not enabled.
 

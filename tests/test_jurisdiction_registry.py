@@ -21,6 +21,7 @@ from lexichunk.jurisdiction import (
     get_detect_level,
     get_patterns,
 )
+from lexichunk.jurisdiction.uk import detect_level as uk_detect_level
 from lexichunk.models import Jurisdiction
 
 # ---------------------------------------------------------------------------
@@ -107,8 +108,9 @@ class TestRegistration:
         eu = EUPatterns()
         register_jurisdiction("uk", eu, _eu_detect_level)
         assert get_patterns("uk") is eu
-        # Restore original
-        _JURISDICTION_REGISTRY["uk"] = (UK_PATTERNS, get_detect_level(Jurisdiction.UK))
+        # Restore original (use imported uk_detect_level directly, not
+        # get_detect_level() which reads from the already-overwritten registry)
+        _JURISDICTION_REGISTRY["uk"] = (UK_PATTERNS, uk_detect_level)
 
     def test_invalid_empty_name(self) -> None:
         with pytest.raises(ConfigurationError, match="non-empty"):
