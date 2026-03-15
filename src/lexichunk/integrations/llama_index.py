@@ -6,10 +6,16 @@ Install extras:
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from ..chunker import LegalChunker
 from ..models import Jurisdiction
+
+if TYPE_CHECKING:
+    from llama_index.core.schema import Document as _LIDocument
+    from llama_index.core.schema import TextNode as _LITextNode
+
+    from ..models import LegalChunk
 
 # ---------------------------------------------------------------------------
 # Optional dependency probe
@@ -20,8 +26,10 @@ _TextNode: Any = None
 _LlamaDocument: Any = None
 
 try:
-    from llama_index.core.schema import Document as _LlamaDocument  # type: ignore[assignment]
-    from llama_index.core.schema import TextNode as _TextNode  # type: ignore[assignment]
+    from llama_index.core.schema import (  # type: ignore[assignment,no-redef]  # noqa: F401
+        Document as _LlamaDocument,
+    )
+    from llama_index.core.schema import TextNode as _TextNode  # type: ignore[assignment,no-redef]
 
     _LLAMA_INDEX_AVAILABLE = True
 except ImportError:
@@ -103,7 +111,7 @@ class LegalNodeParser:
     # Primary public API
     # ------------------------------------------------------------------
 
-    def get_nodes_from_documents(self, documents: list[Any]) -> list[Any]:
+    def get_nodes_from_documents(self, documents: list[_LIDocument]) -> list[_LITextNode]:
         """Parse a list of LlamaIndex ``Document`` objects into ``TextNode`` objects.
 
         Accepts any object that exposes either a ``.text`` attribute or a
@@ -141,13 +149,13 @@ class LegalNodeParser:
             AttributeError: If a document in *documents* exposes neither a
                 ``.text`` attribute nor a ``.get_content()`` method.
         """
-        nodes: list[Any] = []
+        nodes: list[_LITextNode] = []
         for document in documents:
             text = _extract_text(document)
             nodes.extend(self._nodes_from_text(text))
         return nodes
 
-    def get_nodes_from_text(self, text: str) -> list[Any]:
+    def get_nodes_from_text(self, text: str) -> list[_LITextNode]:
         """Parse a plain-text legal document into a list of ``TextNode`` objects.
 
         Convenience method that does not require wrapping the input in a
@@ -166,7 +174,7 @@ class LegalNodeParser:
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _nodes_from_text(self, text: str) -> list[Any]:
+    def _nodes_from_text(self, text: str) -> list[_LITextNode]:
         """Run the chunker and convert results to ``TextNode`` objects.
 
         Args:
@@ -184,7 +192,7 @@ class LegalNodeParser:
 # ---------------------------------------------------------------------------
 
 
-def _extract_text(document: Any) -> str:
+def _extract_text(document: _LIDocument) -> str:
     """Extract the raw text from a LlamaIndex-compatible document object.
 
     Attempts ``.text`` first (direct attribute access), then falls back to
@@ -211,40 +219,10 @@ def _extract_text(document: Any) -> str:
     )
 
 
-def _build_metadata(chunk: Any) -> dict[str, Any]:
-    """Build the shared metadata dict from a :class:`~lexichunk.models.LegalChunk`.
-
-    Args:
-        chunk: A :class:`~lexichunk.models.LegalChunk` instance.
-
-    Returns:
-        Dictionary of metadata ready to attach to a framework document node.
-    """
-    return {
-        "clause_type": chunk.clause_type.value,
-        "jurisdiction": chunk.jurisdiction.value,
-        "document_section": chunk.document_section.value,
-        "hierarchy_path": chunk.hierarchy_path,
-        "hierarchy_identifier": chunk.hierarchy.identifier,
-        "hierarchy_level": chunk.hierarchy.level,
-        "cross_references": [
-            {
-                "raw_text": ref.raw_text,
-                "target_identifier": ref.target_identifier,
-                "target_chunk_index": ref.target_chunk_index,
-            }
-            for ref in chunk.cross_references
-        ],
-        "defined_terms_used": chunk.defined_terms_used,
-        "context_header": chunk.context_header,
-        "char_start": chunk.char_start,
-        "char_end": chunk.char_end,
-        "chunk_index": chunk.index,
-        "document_id": chunk.document_id,
-    }
+from ..utils import build_metadata as _build_metadata
 
 
-def _chunk_to_text_node(chunk: Any) -> Any:
+def _chunk_to_text_node(chunk: LegalChunk) -> _LITextNode:
     """Convert a :class:`~lexichunk.models.LegalChunk` to a LlamaIndex ``TextNode``.
 
     Args:
@@ -254,7 +232,7 @@ def _chunk_to_text_node(chunk: Any) -> Any:
         A ``llama_index.core.schema.TextNode`` with ``text`` set to the
         chunk's content and ``metadata`` populated with legal metadata.
     """
-    return _TextNode(  # type: ignore[misc]
+    return _TextNode(  # type: ignore[misc,no-any-return]
         text=chunk.content,
         metadata=_build_metadata(chunk),
     )

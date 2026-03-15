@@ -4,9 +4,9 @@ import pytest
 
 from lexichunk.jurisdiction.uk import detect_level as uk_detect_level
 from lexichunk.jurisdiction.us import detect_level as us_detect_level
+from lexichunk.jurisdiction.us import roman_to_int
 from lexichunk.models import DocumentSection, Jurisdiction
 from lexichunk.parsers.structure import ParsedClause, StructureParser
-
 
 # ---------------------------------------------------------------------------
 # UK detect_level tests
@@ -137,6 +137,25 @@ def test_us_detect_level_section():
     assert "1.01" in identifier
 
 
+def test_us_all_caps_header_detected():
+    """'REPRESENTATIONS AND WARRANTIES' → detected as a level-0 clause header."""
+    result = us_detect_level("REPRESENTATIONS AND WARRANTIES")
+    assert result is not None
+    level, identifier = result
+    assert level == 0
+    assert identifier == "REPRESENTATIONS AND WARRANTIES"
+
+
+def test_us_mixed_case_not_caps_header():
+    """'Representations and Warranties' → not an ALL-CAPS header.
+
+    Mixed-case text should not match the ALL-CAPS pattern; it returns
+    None (handled by existing patterns only if it matches ARTICLE/Section/etc.).
+    """
+    result = us_detect_level("Representations and Warranties")
+    assert result is None
+
+
 def test_us_detect_level_exhibit():
     """'Exhibit A' → level -2."""
     result = us_detect_level("Exhibit A")
@@ -221,3 +240,42 @@ def test_structure_parser_no_headers():
     assert len(result) == 1
     assert result[0].identifier == "preamble"
     assert result[0].document_section == DocumentSection.PREAMBLE
+
+
+# ---------------------------------------------------------------------------
+# roman_to_int tests
+# ---------------------------------------------------------------------------
+
+
+def test_roman_to_int_valid():
+    """Standard Roman numerals convert correctly."""
+    assert roman_to_int("I") == 1
+    assert roman_to_int("IV") == 4
+    assert roman_to_int("VII") == 7
+    assert roman_to_int("IX") == 9
+    assert roman_to_int("XL") == 40
+    assert roman_to_int("XCIX") == 99
+
+
+def test_roman_to_int_case_insensitive():
+    """Lowercase input is accepted."""
+    assert roman_to_int("vii") == 7
+    assert roman_to_int("xlii") == 42
+
+
+def test_roman_to_int_invalid_char_raises():
+    """Non-Roman characters raise ValueError."""
+    with pytest.raises(ValueError, match="Invalid Roman numeral character"):
+        roman_to_int("ABCD")
+
+
+def test_roman_to_int_empty_raises():
+    """Empty string raises ValueError."""
+    with pytest.raises(ValueError, match="Empty string"):
+        roman_to_int("")
+
+
+def test_roman_to_int_mixed_invalid_raises():
+    """String mixing valid and invalid chars raises ValueError."""
+    with pytest.raises(ValueError, match="Invalid Roman numeral character"):
+        roman_to_int("XIV2")

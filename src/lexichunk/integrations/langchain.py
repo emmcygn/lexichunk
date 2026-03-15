@@ -6,10 +6,15 @@ Install extras:
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from ..chunker import LegalChunker
 from ..models import Jurisdiction
+
+if TYPE_CHECKING:
+    from langchain_core.documents import Document as _LCDocument
+
+    from ..models import LegalChunk
 
 # ---------------------------------------------------------------------------
 # Optional dependency probe
@@ -19,7 +24,7 @@ _LANGCHAIN_AVAILABLE = False
 _Document: Any = None
 
 try:
-    from langchain_core.documents import Document as _Document  # type: ignore[assignment]
+    from langchain_core.documents import Document as _Document  # type: ignore[assignment,no-redef]
 
     _LANGCHAIN_AVAILABLE = True
 except ImportError:
@@ -101,7 +106,7 @@ class LegalTextSplitter:
     # Primary public API
     # ------------------------------------------------------------------
 
-    def split_text(self, text: str) -> list[Any]:
+    def split_text(self, text: str) -> list[_LCDocument]:
         """Split a legal document into a list of LangChain ``Document`` objects.
 
         Runs the full :class:`~lexichunk.chunker.LegalChunker` pipeline and
@@ -134,7 +139,7 @@ class LegalTextSplitter:
         chunks = self._chunker.chunk(text)
         return [_chunk_to_document(chunk) for chunk in chunks]
 
-    def create_documents(self, texts: list[str]) -> list[Any]:
+    def create_documents(self, texts: list[str]) -> list[_LCDocument]:
         """Split multiple legal documents and return a flat list of ``Document`` objects.
 
         Convenience wrapper that calls :meth:`split_text` for every text in
@@ -147,7 +152,7 @@ class LegalTextSplitter:
             Flat list of ``langchain_core.documents.Document`` objects from all
             input texts, in the order they were processed.
         """
-        documents: list[Any] = []
+        documents: list[_LCDocument] = []
         for text in texts:
             documents.extend(self.split_text(text))
         return documents
@@ -158,40 +163,10 @@ class LegalTextSplitter:
 # ---------------------------------------------------------------------------
 
 
-def _build_metadata(chunk: Any) -> dict[str, Any]:
-    """Build the shared metadata dict from a :class:`~lexichunk.models.LegalChunk`.
-
-    Args:
-        chunk: A :class:`~lexichunk.models.LegalChunk` instance.
-
-    Returns:
-        Dictionary of metadata ready to attach to a framework document node.
-    """
-    return {
-        "clause_type": chunk.clause_type.value,
-        "jurisdiction": chunk.jurisdiction.value,
-        "document_section": chunk.document_section.value,
-        "hierarchy_path": chunk.hierarchy_path,
-        "hierarchy_identifier": chunk.hierarchy.identifier,
-        "hierarchy_level": chunk.hierarchy.level,
-        "cross_references": [
-            {
-                "raw_text": ref.raw_text,
-                "target_identifier": ref.target_identifier,
-                "target_chunk_index": ref.target_chunk_index,
-            }
-            for ref in chunk.cross_references
-        ],
-        "defined_terms_used": chunk.defined_terms_used,
-        "context_header": chunk.context_header,
-        "char_start": chunk.char_start,
-        "char_end": chunk.char_end,
-        "chunk_index": chunk.index,
-        "document_id": chunk.document_id,
-    }
+from ..utils import build_metadata as _build_metadata
 
 
-def _chunk_to_document(chunk: Any) -> Any:
+def _chunk_to_document(chunk: LegalChunk) -> _LCDocument:
     """Convert a :class:`~lexichunk.models.LegalChunk` to a LangChain ``Document``.
 
     Args:
@@ -201,7 +176,7 @@ def _chunk_to_document(chunk: Any) -> Any:
         A ``langchain_core.documents.Document`` with ``page_content`` set to
         the chunk's text and ``metadata`` populated with legal metadata.
     """
-    return _Document(  # type: ignore[misc]
+    return _Document(  # type: ignore[misc,no-any-return]
         page_content=chunk.content,
         metadata=_build_metadata(chunk),
     )

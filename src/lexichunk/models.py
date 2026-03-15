@@ -2,9 +2,27 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
+from typing import Optional, Protocol, runtime_checkable
+
+
+@runtime_checkable
+class JurisdictionPatterns(Protocol):
+    """Protocol defining the attributes a jurisdiction pattern set must expose.
+
+    Any object with these six attributes structurally conforms — no
+    explicit inheritance required.  Both :class:`UKPatterns` and
+    :class:`USPatterns` satisfy this protocol as-is.
+    """
+
+    cross_ref: re.Pattern[str]
+    definition: re.Pattern[str]
+    definition_curly: re.Pattern[str]
+    definitions_headers: tuple[str, ...]
+    boilerplate_headers: tuple[str, ...]
+    signature_markers: tuple[str, ...]
 
 
 class Jurisdiction(Enum):
@@ -99,15 +117,77 @@ class LegalChunk:
 
     # Legal metadata
     clause_type: ClauseType
-    jurisdiction: Jurisdiction
+    jurisdiction: Jurisdiction | str
 
     # Cross-references and terms
     cross_references: list[CrossReference] = field(default_factory=list)
     defined_terms_used: list[str] = field(default_factory=list)
     defined_terms_context: dict[str, str] = field(default_factory=dict)
 
+    # Classification accuracy
+    classification_confidence: float = 0.0
+    secondary_clause_type: Optional[ClauseType] = None
+
+    # Cross-reference resolution stats
+    cross_ref_total: int = 0
+    cross_ref_resolved: int = 0
+
     # Retrieval helpers
     context_header: str = ""
     document_id: Optional[str] = None
     char_start: int = 0
     char_end: int = 0
+    token_count: int = 0
+    original_header: str = ""
+
+
+@dataclass
+class BatchError:
+    """Error from processing a single document in a batch.
+
+    Args:
+        index: Position of the failed document in the input list.
+        text_preview: First 100 characters of the input text.
+        error: Error message string.
+        error_type: Fully-qualified exception class name.
+    """
+
+    index: int
+    text_preview: str
+    error: str
+    error_type: str
+
+
+@dataclass
+class BatchResult:
+    """Result of :meth:`~lexichunk.chunker.LegalChunker.chunk_batch`.
+
+    Contains per-document chunk lists and any errors that occurred.
+    Documents that errored out have an empty list at their index in
+    ``results``.
+
+    Args:
+        results: Per-document chunk lists, in input order.  Failed documents
+            have an empty list.
+        errors: List of :class:`BatchError` objects for documents that
+            failed processing.
+    """
+
+    results: list[list["LegalChunk"]]
+    errors: list[BatchError]
+
+    @property
+    def total_chunks(self) -> int:
+        """Total number of chunks across all successfully processed documents."""
+        return sum(len(r) for r in self.results)
+
+    @property
+    def success_count(self) -> int:
+        """Number of documents processed without errors."""
+        error_indices = {e.index for e in self.errors}
+        return len(self.results) - len(error_indices)
+
+    @property
+    def error_count(self) -> int:
+        """Number of documents that failed processing."""
+        return len(self.errors)

@@ -14,17 +14,66 @@ from ..models import (
 )
 
 # ---------------------------------------------------------------------------
-# Abbreviation pattern — matches tokens whose trailing dot must NOT trigger a
-# sentence split.  The pattern is used in _split_sentences to skip candidate
-# boundary positions that are actually abbreviations.
+# Default abbreviation list — tokens whose trailing dot must NOT trigger a
+# sentence split.
 # ---------------------------------------------------------------------------
-_ABBREVS = re.compile(
-    r'\b(?:U\.S\.C|F\.[23]d|LLC|Ltd|Inc|Corp|plc|LLP|'
-    r'e\.g|i\.e|cf|et al|ibid|viz|'
-    r'Cl|Sec|Art|No|vol|pp|para|'
-    r'Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec'
-    r')\.'
+DEFAULT_ABBREVIATIONS: tuple[str, ...] = (
+    # Case law reporters
+    "U.S.C", "F.2d", "F.3d", "F.Supp", "S.Ct", "L.Ed",
+    "A.2d", "A.3d", "N.E", "N.E.2d", "N.W", "N.W.2d",
+    "S.E", "S.E.2d", "S.W", "S.W.2d", "S.W.3d", "P.2d", "P.3d",
+    "So.2d", "So.3d", "Cal.Rptr", "Fed.Appx",
+    "Bankr", "B.R",
+    # Entity types
+    "LLC", "Ltd", "Inc", "Corp", "plc", "LLP", "L.P", "N.A",
+    "Co", "Ass'n", "Assn", "Bros",
+    # Latin / scholarly
+    "e.g", "i.e", "cf", "et al", "ibid", "viz", "v", "vs",
+    "supra", "infra", "id", "op.cit",
+    # Legal markers
+    "Cl", "Sec", "Art", "No", "vol", "pp", "para", "Sch",
+    "Pt", "Ch", "Div", "Reg", "Stat", "Amend", "Ex",
+    # US states (common abbreviations)
+    "Cal", "Tex", "Fla", "Ill", "Mass", "Conn", "Ariz",
+    "Colo", "Minn", "Wash", "Wis", "Tenn", "Okla",
+    "Ala", "Ark", "Del", "Ga", "Ind", "Kan", "Ky",
+    "Md", "Mich", "Miss", "Mo", "Neb", "Nev",
+    "N.J", "N.Y", "N.C", "N.D", "N.M", "N.H",
+    "S.C", "S.D", "Va", "Vt", "W.Va",
+    # Dates
+    "Jan", "Feb", "Mar", "Apr", "Jun", "Jul", "Aug",
+    "Sep", "Sept", "Oct", "Nov", "Dec",
+    # Titles
+    "Mr", "Mrs", "Ms", "Dr", "Prof", "Hon", "Rev", "Gen",
+    "Gov", "Sen", "Rep", "Sgt", "Capt", "Col", "Maj",
+    "Lt", "Cmdr", "Adm",
+    # Procedural rules components (Fed. R. Civ. P., Fed. R. Evid., etc.)
+    "Fed", "R", "Civ", "Crim", "Evid", "P",
+    # Misc legal / business
+    "Dept", "Dist", "Cir", "App", "Supp", "Admin",
+    "Comm", "Auth", "Bd", "Bur",
+    "approx", "est", "max", "min", "avg",
+    "St", "Ave", "Blvd",
 )
+
+
+def _compile_abbreviations(
+    defaults: tuple[str, ...],
+    extras: list[str] | None = None,
+) -> re.Pattern[str]:
+    """Build a regex pattern from abbreviation tokens.
+
+    Each token is escaped and joined with ``|``.  The compiled pattern
+    matches ``\\b<token>\\.`` — i.e. a word-boundary, the abbreviation,
+    and its trailing dot.
+    """
+    all_abbrevs = list(defaults)
+    if extras:
+        all_abbrevs.extend(extras)
+    # Sort by length descending so longer matches take priority.
+    all_abbrevs.sort(key=len, reverse=True)
+    escaped = [re.escape(a) for a in all_abbrevs]
+    return re.compile(r'\b(?:' + '|'.join(escaped) + r')\.')
 
 # Matches a sentence-ending punctuation mark followed by whitespace and an
 # uppercase letter (the start of the next sentence).  We use this to discover
@@ -36,17 +85,7 @@ _SENTENCE_BOUNDARY = re.compile(r'(?<=[.!?])\s+(?=[A-Z])')
 _NUMBER_DOT = re.compile(r'\d+\.\d')
 
 
-def _approx_tokens(text: str) -> int:
-    """Approximate token count: 1 token ≈ 4 characters.
-
-    Args:
-        text: Any string whose token count should be estimated.
-
-    Returns:
-        A positive integer approximation of the token count.
-    """
-    return max(1, len(text) // 4)
-
+from ..utils import approx_tokens as _approx_tokens
 
 # ---------------------------------------------------------------------------
 # Module-level convenience function
@@ -96,19 +135,27 @@ class FallbackChunker:
         max_chunk_size: Maximum chunk size in approximate tokens.
         min_chunk_size: Minimum chunk size; smaller pieces are merged.
         document_id: Optional document identifier.
+        chars_per_token: Number of characters per token for the approximation
+            heuristic.  Defaults to 4.
     """
 
     def __init__(
         self,
-        jurisdiction: Jurisdiction,
+        jurisdiction: Jurisdiction | str,
         max_chunk_size: int = 512,
         min_chunk_size: int = 64,
         document_id: Optional[str] = None,
+        chars_per_token: int = 4,
+        extra_abbreviations: list[str] | None = None,
     ) -> None:
         self._jurisdiction = jurisdiction
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
         self._document_id = document_id
+        self._chars_per_token = chars_per_token
+        self._abbrev_pattern = _compile_abbreviations(
+            DEFAULT_ABBREVIATIONS, extra_abbreviations
+        )
 
     # ------------------------------------------------------------------
     # Public API
@@ -156,7 +203,7 @@ class FallbackChunker:
         current_tokens: int = 0
 
         for sentence, offset in sentences:
-            sentence_tokens = _approx_tokens(sentence)
+            sentence_tokens = _approx_tokens(sentence, self._chars_per_token)
 
             # If adding this sentence would exceed the cap *and* we already
             # have content in the window, flush before adding.
@@ -175,7 +222,8 @@ class FallbackChunker:
         # Merge a tiny trailing window into the previous one.
         if len(windows) > 1:
             last_tokens = _approx_tokens(
-                " ".join(s for s, _ in windows[-1])
+                " ".join(s for s, _ in windows[-1]),
+                self._chars_per_token,
             )
             if last_tokens < self._min_chunk_size:
                 windows[-2].extend(windows[-1])
@@ -209,6 +257,7 @@ class FallbackChunker:
                 char_start=char_start,
                 char_end=char_end,
                 document_id=self._document_id,
+                token_count=_approx_tokens(window_text, self._chars_per_token),
             )
             chunks.append(chunk)
 
@@ -244,7 +293,7 @@ class FallbackChunker:
         """
         # Collect the character positions of all abbreviation matches so we
         # can quickly test whether a candidate boundary is a false positive.
-        abbrev_ends: set[int] = {m.end() for m in _ABBREVS.finditer(text)}
+        abbrev_ends: set[int] = {m.end() for m in self._abbrev_pattern.finditer(text)}
         number_dot_ends: set[int] = {m.end() - 1 for m in _NUMBER_DOT.finditer(text)}
 
         # Find all candidate split positions (the position of the whitespace

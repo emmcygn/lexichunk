@@ -5,15 +5,35 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from ..exceptions import ParsingError
+
 _ROMAN = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
 
 
 def roman_to_int(s: str) -> int:
-    """Convert a Roman numeral string to an integer."""
+    """Convert a Roman numeral string to an integer.
+
+    Args:
+        s: A string containing only valid Roman numeral characters
+            (I, V, X, L, C, D, M — case-insensitive).
+
+    Returns:
+        The integer value of the Roman numeral.
+
+    Raises:
+        ValueError: If *s* is empty or contains non-Roman characters.
+    """
+    if not s:
+        raise ParsingError("Empty string is not a valid Roman numeral")
     s = s.upper()
+    for ch in s:
+        if ch not in _ROMAN:
+            raise ParsingError(
+                f"Invalid Roman numeral character: {ch!r} in {s!r}"
+            )
     result, prev = 0, 0
     for ch in reversed(s):
-        val = _ROMAN.get(ch, 0)
+        val = _ROMAN[ch]
         if val < prev:
             result -= val
         else:
@@ -58,7 +78,7 @@ class USPatterns:
     ))
 
     cross_ref: re.Pattern = field(default_factory=lambda: re.compile(
-        r'\b(?:Section|Article|Exhibit|Schedule|Clause)\s+(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*|[IVXLC]+)',
+        r'\b(?:Sections?|Articles?|Exhibits?|Schedules?|Clauses?)\s+(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*|[IVXLC]+)',
         re.IGNORECASE
     ))
 
@@ -125,5 +145,16 @@ def detect_level(line: str) -> tuple[int, str] | None:
     m = re.match(r'^\(([ivxlc]+)\)\s+\S', s)
     if m:
         return (4, f'({m.group(1)})')
+
+    # Standalone ALL-CAPS header (e.g. "REPRESENTATIONS AND WARRANTIES").
+    # Must be at least 2 characters, all uppercase letters/spaces, with at
+    # least one letter, and not already caught by ARTICLE/SECTION above.
+    stripped = s.strip()
+    if (
+        len(stripped) >= 2
+        and re.fullmatch(r'[A-Z][A-Z \t]+', stripped)
+        and not stripped.startswith(('ARTICLE', 'SECTION', 'EXHIBIT', 'SCHEDULE'))
+    ):
+        return (0, stripped)
 
     return None

@@ -1,10 +1,8 @@
 """Tests for DefinitionsExtractor."""
 
-import pytest
 
 from lexichunk.models import DefinedTerm, Jurisdiction
 from lexichunk.parsers.definitions import DefinitionsExtractor
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -168,3 +166,203 @@ def test_fees_defined_in_uk_fixture(uk_service_agreement):
     extractor = _make_extractor(Jurisdiction.UK)
     result = extractor.extract(uk_service_agreement)
     assert "Fees" in result
+
+
+# ---------------------------------------------------------------------------
+# Single-quote definition tests
+# ---------------------------------------------------------------------------
+
+
+def test_single_quote_definition():
+    """Straight single-quoted term with 'means' keyword is extracted."""
+    text = "'Supplier' means the entity providing services."
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Supplier" in result
+    dt = result["Supplier"]
+    assert isinstance(dt, DefinedTerm)
+    assert dt.term == "Supplier"
+
+
+def test_single_quote_means():
+    """Single-quoted multi-word term with 'means' keyword is extracted."""
+    text = "'Confidential Information' means any information disclosed by either party."
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Confidential Information" in result
+    dt = result["Confidential Information"]
+    assert dt.term == "Confidential Information"
+
+
+def test_mixed_quotes():
+    """Document with both double-quoted and single-quoted definitions extracts both."""
+    text = (
+        '"Term One" means the first defined term.\n\n'
+        "'Term Two' means the second defined term."
+    )
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Term One" in result, f"Missing 'Term One'; got {list(result.keys())}"
+    assert "Term Two" in result, f"Missing 'Term Two'; got {list(result.keys())}"
+
+
+# ---------------------------------------------------------------------------
+# Inline / parenthetical definition tests
+# ---------------------------------------------------------------------------
+
+
+def test_inline_parenthetical_definition():
+    """Inline parenthetical: '(each a "Party")' extracts 'Party'."""
+    text = 'The Buyer and the Seller (each a "Party" and together the "Parties") agree.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Party" in result, f"Missing 'Party'; got {list(result.keys())}"
+    assert "Parties" in result, f"Missing 'Parties'; got {list(result.keys())}"
+
+
+def test_inline_parenthetical_single_term():
+    """Inline parenthetical with a single quoted term."""
+    text = 'This agreement (the "Agreement") is entered into.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Agreement" in result, f"Missing 'Agreement'; got {list(result.keys())}"
+
+
+def test_parenthetical_backref():
+    """Parenthetical back-reference: 'the Borrower (as defined in Section 1.1)'."""
+    text = "the Borrower (as defined in Section 1.1) shall pay the fees."
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Borrower" in result, f"Missing 'Borrower'; got {list(result.keys())}"
+
+
+def test_shall_have_the_meaning():
+    """'shall have the meaning' trigger phrase extracts the term."""
+    text = '"Term" shall have the meaning set forth in Section 2.1.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Term" in result, f"Missing 'Term'; got {list(result.keys())}"
+
+
+# ---------------------------------------------------------------------------
+# Skip list tests
+# ---------------------------------------------------------------------------
+
+
+def test_skip_list_rejects_common_words():
+    """Common false-positive words like 'Each', 'Any', 'Such' are rejected."""
+    from lexichunk.parsers.definitions import _SKIP_TERMS
+
+    reject_words = ["Each", "Any", "Such", "All", "No", "If", "Where", "When",
+                     "Upon", "In", "For", "By", "At", "On", "To", "Of", "Or",
+                     "And", "But", "Not", "It", "We", "You", "They", "Our",
+                     "Your", "Its"]
+    for word in reject_words:
+        assert word in _SKIP_TERMS, f"'{word}' should be in _SKIP_TERMS"
+
+
+def test_skip_list_rejects_each_in_extraction():
+    """'Each' should not be extracted even when it appears in definition form."""
+    text = '"Each" means every individual party to this agreement.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "Each" not in result
+
+
+# ---------------------------------------------------------------------------
+# Hereinafter definition pattern tests
+# ---------------------------------------------------------------------------
+
+
+def test_hereinafter_referred_to_as():
+    """'hereinafter referred to as "Term"' is extracted."""
+    text = 'XYZ Corporation, a company incorporated in England, hereinafter referred to as "The Company" shall provide services.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The Company" in result
+
+
+def test_hereinafter_called():
+    """'hereinafter called "Term"' is extracted."""
+    text = 'John Smith, hereinafter called "The Consultant", agrees to the following terms.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The Consultant" in result
+
+
+def test_hereinafter_known_as():
+    """'hereinafter known as "Term"' is extracted."""
+    text = 'Acme Ltd, hereinafter known as "The Supplier", shall deliver goods.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The Supplier" in result
+
+
+def test_hereinafter_case_insensitive():
+    """Hereinafter pattern is case-insensitive."""
+    text = 'ABC Inc, HEREINAFTER REFERRED TO AS "The Buyer", agrees to purchase.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The Buyer" in result
+
+
+def test_hereinafter_curly_quotes():
+    """Hereinafter pattern works with curly quotes."""
+    text = 'DEF Corp, hereinafter referred to as \u201cThe Vendor\u201d, will supply goods.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The Vendor" in result
+
+
+def test_hereinafter_context_extraction():
+    """The definition body should be the preceding text, not the 'hereinafter' phrase."""
+    text = 'Global Services Inc, a Delaware corporation. The corporation hereinafter referred to as "The Provider" shall deliver services.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The Provider" in result
+    dt = result["The Provider"]
+    # The definition should contain preceding context, not the hereinafter phrase.
+    assert "hereinafter" not in dt.definition.lower() or "corporation" in dt.definition.lower()
+
+
+def test_hereinafter_invalid_term_rejected():
+    """Hereinafter with a skip-list term is rejected."""
+    text = 'Something hereinafter referred to as "The" shall apply.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The" not in result
+
+
+def test_hereinafter_no_quotes_not_matched():
+    """Hereinafter without quotes around the term should not be matched."""
+    text = "XYZ Corp hereinafter referred to as The Company shall provide services."
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The Company" not in result
+
+
+def test_hereinafter_at_document_start():
+    """Hereinafter at position 0 should fall back to the matched text itself."""
+    text = 'hereinafter referred to as "The Company" shall provide services.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The Company" in result
+    # Definition body falls back to the hereinafter phrase when no preceding text.
+    dt = result["The Company"]
+    assert len(dt.definition) > 0
+
+
+def test_hereinafter_uppercase_keyword_curly_quotes():
+    """UPPERCASE keyword + curly quotes should work."""
+    text = 'ABC Corp, HEREINAFTER REFERRED TO AS \u201cThe Vendor\u201d, agrees to terms.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "The Vendor" in result
+
+
+def test_hereinafter_lowercase_term_rejected():
+    """Lowercase first letter in term is rejected (consistent with other patterns)."""
+    text = 'ABC Corp hereinafter referred to as "the company" agrees.'
+    extractor = _make_extractor()
+    result = extractor.extract(text)
+    assert "the company" not in result

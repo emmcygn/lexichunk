@@ -232,7 +232,7 @@ Raw Text
 
 **Clause Chunker** splits at detected boundaries. Merges undersized clauses with their siblings; splits oversized clauses at sub-clause boundaries then at sentence boundaries.
 
-**Metadata Enricher** runs four enrichment passes: keyword-based clause type classification (24 types), cross-reference detection and resolution, defined term attachment (scans each chunk for known terms), and context header generation following the Contextual Retrieval pattern.
+**Metadata Enricher** runs four enrichment passes: keyword-based clause type classification (27 types), cross-reference detection and resolution, defined term attachment (scans each chunk for known terms), and context header generation following the Contextual Retrieval pattern.
 
 Zero mandatory dependencies — the core uses stdlib and `re` only.
 

@@ -1,10 +1,8 @@
 """Tests for ReferenceDetector."""
 
-import pytest
 
 from lexichunk.models import CrossReference, Jurisdiction
 from lexichunk.parsers.references import ReferenceDetector
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -35,7 +33,7 @@ def test_detect_uk_clause_ref():
     refs = detector.detect(text)
     assert len(refs) >= 1
     ids = _identifiers(refs)
-    assert any("3.2" in i for i in ids), f"Expected '3.2' in identifiers; got {ids}"
+    assert "3.2" in ids, f"Expected '3.2' in identifiers; got {ids}"
 
 
 def test_detect_us_section_ref():
@@ -60,7 +58,7 @@ def test_detect_article_ref():
     refs = detector.detect(text)
     assert len(refs) >= 1
     ids = _identifiers(refs)
-    assert any("7.01" in i for i in ids), f"Expected '7.01' in identifiers; got {ids}"
+    assert "7.01" in ids, f"Expected '7.01' in identifiers; got {ids}"
 
 
 def test_detect_schedule_ref():
@@ -85,7 +83,7 @@ def test_detect_exhibit_ref():
     refs = detector.detect(text)
     assert len(refs) >= 1
     ids = _identifiers(refs)
-    assert any("1" in i for i in ids), f"Expected schedule identifier '1' in refs; got {ids}"
+    assert "1" in ids, f"Expected schedule identifier '1' in refs; got {ids}"
 
 
 def test_detect_contextual_ref():
@@ -95,7 +93,7 @@ def test_detect_contextual_ref():
     refs = detector.detect(text)
     assert len(refs) >= 1
     ids = _identifiers(refs)
-    assert any("2.1" in i for i in ids), f"Expected '2.1' in identifiers; got {ids}"
+    assert "2.1" in ids, f"Expected '2.1' in identifiers; got {ids}"
 
 
 def test_deduplication():
@@ -181,7 +179,7 @@ def test_detect_multiple_distinct_refs():
     refs = detector.detect(text)
     ids = _identifiers(refs)
     # We expect refs to "2.1", "5.3", and "1" (schedule).
-    assert len(refs) >= 2, f"Expected at least 2 distinct refs; got {refs}"
+    assert len(ids) >= 2, f"Expected at least 2 distinct refs; got {refs}"
 
 
 def test_resolve_unresolvable_ref_keeps_none():
@@ -224,7 +222,7 @@ def test_trailing_period_with_subclause():
     text = "Per Section 4.1(a)."
     refs = _us_detector().detect(text)
     ids = _identifiers(refs)
-    assert any("4.1(a)" in i for i in ids), f"Expected '4.1(a)'; got {ids}"
+    assert "4.1(a)" in ids, f"Expected '4.1(a)'; got {ids}"
 
 
 # ---------------------------------------------------------------------------
@@ -270,6 +268,29 @@ def test_partial_match_parent_resolves_to_first_child():
     )
 
 
+def test_partial_match_picks_first_of_three_children():
+    """Ref to '4' with 3 children resolves to the child with the lowest chunk index.
+
+    Children are deliberately out of identifier-sort order (4.3, 4.1, 4.2) to
+    prove that ``_partial_match`` selects by lowest chunk_index, not by
+    lexicographic identifier order.  Chunk 1 (identifier "4.3") has the lowest
+    index among the three children, so it must win.
+    """
+    detector = _uk_detector()
+    ref = CrossReference(raw_text="Clause 4", target_identifier="4")
+    pairs = [
+        ([ref], "1.1"),  # chunk 0 — contains the reference
+        ([], "4.3"),     # chunk 1 — child of 4, lowest index
+        ([], "4.1"),     # chunk 2 — child of 4
+        ([], "4.2"),     # chunk 3 — child of 4
+    ]
+    resolved = detector.resolve(pairs)
+    assert resolved[0][0].target_chunk_index == 1, (
+        f"Expected partial match to pick lowest chunk index (1, id='4.3'); "
+        f"got {resolved[0][0].target_chunk_index}"
+    )
+
+
 def test_partial_match_does_not_match_unrelated():
     """Ref to '4' must NOT resolve to '14' or '41' — only children like '4.X'."""
     detector = _uk_detector()
@@ -293,7 +314,7 @@ def test_detect_article_roman_numeral():
     text = "The indemnification obligations are as set forth in Article VII."
     refs = _us_detector().detect(text)
     ids = _identifiers(refs)
-    assert any("VII" in i for i in ids), f"Expected 'VII' in identifiers; got {ids}"
+    assert "VII" in ids, f"Expected 'VII' in identifiers; got {ids}"
 
 
 def test_resolve_article_roman_numeral():
@@ -306,3 +327,36 @@ def test_resolve_article_roman_numeral():
     ]
     resolved = detector.resolve(pairs)
     assert resolved[0][0].target_chunk_index == 1
+
+
+# ---------------------------------------------------------------------------
+# Conjunctive reference tests (S4)
+# ---------------------------------------------------------------------------
+
+
+def test_conjunctive_sections():
+    """'Sections 3.1, 3.2 and 3.3' detects all three identifiers."""
+    text = "The obligations in Sections 3.1, 3.2 and 3.3 shall apply."
+    refs = _uk_detector().detect(text)
+    ids = _identifiers(refs)
+    assert "3.1" in ids, f"Expected '3.1' in identifiers; got {ids}"
+    assert "3.2" in ids, f"Expected '3.2' in identifiers; got {ids}"
+    assert "3.3" in ids, f"Expected '3.3' in identifiers; got {ids}"
+
+
+def test_conjunctive_clauses():
+    """'Clauses 4.1, 4.2, 4.3 and 4.4' detects all four identifiers."""
+    text = "Subject to Clauses 4.1, 4.2, 4.3 and 4.4 of this Agreement."
+    refs = _uk_detector().detect(text)
+    ids = _identifiers(refs)
+    for expected in ("4.1", "4.2", "4.3", "4.4"):
+        assert expected in ids, f"Expected {expected!r} in identifiers; got {ids}"
+
+
+def test_conjunctive_or():
+    """'Section 2.1 or Section 2.2' detects both."""
+    text = "As defined in Section 2.1 or Section 2.2 of this Agreement."
+    refs = _us_detector().detect(text)
+    ids = _identifiers(refs)
+    assert "2.1" in ids, f"Expected '2.1' in identifiers; got {ids}"
+    assert "2.2" in ids, f"Expected '2.2' in identifiers; got {ids}"

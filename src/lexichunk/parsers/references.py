@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import string
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from ..models import CrossReference, Jurisdiction
+
+logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from ..models import LegalChunk
 from ..jurisdiction import get_patterns
 
 # ---------------------------------------------------------------------------
@@ -41,7 +47,19 @@ _LABEL_WORDS: tuple[str, ...] = (
 )
 
 # Punctuation translation table for identifier normalisation.
-_STRIP_PUNCT = str.maketrans("", "", string.punctuation)
+# Preserve dots and parentheses — they are structurally meaningful in legal
+# identifiers like "3.1(a)".  Only strip the remaining punctuation characters.
+_STRIP_PUNCT = str.maketrans(
+    "", "", string.punctuation.replace(".", "").replace("(", "").replace(")", "")
+)
+
+# Pattern matching trailing conjunctive identifiers after a detected ref.
+# Captures sequences like ", 3.2, 3.3 and 3.4" or ", 3.2 or 3.3".
+_CONJUNCTIVE_TAIL = re.compile(
+    r'(?:\s*,\s*|\s+(?:and|or)\s+)'
+    r'(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*)',
+    re.IGNORECASE,
+)
 
 
 class ReferenceDetector:
@@ -51,13 +69,14 @@ class ReferenceDetector:
         jurisdiction: The jurisdiction whose patterns are used for detection.
     """
 
-    def __init__(self, jurisdiction: Jurisdiction) -> None:
+    def __init__(self, jurisdiction: Jurisdiction | str) -> None:
         """Initialise the detector for a given jurisdiction.
 
         Args:
-            jurisdiction: One of ``Jurisdiction.UK`` or ``Jurisdiction.US``.
+            jurisdiction: One of ``Jurisdiction.UK`` or ``Jurisdiction.US``,
+                or a custom jurisdiction string.
         """
-        self.jurisdiction: Jurisdiction = jurisdiction
+        self.jurisdiction: Jurisdiction | str = jurisdiction
         self._patterns: list[re.Pattern[str]] = [
             get_patterns(jurisdiction).cross_ref,
             *EXTENDED_PATTERNS,
@@ -107,6 +126,25 @@ class ReferenceDetector:
                         )
                     )
 
+                # Scan for conjunctive tails: ", 3.2, 3.3 and 3.4"
+                tail_pos = match.end()
+                for tail_match in _CONJUNCTIVE_TAIL.finditer(text, tail_pos):
+                    # Only accept tails contiguous with the previous match end.
+                    if tail_match.start() != tail_pos:
+                        break
+                    tail_id = tail_match.group(1)
+                    tail_norm = self._normalise_identifier(tail_id)
+                    if tail_norm and tail_norm not in seen:
+                        seen.add(tail_norm)
+                        refs.append(
+                            CrossReference(
+                                raw_text=tail_match.group(0).strip(" ,"),
+                                target_identifier=tail_id,
+                            )
+                        )
+                    tail_pos = tail_match.end()
+
+        logger.debug("Detected %d cross-references", len(refs))
         return refs
 
     def resolve(
@@ -278,9 +316,9 @@ def detect_references(
 
 
 def resolve_references(
-    chunks: list,  # list[LegalChunk] — avoid circular import by using list
-    jurisdiction: Jurisdiction,
-) -> list:
+    chunks: list[LegalChunk],
+    jurisdiction: Jurisdiction | str,
+) -> list[LegalChunk]:
     """Resolve cross-references across all chunks (second pass).
 
     Builds a ``ReferenceDetector``, collects ``(cross_references, identifier)``
@@ -303,6 +341,22 @@ def resolve_references(
         (c.cross_references, c.hierarchy.identifier) for c in chunks
     ]
     resolved = detector.resolve(pairs)
+
+    total_refs = 0
+    total_resolved = 0
     for chunk, refs in zip(chunks, resolved):
         chunk.cross_references = refs
+        chunk.cross_ref_total = len(refs)
+        chunk.cross_ref_resolved = sum(
+            1 for r in refs if r.target_chunk_index is not None
+        )
+        total_refs += chunk.cross_ref_total
+        total_resolved += chunk.cross_ref_resolved
+
+    rate = total_resolved / total_refs if total_refs > 0 else 1.0
+    logger.debug(
+        "Cross-reference resolution: %d/%d resolved (%.1f%%)",
+        total_resolved, total_refs, rate * 100,
+    )
+
     return chunks

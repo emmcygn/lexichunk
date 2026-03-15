@@ -2,10 +2,35 @@
 
 from __future__ import annotations
 
-import re
-from typing import Optional
+from dataclasses import dataclass, field
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Optional
 
 from ..models import ClauseType, DocumentSection
+
+if TYPE_CHECKING:
+    from ..models import LegalChunk
+
+
+@dataclass(frozen=True)
+class ClassificationResult:
+    """Result of a detailed clause type classification.
+
+    Attributes:
+        clause_type: The primary (best-scoring) clause type.
+        confidence: Confidence score between 0.0 and 1.0.
+            Computed as best_score / sum(all_scores).  1.0 when only one
+            clause type matched; 0.0 for UNKNOWN.
+        secondary_clause_type: The second-best clause type, or ``None``
+            when fewer than two types matched.
+        scores: Per-clause-type scores after all scoring stages (keyword
+            matching, path bonus, and position boost).  Read-only view.
+    """
+
+    clause_type: ClauseType
+    confidence: float
+    secondary_clause_type: Optional[ClauseType]
+    scores: MappingProxyType[ClauseType, float] = field(default_factory=lambda: MappingProxyType({}))
 
 # ---------------------------------------------------------------------------
 # Signal table
@@ -232,7 +257,11 @@ _PATH_BONUS: float = 3.0
 # ---------------------------------------------------------------------------
 
 
-def _score(content_lower: str, path_lower: str) -> dict[ClauseType, float]:
+def _score(
+    content_lower: str,
+    path_lower: str,
+    signals: dict[ClauseType, list[str]] | None = None,
+) -> dict[ClauseType, float]:
     """Compute per-ClauseType keyword scores for lowercased inputs.
 
     Each signal match in *content_lower* contributes a weight equal to the
@@ -243,17 +272,19 @@ def _score(content_lower: str, path_lower: str) -> dict[ClauseType, float]:
     Args:
         content_lower: Lowercased chunk content to score.
         path_lower: Lowercased hierarchy path string to score.
+        signals: Signal table to use.  Defaults to ``CLAUSE_SIGNALS``.
 
     Returns:
         A mapping from ClauseType to its accumulated score; only clause
         types with a score greater than zero are included.
     """
+    effective_signals = signals if signals is not None else CLAUSE_SIGNALS
     scores: dict[ClauseType, float] = {}
 
-    for clause_type, signals in CLAUSE_SIGNALS.items():
+    for clause_type, signal_list in effective_signals.items():
         score = 0.0
 
-        for signal in signals:
+        for signal in signal_list:
             if signal in content_lower:
                 # Longer phrases receive higher weight than single words.
                 score += len(signal.split())
@@ -270,14 +301,122 @@ def _score(content_lower: str, path_lower: str) -> dict[ClauseType, float]:
 
 
 # ---------------------------------------------------------------------------
+# Position-aware scoring
+# ---------------------------------------------------------------------------
+
+_POSITION_BONUS: float = 1.5
+_POSITION_THRESHOLD: float = 0.75
+
+# Clause types that commonly appear toward the end of a document.
+_END_OF_DOC_TYPES: frozenset[ClauseType] = frozenset({
+    ClauseType.BOILERPLATE,
+    ClauseType.ENTIRE_AGREEMENT,
+    ClauseType.SEVERABILITY,
+    ClauseType.GOVERNING_LAW,
+    ClauseType.NOTICES,
+    ClauseType.AMENDMENT,
+    ClauseType.ASSIGNMENT,
+})
+
+
+def _classify_detailed(
+    content: str,
+    hierarchy_path: str = "",
+    document_section: Optional[DocumentSection] = None,
+    relative_position: float = 0.0,
+    signals: dict[ClauseType, list[str]] | None = None,
+) -> ClassificationResult:
+    """Classify a chunk with full detail: confidence and secondary type.
+
+    Args:
+        content: The chunk text to classify.
+        hierarchy_path: Optional hierarchy path string for bonus scoring.
+        document_section: Optional document section for structural override.
+        relative_position: Position of the chunk in the document (0.0–1.0).
+        signals: Merged signal table, or ``None`` for defaults.
+
+    Returns:
+        A :class:`ClassificationResult` with confidence and secondary type.
+    """
+    # Structural overrides → confidence 1.0, no secondary.
+    if document_section is not None:
+        direct = _SECTION_TO_CLAUSE_TYPE.get(document_section)
+        if direct is not None:
+            return ClassificationResult(
+                clause_type=direct,
+                confidence=1.0,
+                secondary_clause_type=None,
+                scores=MappingProxyType({direct: 1.0}),
+            )
+
+    content_lower = content.lower()
+    path_lower = hierarchy_path.lower()
+    scores = _score(content_lower, path_lower, signals=signals)
+
+    if not scores:
+        return ClassificationResult(
+            clause_type=ClauseType.UNKNOWN,
+            confidence=0.0,
+            secondary_clause_type=None,
+            scores=MappingProxyType({}),
+        )
+
+    # Apply position boost for end-of-document clause types.
+    if relative_position > _POSITION_THRESHOLD:
+        for ct in _END_OF_DOC_TYPES:
+            if ct in scores:
+                scores[ct] += _POSITION_BONUS
+
+    # Sort by score descending; ties broken by CLAUSE_SIGNALS order.
+    sorted_types = sorted(
+        scores,
+        key=lambda ct: scores[ct],
+        reverse=True,
+    )
+
+    best = sorted_types[0]
+    total = sum(scores.values())
+    confidence = scores[best] / total if total > 0 else 0.0
+
+    secondary = sorted_types[1] if len(sorted_types) >= 2 else None
+
+    return ClassificationResult(
+        clause_type=best,
+        confidence=confidence,
+        secondary_clause_type=secondary,
+        scores=MappingProxyType(scores),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Public classification function
 # ---------------------------------------------------------------------------
+
+
+def _merge_signals(
+    extra_signals: dict[ClauseType, list[str]] | None,
+) -> dict[ClauseType, list[str]] | None:
+    """Merge extra signals into the base ``CLAUSE_SIGNALS`` table.
+
+    Returns ``None`` when there are no extras (so ``_score`` uses its
+    default), or a new merged dict when extras are provided.
+    """
+    if not extra_signals:
+        return None
+    merged = {ct: list(sigs) for ct, sigs in CLAUSE_SIGNALS.items()}
+    for ct, extras in extra_signals.items():
+        if ct in merged:
+            merged[ct] = merged[ct] + extras
+        else:
+            merged[ct] = list(extras)
+    return merged
 
 
 def classify_clause_type(
     content: str,
     hierarchy_path: str = "",
     document_section: Optional[DocumentSection] = None,
+    extra_signals: dict[ClauseType, list[str]] | None = None,
 ) -> ClauseType:
     """Classify a chunk of legal text into a ClauseType.
 
@@ -308,31 +447,19 @@ def classify_clause_type(
             (e.g. ``"Article VII > Section 7.2"``).
         document_section: The document section this chunk belongs to, or
             ``None`` when not known.
+        extra_signals: Additional clause-type keywords to merge with the
+            built-in ``CLAUSE_SIGNALS`` table before scoring.
 
     Returns:
         The most likely :class:`ClauseType`, or
         :attr:`ClauseType.UNKNOWN` if no signals matched.
     """
-    # ---- structural overrides (fast path) ---------------------------------
-    if document_section is not None:
-        direct = _SECTION_TO_CLAUSE_TYPE.get(document_section)
-        if direct is not None:
-            return direct
-
-    # ---- keyword scoring --------------------------------------------------
-    content_lower = content.lower()
-    path_lower = hierarchy_path.lower()
-
-    scores = _score(content_lower, path_lower)
-
-    if not scores:
-        return ClauseType.UNKNOWN
-
-    # Select the clause type with the highest score.  Because Python dicts
-    # preserve insertion order (3.7+) and CLAUSE_SIGNALS is an ordered dict
-    # literal, ties are broken by the order clauses appear in CLAUSE_SIGNALS.
-    best: ClauseType = max(scores, key=lambda ct: scores[ct])
-    return best
+    merged = _merge_signals(extra_signals)
+    result = _classify_detailed(
+        content, hierarchy_path, document_section,
+        relative_position=0.0, signals=merged,
+    )
+    return result.clause_type
 
 
 # ---------------------------------------------------------------------------
@@ -341,10 +468,15 @@ def classify_clause_type(
 
 
 class ClauseTypeClassifier:
-    """Stateless clause type classifier using keyword heuristics.
+    """Clause type classifier using keyword heuristics.
 
     Can be instantiated for repeated use; internally delegates every
     classification decision to :func:`classify_clause_type`.
+
+    Args:
+        extra_signals: Optional dict mapping :class:`ClauseType` to
+            additional keyword strings.  These are merged with the built-in
+            ``CLAUSE_SIGNALS`` table before scoring.
 
     Example::
 
@@ -352,6 +484,13 @@ class ClauseTypeClassifier:
         clause_type = classifier.classify("The Supplier shall indemnify …")
         chunks = classifier.classify_all(chunks)
     """
+
+    def __init__(
+        self,
+        extra_signals: dict[ClauseType, list[str]] | None = None,
+    ) -> None:
+        self._extra_signals = extra_signals
+        self._merged_signals = _merge_signals(extra_signals)
 
     def classify(
         self,
@@ -370,28 +509,59 @@ class ClauseTypeClassifier:
         Returns:
             The most likely :class:`ClauseType` for the given text.
         """
-        return classify_clause_type(content, hierarchy_path, document_section)
+        return _classify_detailed(
+            content, hierarchy_path, document_section,
+            relative_position=0.0, signals=self._merged_signals,
+        ).clause_type
 
-    def classify_all(self, chunks: list) -> list:
+    def classify_detailed(
+        self,
+        content: str,
+        hierarchy_path: str = "",
+        document_section: Optional[DocumentSection] = None,
+        relative_position: float = 0.0,
+    ) -> ClassificationResult:
+        """Classify a single chunk with full detail.
+
+        Args:
+            content: The chunk text to classify.
+            hierarchy_path: Optional hierarchy path string for bonus scoring.
+            document_section: Optional document section for structural
+                override logic.
+            relative_position: Position of the chunk in the document (0.0–1.0).
+
+        Returns:
+            A :class:`ClassificationResult` with confidence and secondary type.
+        """
+        return _classify_detailed(
+            content, hierarchy_path, document_section,
+            relative_position=relative_position,
+            signals=self._merged_signals,
+        )
+
+    def classify_all(self, chunks: list[LegalChunk]) -> list[LegalChunk]:
         """Classify ``clause_type`` on a list of LegalChunk objects in-place.
 
-        Iterates over *chunks*, calling :meth:`classify` for each item using
-        ``chunk.content``, ``chunk.hierarchy_path``, and
-        ``chunk.document_section``.  The result is written back to
-        ``chunk.clause_type``.
+        Iterates over *chunks*, calling :meth:`classify_detailed` for each
+        item.  Populates ``clause_type``, ``classification_confidence``,
+        and ``secondary_clause_type`` on every chunk.
 
         Args:
             chunks: List of :class:`~lexichunk.models.LegalChunk` objects.
-                Each must expose ``.content``, ``.hierarchy_path``, and
-                ``.document_section`` attributes.
 
         Returns:
-            The same list with ``clause_type`` populated on every chunk.
+            The same list with classification fields populated on every chunk.
         """
-        for chunk in chunks:
-            chunk.clause_type = self.classify(
+        n = max(len(chunks) - 1, 1)
+        for i, chunk in enumerate(chunks):
+            relative_position = i / n
+            result = self.classify_detailed(
                 chunk.content,
                 chunk.hierarchy_path,
                 chunk.document_section,
+                relative_position=relative_position,
             )
+            chunk.clause_type = result.clause_type
+            chunk.classification_confidence = result.confidence
+            chunk.secondary_clause_type = result.secondary_clause_type
         return chunks

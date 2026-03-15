@@ -12,9 +12,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
-from ..models import DocumentSection, HierarchyNode, Jurisdiction
 from ..jurisdiction import get_detect_level
-
+from ..models import DocumentSection, HierarchyNode, Jurisdiction
 
 # ---------------------------------------------------------------------------
 # Public dataclass
@@ -140,7 +139,7 @@ class StructureParser:
     """
 
     def __init__(
-        self, jurisdiction: Jurisdiction, doc_type: str = "contract"
+        self, jurisdiction: Jurisdiction | str, doc_type: str = "contract"
     ) -> None:
         self._jurisdiction = jurisdiction
         self._doc_type = doc_type
