@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from lexichunk import ClassificationResult, ClauseType, LegalChunker
+from lexichunk import ClauseType, LegalChunker
 from lexichunk.enrichment.clause_type import (
-    ClauseTypeClassifier,
     _classify_detailed,
 )
-from lexichunk.models import DocumentSection, LegalChunk
+from lexichunk.models import DocumentSection
 
 
 class TestSingleChunkPosition:

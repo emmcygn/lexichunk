@@ -2,12 +2,8 @@
 
 from __future__ import annotations
 
-import pytest
-
 from lexichunk import ClauseType, LegalChunker
 from lexichunk.enrichment.clause_type import (
-    ClassificationResult,
-    ClauseTypeClassifier,
     _END_OF_DOC_TYPES,
     _POSITION_BONUS,
     _POSITION_THRESHOLD,

@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import pytest
-
 from lexichunk import LegalChunker
-from lexichunk.models import LegalChunk
 
 
 class TestPerChunkStats:
@@ -129,7 +126,6 @@ class TestChunkerProperties:
             "2. Details\n\nDetails here.\n"
         )
         chunker.chunk(text1)
-        stats1 = chunker.cross_ref_stats
 
         text2 = "1. Simple\n\nNo references at all.\n"
         chunker.chunk(text2)

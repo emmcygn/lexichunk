@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import pytest
-
 from types import MappingProxyType
+
+import pytest
 
 from lexichunk import ClassificationResult, ClauseType, LegalChunker
 from lexichunk.enrichment.clause_type import (
@@ -145,7 +145,7 @@ class TestClassifyAllPopulatesFields:
         )
         chunks = chunker.chunk(text)
         # At least one chunk should have signals for both types.
-        mixed = [c for c in chunks if c.secondary_clause_type is not None]
+        [c for c in chunks if c.secondary_clause_type is not None]
         # Even if none is mixed, confidence should still be populated.
         for chunk in chunks:
             assert isinstance(chunk.classification_confidence, float)

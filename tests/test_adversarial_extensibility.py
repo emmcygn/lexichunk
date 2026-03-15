@@ -7,7 +7,6 @@ pipeline-level weirdness.
 
 from __future__ import annotations
 
-import copy
 import re
 from dataclasses import dataclass, field
 from typing import Optional
@@ -33,14 +32,12 @@ from lexichunk.jurisdiction import (
     get_patterns,
 )
 from lexichunk.models import (
-    ClauseType as CT,
     DocumentSection,
     HierarchyNode,
     Jurisdiction,
     LegalChunk,
 )
 from lexichunk.utils import build_metadata
-
 
 # ---------------------------------------------------------------------------
 # Helpers
