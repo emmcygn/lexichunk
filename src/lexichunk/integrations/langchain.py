@@ -24,7 +24,7 @@ _LANGCHAIN_AVAILABLE = False
 _Document: Any = None
 
 try:
-    from langchain_core.documents import Document as _Document  # type: ignore[assignment]
+    from langchain_core.documents import Document as _Document  # type: ignore[assignment,no-redef]
 
     _LANGCHAIN_AVAILABLE = True
 except ImportError:

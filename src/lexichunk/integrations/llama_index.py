@@ -27,9 +27,9 @@ _LlamaDocument: Any = None
 
 try:
     from llama_index.core.schema import (
-        Document as _LlamaDocument,  # type: ignore[assignment]  # noqa: F401
+        Document as _LlamaDocument,  # type: ignore[assignment,no-redef]  # noqa: F401
     )
-    from llama_index.core.schema import TextNode as _TextNode  # type: ignore[assignment]
+    from llama_index.core.schema import TextNode as _TextNode  # type: ignore[assignment,no-redef]
 
     _LLAMA_INDEX_AVAILABLE = True
 except ImportError:
