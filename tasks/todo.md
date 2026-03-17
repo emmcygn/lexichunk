@@ -163,6 +163,16 @@
 2. `assert metrics is not None` in public `chunk_with_metrics()` — stripped by `python -O` → removed assert, used type comment
 3. Docstring said "Identical to chunk()" but logging behavior differs — `chunk_with_metrics()` emits per-stage debug logs that `chunk()` does not → updated docstring
 
+## PR #1: dev → master (v0.1.0 → v0.7.0) — CI Fixes ✅
+- [x] Open PR #1: https://github.com/emmcygn/lexichunk/pull/1
+- [x] Fix CI run #1: ruff lint failures — unused imports (F401), unused vars (F841), unsorted imports (I001) in 5 test files
+- [x] Fix CI run #2: mypy failures — add `[[tool.mypy.overrides]]` for optional deps (langchain_core, llama_index), add `no-redef` to type:ignore comments
+- [x] Fix CI run #3: last mypy no-redef — multi-line import in llama_index.py moved type:ignore to `from` line
+- [ ] Verify CI run #4 is green
+- [ ] Merge PR #1 once CI passes
+
+**Lesson**: Always run `ruff check src/ tests/ && mypy src/lexichunk/` locally before pushing. See L019 in lessons.md.
+
 ## Review (v0.1.0)
 
 **Result**: 107/107 tests passing in 0.42s. Full pipeline verified end-to-end.

@@ -185,3 +185,19 @@ Never reverse steps 2 and 3.
 **Rule**: When a test modifies global mutable state and needs to restore it, capture the original value BEFORE the mutation, or import the canonical value directly from its source module. Never use a lookup function that reads from the same global state you just modified.
 
 **Check**: In test teardown/restore code, trace the data flow: does the "restore" value come from a function that reads the state you just mutated? If yes, you're restoring the mutated value, not the original.
+
+---
+
+## L019 — Always run ruff + mypy locally before pushing to CI
+
+**Pattern**: PR #1 (dev → master) failed CI 3 times in a row. Run #1: 17 ruff errors (unused imports, unsorted imports in test files). Run #2: 5 mypy errors (optional deps not installed, `no-redef` not suppressed). Run #3: 1 mypy error (multi-line import placed `type: ignore` on wrong line). All were trivially caught locally.
+
+**Rule**: Before every `git push`, run: `python -m ruff check src/ tests/ && python -m mypy src/lexichunk/`. This catches 100% of the lint/type errors that CI will find.
+
+**Specific gotchas**:
+1. Test files accumulate unused imports from copy-paste — ruff F401 catches them
+2. Optional deps (langchain, llama-index) need `[[tool.mypy.overrides]]` with `ignore_missing_imports = true` in pyproject.toml
+3. mypy attributes `no-redef` to the `from` line of multi-line imports, not the alias line — if ruff reformats an import to multi-line, the `type: ignore` comment must go on the `from` line
+4. ruff's I001 (isort) and mypy's `type: ignore` can conflict — after ruff auto-fix, always re-verify mypy
+
+**Check**: Did you run both linters locally? If not, run them now before pushing.
