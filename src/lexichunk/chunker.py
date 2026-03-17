@@ -99,6 +99,7 @@ class LegalChunker:
         extra_abbreviations: list[str] | None = None,
         extra_clause_signals: dict[ClauseType, list[str]] | None = None,
         enable_definition_cache: bool = True,
+        max_cache_size: int = 128,
     ) -> None:
         # Normalise jurisdiction: try enum first, then registry lookup.
         if isinstance(jurisdiction, str):
@@ -149,6 +150,7 @@ class LegalChunker:
         self._extra_abbreviations = extra_abbreviations
         self._extra_clause_signals = extra_clause_signals
         self._enable_definition_cache = enable_definition_cache
+        self._max_cache_size = max(max_cache_size, 1)
         self._definition_cache: dict[str, dict[str, DefinedTerm]] = {}
         self._last_cross_ref_stats: dict[str, int | float] = {}
 
@@ -206,7 +208,9 @@ class LegalChunker:
 
         Returns:
             List of :class:`~lexichunk.models.LegalChunk` objects in document
-            order with all metadata populated.
+            order with all metadata populated.  Returned chunks are fully
+            enriched; callers should not mutate the list or its elements if the
+            chunker instance is reused with caching enabled.
         """
         chunks, _ = self._run_pipeline(text, document_id, collect_metrics=False)
         return chunks
@@ -299,6 +303,8 @@ class LegalChunker:
 
         # ------------------------------------------------------------------
         # Stage 1: Structure parsing
+        # Input: sanitised text string.
+        # Output: list[ParsedClause] with char_start/char_end/content/level.
         # ------------------------------------------------------------------
         if collect_metrics:
             logger.debug("Stage 1: structure_parsing — start")
@@ -314,6 +320,12 @@ class LegalChunker:
 
         # ------------------------------------------------------------------
         # Stage 2: Chunking
+        # Input: list[ParsedClause].
+        # Output: list[LegalChunk] with content, index, hierarchy,
+        #   hierarchy_path, document_section, char_start, char_end,
+        #   token_count, jurisdiction, document_id.
+        # Unpopulated: cross_references, clause_type (UNKNOWN),
+        #   classification_confidence, context_header, defined_terms_*.
         # ------------------------------------------------------------------
         if collect_metrics:
             logger.debug("Stage 2: chunking — start")
@@ -372,6 +384,7 @@ class LegalChunker:
 
         # ------------------------------------------------------------------
         # Stage 3: Cross-reference detection (first pass)
+        # Populates: cross_references (target_chunk_index=None).
         # ------------------------------------------------------------------
         if collect_metrics:
             logger.debug("Stage 3: cross_reference_detection — start")
@@ -389,6 +402,8 @@ class LegalChunker:
 
         # ------------------------------------------------------------------
         # Stage 4: Clause type classification
+        # Populates: clause_type, classification_confidence,
+        #   secondary_clause_type.
         # ------------------------------------------------------------------
         if collect_metrics:
             logger.debug("Stage 4: clause_type_classification — start")
@@ -405,6 +420,7 @@ class LegalChunker:
 
         # ------------------------------------------------------------------
         # Stage 5: Context header generation
+        # Populates: context_header (if include_context_header).
         # ------------------------------------------------------------------
         if collect_metrics:
             logger.debug("Stage 5: context_enrichment — start")
@@ -426,6 +442,7 @@ class LegalChunker:
 
         # ------------------------------------------------------------------
         # Stage 6: Defined terms extraction and attachment
+        # Populates: defined_terms_used, defined_terms_context.
         # ------------------------------------------------------------------
         if collect_metrics:
             logger.debug("Stage 6: defined_terms — start")
@@ -440,6 +457,10 @@ class LegalChunker:
                 else:
                     defined_terms = self._definitions_extractor.extract(text)
                     self._definition_cache[cache_key] = defined_terms
+                    # Evict oldest entry (FIFO) when cache exceeds max size.
+                    while len(self._definition_cache) > self._max_cache_size:
+                        oldest = next(iter(self._definition_cache))
+                        del self._definition_cache[oldest]
             else:
                 defined_terms = self._definitions_extractor.extract(text)
             _attach_defined_terms(chunks, defined_terms)
@@ -454,6 +475,8 @@ class LegalChunker:
 
         # ------------------------------------------------------------------
         # Stage 7: Cross-reference resolution (second pass)
+        # Populates: cross_references (with target_chunk_index resolved),
+        #   cross_ref_total, cross_ref_resolved.
         # ------------------------------------------------------------------
         if collect_metrics:
             logger.debug("Stage 7: cross_reference_resolution — start")
@@ -723,6 +746,7 @@ class LegalChunker:
             extra_abbreviations=self._extra_abbreviations,
             extra_clause_signals=self._extra_clause_signals,
             enable_definition_cache=self._enable_definition_cache,
+            max_cache_size=self._max_cache_size,
         )
 
         results: list[list[LegalChunk]] = [[] for _ in pairs]
@@ -772,6 +796,7 @@ class _ChunkerConfig:
     extra_abbreviations: list[str] | None
     extra_clause_signals: dict[ClauseType, list[str]] | None
     enable_definition_cache: bool
+    max_cache_size: int
 
 
 def _chunk_single(
@@ -794,6 +819,7 @@ def _chunk_single(
         extra_abbreviations=config.extra_abbreviations,
         extra_clause_signals=config.extra_clause_signals,
         enable_definition_cache=config.enable_definition_cache,
+        max_cache_size=config.max_cache_size,
     )
     return chunker.chunk(text, document_id=doc_id)
 

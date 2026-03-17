@@ -11,6 +11,41 @@ from ..models import CrossReference, Jurisdiction
 
 logger = logging.getLogger(__name__)
 
+# Roman numeral pattern for normalisation.  Anchored and restricted to
+# structurally valid numerals (I–III, IV, V–VIII, IX, X–XXX, XL, L, etc.)
+# to avoid false positives on English words like "Civil" or "Vivid".
+_ROMAN_RE = re.compile(
+    r'^(M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$',
+)
+_ROMAN_MAP = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
+
+
+def _roman_to_arabic(s: str) -> str:
+    """Convert a Roman numeral token to its Arabic string, or return as-is.
+
+    Only converts strings that are structurally valid Roman numerals (e.g.
+    ``"VII"``, ``"XIV"``).  English words composed of Roman-numeral characters
+    (``"Civil"``, ``"Vivid"``) are returned unchanged.
+    """
+    if not s:
+        return s
+    upper = s.upper()
+    if not _ROMAN_RE.match(upper):
+        return s
+    result, prev = 0, 0
+    for ch in reversed(upper):
+        val = _ROMAN_MAP.get(ch, 0)
+        if val == 0:
+            return s  # not a valid Roman numeral
+        if val < prev:
+            result -= val
+        else:
+            result += val
+        prev = val
+    if result == 0:
+        return s  # empty match → not a numeral
+    return str(result)
+
 if TYPE_CHECKING:
     from ..models import LegalChunk
 from ..jurisdiction import get_patterns
@@ -44,6 +79,8 @@ _LABEL_WORDS: tuple[str, ...] = (
     "paragraph",
     "schedule",
     "exhibit",
+    "chapter",
+    "annex",
 )
 
 # Punctuation translation table for identifier normalisation.
@@ -275,10 +312,11 @@ class ReferenceDetector:
         return best_index
 
     def _normalise_identifier(self, raw: str) -> str:
-        """Normalise an identifier for lookup (lowercase, strip punctuation).
+        """Normalise an identifier for lookup.
 
-        Whitespace is also collapsed so that ``"Section  1.1"`` and
-        ``"Section 1.1"`` map to the same key.
+        Steps: lowercase, strip punctuation (preserving dots and parens),
+        collapse whitespace, and convert any Roman numeral tokens to Arabic
+        so that ``"Article VII"`` and ``"Article 7"`` map to the same key.
 
         Args:
             raw: The raw identifier or label string.
@@ -288,7 +326,17 @@ class ReferenceDetector:
         """
         lowered = raw.lower()
         stripped = lowered.translate(_STRIP_PUNCT)
-        return " ".join(stripped.split())
+        tokens = stripped.split()
+        # Convert Roman numeral tokens to Arabic — but only when they
+        # follow a label word (article, chapter, etc.) to avoid converting
+        # English words that happen to be valid Roman numerals (e.g. "mix").
+        result: list[str] = []
+        for i, token in enumerate(tokens):
+            if i > 0 and tokens[i - 1] in _LABEL_WORDS:
+                result.append(_roman_to_arabic(token))
+            else:
+                result.append(token)
+        return " ".join(result)
 
 
 # ---------------------------------------------------------------------------

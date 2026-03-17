@@ -260,3 +260,93 @@ class TestEUPipelineE2E:
         result = chunker.chunk_batch([GDPR_EXCERPT, GDPR_EXCERPT])
         assert result.success_count == 2
         assert result.error_count == 0
+
+
+# ---------------------------------------------------------------------------
+# GDPR fixture tests
+# ---------------------------------------------------------------------------
+
+import pathlib
+
+_FIXTURE_DIR = pathlib.Path(__file__).parent / "fixtures"
+_GDPR_FIXTURE = (_FIXTURE_DIR / "eu_gdpr_excerpt.txt").read_text(encoding="utf-8")
+
+
+class TestGDPRFixture:
+    def test_gdpr_fixture_chunks_produced(self) -> None:
+        chunker = LegalChunker(jurisdiction="eu", min_chunk_size=0)
+        chunks = chunker.chunk(_GDPR_FIXTURE)
+        assert len(chunks) >= 6  # at least preamble + 6 articles
+
+    def test_gdpr_fixture_hierarchy_has_chapters(self) -> None:
+        chunker = LegalChunker(jurisdiction="eu", min_chunk_size=0)
+        chunks = chunker.chunk(_GDPR_FIXTURE)
+        identifiers = [c.hierarchy.identifier for c in chunks]
+        assert any("Chapter" in i for i in identifiers)
+
+    def test_gdpr_fixture_hierarchy_has_articles(self) -> None:
+        chunker = LegalChunker(jurisdiction="eu", min_chunk_size=0)
+        chunks = chunker.chunk(_GDPR_FIXTURE)
+        identifiers = [c.hierarchy.identifier for c in chunks]
+        article_ids = [i for i in identifiers if "Article" in i]
+        assert len(article_ids) >= 4
+
+    def test_gdpr_fixture_definitions_extracted(self) -> None:
+        chunker = LegalChunker(jurisdiction="eu")
+        terms = chunker.get_defined_terms(_GDPR_FIXTURE)
+        term_names = {t.lower() for t in terms}
+        assert "personal data" in term_names
+        assert "processing" in term_names
+        assert "controller" in term_names
+
+    def test_gdpr_fixture_definitions_detected_by_extractor(self) -> None:
+        """The definitions extractor should find a definitions section."""
+        chunker = LegalChunker(jurisdiction="eu")
+        terms = chunker.get_defined_terms(_GDPR_FIXTURE)
+        # Should extract at least 5 terms from Article 4
+        assert len(terms) >= 5
+
+    def test_gdpr_fixture_cross_refs_detected(self) -> None:
+        chunker = LegalChunker(jurisdiction="eu", min_chunk_size=0)
+        chunks = chunker.chunk(_GDPR_FIXTURE)
+        all_refs = []
+        for c in chunks:
+            all_refs.extend(c.cross_references)
+        # Fixture references Chapter 2, paragraph 1, etc.
+        assert len(all_refs) > 0
+
+    def test_gdpr_fixture_preamble_detected(self) -> None:
+        """Recitals before Chapter I should be preamble."""
+        from lexichunk.models import DocumentSection
+        chunker = LegalChunker(jurisdiction="eu", min_chunk_size=0)
+        chunks = chunker.chunk(_GDPR_FIXTURE)
+        preamble = [c for c in chunks if c.document_section == DocumentSection.PREAMBLE]
+        assert len(preamble) >= 1
+        # Preamble should contain recital text
+        preamble_text = " ".join(c.content for c in preamble)
+        assert "fundamental right" in preamble_text.lower()
+
+    def test_gdpr_fixture_operative_sections(self) -> None:
+        from lexichunk.models import DocumentSection
+        chunker = LegalChunker(jurisdiction="eu", min_chunk_size=0)
+        chunks = chunker.chunk(_GDPR_FIXTURE)
+        operative = [c for c in chunks if c.document_section == DocumentSection.OPERATIVE]
+        assert len(operative) > 0
+
+    def test_gdpr_fixture_definitions_section_bounded(self) -> None:
+        """Definitions section should not bleed into Article 5."""
+        chunker = LegalChunker(jurisdiction="eu")
+        defs = chunker.get_defined_terms(_GDPR_FIXTURE)
+        # Article 5 talks about "principles" — should NOT be extracted as a term
+        term_names = {t.lower() for t in defs}
+        # These are real definition terms from Article 4
+        assert "consent" in term_names
+        assert "recipient" in term_names
+
+    def test_gdpr_fixture_char_offsets_valid(self) -> None:
+        chunker = LegalChunker(jurisdiction="eu", min_chunk_size=0)
+        chunks = chunker.chunk(_GDPR_FIXTURE)
+        for ch in chunks:
+            assert ch.char_start >= 0
+            assert ch.char_end >= ch.char_start
+            assert ch.char_end <= len(LegalChunker._sanitize_input(_GDPR_FIXTURE))

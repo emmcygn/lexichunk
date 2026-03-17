@@ -225,10 +225,22 @@ class ClauseAwareChunker:
         current_tokens = 0
         part_index = 0
 
-        # Running character offset within the original content.
-        char_cursor = clause.char_start
+        # Compute each sentence's start offset within the original document by
+        # scanning through the clause content.  This avoids the broken arithmetic
+        # that previously produced negative char_start values.
+        content = clause.content
+        sentence_offsets: list[int] = []  # document-absolute offset per sentence
+        scan_pos = 0
+        for sentence in sentences:
+            loc = content.find(sentence, scan_pos)
+            if loc < 0:
+                loc = scan_pos  # fallback: use current scan position
+            sentence_offsets.append(clause.char_start + loc)
+            scan_pos = loc + len(sentence)
 
-        def _flush(sentences_buf: list[str], start: int, end: int, part_idx: int) -> ParsedClause:
+        def _flush(
+            sentences_buf: list[str], start: int, end: int, part_idx: int,
+        ) -> ParsedClause:
             text = ' '.join(sentences_buf)
             return ParsedClause(
                 identifier=f"{clause.identifier}.__part{part_idx}",
@@ -242,20 +254,19 @@ class ClauseAwareChunker:
                 children=[],
             )
 
-        sentence_char_start = char_cursor
+        group_start = clause.char_start
 
-        for sentence in sentences:
+        for i, sentence in enumerate(sentences):
             sentence_tokens = _approx_tokens(sentence, self._chars_per_token)
 
             if current_sentences and (current_tokens + sentence_tokens > self._max_chunk_size):
-                # Flush the current accumulation.
-                group_text = ' '.join(current_sentences)
-                group_end = sentence_char_start  # approximate
-                result.append(_flush(current_sentences, sentence_char_start - len(group_text), group_end, part_index))
+                # Flush: char_end is the start of the current sentence.
+                group_end = sentence_offsets[i]
+                result.append(_flush(current_sentences, group_start, group_end, part_index))
                 part_index += 1
                 current_sentences = []
                 current_tokens = 0
-                sentence_char_start = group_end
+                group_start = sentence_offsets[i]
 
             current_sentences.append(sentence)
             current_tokens += sentence_tokens
@@ -263,7 +274,7 @@ class ClauseAwareChunker:
         # Flush any remaining sentences.
         if current_sentences:
             result.append(
-                _flush(current_sentences, sentence_char_start, clause.char_end, part_index)
+                _flush(current_sentences, group_start, clause.char_end, part_index)
             )
 
         # If splitting yielded nothing useful, return the clause as-is.

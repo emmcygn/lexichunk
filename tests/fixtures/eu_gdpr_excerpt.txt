@@ -1,0 +1,75 @@
+(1) The protection of natural persons in relation to the processing of personal data is a fundamental right.
+
+(2) The principles of, and rules on the protection of natural persons with regard to the processing of their personal data should, whatever the nationality or residence of the natural person, respect their fundamental rights and freedoms, in particular their right to the protection of personal data.
+
+(3) The free movement of personal data within the Union shall be ensured.
+
+CHAPTER I
+GENERAL PROVISIONS
+
+Article 1
+Subject matter and scope
+
+1. This Regulation lays down rules relating to the protection of natural persons with regard to the processing of personal data and rules relating to the free movement of personal data.
+
+2. This Regulation protects fundamental rights and freedoms of natural persons and in particular their right to the protection of personal data.
+
+3. The free movement of personal data within the Union shall be neither restricted nor prohibited for reasons connected with the protection of natural persons with regard to the processing of personal data.
+
+Article 2
+Material scope
+
+1. This Regulation applies to the processing of personal data wholly or partly by automated means and to the processing other than by automated means of personal data which form part of a filing system or are intended to form part of a filing system.
+
+2. This Regulation does not apply to the processing of personal data:
+(a) in the course of an activity which falls outside the scope of Union law;
+(b) by the Member States when carrying out activities which fall within the scope of Chapter 2 of Title V of the TEU;
+(c) by a natural person in the course of a purely personal or household activity;
+(d) by competent authorities for the purposes of the prevention, investigation, detection or prosecution of criminal offences.
+
+Article 3
+Territorial scope
+
+1. This Regulation applies to the processing of personal data in the context of the activities of an establishment of a controller or a processor in the Union, regardless of whether the processing takes place in the Union or not.
+
+2. This Regulation applies to the processing of personal data of data subjects who are in the Union by a controller or processor not established in the Union, where the processing activities are related to:
+(a) the offering of goods or services, irrespective of whether a payment of the data subject is required, to such data subjects in the Union; or
+(b) the monitoring of their behaviour as far as their behaviour takes place within the Union.
+
+Article 4
+Definitions
+
+For the purposes of this Regulation, the following definitions apply:
+'Personal Data' means any information relating to an identified or identifiable natural person; an identifiable natural person is one who can be identified, directly or indirectly.
+'Processing' means any operation or set of operations which is performed on personal data or on sets of personal data, whether or not by automated means.
+'Controller' means the natural or legal person, public authority, agency or other body which, alone or jointly with others, determines the purposes and means of the processing of personal data.
+'Processor' means a natural or legal person, public authority, agency or other body which processes personal data on behalf of the controller.
+'Recipient' means a natural or legal person, public authority, agency or other body, to which the personal data are disclosed.
+'Consent' means any freely given, specific, informed and unambiguous indication of the data subject's wishes.
+
+CHAPTER II
+PRINCIPLES
+
+Article 5
+Principles relating to processing of personal data
+
+1. Personal data shall be:
+(a) processed lawfully, fairly and in a transparent manner in relation to the data subject;
+(b) collected for specified, explicit and legitimate purposes and not further processed in a manner that is incompatible with those purposes;
+(c) adequate, relevant and limited to what is necessary in relation to the purposes for which they are processed;
+(d) accurate and, where necessary, kept up to date;
+(e) kept in a form which permits identification of data subjects for no longer than is necessary;
+(f) processed in a manner that ensures appropriate security of the personal data.
+
+2. The controller shall be responsible for, and be able to demonstrate compliance with, paragraph 1.
+
+Article 6
+Lawfulness of processing
+
+1. Processing shall be lawful only if and to the extent that at least one of the following applies:
+(a) the data subject has given consent to the processing of his or her personal data for one or more specific purposes;
+(b) processing is necessary for the performance of a contract to which the data subject is party;
+(c) processing is necessary for compliance with a legal obligation to which the controller is subject;
+(d) processing is necessary in order to protect the vital interests of the data subject or of another natural person;
+(e) processing is necessary for the performance of a task carried out in the public interest;
+(f) processing is necessary for the purposes of the legitimate interests pursued by the controller or by a third party.
