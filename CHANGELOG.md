@@ -2,6 +2,19 @@
 
 All notable changes to lexichunk are documented in this file.
 
+## [0.8.0b1] — 2026-03-17
+
+### Added
+- EU Directives jurisdiction (`Jurisdiction.EU` / `"eu"`) — supports GDPR, DSA, DMA, AI Act, ePrivacy structure (Chapter/Article/Section/paragraph/Annex)
+- ReDoS security audit — 28 tests verifying all regex patterns resist catastrophic backtracking with pathological inputs
+- Coverage enforcement in CI — `--cov-fail-under=90` gate (currently 97%)
+- PyPI publish workflow (`.github/workflows/publish.yml`) — automated release on tag push via OIDC trusted publisher
+
+### Changed
+- Version bumped to 0.8.0b1 (Beta status)
+- Development Status classifier upgraded from Alpha to Beta
+- CI now runs `pytest --cov` with 90% minimum coverage gate
+
 ## [0.7.0] — 2026-03-14
 
 ### Added

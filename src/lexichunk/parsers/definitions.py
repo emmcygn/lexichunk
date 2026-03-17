@@ -87,13 +87,20 @@ _US_CLAUSE_HEADER: re.Pattern[str] = re.compile(
     r"\([a-z]\)\s|\([ivxlc]+\)\s)",
     re.MULTILINE,
 )
+_EU_CLAUSE_HEADER: re.Pattern[str] = re.compile(
+    r"^(?:(?:CHAPTER|Chapter)\s+[IVXLC]+|(?:ARTICLE|Article)\s+\d+|"
+    r"(?:SECTION|Section)\s+\d+|\d+\.\s+\S|\([a-z]\)\s|\([ivxlc]+\)\s)",
+    re.MULTILINE,
+)
 
 # Pattern that matches a clause-number token at the beginning of a line; used
 # to infer source_clause when scanning the whole document.
 _CLAUSE_LABEL: re.Pattern[str] = re.compile(
     r"^(?:"
-    r"(?:ARTICLE|Article)\s+([IVXLC]+)"         # US article
+    r"(?:ARTICLE|Article)\s+([IVXLC]+)"         # US article (Roman)
+    r"|(?:ARTICLE|Article)\s+(\d+)"             # EU article (Arabic)
     r"|(?:SECTION|Section)\s+(\d+\.\d+\S*)"     # US section
+    r"|(?:CHAPTER|Chapter)\s+([IVXLC]+)"        # EU chapter
     r"|(\d+\.\d+\.\d+)\.?\s"                    # UK x.y.z
     r"|(\d+\.\d+)\.?\s"                         # UK x.y
     r"|(\d+)\.\s+[A-Z]"                         # UK x
@@ -125,9 +132,12 @@ class DefinitionsExtractor:
         """
         self._jurisdiction: Jurisdiction | str = jurisdiction
         self._patterns: Union[UKPatterns, USPatterns, JurisdictionPatterns] = get_patterns(jurisdiction)
-        self._clause_header_re: re.Pattern[str] = (
-            _UK_CLAUSE_HEADER if jurisdiction == Jurisdiction.UK else _US_CLAUSE_HEADER
-        )
+        if jurisdiction == Jurisdiction.UK:
+            self._clause_header_re: re.Pattern[str] = _UK_CLAUSE_HEADER
+        elif jurisdiction == Jurisdiction.EU:
+            self._clause_header_re = _EU_CLAUSE_HEADER
+        else:
+            self._clause_header_re = _US_CLAUSE_HEADER
 
     # ------------------------------------------------------------------
     # Public API
@@ -256,6 +266,17 @@ class DefinitionsExtractor:
                 re.MULTILINE,
             )
             level_map = {0: 2, 1: 1, 2: 0, 3: -1}  # group-index → level
+        elif self._jurisdiction == Jurisdiction.EU:
+            next_header_re = re.compile(
+                r"^(?:"
+                r"((?:CHAPTER|Chapter)\s+[IVXLC]+)"    # level -1
+                r"|((?:ARTICLE|Article)\s+\d+)"         # level 0
+                r"|((?:SECTION|Section)\s+\d+)"         # level 1
+                r"|((?:ANNEX|Annex)\s+[IVXLC]+)"        # level -2
+                r")",
+                re.MULTILINE,
+            )
+            level_map = {0: -1, 1: 0, 2: 1, 3: -2}  # group-index → level
         else:
             next_header_re = re.compile(
                 r"^(?:"
@@ -300,6 +321,14 @@ class DefinitionsExtractor:
                 return 1
             if re.match(r"^\d+", l):
                 return 0
+            return 0
+        elif self._jurisdiction == Jurisdiction.EU:
+            if re.match(r"^(?:CHAPTER|Chapter)", l):
+                return -1
+            if re.match(r"^(?:ARTICLE|Article)", l):
+                return 0
+            if re.match(r"^(?:SECTION|Section)", l):
+                return 1
             return 0
         else:
             if re.match(r"^(?:ARTICLE|Article)", l):

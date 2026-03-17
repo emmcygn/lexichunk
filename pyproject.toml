@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lexichunk"
-version = "0.7.0"
+version = "0.8.0b1"
 description = "Intelligent text chunking for legal documents in RAG pipelines"
 readme = "README.md"
 license = "MIT"
@@ -14,7 +14,7 @@ authors = [
 requires-python = ">=3.10"
 keywords = ["legal", "nlp", "rag", "chunking", "text-splitting", "langchain", "llama-index"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",

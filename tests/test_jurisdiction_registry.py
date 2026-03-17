@@ -66,9 +66,9 @@ def _eu_detect_level(line: str) -> Optional[tuple[int, str]]:
 
 @pytest.fixture(autouse=True)
 def _cleanup_registry():
-    """Remove the 'eu' entry from the registry after each test."""
+    """Remove the 'de' entry from the registry after each test."""
     yield
-    _JURISDICTION_REGISTRY.pop("eu", None)
+    _JURISDICTION_REGISTRY.pop("de", None)
 
 
 # ---------------------------------------------------------------------------
@@ -94,13 +94,13 @@ class TestProtocolConformance:
 
 class TestRegistration:
     def test_register_and_retrieve_patterns(self) -> None:
-        eu = EUPatterns()
-        register_jurisdiction("eu", eu, _eu_detect_level)
-        assert get_patterns("eu") is eu
+        de = EUPatterns()
+        register_jurisdiction("de", de, _eu_detect_level)
+        assert get_patterns("de") is de
 
     def test_register_and_retrieve_detect_level(self) -> None:
-        register_jurisdiction("eu", EUPatterns(), _eu_detect_level)
-        fn = get_detect_level("eu")
+        register_jurisdiction("de", EUPatterns(), _eu_detect_level)
+        fn = get_detect_level("de")
         assert fn is _eu_detect_level
 
     def test_overwrite_builtin(self) -> None:
@@ -159,7 +159,7 @@ class TestBackwardCompat:
 
 class TestCustomJurisdictionE2E:
     def test_chunk_with_custom_jurisdiction(self) -> None:
-        register_jurisdiction("eu", EUPatterns(), _eu_detect_level)
+        register_jurisdiction("de", EUPatterns(), _eu_detect_level)
 
         text = (
             "Article 1\n"
@@ -167,7 +167,7 @@ class TestCustomJurisdictionE2E:
             "Article 2\n"
             "Personal data shall be collected for specified purposes.\n"
         )
-        chunker = LegalChunker(jurisdiction="eu")
+        chunker = LegalChunker(jurisdiction="de")
         chunks = chunker.chunk(text)
         assert len(chunks) > 0
-        assert chunks[0].jurisdiction == "eu"
+        assert chunks[0].jurisdiction == "de"

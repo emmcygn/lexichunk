@@ -30,6 +30,7 @@ class Jurisdiction(Enum):
 
     UK = "uk"
     US = "us"
+    EU = "eu"
 
 
 class ClauseType(Enum):
