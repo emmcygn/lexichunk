@@ -173,6 +173,62 @@
 
 **Lesson**: Always run `ruff check src/ tests/ && mypy src/lexichunk/` locally before pushing. See L019 in lessons.md.
 
+## Milestone 0.8.0b1 — Production-Ready ✅
+- [x] Add EU Directives jurisdiction (`Jurisdiction.EU`, `EUPatterns`, `detect_level()`)
+- [x] Register `"eu"` in built-in jurisdiction registry
+- [x] Add EU-specific clause header regex for definitions parser (`_EU_CLAUSE_HEADER`)
+- [x] Fix `_find_section_end` and `_header_level` for EU jurisdiction branch
+- [x] Fix `_CLAUSE_LABEL` to support EU-style `Article \d+` and `Chapter [IVXLC]+`
+- [x] Write `tests/test_eu_jurisdiction.py` — 40 tests (detect_level, patterns, registry, E2E pipeline)
+- [x] ReDoS security audit: `tests/test_redos_audit.py` — 28 tests (UK/US/EU patterns, extended patterns, definitions, pipeline timeouts)
+- [x] Add ≥90% coverage gate in CI (`--cov-fail-under=90`)
+- [x] Create `.github/workflows/publish.yml` — PyPI publish on `v*` tag via OIDC
+- [x] Version bump to `0.8.0b1`, classifier to Beta
+- [x] Update `CHANGELOG.md` with v0.8.0b1 entry
+- [x] Write `tests/test_adversarial_v080.py` — 35 adversarial tests (separate pass)
+- [x] Fix 3 bugs found during adversarial review (definitions parser EU branches)
+- [x] Update test cleanup fixtures to preserve new built-in `"eu"` jurisdiction
+- [x] Full verification: pytest 650/650, 97% coverage, ruff clean, mypy 0 errors
+
+**Result**: 650 tests passing (103 new). 97% code coverage enforced in CI. All regex patterns verified ReDoS-safe. EU jurisdiction fully integrated through 8-stage pipeline.
+
+**Adversarial review (separate pass) caught and fixed 3 bugs:**
+1. `_find_section_end` missing EU branch → definitions section boundary detection used US patterns (Roman article numerals)
+2. `_header_level` missing EU branch → EU header hierarchy levels incorrectly inferred
+3. `_CLAUSE_LABEL` missing EU-style `Article \d+` and `Chapter [IVXLC]+` → source clause inference failed for EU documents
+
+**Key decisions:**
+- EU jurisdiction models legislative instruments (GDPR/DSA/DMA), not EU-style contracts (which typically follow member state conventions)
+- ReDoS approach: audit + wall-clock budget tests, not per-regex timeout (preserves zero-dependency contract for Python 3.10)
+- PyPI publish uses OIDC trusted publisher (no manual token) — user must configure on PyPI
+
+## Stage: Immediate — Pre-Production Hardening ✅
+- [x] Fix `_split_oversized_clause` negative char_start — track document positions via `content.find()` instead of broken arithmetic
+- [x] Document content/offset invariant on `LegalChunk` — `char_start:char_end` spans clause's own text; `content` may prepend ancestor headers
+- [x] Create `tests/test_char_offsets.py` — 16 tests covering all chunking paths (single, merged, oversized, fallback, preamble, sanitized, EU)
+- [x] Fix EU `_find_section_end` — add numbered paragraph `(\d+)\.\s` to boundary detection
+- [x] Add GDPR fixture (`tests/fixtures/eu_gdpr_excerpt.txt`) + 10 fixture tests
+- [x] Fix EU recitals detected as PREAMBLE (pre-Article text correctly handled by structure parser)
+- [x] Fix `bisect_left` tuple comparison → `bisect_right` on flat offset list
+- [x] Tighten definitions section header matching with word boundaries
+- [x] Add lowercase-initial defined term support (`"the Company" means...`)
+- [x] Increase hereinafter lookback from 200→500 chars
+- [x] Add Roman/Arabic numeral normalization for cross-ref resolution (context-restricted to label words)
+- [x] Add `max_cache_size=128` parameter with FIFO eviction
+- [x] Document mutation semantics on `LegalChunk` and `chunk()` docstrings
+- [x] Document pipeline stage invariants in `_run_pipeline()` comments
+- [x] Full verification: pytest 676/676, 97% coverage, ruff clean, mypy 0 errors
+
+**Result**: 676 tests passing (26 new). Critical char offset bug fixed (negative values in oversized splits). EU pipeline hardened with GDPR fixture. Definitions parser improved with lowercase terms, tighter matching, bisect fix. Cross-ref resolution now handles Roman/Arabic equivalence. Cache has bounded growth.
+
+**Adversarial review (separate pass) caught and fixed 1 bug:**
+1. `_roman_to_arabic()` matched English words ("mix"→1009, "civil"→153) as valid Roman numerals → restricted conversion to tokens following label words only (L022)
+
+**Key decisions:**
+- char_start/char_end point to original document span, content prepends ancestor headers — documented as intentional design, not a bug
+- Roman conversion context-restricted rather than regex-restricted — avoids entire class of false positives
+- Definitions section matching uses trailing word boundary instead of exact match — allows "Definitions —" but rejects "Definitions of Key Metrics"
+
 ## Review (v0.1.0)
 
 **Result**: 107/107 tests passing in 0.42s. Full pipeline verified end-to-end.
