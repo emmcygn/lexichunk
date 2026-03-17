@@ -201,3 +201,33 @@ Never reverse steps 2 and 3.
 4. ruff's I001 (isort) and mypy's `type: ignore` can conflict — after ruff auto-fix, always re-verify mypy
 
 **Check**: Did you run both linters locally? If not, run them now before pushing.
+
+---
+
+## L020 — Adding a new built-in jurisdiction requires updating test cleanup fixtures
+
+**Pattern**: Adding `Jurisdiction.EU` as a built-in broke two test cleanup fixtures that deleted non-UK/US entries from `_JURISDICTION_REGISTRY` after each test. The `autouse=True` fixtures in `test_jurisdiction_registry.py` and `test_adversarial_extensibility.py` removed the new `"eu"` entry, causing 12 test failures when the full suite ran (the EU tests ran after the cleanup).
+
+**Rule**: When adding a new built-in jurisdiction to the registry, search all test files for `_JURISDICTION_REGISTRY.pop` and cleanup fixtures that filter by jurisdiction name. Update their allowlists to include the new built-in.
+
+**Check**: `grep -r "_JURISDICTION_REGISTRY" tests/` — verify every cleanup preserves all built-in jurisdictions.
+
+---
+
+## L022 — Roman numeral conversion must be context-restricted
+
+**Pattern**: Added `_roman_to_arabic()` to normalize "Article VII" → "Article 7" in cross-ref resolution. The initial implementation converted ALL tokens that match a structural Roman numeral pattern. But words like "mix" (M+IX=1009), "dim" (D+I+M), and similar English words are structurally valid Roman numerals. Converting them corrupts identifiers.
+
+**Rule**: Only apply Roman→Arabic conversion on tokens that immediately follow a label word (article, chapter, section, etc.). Never convert tokens in isolation.
+
+**Check**: After implementing Roman numeral conversion, test with English words that are coincidentally valid Roman numerals: "mix", "dim", "mild", "livid".
+
+---
+
+## L021 — New jurisdiction needs parser-level support, not just detection
+
+**Pattern**: Adding EU jurisdiction with `detect_level()` and `EUPatterns` was insufficient. The definitions parser (`definitions.py`) has three jurisdiction-branching locations: `_find_section_end`, `_header_level`, and `_clause_header_re` selection. These branched on `UK` vs `else`, so EU fell into the US branch — which expects Roman numeral articles (`Article [IVXLC]+`) instead of EU's Arabic numeral articles (`Article \d+`).
+
+**Rule**: When adding a new built-in jurisdiction, grep for every `== Jurisdiction.UK` and `== Jurisdiction.US` branch in the codebase. Each one is a potential place where the new jurisdiction needs its own branch or a correct fallback.
+
+**Check**: `grep -rn "Jurisdiction\.UK\|Jurisdiction\.US" src/` — audit every branch for new jurisdiction coverage.

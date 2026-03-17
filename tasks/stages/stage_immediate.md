@@ -7,7 +7,7 @@
 
 ## 1. Critical Bugs
 
-### 1.1 — [ ] Fix char_start/char_end offset mismatch when clauses are merged
+### 1.1 — [x] Fix char_start/char_end offset mismatch when clauses are merged
 
 **Explanation**: When multiple small clauses are merged into a single chunk by the clause-aware chunker, their contents are joined with `'\n'.join(c.content for c in group)`. However, clause contents already include trailing newlines from the structure parser. The join inserts an *extra* `\n` between each clause, meaning the merged content has characters that don't exist in the original document between `char_start` and `char_end`. Consequently, `text[chunk.char_start:chunk.char_end]` does NOT equal `chunk.content` for merged chunks.
 
@@ -22,7 +22,7 @@
 
 ---
 
-### 1.2 — [ ] Fix char offset calculation in `_split_oversized_clause`
+### 1.2 — [x] Fix char offset calculation in `_split_oversized_clause`
 
 **Explanation**: When a single clause exceeds `max_chunk_size` and must be split at sentence boundaries, the code computes `char_start` for each sub-chunk using `sentence_char_start - len(group_text)`. This arithmetic is incorrect because `group_text` is the rejoined text (sentences joined with spaces), not the original document substring. The offset distance between joined text and original text diverges due to whitespace normalization, newline handling, and sentence stripping.
 
@@ -37,7 +37,7 @@
 
 ---
 
-### 1.3 — [ ] Fix fallback chunker char offset calculation
+### 1.3 — [x] Fix fallback chunker char offset calculation
 
 **Explanation**: The fallback chunker (`FallbackChunker.chunk()`) constructs `char_start` from `window[0][1]` (first sentence offset) and `char_end` from `last_offset + len(last_sentence)`. However, sentences are stripped of whitespace during `_split_sentences()`, and the window content is joined with `" ".join(s for s, _ in window)`. This means `chunk.content` contains space-joined stripped sentences, while `char_start`/`char_end` point to spans in the original text that include the unstripped whitespace and original separators.
 
@@ -53,7 +53,7 @@
 
 ## 2. Test Gaps — Offset Verification
 
-### 2.1 — [ ] Create `tests/test_char_offsets.py` with offset invariant tests
+### 2.1 — [x] Create `tests/test_char_offsets.py` with offset invariant tests
 
 **Explanation**: The entire test suite (650 tests) has zero tests verifying that `char_start`/`char_end` accurately map back to the original document text. This is a fundamental contract of the `LegalChunk` dataclass that has never been validated.
 
@@ -75,7 +75,7 @@
 
 ---
 
-### 2.2 — [ ] Add merged-clause content correctness test
+### 2.2 — [x] Add merged-clause content correctness test
 
 **Explanation**: When the clause-aware chunker merges small adjacent clauses, no test verifies that the merged content preserves all source text without duplication or loss.
 
@@ -92,7 +92,7 @@
 
 ## 3. EU Jurisdiction Completeness
 
-### 3.1 — [ ] Fix EU `_find_section_end` missing numbered paragraph detection
+### 3.1 — [x] Fix EU `_find_section_end` missing numbered paragraph detection
 
 **Explanation**: The EU branch of `_find_section_end()` in `definitions.py` detects Chapter, Article, Section, and Annex headers as section boundaries — but does NOT detect numbered paragraphs (`1.`, `2.`, `3.`), which are level 2 in the EU hierarchy. This means when the definitions section finder looks for the end of a definitions section, it won't stop at the first numbered paragraph of the next article. The definitions section will be extracted too broadly, potentially including operative clause text.
 
@@ -106,7 +106,7 @@
 
 ---
 
-### 3.2 — [ ] Add EU legislative test fixture
+### 3.2 — [x] Add EU legislative test fixture
 
 **Explanation**: The SDK claims EU jurisdiction support but has zero production-realistic EU legislative text in test fixtures. All EU tests use synthetic inline text strings. A real GDPR/AI Act excerpt would exercise the full pipeline with authentic numbering, cross-references, defined terms, and hierarchy.
 
@@ -121,7 +121,7 @@
 
 ---
 
-### 3.3 — [ ] Fix EU recitals not detected as DocumentSection.RECITALS
+### 3.3 — [x] Fix EU recitals not detected as DocumentSection.RECITALS
 
 **Explanation**: EU directives have a preamble block of numbered recitals (e.g., `(1) The protection of natural persons...`, `(2) The principles of...`). These are important for legislative interpretation. Currently, the structure parser's `_detect_document_section()` checks for keywords like "recital", "background", "whereas" — but EU recital blocks don't have a header line containing these words. They're just a sequence of numbered parenthetical paragraphs before the first Chapter/Article.
 
@@ -152,7 +152,7 @@
 
 ## 4. Definitions Parser Fixes
 
-### 4.1 — [ ] Tighten definitions section header matching
+### 4.1 — [x] Tighten definitions section header matching
 
 **Explanation**: `_find_definitions_section()` uses a regex that matches any clause header containing one of the `definitions_headers` strings (e.g., "definitions", "interpretation") as a substring. This is too broad — it matches "General Principles and Interpretation" or "Definitions of Key Performance Metrics" as the definitions section, even though these are not the formal definitions section.
 
@@ -167,7 +167,7 @@
 
 ---
 
-### 4.2 — [ ] Fix `bisect_left` tuple comparison edge case
+### 4.2 — [x] Fix `bisect_left` tuple comparison edge case
 
 **Explanation**: `_nearest_clause_label()` uses `bisect.bisect_left(labels, (pos,))` where `labels` is a list of `(offset, label)` 2-tuples. This works because Python compares tuples lexicographically — the 1-tuple `(pos,)` is compared against the first element of each 2-tuple. However, if `pos` exactly equals an offset, Python tries to compare the missing second element of the 1-tuple against the `label` string, which raises `TypeError` in some Python versions or produces undefined ordering.
 
@@ -181,7 +181,7 @@
 
 ---
 
-### 4.3 — [ ] Add lowercase-initial defined term support
+### 4.3 — [x] Add lowercase-initial defined term support
 
 **Explanation**: All definition patterns require an uppercase initial letter: `[A-Z][A-Za-z\s\-]{1,60}`. However, UK contracts commonly define terms with a lowercase article: `"the Company"`, `"the Supplier"`, `"the Client"`. These are legitimate defined terms that are currently missed entirely.
 
@@ -198,7 +198,7 @@
 
 ---
 
-### 4.4 — [ ] Handle hereinafter definition body extraction edge cases
+### 4.4 — [x] Handle hereinafter definition body extraction edge cases
 
 **Explanation**: For `hereinafter referred to as "Term"` definitions, the code extracts preceding context by looking backward 200 characters and finding the last `.` as a sentence boundary. This is fragile: (1) URLs or abbreviations with periods truncate the body early, (2) 200 chars may be too small for complex definitions, (3) no handling of lists or multi-sentence contexts.
 
@@ -216,7 +216,7 @@
 
 ## 5. Cross-Reference Fixes
 
-### 5.1 — [ ] Add Roman/Arabic numeral normalization for cross-ref resolution
+### 5.1 — [x] Add Roman/Arabic numeral normalization for cross-ref resolution
 
 **Explanation**: A chunk with identifier `"Article VII"` (Roman) and a reference to `"Article 7"` (Arabic) will NOT resolve because the normalizer doesn't convert between numeral systems. Similarly, `"Chapter III"` and `"Chapter 3"` won't match.
 
@@ -234,7 +234,7 @@
 
 ## 6. Definition Cache
 
-### 6.1 — [ ] Add max_cache_size parameter to LegalChunker
+### 6.1 — [x] Add max_cache_size parameter to LegalChunker
 
 **Explanation**: The definition cache (`self._definition_cache: dict[str, dict[str, DefinedTerm]]`) grows unboundedly. Each unique document text adds an entry keyed by SHA-256 hash. For a long-running service chunking thousands of unique documents, this accumulates MB of cached definition dicts in memory with no eviction.
 
@@ -253,7 +253,7 @@
 
 ## 7. Documentation / API Contract
 
-### 7.1 — [ ] Document LegalChunk mutation semantics
+### 7.1 — [x] Document LegalChunk mutation semantics
 
 **Explanation**: The enrichment pipeline mutates `LegalChunk` objects in-place across stages 3-7: setting `cross_references`, `clause_type`, `classification_confidence`, `context_header`, `defined_terms_used`, `defined_terms_context`, `cross_ref_total`, `cross_ref_resolved`. Callers receive these mutated objects from `chunk()`. If a caller later mutates a chunk (e.g., appending to `cross_references`), it could corrupt cached state if the same text is chunked again with caching enabled.
 
@@ -267,7 +267,7 @@
 
 ---
 
-### 7.2 — [ ] Document pipeline stage invariants
+### 7.2 — [x] Document pipeline stage invariants
 
 **Explanation**: The 7-stage pipeline has implicit assumptions about chunk state at each stage boundary. These aren't documented anywhere, making it risky to reorder stages, add new stages, or debug intermediate state.
 
