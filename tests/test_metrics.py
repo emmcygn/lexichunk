@@ -162,20 +162,12 @@ class TestFallbackUsed:
         _, metrics = chunker.chunk_with_metrics(STRUCTURED_TEXT)
         assert metrics.fallback_used is False
 
-    def test_preamble_only_no_fallback(self, chunker: LegalChunker) -> None:
-        """Plain text still parses as preamble — not fallback."""
+    def test_preamble_only_uses_fallback(self, chunker: LegalChunker) -> None:
+        """Plain text with no clause headers triggers the fallback chunker."""
         _, metrics = chunker.chunk_with_metrics(UNSTRUCTURED_TEXT)
-        # The structure parser wraps any text as "preamble", so fallback
-        # is NOT triggered for non-empty text with built-in jurisdictions.
-        assert metrics.fallback_used is False
-
-    def test_fallback_used_with_empty_parse(self) -> None:
-        """Force the fallback path via a custom jurisdiction that never matches."""
-        from unittest.mock import patch
-
-        chunker = LegalChunker(jurisdiction="uk")
-        with patch.object(chunker._structure_parser, "parse", return_value=[]):
-            _, metrics = chunker.chunk_with_metrics(UNSTRUCTURED_TEXT)
+        # The structure parser wraps headerless text as a preamble clause,
+        # but the pipeline treats preamble-only results as "no structure" and
+        # routes to the sentence-level fallback chunker for better splitting.
         assert metrics.fallback_used is True
 
 

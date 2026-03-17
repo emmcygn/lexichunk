@@ -146,6 +146,10 @@ class LegalChunker:
         self._chars_per_token = chars_per_token
         self._include_definitions = include_definitions
         self._include_context_header = include_context_header
+        if document_id is not None and not isinstance(document_id, str):
+            raise ConfigurationError(
+                f"document_id must be a string or None, got {type(document_id).__name__}"
+            )
         self._document_id = document_id
         self._extra_abbreviations = extra_abbreviations
         self._extra_clause_signals = extra_clause_signals
@@ -261,12 +265,19 @@ class LegalChunker:
             ``(chunks, metrics)`` — *metrics* is ``None`` when
             *collect_metrics* is ``False``.
         """
+        if not isinstance(text, str):
+            raise InputError(
+                f"Expected str, got {type(text).__name__}. "
+                f"Pass a plain-text string to chunk()."
+            )
+
         pipeline_start = time.perf_counter() if collect_metrics else 0.0
         stage_metrics: list[StageMetric] = []
 
         text = self._sanitize_input(text)
 
         if not text or not text.strip():
+            self._last_cross_ref_stats = {"total": 0, "resolved": 0, "rate": 1.0}
             if collect_metrics:
                 return [], PipelineMetrics(
                     total_duration_ms=(time.perf_counter() - pipeline_start) * 1000,
@@ -298,6 +309,10 @@ class LegalChunker:
             len(text), jur_label, self._doc_type,
         )
 
+        if document_id is not None and not isinstance(document_id, str):
+            raise InputError(
+                f"document_id must be a string or None, got {type(document_id).__name__}"
+            )
         doc_id = document_id if document_id is not None else self._document_id
         fallback_used = False
 
@@ -330,7 +345,13 @@ class LegalChunker:
         if collect_metrics:
             logger.debug("Stage 2: chunking — start")
             t0 = time.perf_counter()
-        if clauses:
+        # Treat preamble-only results (single level=-99 clause from headerless
+        # documents) as "no structure detected" so the fallback chunker handles
+        # them with proper sentence-level splitting.
+        has_structure = clauses and not (
+            len(clauses) == 1 and clauses[0].level == -99
+        )
+        if has_structure:
             chunker = ClauseAwareChunker(
                 jurisdiction=self._jurisdiction,
                 max_chunk_size=self._max_chunk_size,

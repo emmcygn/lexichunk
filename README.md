@@ -81,7 +81,7 @@ Every call to `chunker.chunk()` returns a `list[LegalChunk]`. Each `LegalChunk` 
 | `hierarchy_path` | `str` | Human-readable path, e.g. `"Article VII > Section 7.2 > (a)"`. |
 | `document_section` | `DocumentSection` | High-level section: `PREAMBLE`, `DEFINITIONS`, `OPERATIVE`, `SCHEDULES`, `SIGNATURES`. |
 | `clause_type` | `ClauseType` | Classified type: `INDEMNIFICATION`, `CONFIDENTIALITY`, `TERMINATION`, `ACCEPTABLE_USE`, `USER_RESTRICTIONS`, `ACCOUNT_SECURITY`, etc. (27 types). |
-| `jurisdiction` | `Jurisdiction` | `UK` or `US`. |
+| `jurisdiction` | `Jurisdiction` | `UK`, `US`, or `EU`. |
 | `cross_references` | `list[CrossReference]` | Every detected reference to another clause. Each has `raw_text`, `target_identifier`, and `target_chunk_index` (resolved after chunking where possible). |
 | `defined_terms_used` | `list[str]` | Capitalised defined terms found in this chunk's text. |
 | `defined_terms_context` | `dict[str, str]` | Maps each used defined term to its full contract-specific definition. |
@@ -105,19 +105,19 @@ Pass `doc_type="contract"` or `doc_type="terms_conditions"` to the chunker.
 
 ## Jurisdiction Differences
 
-lexichunk applies jurisdiction-specific structural rules. The two conventions differ in numbering, header style, and cross-reference language.
+lexichunk applies jurisdiction-specific structural rules. The three built-in jurisdictions differ in numbering, header style, and cross-reference language.
 
-| Feature | UK Convention | US Convention |
-|---|---|---|
-| Top-level grouping | Clause (flat numbering) | Article (Roman numerals) |
-| Numbering | `1`, `1.1`, `1.1.1`, `(a)`, `(i)` | `Article I`, `Section 1.01`, `(a)`, `(i)` |
-| Headers | Sentence case, minimal | ALL CAPS common |
-| Defined terms location | "Definitions" clause | "Article I — Definitions" |
-| Schedules/Exhibits | "Schedule 1" | "Exhibit A" or "Schedule 1" |
-| Boilerplate heading | "General" | "Miscellaneous" |
-| Cross-reference style | "Clause 5.2" or "paragraph (a)" | "Section 5.2" or "Section 5.2(a)" |
+| Feature | UK Convention | US Convention | EU Directives |
+|---|---|---|---|
+| Top-level grouping | Clause (flat numbering) | Article (Roman numerals) | Chapter (Roman) / Article (Arabic) |
+| Numbering | `1`, `1.1`, `1.1.1`, `(a)`, `(i)` | `Article I`, `Section 1.01`, `(a)`, `(i)` | `Chapter I`, `Article 1`, `1.`, `(a)` |
+| Headers | Sentence case, minimal | ALL CAPS common | Mixed case |
+| Defined terms location | "Definitions" clause | "Article I — Definitions" | "Article 4 — Definitions" |
+| Schedules/Exhibits | "Schedule 1" | "Exhibit A" or "Schedule 1" | "Annex I" |
+| Boilerplate heading | "General" | "Miscellaneous" | "Final Provisions" |
+| Cross-reference style | "Clause 5.2" or "paragraph (a)" | "Section 5.2" or "Section 5.2(a)" | "Article 6(1)(a)" |
 
-Select the jurisdiction at construction time with `jurisdiction="uk"` or `jurisdiction="us"`. The chunker uses the appropriate regex patterns for boundary detection and cross-reference resolution.
+Select the jurisdiction at construction time with `jurisdiction="uk"`, `jurisdiction="us"`, or `jurisdiction="eu"`. Custom jurisdictions can be registered via `register_jurisdiction()`.
 
 ---
 
@@ -197,42 +197,42 @@ response = query_engine.query("What are the indemnification obligations?")
 
 ## Architecture
 
-lexichunk runs a four-stage pipeline on every document:
+lexichunk runs a seven-stage pipeline on every document:
 
 ```
-Raw Text
+Raw Text → sanitize (BOM, CRLF, NFC)
     |
     v
-+------------------+
-| Structure Parser |  Detect clauses, sections, numbering, hierarchy
-+--------+---------+
-         |
-         v
-+------------------+
-|  Term Extractor  |  Parse definitions section, build term -> definition map
-+--------+---------+
-         |
-         v
-+------------------+
-|  Clause Chunker  |  Split at clause boundaries, merge/split on size limits
-+--------+---------+
-         |
-         v
-+------------------+
-| Metadata Enricher|  Clause type, cross-refs, defined terms, context header
-+--------+---------+
-         |
-         v
+1. Structure Parser     Detect clauses, numbering, hierarchy (UK/US/EU)
+    |
+2. Clause Chunker       Split at clause boundaries, merge/split on size
+    |                   (fallback: sentence-level splitting if no structure)
+    |
+3. Cross-ref Detection  Detect references (first pass, unresolved)
+    |
+4. Clause Classifier    Keyword scoring → 27 clause types + confidence
+    |
+5. Context Enricher     Generate Contextual Retrieval headers
+    |
+6. Term Extractor       Extract defined terms, attach to chunks
+    |
+7. Cross-ref Resolution Resolve target_chunk_index (second pass)
+    |
+    v
   List[LegalChunk]
 ```
 
-**Structure Parser** uses jurisdiction-specific regex patterns to detect clause boundaries and build a `HierarchyNode` tree. Falls back to sentence-level splitting for unrecognised formats.
+**Structure Parser** uses jurisdiction-specific regex patterns (UK, US, EU) to detect clause boundaries and build a `HierarchyNode` tree. Falls back to sentence-level splitting for documents with no detected structure.
 
-**Term Extractor** scans the definitions section for patterns like `"[Term]" means`, `"[Term]" shall mean`, and `"[Term]" has the meaning`. Builds a term-to-definition dictionary keyed by capitalised term.
+**Clause Chunker** splits at detected boundaries. Merges undersized clauses with their siblings; splits oversized clauses at sentence boundaries.
 
-**Clause Chunker** splits at detected boundaries. Merges undersized clauses with their siblings; splits oversized clauses at sub-clause boundaries then at sentence boundaries.
+**Cross-ref Detection & Resolution** runs in two passes: first detects references, then resolves `target_chunk_index` after all chunks are created.
 
-**Metadata Enricher** runs four enrichment passes: keyword-based clause type classification (27 types), cross-reference detection and resolution, defined term attachment (scans each chunk for known terms), and context header generation following the Contextual Retrieval pattern.
+**Clause Classifier** scores each chunk against 27 clause types using keyword signals with phrase-length weighting and position-aware bonuses.
+
+**Term Extractor** scans the definitions section for patterns like `"[Term]" means`, `'the Company' means`, hereinafter, and inline parenthetical definitions. Attaches relevant terms to each chunk.
+
+**Context Enricher** generates a header string for each chunk following the Contextual Retrieval pattern.
 
 Zero mandatory dependencies — the core uses stdlib and `re` only.
 

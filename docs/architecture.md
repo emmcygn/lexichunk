@@ -106,9 +106,9 @@ Cross-references are detected in Stage 3 (before chunking boundaries are final) 
 
 Definition extraction is SHA-256-keyed so repeated calls with the same document content skip re-extraction. The cache lives on the `LegalChunker` instance and can be cleared with `clear_definition_cache()`.
 
-### Frozen Dataclasses with Immutable Containers
+### Dataclass Immutability
 
-All output dataclasses use `frozen=True`. Container fields use `tuple` (not `list`) or `MappingProxyType` (not `dict`) to prevent accidental mutation.
+Internal dataclasses (`ClassificationResult`, `PipelineMetrics`, `StageMetric`) use `frozen=True` with `MappingProxyType` and `tuple` for true immutability. The primary output type `LegalChunk` is a mutable dataclass — the pipeline populates its fields across stages. Callers should treat returned chunks as read-only; mutations may affect cached state.
 
 ## Observability
 
