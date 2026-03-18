@@ -554,6 +554,10 @@ class LegalChunker:
         Returns:
             Dict mapping term name to :class:`~lexichunk.models.DefinedTerm`.
         """
+        if not isinstance(text, str):
+            raise InputError(
+                f"Expected str, got {type(text).__name__}."
+            )
         return self._definitions_extractor.extract(self._sanitize_input(text))
 
     def parse_structure(self, text: str) -> list[HierarchyNode]:
@@ -569,6 +573,10 @@ class LegalChunker:
             List of :class:`~lexichunk.models.HierarchyNode` objects in
             document order.
         """
+        if not isinstance(text, str):
+            raise InputError(
+                f"Expected str, got {type(text).__name__}."
+            )
         return self._structure_parser.parse_structure(self._sanitize_input(text))
 
     def chunk_iter(

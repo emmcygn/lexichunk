@@ -49,7 +49,7 @@ Scans the document line-by-line using jurisdiction-specific `detect_level()` fun
 
 ### Stage 2: Chunking
 
-**Class**: `lexichunk.strategies.clause_aware.ClauseAwareChunker` (primary) or `lexichunk.strategies.fallback.FallbackChunker` (when Stage 1 returns `[]`)
+**Class**: `lexichunk.strategies.clause_aware.ClauseAwareChunker` (primary) or `lexichunk.strategies.fallback.FallbackChunker` (when Stage 1 finds no clause structure — either returns `[]` or only a preamble clause)
 
 The clause-aware chunker respects clause boundaries. Clauses smaller than `min_chunk_size` are merged with neighbours; clauses exceeding `max_chunk_size` are split at sentence boundaries. Ancestor headers are prepended to maintain hierarchy context.
 
@@ -62,13 +62,13 @@ The fallback chunker uses sentence-level splitting with a legal-abbreviation-awa
 
 **Class**: `lexichunk.parsers.references.ReferenceDetector`
 
-Regex-based detection of legal cross-references ("Section 2.1", "Clause 5(a)", "Schedule 2", "Article III", etc.). Produces `CrossReference` objects with `raw_text` and `target_identifier`. Jurisdiction-specific patterns handle UK ("Clause", "Schedule") and US ("Section", "Article") conventions.
+Regex-based detection of legal cross-references ("Section 2.1", "Clause 5(a)", "Schedule 2", "Article III", "Article 6(1)(a)", etc.). Produces `CrossReference` objects with `raw_text` and `target_identifier`. Jurisdiction-specific patterns handle UK ("Clause", "Schedule"), US ("Section", "Article", "Exhibit"), and EU ("Article", "Chapter", "Annex", "Recital") conventions.
 
 ### Stage 4: Clause Type Classification
 
 **Class**: `lexichunk.enrichment.clause_type.ClauseTypeClassifier`
 
-Keyword-based scoring with 15 clause types (definitions, representations, warranties, etc.). Position-aware: end-of-document clause types (governing law, assignment, etc.) receive a bonus when they appear past the 75% mark. Produces `clause_type`, `classification_confidence`, and `secondary_clause_type`.
+Keyword-based scoring with 27 clause types (definitions, representations, warranties, indemnification, data protection, etc.). Position-aware: end-of-document clause types (governing law, assignment, etc.) receive a bonus when they appear past the 75% mark. Produces `clause_type`, `classification_confidence`, and `secondary_clause_type`.
 
 ### Stage 5: Context Enrichment
 
