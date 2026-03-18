@@ -9,30 +9,46 @@ dist/
 build/
 *.egg
 .eggs/
+*.whl
 
 # Virtual environments
 .venv/
 venv/
 env/
 
-# Testing
+# Testing / QA
 .pytest_cache/
 .hypothesis/
+.benchmarks/
 .coverage
+.coverage.*
 htmlcov/
+
+# Type checking / Linting
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
 
 # IDE
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
+Desktop.ini
 
-# Environment
+# Environment / Secrets
 .env
 .env.*
 
-# Claude Code
-.claude/settings.local.json
+# Claude Code (tool-specific, not SDK code)
+.claude/
+
+# Internal development docs (not shipped to consumers)
+CLAUDE.md
+PRD.md
+tasks/
