@@ -82,7 +82,7 @@ def _cleanup():
     """Remove test jurisdictions after each test."""
     yield
     for key in list(_JURISDICTION_REGISTRY.keys()):
-        if key not in ("uk", "us"):
+        if key not in ("uk", "us", "eu"):
             del _JURISDICTION_REGISTRY[key]
 
 

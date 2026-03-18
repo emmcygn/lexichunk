@@ -30,6 +30,7 @@ class Jurisdiction(Enum):
 
     UK = "uk"
     US = "us"
+    EU = "eu"
 
 
 class ClauseType(Enum):
@@ -105,7 +106,19 @@ class HierarchyNode:
 
 @dataclass
 class LegalChunk:
-    """A single chunk of legal text with full metadata."""
+    """A single chunk of legal text with full metadata.
+
+    **Offset invariant**: ``char_start`` and ``char_end`` mark the span of this
+    clause's own text in the *original* (sanitised) document.  The ``content``
+    field may additionally prepend ancestor header lines for retrieval context,
+    so ``content`` is typically a superset of
+    ``original_text[char_start:char_end]``.
+
+    **Mutation warning**: Mutable container fields (``cross_references``,
+    ``defined_terms_used``, ``defined_terms_context``) are populated by the
+    pipeline.  Callers should treat returned chunks as read-only; mutations may
+    affect cached state when ``enable_definition_cache`` is ``True``.
+    """
 
     content: str
     index: int

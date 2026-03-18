@@ -2,6 +2,32 @@
 
 All notable changes to lexichunk are documented in this file.
 
+## [0.8.0b1] — 2026-03-17
+
+### Added
+- EU Directives jurisdiction (`Jurisdiction.EU` / `"eu"`) — supports GDPR, DSA, DMA, AI Act, ePrivacy structure (Chapter/Article/Section/paragraph/Annex)
+- GDPR test fixture (`tests/fixtures/eu_gdpr_excerpt.txt`) with 10 fixture-based tests
+- ReDoS security audit — 28 tests verifying all regex patterns resist catastrophic backtracking with pathological inputs
+- Coverage enforcement in CI — `--cov-fail-under=90` gate (currently 97%)
+- PyPI publish workflow (`.github/workflows/publish.yml`) — automated release on tag push via OIDC trusted publisher
+- Character offset invariant tests (`tests/test_char_offsets.py`) — 16 tests covering all chunking paths
+- Lowercase-initial defined term support (`"the Company" means...`)
+- Roman/Arabic numeral normalization for cross-reference resolution
+- `max_cache_size` parameter on `LegalChunker` (default 128, FIFO eviction)
+- Pipeline stage invariant documentation in `_run_pipeline()`
+
+### Fixed
+- Critical: `_split_oversized_clause` produced negative `char_start` values — rewrote offset tracking
+- `bisect_left` tuple comparison edge case in `_nearest_clause_label` — replaced with flat-list `bisect_right`
+- EU `_find_section_end` missing numbered paragraph boundary detection
+- Definitions section header matching too broad — added word boundary constraints
+- Hereinafter definition lookback window increased from 200 to 500 chars
+
+### Changed
+- Version bumped to 0.8.0b1 (Beta status)
+- Development Status classifier upgraded from Alpha to Beta
+- CI now runs `pytest --cov` with 90% minimum coverage gate
+
 ## [0.7.0] — 2026-03-14
 
 ### Added

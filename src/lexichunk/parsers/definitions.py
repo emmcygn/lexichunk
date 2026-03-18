@@ -57,15 +57,28 @@ _INLINE_PAREN_TERM: re.Pattern[str] = re.compile(
     r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]',
 )
 
+# Lowercase-article definitions (straight and single quotes).
+# e.g. "the Company" means..., 'the Supplier' means...
+# Captures the full term including the article ("the Company", not "Company").
+_DEFINITION_ARTICLE: re.Pattern[str] = re.compile(
+    r'["\u201c](the\s+[A-Z][A-Za-z\s\-]{1,60})["\u201d]\s+'
+    r'(?:means|shall mean|has the meaning|is defined as|refers to)',
+    re.MULTILINE,
+)
+_DEFINITION_ARTICLE_SINGLE: re.Pattern[str] = re.compile(
+    r"['\u2018](the\s+[A-Z][A-Za-z\s\-]{1,60})['\u2019]\s+"
+    r"(?:means|shall mean|has the meaning|is defined as|refers to)",
+    re.MULTILINE,
+)
+
 # "Hereinafter" definition pattern.
 # e.g. hereinafter referred to as "the Company"
 # Supports straight and curly quotes.  The keyword portion is
 # case-insensitive via inline (?i:...) but the term capture group
-# requires an uppercase initial letter to stay consistent with
-# other definition patterns.
+# allows an optional lowercase article before the uppercase term.
 _DEFINITION_HEREINAFTER: re.Pattern[str] = re.compile(
     r'(?i:hereinafter\s+(?:referred\s+to\s+as|called|known\s+as))\s+'
-    r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]',
+    r'["\u201c]((?:the\s+)?[A-Z][A-Za-z\s\-]{1,60})["\u201d]',
     re.MULTILINE,
 )
 
@@ -87,13 +100,20 @@ _US_CLAUSE_HEADER: re.Pattern[str] = re.compile(
     r"\([a-z]\)\s|\([ivxlc]+\)\s)",
     re.MULTILINE,
 )
+_EU_CLAUSE_HEADER: re.Pattern[str] = re.compile(
+    r"^(?:(?:CHAPTER|Chapter)\s+[IVXLC]+|(?:ARTICLE|Article)\s+\d+|"
+    r"(?:SECTION|Section)\s+\d+|\d+\.\s+\S|\([a-z]\)\s|\([ivxlc]+\)\s)",
+    re.MULTILINE,
+)
 
 # Pattern that matches a clause-number token at the beginning of a line; used
 # to infer source_clause when scanning the whole document.
 _CLAUSE_LABEL: re.Pattern[str] = re.compile(
     r"^(?:"
-    r"(?:ARTICLE|Article)\s+([IVXLC]+)"         # US article
+    r"(?:ARTICLE|Article)\s+([IVXLC]+)"         # US article (Roman)
+    r"|(?:ARTICLE|Article)\s+(\d+)"             # EU article (Arabic)
     r"|(?:SECTION|Section)\s+(\d+\.\d+\S*)"     # US section
+    r"|(?:CHAPTER|Chapter)\s+([IVXLC]+)"        # EU chapter
     r"|(\d+\.\d+\.\d+)\.?\s"                    # UK x.y.z
     r"|(\d+\.\d+)\.?\s"                         # UK x.y
     r"|(\d+)\.\s+[A-Z]"                         # UK x
@@ -125,9 +145,12 @@ class DefinitionsExtractor:
         """
         self._jurisdiction: Jurisdiction | str = jurisdiction
         self._patterns: Union[UKPatterns, USPatterns, JurisdictionPatterns] = get_patterns(jurisdiction)
-        self._clause_header_re: re.Pattern[str] = (
-            _UK_CLAUSE_HEADER if jurisdiction == Jurisdiction.UK else _US_CLAUSE_HEADER
-        )
+        if jurisdiction == Jurisdiction.UK:
+            self._clause_header_re: re.Pattern[str] = _UK_CLAUSE_HEADER
+        elif jurisdiction == Jurisdiction.EU:
+            self._clause_header_re = _EU_CLAUSE_HEADER
+        else:
+            self._clause_header_re = _US_CLAUSE_HEADER
 
     # ------------------------------------------------------------------
     # Public API
@@ -195,20 +218,24 @@ class DefinitionsExtractor:
         """
         headers: tuple[str, ...] = self._patterns.definitions_headers  # type: ignore[attr-defined]
 
-        # Build a pattern that finds a line whose lowercased content contains
-        # one of the definitions header strings.  We look for the header at the
-        # start of a line (possibly preceded by a clause number).
+        # Build a pattern that finds a clause header whose title IS one of the
+        # definitions header strings (at a word boundary, not as a substring of
+        # a longer phrase like "Definitions of Key Metrics").
         header_alts = "|".join(re.escape(h) for h in headers)
+        # Use word boundaries so "interpretation" matches "Interpretation" but
+        # not "Interpretation Guidelines".  The header word must either end the
+        # line or be followed by whitespace/punctuation (not more title words).
+        bounded = r"(?:" + header_alts + r")(?:\s*$|[\s\-\u2013\u2014,;:])"
         # Matches lines such as:
         #   "1. Definitions"  "1.1 Interpretation"  "ARTICLE I — DEFINITIONS"
         #   "Section 1.01 Definitions"  "DEFINITIONS"
         section_start_re = re.compile(
             r"^(?:"
-            r"(?:ARTICLE|Article)\s+[IVXLC]+[^\n]*(?:" + header_alts + r")[^\n]*"
-            r"|(?:SECTION|Section)\s+[\d.]+[^\n]*(?:" + header_alts + r")[^\n]*"
-            r"|\d+(?:\.\d+)*\.?\s+[^\n]*(?:" + header_alts + r")[^\n]*"
-            r"|(?:" + header_alts + r")[^\n]*"
-            r")",
+            r"(?:ARTICLE|Article)\s+[\dIVXLC]+[^\n]*" + bounded
+            + r"|(?:SECTION|Section)\s+[\d.]+[^\n]*" + bounded
+            + r"|\d+(?:\.\d+)*\.?\s+[^\n]*" + bounded
+            + r"|(?:" + header_alts + r")\s*$"
+            + r")",
             re.IGNORECASE | re.MULTILINE,
         )
 
@@ -256,6 +283,18 @@ class DefinitionsExtractor:
                 re.MULTILINE,
             )
             level_map = {0: 2, 1: 1, 2: 0, 3: -1}  # group-index → level
+        elif self._jurisdiction == Jurisdiction.EU:
+            next_header_re = re.compile(
+                r"^(?:"
+                r"((?:CHAPTER|Chapter)\s+[IVXLC]+)"    # level -1
+                r"|((?:ARTICLE|Article)\s+\d+)"         # level 0
+                r"|((?:SECTION|Section)\s+\d+)"         # level 1
+                r"|((?:ANNEX|Annex)\s+[IVXLC]+)"        # level -2
+                r"|(\d+)\.\s"                           # level 2 (numbered paragraph)
+                r")",
+                re.MULTILINE,
+            )
+            level_map = {0: -1, 1: 0, 2: 1, 3: -2, 4: 2}  # group-index → level
         else:
             next_header_re = re.compile(
                 r"^(?:"
@@ -301,6 +340,14 @@ class DefinitionsExtractor:
             if re.match(r"^\d+", l):
                 return 0
             return 0
+        elif self._jurisdiction == Jurisdiction.EU:
+            if re.match(r"^(?:CHAPTER|Chapter)", l):
+                return -1
+            if re.match(r"^(?:ARTICLE|Article)", l):
+                return 0
+            if re.match(r"^(?:SECTION|Section)", l):
+                return 1
+            return 0
         else:
             if re.match(r"^(?:ARTICLE|Article)", l):
                 return 0
@@ -336,6 +383,8 @@ class DefinitionsExtractor:
             _DEFINITION_SINGLE,
             _DEFINITION_SINGLE_CURLY,
             _DEFINITION_SHALL_HAVE_MEANING,
+            _DEFINITION_ARTICLE,
+            _DEFINITION_ARTICLE_SINGLE,
         ):  # type: ignore[attr-defined]
             for m in pattern.finditer(text):
                 term = m.group(1).strip()
@@ -411,9 +460,9 @@ class DefinitionsExtractor:
                 continue
             if term not in results:
                 clause = self._nearest_clause_label(clause_labels, m.start()) or source_clause or "preamble"
-                # Extract up to ~200 chars preceding context to the last
+                # Extract up to ~500 chars preceding context to the last
                 # sentence boundary.
-                preceding = text[max(0, m.start() - 200):m.start()]
+                preceding = text[max(0, m.start() - 500):m.start()]
                 # Find the last sentence boundary in the preceding text.
                 last_dot = preceding.rfind(".")
                 if last_dot >= 0:
@@ -542,9 +591,11 @@ class DefinitionsExtractor:
         """
         if not labels:
             return None
-        # bisect_left on the offset component; labels is sorted by offset.
-        idx = bisect.bisect_left(labels, (pos,))
-        # idx is the first label with offset >= pos; we want the one before it.
+        # Extract offsets into a flat list for safe bisect (avoids tuple
+        # comparison edge case when pos exactly equals an offset).
+        offsets = [o for o, _ in labels]
+        idx = bisect.bisect_right(offsets, pos)
+        # idx is the first label with offset > pos; we want the one before it.
         if idx == 0:
             return None
         return labels[idx - 1][1]

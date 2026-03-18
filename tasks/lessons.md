@@ -185,3 +185,49 @@ Never reverse steps 2 and 3.
 **Rule**: When a test modifies global mutable state and needs to restore it, capture the original value BEFORE the mutation, or import the canonical value directly from its source module. Never use a lookup function that reads from the same global state you just modified.
 
 **Check**: In test teardown/restore code, trace the data flow: does the "restore" value come from a function that reads the state you just mutated? If yes, you're restoring the mutated value, not the original.
+
+---
+
+## L019 — Always run ruff + mypy locally before pushing to CI
+
+**Pattern**: PR #1 (dev → master) failed CI 3 times in a row. Run #1: 17 ruff errors (unused imports, unsorted imports in test files). Run #2: 5 mypy errors (optional deps not installed, `no-redef` not suppressed). Run #3: 1 mypy error (multi-line import placed `type: ignore` on wrong line). All were trivially caught locally.
+
+**Rule**: Before every `git push`, run: `python -m ruff check src/ tests/ && python -m mypy src/lexichunk/`. This catches 100% of the lint/type errors that CI will find.
+
+**Specific gotchas**:
+1. Test files accumulate unused imports from copy-paste — ruff F401 catches them
+2. Optional deps (langchain, llama-index) need `[[tool.mypy.overrides]]` with `ignore_missing_imports = true` in pyproject.toml
+3. mypy attributes `no-redef` to the `from` line of multi-line imports, not the alias line — if ruff reformats an import to multi-line, the `type: ignore` comment must go on the `from` line
+4. ruff's I001 (isort) and mypy's `type: ignore` can conflict — after ruff auto-fix, always re-verify mypy
+
+**Check**: Did you run both linters locally? If not, run them now before pushing.
+
+---
+
+## L020 — Adding a new built-in jurisdiction requires updating test cleanup fixtures
+
+**Pattern**: Adding `Jurisdiction.EU` as a built-in broke two test cleanup fixtures that deleted non-UK/US entries from `_JURISDICTION_REGISTRY` after each test. The `autouse=True` fixtures in `test_jurisdiction_registry.py` and `test_adversarial_extensibility.py` removed the new `"eu"` entry, causing 12 test failures when the full suite ran (the EU tests ran after the cleanup).
+
+**Rule**: When adding a new built-in jurisdiction to the registry, search all test files for `_JURISDICTION_REGISTRY.pop` and cleanup fixtures that filter by jurisdiction name. Update their allowlists to include the new built-in.
+
+**Check**: `grep -r "_JURISDICTION_REGISTRY" tests/` — verify every cleanup preserves all built-in jurisdictions.
+
+---
+
+## L022 — Roman numeral conversion must be context-restricted
+
+**Pattern**: Added `_roman_to_arabic()` to normalize "Article VII" → "Article 7" in cross-ref resolution. The initial implementation converted ALL tokens that match a structural Roman numeral pattern. But words like "mix" (M+IX=1009), "dim" (D+I+M), and similar English words are structurally valid Roman numerals. Converting them corrupts identifiers.
+
+**Rule**: Only apply Roman→Arabic conversion on tokens that immediately follow a label word (article, chapter, section, etc.). Never convert tokens in isolation.
+
+**Check**: After implementing Roman numeral conversion, test with English words that are coincidentally valid Roman numerals: "mix", "dim", "mild", "livid".
+
+---
+
+## L021 — New jurisdiction needs parser-level support, not just detection
+
+**Pattern**: Adding EU jurisdiction with `detect_level()` and `EUPatterns` was insufficient. The definitions parser (`definitions.py`) has three jurisdiction-branching locations: `_find_section_end`, `_header_level`, and `_clause_header_re` selection. These branched on `UK` vs `else`, so EU fell into the US branch — which expects Roman numeral articles (`Article [IVXLC]+`) instead of EU's Arabic numeral articles (`Article \d+`).
+
+**Rule**: When adding a new built-in jurisdiction, grep for every `== Jurisdiction.UK` and `== Jurisdiction.US` branch in the codebase. Each one is a potential place where the new jurisdiction needs its own branch or a correct fallback.
+
+**Check**: `grep -rn "Jurisdiction\.UK\|Jurisdiction\.US" src/` — audit every branch for new jurisdiction coverage.

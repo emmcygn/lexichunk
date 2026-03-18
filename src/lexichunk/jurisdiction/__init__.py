@@ -6,6 +6,8 @@ from typing import Callable, Optional, Union
 
 from ..exceptions import ConfigurationError
 from ..models import Jurisdiction, JurisdictionPatterns
+from .eu import EU_PATTERNS, EUPatterns
+from .eu import detect_level as eu_detect_level
 from .uk import UK_PATTERNS, UKPatterns
 from .uk import detect_level as uk_detect_level
 from .us import US_PATTERNS, USPatterns
@@ -21,6 +23,7 @@ DetectLevelFn = Callable[[str], Optional[tuple[int, str]]]
 _JURISDICTION_REGISTRY: dict[str, tuple[JurisdictionPatterns, DetectLevelFn]] = {
     "uk": (UK_PATTERNS, uk_detect_level),
     "us": (US_PATTERNS, us_detect_level),
+    "eu": (EU_PATTERNS, eu_detect_level),
 }
 
 
@@ -67,7 +70,7 @@ def register_jurisdiction(
 
 def get_patterns(
     jurisdiction: Union[Jurisdiction, str],
-) -> UKPatterns | USPatterns | JurisdictionPatterns:
+) -> EUPatterns | UKPatterns | USPatterns | JurisdictionPatterns:
     """Return the compiled pattern set for the given jurisdiction.
 
     Args:
@@ -114,6 +117,8 @@ __all__ = [
     "get_detect_level",
     "register_jurisdiction",
     "DetectLevelFn",
+    "EU_PATTERNS",
+    "EUPatterns",
     "UK_PATTERNS",
     "US_PATTERNS",
     "UKPatterns",

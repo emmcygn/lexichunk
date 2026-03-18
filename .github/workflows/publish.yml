@@ -1,10 +1,9 @@
-name: CI
+name: Publish to PyPI
 
 on:
   push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
+    tags:
+      - "v*"
 
 jobs:
   test:
@@ -33,4 +32,28 @@ jobs:
         run: mypy src/lexichunk/
 
       - name: Run tests with coverage
-        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=90
+        run: pytest --tb=short -q --cov=lexichunk --cov-fail-under=90
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: pip install build
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
