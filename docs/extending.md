@@ -2,7 +2,7 @@
 
 ## Custom Jurisdictions
 
-lexichunk ships with UK and US jurisdiction support. You can add your own by implementing the `JurisdictionPatterns` protocol and registering a `detect_level` function.
+lexichunk ships with UK, US and EU jurisdiction support. You can add your own by implementing the `JurisdictionPatterns` protocol and registering a `detect_level` function.
 
 ### Step 1: Create a Patterns Object
 
@@ -104,8 +104,11 @@ The extra signals are merged with the built-in signals — they do not replace t
 
 ### How Classification Works
 
-1. Each chunk's content is scanned for keyword matches against all 15 clause types.
-2. Each match adds 1 to that type's score.
+1. Each chunk's content is scanned for keyword matches against all 27 clause types.
+2. Scoring is phrase-length weighted, not a flat count: each signal match adds a
+   weight equal to the number of words in that signal (`len(signal.split())`).
+   A multi-word phrase like `"limitation of liability"` therefore contributes
+   more to its type's score than a single-word match like `"payable"`.
 3. Position bonus: +1.5 for end-of-document types (governing law, assignment, etc.) when the chunk is past the 75% mark.
 4. The type with the highest score wins. Confidence = `best_score / sum_of_all_scores`.
 5. The runner-up becomes `secondary_clause_type`.
@@ -117,8 +120,8 @@ from lexichunk.enrichment.clause_type import ClauseTypeClassifier
 
 classifier = ClauseTypeClassifier()
 result = classifier.classify_detailed(chunk_text, relative_position=0.8)
-print(result.clause_type)       # ClauseType.GOVERNING_LAW
-print(result.confidence)        # 0.72
-print(result.secondary_type)    # ClauseType.AMENDMENT
-print(dict(result.scores))      # {ClauseType.GOVERNING_LAW: 5.5, ...}
+print(result.clause_type)             # ClauseType.GOVERNING_LAW
+print(result.confidence)              # 0.72
+print(result.secondary_clause_type)   # ClauseType.AMENDMENT
+print(dict(result.scores))            # {ClauseType.GOVERNING_LAW: 5.5, ...}
 ```
