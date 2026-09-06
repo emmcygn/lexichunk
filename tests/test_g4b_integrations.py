@@ -159,7 +159,7 @@ class TestBuildMetadata:
         metadata = build_metadata(chunk, include_defined_terms_context=True, flatten=True)
         assert isinstance(metadata["cross_references"], str)
         assert json.loads(metadata["cross_references"]) == [
-            {"raw_text": "clause 3", "target_identifier": "3", "target_chunk_index": 2}
+            {"raw_text": "clause 3", "target_identifier": "3", "target_chunk_index": 2, "target_kind": "clause"}
         ]
         assert isinstance(metadata["defined_terms_used"], str)
         assert isinstance(metadata["defined_terms_context"], str)
