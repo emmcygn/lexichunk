@@ -32,6 +32,10 @@ dependencies = []
 [project.optional-dependencies]
 langchain = ["langchain-core>=0.2.0,<2"]
 llama-index = ["llama-index-core>=0.10.0,<0.15"]
+# Ingestion adapters. `docling-core` alone is enough to read a
+# DoclingDocument (including its JSON form); the full `docling` package is
+# only needed to produce one from a PDF, and lexichunk never imports it.
+docling = ["docling-core>=2.0"]
 examples = [
     "langchain-text-splitters",
     "langchain-community",
@@ -48,6 +52,7 @@ dev = [
 all = [
     "langchain-core>=0.2.0,<2",
     "llama-index-core>=0.10.0,<0.15",
+    "docling-core>=2.0",
 ]
 
 [project.urls]
@@ -87,6 +92,7 @@ disallow_untyped_defs = true
 module = [
     "langchain_core.*",
     "llama_index.*",
+    "docling_core.*",
 ]
 ignore_missing_imports = true
 

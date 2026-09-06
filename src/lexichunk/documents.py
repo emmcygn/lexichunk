@@ -355,7 +355,15 @@ def _build_from_sections(
     last = len(validated) - 1
 
     for position, section in enumerate(validated):
-        header = _header_line(identifiers[position], section.title) + "\n"
+        # A preamble is the text *before* the first heading, so it has no
+        # heading of its own — its identifier is a label, not something that
+        # appears in the document. Synthesising a header line for it would
+        # inject a word the source never contained.
+        header = (
+            ""
+            if section.level == _PREAMBLE_LEVEL
+            else _header_line(identifiers[position], section.title) + "\n"
+        )
         body = section.text
         if body and not body.endswith("\n"):
             body += "\n"

@@ -1275,8 +1275,30 @@ def parse_structure(
     return StructureParser(jurisdiction, doc_type=doc_type).parse(text)
 
 
+def is_allcaps_fallback(line: str, level: int, identifier: str) -> bool:
+    """Whether a ``detect_level`` match came from the ALL-CAPS fallback branch.
+
+    The US and EU rules end with a branch that accepts any standalone
+    ALL-CAPS line as a level-0 heading and hands the whole line back as the
+    identifier.  That match carries no *numbering* information — it says only
+    "this line is shouty" — so a caller that already knows the heading's
+    depth from elsewhere (an ingestion adapter reading a converter's own
+    outline) should ignore it and keep the depth it has.
+
+    Args:
+        line: The stripped candidate line.
+        level: The level ``detect_level`` proposed.
+        identifier: The identifier ``detect_level`` proposed.
+
+    Returns:
+        ``True`` when the match is the ALL-CAPS fallback.
+    """
+    return _is_allcaps_fallback(line, level, identifier)
+
+
 __all__ = [
     "ParsedClause",
     "StructureParser",
+    "is_allcaps_fallback",
     "parse_structure",
 ]
