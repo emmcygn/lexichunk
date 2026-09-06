@@ -355,6 +355,7 @@ class ReferenceDetector:
         sections: Optional[list[str]] = None,
         ancestors: Optional[list[str]] = None,
         extra_identifiers: Optional[dict[int, list[str]]] = None,
+        continuation_indices: Optional[set[int]] = None,
     ) -> list[list[CrossReference]]:
         """Resolve cross-reference target identifiers to chunk indices.
 
@@ -388,6 +389,13 @@ class ReferenceDetector:
                 identifiers that chunk absorbed (e.g. a merged chunk that
                 swallowed sub-clause ``"4.1"``), so references to the absorbed
                 identifier still resolve.
+            continuation_indices: Optional set of chunk indices that continue a
+                clause which *starts* in an earlier chunk (the tail pieces of
+                an over-sized clause).  Every piece carries the clause's own
+                identifier, so only the first one is registered as a lookup
+                candidate and a reference to that clause resolves to where the
+                clause begins.  These chunks' own references are still
+                resolved.
 
         Returns:
             Updated list of cross-reference lists with ``target_chunk_index``
@@ -399,21 +407,41 @@ class ReferenceDetector:
         # (kind, normalised ancestor number) → descendant chunk indices.
         prefix_map: dict[tuple[str, str], list[int]] = {}
 
+        def _add(
+            bucket: dict[tuple[str, str], list[int]],
+            key: tuple[str, str],
+            chunk_index: int,
+        ) -> None:
+            # One chunk contributes at most one candidate per key.  A merged
+            # chunk registers both its own identifier and the identifiers it
+            # absorbed, and those overlap (the dominant clause's identifier is
+            # in both lists) — registering it twice would make the chunk look
+            # ambiguous with itself and resolve to nothing.
+            candidates = bucket.setdefault(key, [])
+            if not candidates or candidates[-1] != chunk_index:
+                candidates.append(chunk_index)
+
         def _register(chunk_index: int, identifier: str) -> None:
             if not identifier:
                 return
             kind, number = self._split_identifier(identifier)
             if not number:
                 return
-            index_map.setdefault((kind, number), []).append(chunk_index)
+            _add(index_map, (kind, number), chunk_index)
             for ancestor in self._ancestor_numbers(number):
-                prefix_map.setdefault((kind, ancestor), []).append(chunk_index)
+                _add(prefix_map, (kind, ancestor), chunk_index)
 
+        extras = extra_identifiers or {}
+        continuations = continuation_indices or set()
         for chunk_index, (_refs, identifier) in enumerate(chunks_with_refs):
+            if chunk_index in continuations:
+                continue
+            # Own identifier and absorbed identifiers are registered together
+            # so every entry for one chunk lands consecutively, which is what
+            # makes the cheap duplicate check in ``_add`` exact.
             _register(chunk_index, identifier)
-        for chunk_index, absorbed in (extra_identifiers or {}).items():
-            for identifier in absorbed:
-                _register(chunk_index, identifier)
+            for absorbed in extras.get(chunk_index, ()):
+                _register(chunk_index, absorbed)
 
         # Second pass: resolve each cross-reference.
         resolved: list[list[CrossReference]] = []
@@ -430,6 +458,7 @@ class ReferenceDetector:
                     ancestors,
                     section,
                     ancestor,
+                    chunk_index,
                 )
                 updated.append(
                     CrossReference(
@@ -456,6 +485,7 @@ class ReferenceDetector:
         ancestors: Optional[list[str]],
         section: Optional[str],
         ancestor: Optional[str],
+        self_index: Optional[int] = None,
     ) -> Optional[int]:
         """Resolve a single reference against the pre-built lookup maps.
 
@@ -467,6 +497,8 @@ class ReferenceDetector:
             ancestors: Per-chunk top-level ancestor labels, or ``None``.
             section: The referring chunk's section label, or ``None``.
             ancestor: The referring chunk's top-level ancestor, or ``None``.
+            self_index: Index of the referring chunk, used as the final
+                tie-break when a chunk names its own identifier.
 
         Returns:
             The resolved chunk index, or ``None`` when unresolvable or
@@ -482,7 +514,8 @@ class ReferenceDetector:
             candidates = index_map.get((kind, number))
             if candidates:
                 return self._disambiguate(
-                    candidates, sections, ancestors, section, ancestor
+                    candidates, sections, ancestors, section, ancestor,
+                    self_index,
                 )
 
         # 2. Child match — "4" resolves to its first child "4.1".
@@ -498,7 +531,8 @@ class ReferenceDetector:
                 candidates = index_map.get((kind, parent))
                 if candidates:
                     return self._disambiguate(
-                        candidates, sections, ancestors, section, ancestor
+                        candidates, sections, ancestors, section, ancestor,
+                        self_index,
                     )
 
         return None
@@ -510,13 +544,17 @@ class ReferenceDetector:
         ancestors: Optional[list[str]],
         section: Optional[str],
         ancestor: Optional[str],
+        self_index: Optional[int] = None,
     ) -> Optional[int]:
         """Pick a single chunk index from *candidates*, or ``None``.
 
         A single candidate resolves immediately.  Otherwise the candidates are
         narrowed to those sharing the referring chunk's ``document_section``
-        and then to those sharing its top-level ancestor.  If more than one
-        candidate survives, the reference is left unresolved.
+        and then to those sharing its top-level ancestor.  Should more than one
+        candidate still survive, a candidate that *is* the referring chunk wins
+        — a chunk that names its own identifier ("the obligations in paragraph
+        1 above") is talking about itself.  If nothing breaks the tie, the
+        reference is left unresolved.
 
         Args:
             candidates: Candidate chunk indices, in document order.
@@ -524,6 +562,7 @@ class ReferenceDetector:
             ancestors: Per-chunk top-level ancestor labels, or ``None``.
             section: The referring chunk's section label, or ``None``.
             ancestor: The referring chunk's top-level ancestor, or ``None``.
+            self_index: Index of the referring chunk, or ``None``.
 
         Returns:
             The single surviving candidate, or ``None`` when still ambiguous.
@@ -534,14 +573,19 @@ class ReferenceDetector:
         pool = candidates
         if sections is not None and section is not None:
             narrowed = [i for i in pool if sections[i] == section]
-            if len(narrowed) == 1:
-                return narrowed[0]
             if narrowed:
                 pool = narrowed
+                if len(pool) == 1:
+                    return pool[0]
         if ancestors is not None and ancestor is not None:
             narrowed = [i for i in pool if ancestors[i] == ancestor]
-            if len(narrowed) == 1:
-                return narrowed[0]
+            if narrowed:
+                pool = narrowed
+                if len(pool) == 1:
+                    return pool[0]
+
+        if self_index is not None and self_index in pool:
+            return self_index
 
         # Genuinely ambiguous — a wrong pointer is worse than no pointer.
         return None
@@ -718,6 +762,7 @@ def resolve_references(
     jurisdiction: Jurisdiction | str,
     *,
     extra_identifiers: Optional[dict[int, list[str]]] = None,
+    continuation_indices: Optional[set[int]] = None,
 ) -> list[LegalChunk]:
     """Resolve cross-references across all chunks (second pass).
 
@@ -738,6 +783,10 @@ def resolve_references(
         extra_identifiers: Optional mapping of chunk index → extra identifiers
             that chunk absorbed during merging, so a merged chunk that
             swallowed sub-clause ``"4.1"`` still resolves ``"clause 4.1"``.
+        continuation_indices: Optional set of chunk indices that continue a
+            clause starting in an earlier chunk, so ``"clause 1.1"`` resolves
+            to the piece where clause 1.1 begins rather than going ambiguous
+            across its pieces.
 
     Returns:
         The same *chunks* list, with ``cross_references`` updated in-place on
@@ -754,6 +803,7 @@ def resolve_references(
         sections=sections,
         ancestors=ancestors,
         extra_identifiers=extra_identifiers,
+        continuation_indices=continuation_indices,
     )
 
     total_refs = 0

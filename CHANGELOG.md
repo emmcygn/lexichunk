@@ -58,6 +58,24 @@ several concurrent branches ahead of the release.
   single warning logged if an indivisible run still exceeds the cap.
 - `chunk_batch()` falls back to serial execution (with a `WARNING` log)
   when the process pool cannot be started, instead of raising.
+- Four commercial `ClauseType` members — `SERVICES`, `INSURANCE`, `AUDIT`
+  and `NON_SOLICITATION` — bringing the classifier to 31 clause types.
+  `secondary_clause_type` semantics are unchanged.
+- Container headings written over two lines (`ARTICLE I` above `DEFINITIONS`,
+  `Chapter I` above `General provisions`) now adopt the second line as the
+  clause title, so `hierarchy_path` reads `Article I — Definitions`.  The
+  line stays in the body text and no offsets change.
+- Descendants of a Schedule / Exhibit / Annex (or of a Recitals or
+  Definitions block) now inherit that container's `DocumentSection`, so
+  `SCHEDULE 1 > 1 — Overview` is `SCHEDULES` and `1 — Definitions > 1.1` is
+  `DEFINITIONS` rather than `OPERATIVE`.  A descendant with a section of its
+  own keeps it.  This also lets cross-reference resolution tell a main-body
+  `clause 3` from a Schedule's paragraph 3.
+- Chunks whose entire body was a heading line (`Article I`, `Chapter I`,
+  `SCHEDULE 1 — SERVICES DESCRIPTION`) are folded into the child clause they
+  announce, as long as the result fits `max_chunk_size`.  The absorbed
+  heading's identifier is recorded, so `Schedule 1` / `Article I` references
+  still resolve to the merged chunk.
 - Packaging/CI: Python 3.13 classifier and CI matrix entry, `windows-latest`
   CI coverage (Python 3.12), `examples` extra
   (`langchain-text-splitters`, `langchain-community`, `langchain-openai`),
@@ -67,6 +85,16 @@ several concurrent branches ahead of the release.
   and `CONTRIBUTING.md`.
 
 ### Fixed
+- Cross-references to a sub-clause that was merged into a larger chunk
+  (`clause 2.7`, `clause 3.4(b)`) now resolve: the clause-aware path hands the
+  absorbed identifiers to the resolver instead of dropping them.
+- A merged chunk no longer registers its own identifier twice, which made it
+  look ambiguous with itself and left its references unresolved.
+- The pieces of an over-sized clause keep the clause's own identifier —
+  `hierarchy`, `hierarchy_path`, `original_header` and `context_header` no
+  longer expose the internal `.__part<n>` suffix.  Uniqueness comes from the
+  internal `uid`, and a reference to the clause resolves to the piece where it
+  starts.
 - `(i)` roman-numeral sub-clause identifiers no longer misdetected/mis-normalized
   during cross-reference resolution.
 - EU `Chapter`-level sections are no longer misclassified into

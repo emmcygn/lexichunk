@@ -427,6 +427,13 @@ class LegalChunker:
         has_structure = clauses and not (
             len(clauses) == 1 and clauses[0].level == -99
         )
+        # Identifiers absorbed into a merged chunk (clause-aware path only);
+        # handed to Stage 7 so a reference to a swallowed sub-clause still
+        # resolves to the chunk that actually contains it.
+        merged_identifiers: dict[int, list[str]] | None = None
+        # Chunks that continue an over-sized clause started in an earlier
+        # chunk; they must not register that clause's identifier a second time.
+        continuation_indices: set[int] | None = None
         if has_structure:
             chunker = ClauseAwareChunker(
                 jurisdiction=self._jurisdiction,
@@ -437,6 +444,8 @@ class LegalChunker:
                 extra_abbreviations=self._extra_abbreviations,
             )
             chunks = chunker.chunk(clauses, text)
+            merged_identifiers = chunker.last_merged_identifiers
+            continuation_indices = chunker.last_continuation_indices
         else:
             # No structure detected — fall back to sentence-level splitting.
             # DEBUG, not WARNING: this is a normal, first-class code path
@@ -605,7 +614,12 @@ class LegalChunker:
         if collect_metrics:
             logger.debug("Stage 7: cross_reference_resolution — start")
             t0 = time.perf_counter()
-        resolve_references(chunks, self._jurisdiction)
+        resolve_references(
+            chunks,
+            self._jurisdiction,
+            extra_identifiers=merged_identifiers,
+            continuation_indices=continuation_indices,
+        )
 
         # Populate cross-ref stats for external access.
         total = sum(c.cross_ref_total for c in chunks)

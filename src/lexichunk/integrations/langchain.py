@@ -63,12 +63,16 @@ class LegalTextSplitter(_BaseTransformer):  # type: ignore[misc,valid-type]
     Args:
         jurisdiction: Legal jurisdiction — ``"uk"`` or ``"us"`` (or a
             :class:`~lexichunk.models.Jurisdiction` enum value).
-        doc_type: Document type hint.  ``"contract"`` or
-            ``"terms_conditions"``.  Currently informational.
+        doc_type: Document type hint — ``"contract"`` or
+            ``"terms_conditions"``.  Affects document-section detection: with
+            ``"terms_conditions"`` the signature-block heuristic is relaxed
+            (recitals/signature keyword matching is skipped), which changes
+            which chunks are classified as ``SIGNATURES`` and ``RECITALS``.
         max_chunk_size: Maximum chunk size in approximate tokens
             (1 token ≈ 4 characters).  Defaults to ``512``.
         min_chunk_size: Minimum chunk size in approximate tokens.  Clauses
-            smaller than this are merged with their neighbour.  Defaults to
+            smaller than this are merged with an adjacent sibling where the
+            hierarchy allows.  Defaults to
             ``64``.
         include_definitions: When ``True``, attach relevant defined-term
             definitions to each chunk.  Defaults to ``True``.

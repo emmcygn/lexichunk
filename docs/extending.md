@@ -131,7 +131,7 @@ The extra signals are merged with the built-in signals — they do not replace t
 
 ### How Classification Works
 
-1. Each chunk's content is scanned for keyword matches against all 27 clause types.
+1. Each chunk's content is scanned for keyword matches against all 31 clause types.
 2. Scoring is phrase-length weighted, not a flat count: each signal match adds a
    weight equal to the number of words in that signal (`len(signal.split())`).
    A multi-word phrase like `"limitation of liability"` therefore contributes

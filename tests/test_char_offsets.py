@@ -11,6 +11,8 @@ Additionally: char_start >= 0, char_end >= char_start, and char_end <= len(text)
 
 from __future__ import annotations
 
+from collections import Counter
+
 from lexichunk import LegalChunker
 
 
@@ -158,7 +160,14 @@ class TestOversizedSplit:
         chunks = LegalChunker(
             jurisdiction="uk", max_chunk_size=30, min_chunk_size=0
         ).chunk(text)
-        parts = [ch for ch in chunks if "__part" in ch.hierarchy.identifier]
+        # Split pieces keep the clause's own identifier, so the pieces of one
+        # clause are the chunks that share an identifier.
+        counts = Counter(ch.hierarchy.identifier for ch in chunks)
+        split = [
+            ident for ident, count in counts.items() if count > 1
+        ]
+        assert split, "expected the oversized clause to be split"
+        parts = [ch for ch in chunks if ch.hierarchy.identifier == split[0]]
         if len(parts) > 1:
             for i in range(len(parts) - 1):
                 assert parts[i].char_end == parts[i + 1].char_start, (

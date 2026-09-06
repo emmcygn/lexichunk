@@ -341,8 +341,10 @@ class TestSectionRoles:
     def test_gdpr_fixture_chunks_have_no_schedules_section(self) -> None:
         text = (FIXTURES_DIR / "eu_gdpr_excerpt.txt").read_text(encoding="utf-8")
         chunks = LegalChunker(jurisdiction="eu", min_chunk_size=0).chunk(text)
+        # An EU Chapter heading has no text of its own and is folded into the
+        # Article below it, so it is matched on ``hierarchy_path``.
         chapter_chunks = [
-            c for c in chunks if c.hierarchy.identifier.startswith("Chapter ")
+            c for c in chunks if c.hierarchy_path.startswith("Chapter ")
         ]
         assert chapter_chunks
         assert all(

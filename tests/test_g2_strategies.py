@@ -13,6 +13,7 @@ Inputs are the repro documents from the engineering synthesis review.
 from __future__ import annotations
 
 import logging
+from collections import Counter
 
 import pytest
 
@@ -104,7 +105,8 @@ class TestUidKeyedClauseMap:
         schedule = [
             c
             for c in chunks
-            if c.hierarchy.identifier == "1.1" and c.char_start > 100
+            if c.hierarchy.identifier == "1.1"
+            and c.hierarchy_path.upper().startswith("SCHEDULE")
         ]
         assert schedule, "expected a chunk for the Schedule sub-clause 1.1"
         assert schedule[0].hierarchy_path.startswith("SCHEDULE 1")
@@ -218,7 +220,15 @@ class TestHardSizeCap:
 
     def test_split_pieces_tile_the_clause_without_gaps(self) -> None:
         chunks = _chunk(SEMICOLON_ONLY_CLAUSE, max_chunk_size=512, min_chunk_size=0)
-        parts = [c for c in chunks if "__part" in c.hierarchy.identifier]
+        # Split pieces keep the clause's own identifier (no "__part" suffix),
+        # so the pieces of one clause are the chunks that share an identifier.
+        counts = Counter(c.hierarchy.identifier for c in chunks)
+        split_identifier = next(
+            ident for ident, count in counts.items() if count > 1
+        )
+        parts = [
+            c for c in chunks if c.hierarchy.identifier == split_identifier
+        ]
         assert len(parts) > 1
         for a, b in zip(parts, parts[1:]):
             assert a.char_end == b.char_start, (
@@ -388,8 +398,14 @@ class TestOffsetsAreTheTruth:
 
 class TestDetectionOnRawBody:
     def test_reference_in_an_ancestor_header_is_not_inherited(self) -> None:
+        # Clause 1 carries body text of its own so that it stays a chunk in
+        # its own right: a heading-only clause is folded into its first child
+        # instead, which would put the header line in that chunk's *body*.
         text = (
             "1. Services as set out in Schedule 2\n"
+            "The Supplier shall provide the Services described below with "
+            "reasonable care and skill at all times.\n"
+            "\n"
             "1.1 Standard\n"
             "The Services shall be provided with reasonable care and skill "
             "at all times during the term of this agreement.\n"

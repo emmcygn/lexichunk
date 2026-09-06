@@ -158,6 +158,77 @@ def _extract_title(line: str, identifier: str) -> Optional[str]:
     return remainder or None
 
 
+# Maximum number of words the line below an untitled container heading may
+# contain to be adopted as that heading's title.
+_MAX_ADOPTED_TITLE_WORDS = 8
+
+# Terminal punctuation that marks the line below a heading as prose, not as
+# the heading's title.
+_ADOPTED_TITLE_TERMINATORS = ('.', ';', ':')
+
+# Words kept lower-case when an ALL-CAPS adopted title is re-cased, unless
+# they are the first word ("DEFINITIONS AND INTERPRETATION" →
+# "Definitions and Interpretation").
+_TITLE_CASE_MINOR_WORDS = frozenset({
+    'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 'nor',
+    'of', 'on', 'or', 'the', 'to', 'via', 'with',
+})
+
+
+def _title_case(text: str) -> str:
+    """Re-case an ALL-CAPS heading line as a title.
+
+    Each whitespace-separated token is capitalised, except minor words
+    (``and``, ``of``, ``the`` …) anywhere but in first position.  Only the
+    leading letter is touched, so hyphenated and parenthesised tokens survive
+    intact.
+
+    Args:
+        text: An ALL-CAPS line.
+
+    Returns:
+        The title-cased line.
+    """
+    words = text.split()
+    recased: list[str] = []
+    for position, word in enumerate(words):
+        lowered = word.lower()
+        if position > 0 and lowered in _TITLE_CASE_MINOR_WORDS:
+            recased.append(lowered)
+        else:
+            recased.append(lowered[:1].upper() + lowered[1:])
+    return ' '.join(recased)
+
+
+def _adoptable_title(line: str) -> Optional[str]:
+    """Return *line* as a heading title, or ``None`` when it is body text.
+
+    A container heading written over two lines (``ARTICLE I`` / ``DEFINITIONS``)
+    leaves the second line as the real title.  It qualifies when it is short
+    (at most eight words) and does not end like a sentence.  An ALL-CAPS line
+    is re-cased; anything else is kept verbatim, because mixed-case drafting
+    (``Subject matter and scope``) is already how the drafter wrote it.
+
+    Args:
+        line: The candidate line, as found in the source text.
+
+    Returns:
+        The title to use, or ``None``.
+    """
+    candidate = line.strip()
+    if not candidate:
+        return None
+    if candidate.endswith(_ADOPTED_TITLE_TERMINATORS):
+        return None
+    if len(candidate.split()) > _MAX_ADOPTED_TITLE_WORDS:
+        return None
+    if len(candidate) > MAX_TITLE_CHARS:
+        return None
+    if candidate.isupper():
+        return _title_case(candidate)
+    return candidate
+
+
 def _line_offsets(text: str) -> list[int]:
     """Return a list of character offsets for the start of every line.
 
@@ -237,6 +308,19 @@ _SINGLE_ALPHA_SUB_RE = re.compile(r'^\(([a-z])\)$')
 # UK, US and EU jurisdictions.
 _ROMAN_SUB_LEVEL = 4
 _ALPHA_SUB_LEVEL = 3
+
+# Sections that a container passes down to everything nested inside it.  A
+# paragraph inside "SCHEDULE 1" is part of the schedules, not of the operative
+# clauses, however neutrally its own heading reads; the sub-clauses of
+# "1. Definitions and interpretation" are part of the definitions; the same
+# holds for the recitals.  Only a descendant that would otherwise be OPERATIVE
+# inherits, so a descendant that classifies itself (a "Definitions" paragraph
+# inside a Schedule) keeps its own, more specific section.
+_INHERITED_SECTIONS: frozenset[DocumentSection] = frozenset({
+    DocumentSection.SCHEDULES,
+    DocumentSection.RECITALS,
+    DocumentSection.DEFINITIONS,
+})
 
 
 def _keyword_pattern(keywords: tuple[str, ...]) -> re.Pattern[str]:
@@ -383,6 +467,18 @@ class StructureParser:
         A synthetic *preamble* clause at ``level=-99`` is emitted for any text
         that appears before the first detected clause header.
 
+        ``document_section`` is classified per clause and then inherited: a
+        clause that would otherwise be ``OPERATIVE`` takes the section of its
+        nearest enclosing ``SCHEDULES``, ``RECITALS`` or ``DEFINITIONS``
+        ancestor, so ``SCHEDULE 1 > 1 — Overview`` is ``SCHEDULES`` rather than
+        ``OPERATIVE``.  A descendant with a section of its own (a
+        ``Definitions`` paragraph inside a Schedule) keeps it.
+
+        A container heading with no title of its own (``ARTICLE I`` followed by
+        ``DEFINITIONS`` on the next line) adopts that next line as its
+        ``title``; the line remains part of the body text, so offsets are
+        unaffected.
+
         Args:
             text: The full legal document as a plain-text string.
 
@@ -456,11 +552,20 @@ class StructureParser:
             # Determine parent identifier.
             parent_id: Optional[str] = stack[-1][0].identifier if stack else None
 
-            # Extract title from header line.
+            # Extract title from header line, falling back to the next line
+            # for a container heading written over two lines.
             title = _extract_title(line, identifier)
+            if title is None and level <= 0:
+                title = self._title_from_next_line(lines, line_idx, header_map)
 
-            # Classify document section.
+            # Classify document section, then let an enclosing Schedule /
+            # Exhibit / Annex (or Recitals block) pass its section down.
             doc_section = self._detect_document_section(identifier, title or '', level)
+            if doc_section is DocumentSection.OPERATIVE:
+                for open_clause, _lines in reversed(stack):
+                    if open_clause.document_section in _INHERITED_SECTIONS:
+                        doc_section = open_clause.document_section
+                        break
 
             # Flush preamble if this is the very first header encountered.
             if preamble_lines and not result_clauses:
@@ -593,6 +698,42 @@ class StructureParser:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    @staticmethod
+    def _title_from_next_line(
+        lines: list[str],
+        idx: int,
+        header_map: dict[int, tuple[int, str]],
+    ) -> Optional[str]:
+        """Return the title an untitled container heading adopts, or ``None``.
+
+        US and EU house style splits a container heading over two lines::
+
+            ARTICLE I
+            DEFINITIONS
+
+        The second line is not itself a heading (the ALL-CAPS gate rejects it
+        for lack of a preceding blank line), so without this it would be lost
+        as body text and ``hierarchy_path`` would read a bare ``Article I``.
+        The line is only *read*, never consumed: it stays in the clause's
+        content and every character offset is unchanged.
+
+        Args:
+            lines: The document's lines.
+            idx: Index of the heading line.
+            header_map: The accepted headings, used to refuse a line that is a
+                heading in its own right.
+
+        Returns:
+            The adopted title, or ``None``.
+        """
+        for next_idx in range(idx + 1, len(lines)):
+            if not lines[next_idx].strip():
+                continue
+            if next_idx in header_map:
+                return None
+            return _adoptable_title(lines[next_idx])
+        return None
 
     def _collect_headers(self, lines: list[str]) -> dict[int, tuple[int, str]]:
         """Run ``detect_level`` over *lines* and keep the plausible matches.

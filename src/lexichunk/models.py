@@ -84,6 +84,10 @@ class ClauseType(str, Enum):
     ACCEPTABLE_USE = "acceptable_use"
     USER_RESTRICTIONS = "user_restrictions"
     ACCOUNT_SECURITY = "account_security"
+    SERVICES = "services"
+    INSURANCE = "insurance"
+    AUDIT = "audit"
+    NON_SOLICITATION = "non_solicitation"
     UNKNOWN = "unknown"
 
     def __str__(self) -> str:

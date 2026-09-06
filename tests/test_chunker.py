@@ -730,18 +730,23 @@ def test_original_header_field_populated():
 def test_per_chunk_identifier_in_content(uk_chunker, uk_service_agreement):
     """Every chunk's hierarchy identifier must appear in its content.
 
-    Synthetic __part identifiers from sentence-splitting are excluded since
-    the part suffix is a chunker artifact, not a document-level identifier.
+    An over-sized clause is split across several chunks that all keep the
+    clause's own identifier, and only the piece where the clause *starts*
+    carries the header line that spells it out — so a continuation piece is
+    satisfied by the earlier chunk that witnessed the identifier.
     """
     chunks = uk_chunker.chunk(uk_service_agreement)
+    seen_text: list[str] = []
     for chunk in chunks:
         ident = chunk.hierarchy.identifier
-        if ident == "preamble" or "__part" in ident:
-            continue
-        assert ident in chunk.content, (
-            f"Chunk {chunk.index} identifier {ident!r} not found in content: "
-            f"{chunk.content[:200]!r}"
-        )
+        if ident != "preamble":
+            assert ident in chunk.content or any(
+                ident in earlier for earlier in seen_text
+            ), (
+                f"Chunk {chunk.index} identifier {ident!r} not found in "
+                f"content: {chunk.content[:200]!r}"
+            )
+        seen_text.append(chunk.content)
 
 
 def test_ancestor_header_ordering():

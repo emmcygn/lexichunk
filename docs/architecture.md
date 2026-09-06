@@ -44,6 +44,10 @@ list[LegalChunk]
 
 Scans the document line-by-line using jurisdiction-specific `detect_level()` functions. Each matching line starts a new `ParsedClause` with a level, identifier, and optional title. Non-matching text at the top of the document becomes a "preamble" clause. Children are nested by indentation level.
 
+A container heading written over two lines (`ARTICLE I` above `DEFINITIONS`, `Chapter I` above `General provisions`) adopts the second line as its title when that line is short, is not itself a detected heading, and does not end like a sentence; an ALL-CAPS line is re-cased. The line is only read — it stays in the clause's body text and no character offset changes.
+
+`document_section` is classified per clause and then inherited: a clause that would otherwise be `OPERATIVE` takes the section of its nearest enclosing `SCHEDULES`, `RECITALS` or `DEFINITIONS` ancestor, so `SCHEDULE 1 > 1 — Overview` is `SCHEDULES` and `1 — Definitions > 1.1` is `DEFINITIONS`. A descendant with a section of its own (a `Definitions` paragraph inside a Schedule) keeps it.
+
 **Input**: Raw text (str)
 **Output**: `list[ParsedClause]` in document order
 
@@ -52,6 +56,8 @@ Scans the document line-by-line using jurisdiction-specific `detect_level()` fun
 **Class**: `lexichunk.strategies.clause_aware.ClauseAwareChunker` (primary) or `lexichunk.strategies.fallback.FallbackChunker` (when Stage 1 finds no clause structure — either returns `[]` or only a preamble clause)
 
 The clause-aware chunker respects clause boundaries. Clauses smaller than `min_chunk_size` are merged with an adjacent sibling where the hierarchy allows; hierarchy is never crossed to satisfy `min_chunk_size` (a clause is never merged into a sibling's subtree, or across a parent boundary, purely to hit the minimum). `max_chunk_size` is enforced as a hard cap: an oversized clause is run through a cascading splitter that tries, in order, sentence boundaries, then semicolons, then enumerated sub-items (`(a)`, `(i)`, etc.), then newlines, and finally a word window — falling through to the next strategy only when the current one cannot produce pieces under the cap. A single warning is logged if an indivisible run (e.g. one unbroken word or number) still exceeds `max_chunk_size` after all strategies are exhausted. Ancestor headers are prepended to maintain hierarchy context.
+
+Finally, a group whose whole body is heading lines (`Article I`, `Chapter I`, `SCHEDULE 1 — SERVICES DESCRIPTION`) is folded into the group that starts with its first child, whatever their levels, provided the result still fits `max_chunk_size`. Such a chunk retrieves nothing on its own and displaces the clause it announces. The merged chunk is labelled by the child, starts at the heading's `char_start`, and carries the heading text in its body rather than as a prepended ancestor header; the absorbed identifier is recorded so `Schedule 1` and `Article I` references still resolve to it.
 
 The fallback chunker uses sentence-level splitting with a legal-abbreviation-aware sentence boundary detector (handles "U.S.C.", "F.3d.", "Ltd.", etc.).
 
@@ -68,7 +74,7 @@ Regex-based detection of legal cross-references ("Section 2.1", "Clause 5(a)", "
 
 **Class**: `lexichunk.enrichment.clause_type.ClauseTypeClassifier`
 
-Keyword-based scoring with 27 clause types (definitions, representations, warranties, indemnification, data protection, etc.). Position-aware: end-of-document clause types (governing law, assignment, etc.) receive a bonus when they appear past the 75% mark. Produces `clause_type`, `classification_confidence`, and `secondary_clause_type`.
+Keyword-based scoring with 31 clause types (definitions, representations, warranties, indemnification, data protection, etc.). Position-aware: end-of-document clause types (governing law, assignment, etc.) receive a bonus when they appear past the 75% mark. Produces `clause_type`, `classification_confidence`, and `secondary_clause_type`.
 
 ### Stage 5: Context Enrichment
 

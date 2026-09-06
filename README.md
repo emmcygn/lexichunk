@@ -94,7 +94,7 @@ Every call to `chunker.chunk()` returns a `list[LegalChunk]`. Each `LegalChunk` 
 | `hierarchy` | `HierarchyNode` | Clause position: `level`, `identifier`, `title`, `parent`. |
 | `hierarchy_path` | `str` | Human-readable path, e.g. `"Article VII > Section 7.2 > (a)"`. |
 | `document_section` | `DocumentSection` | High-level section: `PREAMBLE`, `DEFINITIONS`, `OPERATIVE`, `SCHEDULES`, `SIGNATURES`. |
-| `clause_type` | `ClauseType` | Classified type: `INDEMNIFICATION`, `CONFIDENTIALITY`, `TERMINATION`, `ACCEPTABLE_USE`, `USER_RESTRICTIONS`, `ACCOUNT_SECURITY`, etc. (27 types). |
+| `clause_type` | `ClauseType` | Classified type: `INDEMNIFICATION`, `CONFIDENTIALITY`, `TERMINATION`, `ACCEPTABLE_USE`, `USER_RESTRICTIONS`, `ACCOUNT_SECURITY`, etc. (31 types). |
 | `classification_confidence` | `float` | Relative dominance of the winning clause type among the types that scored — not a calibrated probability. |
 | `secondary_clause_type` | `ClauseType \| None` | The runner-up clause type, or `None` when fewer than two types scored. |
 | `jurisdiction` | `Jurisdiction` | `UK`, `US`, or `EU`. |
@@ -322,7 +322,7 @@ Raw Text → sanitize (BOM, CRLF, NFC)
     |
 3. Cross-ref Detection  Detect references (first pass, unresolved)
     |
-4. Clause Classifier    Keyword scoring → 27 clause types + confidence
+4. Clause Classifier    Keyword scoring → 31 clause types + confidence
     |
 5. Context Enricher     Generate Contextual Retrieval headers
     |
@@ -342,7 +342,7 @@ Raw Text → sanitize (BOM, CRLF, NFC)
 
 **Cross-ref Detection & Resolution** runs in two passes: first detects references, then resolves `target_chunk_index` after all chunks are created.
 
-**Clause Classifier** scores each chunk against 27 clause types using keyword signals with phrase-length weighting and position-aware bonuses.
+**Clause Classifier** scores each chunk against 31 clause types using keyword signals with phrase-length weighting and position-aware bonuses.
 
 **Term Extractor** scans the definitions section for patterns like `"[Term]" means`, `'the Company' means`, hereinafter, and inline parenthetical definitions. Attaches relevant terms to each chunk.
 
@@ -351,6 +351,16 @@ Raw Text → sanitize (BOM, CRLF, NFC)
 **Stats & Metrics** aggregates cross-reference resolution stats (`cross_ref_resolution_rate`, `cross_ref_stats`) for the call that just completed; see [docs/architecture.md](docs/architecture.md) for per-stage timing via `chunk_with_metrics()`.
 
 Zero mandatory dependencies — the core uses stdlib and `re` only.
+
+---
+
+## Known limitations
+
+- **Statute references are detected but never resolved.** `section 123 of the Insolvency Act 1986` and `Regulation (EU) 2016/679` produce a `CrossReference` with `target_chunk_index=None` by design: they point outside the document, and lexichunk resolves references only against the chunks it produced. Filter on `target_chunk_index is None` if you want to route them to an external citator.
+- **`classification_confidence` is not a probability.** It is the winning clause type's *relative dominance* among the types that scored, scaled down when the absolute evidence is thin (`(best / total) × min(1, best / 4.0)`). It is comparable between chunks of the same document but is not calibrated, so do not threshold it as if it were a model probability.
+- **Ambiguous cross-references stay unresolved.** When two chunks are equally plausible targets and neither the document section nor the top-level ancestor breaks the tie, `target_chunk_index` stays `None`. A wrong pointer is worse than no pointer.
+- **Offsets index the sanitised text, not your original string.** `char_start`/`char_end` refer to the text after BOM stripping, CRLF→LF normalisation and Unicode NFC normalisation. Call `LegalChunker.sanitize(text)` and slice *that* string, or compare against `chunk.content`.
+- **Clause typing is keyword-based.** There is no model behind it: unusual drafting, heavily defined-term-laden clauses, and short cross-referencing clauses commonly come back as `UNKNOWN`. Extend it with `extra_clause_signals=` rather than expecting coverage of every house style.
 
 ---
 
