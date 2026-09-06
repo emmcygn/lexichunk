@@ -7,6 +7,7 @@ Install extras:
 from __future__ import annotations
 
 import hashlib
+import re
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
 
 from ..chunker import LegalChunker
@@ -81,15 +82,68 @@ _STRUCTURAL_METADATA_KEYS: frozenset[str] = frozenset(
 #   hierarchy_identifier, context_header, defined_terms_used
 
 
+
+# A LlamaIndex ``Document`` that the caller did not give an id to gets one
+# from ``default_factory=lambda: str(uuid.uuid4())`` — a fresh random value on
+# every construction.  This matches the RFC 4122 version-4 shape, which is how
+# an auto-generated id is told apart from a caller-chosen one.
+_UUID4_RE = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+    re.IGNORECASE,
+)
+
+
+def _document_content(document: Any) -> str:
+    """Return *document*'s raw text, tolerating a non-LlamaIndex object."""
+    try:
+        return str(document.get_content(metadata_mode=_MetadataMode.NONE))
+    except Exception:
+        return str(getattr(document, "text", "") or "")
+
+
+def _stable_document_id(document: Any) -> str:
+    """Return a document identifier that is the same on every run.
+
+    The caller's own ``Document.id_`` is used when there is one.  When there
+    is not, LlamaIndex has already filled the field with a fresh
+    ``uuid.uuid4()``, and using that made the whole pipeline
+    non-deterministic: chunking the same text twice without supplying an
+    explicit ``document_id`` — the common call pattern, with nothing in the
+    API signalling that the argument is needed for reproducibility —
+    produced a different ``[Document: …]`` context header, different embed
+    text and a different ``node_id`` every time, so re-ingesting an unchanged
+    document duplicated every vector.
+
+    In that case the identifier is derived from a hash of the document's own
+    content instead, which is stable across runs and still distinguishes two
+    genuinely different documents.
+
+    Args:
+        document: The parent node/document.
+
+    Returns:
+        A stable document identifier string.
+    """
+    raw = getattr(document, "id_", None) or None
+    if isinstance(raw, str) and raw and _UUID4_RE.match(raw) is None:
+        return raw
+    digest = hashlib.sha256(
+        _document_content(document).encode("utf-8", errors="surrogatepass")
+    ).hexdigest()
+    return f"lexichunk-{digest[:32]}"
+
+
 def _deterministic_id_func(i: int, document: Any) -> str:
     """Deterministic node-id generator: hash of (doc id, doc content, split index).
 
     The base LlamaIndex ``default_id_func`` uses ``uuid.uuid4()``, so
     re-parsing identical input produces a brand-new, unrelated set of node
     ids on every run — which duplicates every vector on re-indexing an
-    unchanged corpus. This function instead hashes the parent document's own
-    identifier and content together with the split index, so parsing the
-    same document twice yields the same ``node_id`` for the same split.
+    unchanged corpus. This function instead hashes the parent document's
+    *stable* identifier (see :func:`_stable_document_id`) and content
+    together with the split index, so parsing the same document twice yields
+    the same ``node_id`` for the same split — including when the caller never
+    supplied an identifier of their own.
 
     Args:
         i: Index of the split within *document*.
@@ -99,11 +153,8 @@ def _deterministic_id_func(i: int, document: Any) -> str:
     Returns:
         A stable, hex-encoded SHA-256 digest string.
     """
-    doc_id = getattr(document, "id_", "") or ""
-    try:
-        content = document.get_content(metadata_mode=_MetadataMode.NONE)
-    except Exception:
-        content = getattr(document, "text", "") or ""
+    doc_id = _stable_document_id(document)
+    content = _document_content(document)
     digest_input = f"{doc_id}\x00{content}\x00{i}".encode("utf-8", errors="surrogatepass")
     return hashlib.sha256(digest_input).hexdigest()
 
@@ -168,6 +219,28 @@ class LegalNodeParser(_NodeParserBase):  # type: ignore[misc,valid-type]
             ``clause_type``, ``jurisdiction``, ``document_section``,
             ``hierarchy_path``, ``hierarchy_identifier``, ``context_header``
             and ``defined_terms_used`` are deliberately kept.
+
+    Note:
+        **Node ids and headers are deterministic.** A ``Document`` the caller
+        did not give an ``id_`` to arrives carrying a fresh ``uuid.uuid4()``
+        from LlamaIndex.  Using it would make ``node_id``, the
+        ``[Document: …]`` context header and therefore the embed text differ
+        on every run of the same input, duplicating every vector on
+        re-ingestion.  When ``Document.id_`` has that auto-generated shape and
+        no ``document_id`` was supplied, the identifier is derived from a hash
+        of the document's own content instead.  A caller-chosen ``id_`` always
+        wins.
+
+        **Offsets cover the clause body only.** ``start_char_idx`` and
+        ``end_char_idx`` are lexichunk's own ``char_start``/``char_end``: the
+        span of the clause's own text in the *sanitised* document.  A node's
+        ``.text`` may additionally begin with synthesized ancestor header
+        lines added for retrieval context, and those are not covered by any
+        offset — so ``sanitised[start_char_idx:end_char_idx]`` is a suffix of
+        ``.text`` for such a node, not the whole of it, and ``.text`` is not
+        guaranteed to be a literal substring of the source document.  This is
+        the same contract :class:`~lexichunk.models.LegalChunk` documents for
+        ``content`` versus ``char_start``/``char_end``.
 
     Raises:
         ImportError: If ``llama-index-core`` is not installed when the class
@@ -289,8 +362,19 @@ class LegalNodeParser(_NodeParserBase):  # type: ignore[misc,valid-type]
         all_nodes: List[Any] = []
         for doc in nodes:
             text = doc.get_content(metadata_mode=_MetadataMode.NONE)
-            doc_id = getattr(doc, "id_", None) or None
-            chunks = self._chunker.chunk(text, document_id=doc_id or self._document_id)
+            # A caller-chosen Document.id_ wins; then this parser's own
+            # document_id; then a content hash. The last step is what keeps
+            # context_header, embed text and node ids identical across runs
+            # when nobody supplied an identifier at all — LlamaIndex would
+            # otherwise have filled Document.id_ with a fresh uuid4.
+            raw_id = getattr(doc, "id_", None)
+            explicit_id = (
+                raw_id
+                if isinstance(raw_id, str) and raw_id and _UUID4_RE.match(raw_id) is None
+                else None
+            )
+            doc_id = explicit_id or self._document_id or _stable_document_id(doc)
+            chunks = self._chunker.chunk(text, document_id=doc_id)
             if not chunks:
                 continue
 

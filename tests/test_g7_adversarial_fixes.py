@@ -1139,3 +1139,68 @@ class TestH12ChunkBatchGeneratorErrors:
 
         result = self._chunker().chunk_batch(generator())
         assert result.errors == []
+
+
+@llama_index_required
+class TestH14LlamaIndexDeterminism:
+    """H14 — with no explicit ``document_id``, LlamaIndex had already filled
+    ``Document.id_`` with a fresh ``uuid4``, so ``context_header``, embed text
+    and ``node_id`` all differed on every run of the same input.
+    """
+
+    @staticmethod
+    def _source() -> str:
+        import pathlib
+
+        return (
+            pathlib.Path(__file__).parent / "fixtures" / "uk_service_agreement.txt"
+        ).read_text(encoding="utf-8")
+
+    @staticmethod
+    def _parser():
+        from lexichunk.integrations.llama_index import LegalNodeParser
+
+        return LegalNodeParser(jurisdiction="uk")
+
+    def _nodes(self, **document_kwargs):
+        from llama_index.core.schema import Document
+
+        return self._parser().get_nodes_from_documents(
+            [Document(text=self._source(), **document_kwargs)]
+        )
+
+    def test_node_ids_are_stable_across_runs(self) -> None:
+        assert [n.node_id for n in self._nodes()] == [
+            n.node_id for n in self._nodes()
+        ]
+
+    def test_context_headers_are_stable_across_runs(self) -> None:
+        first = [n.metadata.get("context_header") for n in self._nodes()]
+        second = [n.metadata.get("context_header") for n in self._nodes()]
+        assert first == second
+        assert first[0]
+
+    def test_embed_text_is_stable_across_runs(self) -> None:
+        from llama_index.core.schema import MetadataMode
+
+        first = [n.get_content(metadata_mode=MetadataMode.EMBED) for n in self._nodes()]
+        second = [n.get_content(metadata_mode=MetadataMode.EMBED) for n in self._nodes()]
+        assert first == second
+
+    def test_an_explicit_document_id_still_wins(self) -> None:
+        nodes = self._nodes(id_="msa-2024")
+        assert "[Document: msa-2024]" in nodes[0].metadata["context_header"]
+
+    def test_different_documents_get_different_identifiers(self) -> None:
+        from llama_index.core.schema import Document
+
+        parser = self._parser()
+        one = parser.get_nodes_from_documents([Document(text=self._source())])
+        two = parser.get_nodes_from_documents(
+            [Document(text=self._source() + "\n\n9. Extra\n\nMore body text.\n")]
+        )
+        assert one[0].metadata["context_header"] != two[0].metadata["context_header"]
+
+    def test_the_derived_identifier_is_not_a_uuid(self) -> None:
+        header = self._nodes()[0].metadata["context_header"]
+        assert "[Document: lexichunk-" in header
