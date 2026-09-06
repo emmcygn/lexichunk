@@ -999,3 +999,143 @@ class TestH9ScheduleScopedRedefinition:
         ]
         assert contexts
         assert len(set(contexts)) == 1
+
+
+class TestH10SizeGuardBeforeSanitisation:
+    """H10 — the guard ran on the *post-sanitise* string, so any content that
+    sanitises away bypassed it, and the cost of the sanitisation pass itself
+    was unbounded.
+    """
+
+    @staticmethod
+    def _chunker():
+        from lexichunk import LegalChunker
+
+        return LegalChunker(jurisdiction="uk")
+
+    def test_oversized_input_that_sanitises_to_nothing_is_rejected(self) -> None:
+        from lexichunk.exceptions import InputError
+
+        with pytest.raises(InputError):
+            self._chunker().chunk("\ufeff" * 15_000_000)
+
+    def test_oversized_plain_input_is_still_rejected(self) -> None:
+        from lexichunk.exceptions import InputError
+
+        with pytest.raises(InputError):
+            self._chunker().chunk("a" * 11_000_000)
+
+    def test_get_defined_terms_guard_also_runs_first(self) -> None:
+        from lexichunk.exceptions import InputError
+
+        with pytest.raises(InputError):
+            self._chunker().get_defined_terms("\ufeff" * 15_000_000)
+
+    def test_parse_structure_guard_also_runs_first(self) -> None:
+        from lexichunk.exceptions import InputError
+
+        with pytest.raises(InputError):
+            self._chunker().parse_structure("\ufeff" * 15_000_000)
+
+    def test_ordinary_input_is_unaffected(self) -> None:
+        assert self._chunker().chunk("1. Scope\n\nSome ordinary body text.\n")
+
+
+class TestH11ChunkBatchRejectsMappings:
+    """H11 — iterating a dict yields its keys, so
+    ``chunk_batch({"doc1": text1})`` chunked the string ``"doc1"`` and never
+    read the document, returning a normal-looking result with ``errors=[]``.
+    """
+
+    @staticmethod
+    def _chunker():
+        from lexichunk import LegalChunker
+
+        return LegalChunker(jurisdiction="uk")
+
+    def test_dict_input_raises_input_error(self) -> None:
+        from lexichunk.exceptions import InputError
+
+        with pytest.raises(InputError) as excinfo:
+            self._chunker().chunk_batch({"doc1": "a" * 200, "doc2": "b" * 200})
+        assert "values()" in str(excinfo.value)
+
+    def test_other_mapping_types_are_rejected_too(self) -> None:
+        import types
+
+        from lexichunk.exceptions import InputError
+
+        with pytest.raises(InputError):
+            self._chunker().chunk_batch(
+                types.MappingProxyType({"doc1": "a" * 200})
+            )
+
+    def test_values_view_is_accepted(self) -> None:
+        mapping = {"doc1": "1. A\n\nSome body text.\n", "doc2": "1. B\n\nMore body.\n"}
+        result = self._chunker().chunk_batch(mapping.values())
+        assert len(result.results) == 2
+        assert result.errors == []
+
+    def test_items_view_is_accepted_as_text_id_pairs(self) -> None:
+        mapping = {"1. A\n\nSome body text.\n": "doc1"}
+        result = self._chunker().chunk_batch(mapping.items())
+        assert len(result.results) == 1
+        assert result.errors == []
+
+    def test_lists_and_generators_are_still_accepted(self) -> None:
+        chunker = self._chunker()
+        documents = ["1. A\n\nSome body text.\n", "1. B\n\nMore body text.\n"]
+        assert len(chunker.chunk_batch(documents).results) == 2
+        assert len(chunker.chunk_batch(iter(documents)).results) == 2
+
+
+class TestH12ChunkBatchGeneratorErrors:
+    """H12 — a generator that raised partway through propagated straight out
+    of ``chunk_batch``, breaking its own documented "errors do not halt the
+    batch" guarantee.
+    """
+
+    @staticmethod
+    def _chunker():
+        from lexichunk import LegalChunker
+
+        return LegalChunker(jurisdiction="uk")
+
+    @staticmethod
+    def _raising_generator():
+        yield "1. A\n\nSome body text for the first clause.\n"
+        yield "1. B\n\nSome body text for the second clause.\n"
+        raise RuntimeError("boom")
+
+    def test_raising_generator_does_not_propagate(self) -> None:
+        result = self._chunker().chunk_batch(self._raising_generator())
+        assert len(result.results) == 2
+
+    def test_failure_is_recorded_as_a_batch_error(self) -> None:
+        result = self._chunker().chunk_batch(self._raising_generator())
+        assert len(result.errors) == 1
+        error = result.errors[0]
+        assert error.index == 2
+        assert error.error_type == "RuntimeError"
+        assert "boom" in error.error
+
+    def test_documents_yielded_before_the_failure_are_chunked(self) -> None:
+        result = self._chunker().chunk_batch(self._raising_generator())
+        assert all(chunks for chunks in result.results)
+
+    def test_generator_that_raises_immediately_yields_only_the_error(self) -> None:
+        def generator():
+            raise ValueError("nope")
+            yield ""  # pragma: no cover
+
+        result = self._chunker().chunk_batch(generator())
+        assert result.results == []
+        assert len(result.errors) == 1
+        assert result.errors[0].error_type == "ValueError"
+
+    def test_a_clean_generator_still_reports_no_errors(self) -> None:
+        def generator():
+            yield "1. A\n\nSome body text.\n"
+
+        result = self._chunker().chunk_batch(generator())
+        assert result.errors == []

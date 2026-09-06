@@ -351,6 +351,20 @@ class LegalChunker:
         pipeline_start = time.perf_counter() if collect_metrics else 0.0
         stage_metrics: list[StageMetric] = []
 
+        # The size guard runs on the *raw* input, before sanitisation. Running
+        # it afterwards defeated its documented purpose for any content that
+        # sanitises away — 15,000,000 BOM characters normalise to '' and were
+        # accepted with no InputError — and, more importantly, left the cost of
+        # the regex-based sanitisation pass itself unbounded: a caller could
+        # force an arbitrarily large string through it before any size check
+        # ran. _MAX_INPUT_CHARS is meant to be usable as a sizing contract for
+        # an HTTP endpoint, which requires it to bound the raw input.
+        if len(text) > self._MAX_INPUT_CHARS:
+            raise InputError(
+                f"Input text too large ({len(text)} chars). "
+                f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
+            )
+
         text = self._sanitize_input(text)
 
         if not text or not text.strip():
@@ -369,12 +383,6 @@ class LegalChunker:
             return [], None
 
         input_chars = len(text)
-
-        if input_chars > self._MAX_INPUT_CHARS:
-            raise InputError(
-                f"Input text too large ({input_chars} chars). "
-                f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
-            )
 
         jur_label = (
             self._jurisdiction.value
@@ -700,14 +708,15 @@ class LegalChunker:
             raise InputError(
                 f"Expected str, got {type(text).__name__}."
             )
-        text = self._sanitize_input(text)
-        if not text or not text.strip():
-            return {}
+        # Size guard on the raw input, before sanitisation: see _run_pipeline.
         if len(text) > self._MAX_INPUT_CHARS:
             raise InputError(
                 f"Input text too large ({len(text)} chars). "
                 f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
             )
+        text = self._sanitize_input(text)
+        if not text or not text.strip():
+            return {}
         return self._definitions_extractor.extract(text)
 
     def parse_structure(self, text: str) -> list[HierarchyNode]:
@@ -736,14 +745,15 @@ class LegalChunker:
             raise InputError(
                 f"Expected str, got {type(text).__name__}."
             )
-        text = self._sanitize_input(text)
-        if not text or not text.strip():
-            return []
+        # Size guard on the raw input, before sanitisation: see _run_pipeline.
         if len(text) > self._MAX_INPUT_CHARS:
             raise InputError(
                 f"Input text too large ({len(text)} chars). "
                 f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
             )
+        text = self._sanitize_input(text)
+        if not text or not text.strip():
+            return []
         return self._structure_parser.parse_structure(text)
 
     def chunk_iter(
@@ -811,6 +821,10 @@ class LegalChunker:
         Any iterable is accepted (not just a list) and is materialised
         exactly once — including a generator, which today only worked "by
         accident" and is now a deliberate, documented part of the contract.
+        A generator that *raises* partway through is covered by the same
+        "errors do not halt the batch" guarantee: the documents it already
+        yielded are chunked normally and the failure is recorded as one
+        :class:`~lexichunk.models.BatchError` at the index it stopped on.
 
         Args:
             texts: An iterable of documents to chunk.  **Not** a bare
@@ -819,6 +833,12 @@ class LegalChunker:
                 is itself an iterable of one-character strings, which
                 would otherwise silently chunk it one character at a
                 time). Pass ``chunk_batch([text])`` for a single document.
+                A ``dict`` (or any ``Mapping``) is rejected for the same
+                reason: iterating one yields its *keys*, so
+                ``chunk_batch({"doc1": text1})`` would chunk the string
+                ``"doc1"`` and never look at the document. Pass
+                ``mapping.values()``, or ``mapping.items()`` to use the
+                keys as document ids.
             workers: Number of parallel worker **processes**. ``None``
                 (the default) picks ``min(cpu_count, len(texts))``. When
                 *workers* is 1, or the batch has 2 or fewer documents,
@@ -833,8 +853,8 @@ class LegalChunker:
             chunk lists and any errors.
 
         Raises:
-            InputError: If *texts* is a ``str``/``bytes``/``bytearray``, or
-                is not iterable at all.
+            InputError: If *texts* is a ``str``/``bytes``/``bytearray``, a
+                ``Mapping``, or is not iterable at all.
             ConfigurationError: If *workers* is not an ``int`` or is ``< 1``;
                 or if a custom (non-built-in) jurisdiction is used with
                 effective parallel processing, since custom registrations
@@ -868,12 +888,42 @@ class LegalChunker:
                 f"chunk_batch() expects a sequence of documents, got "
                 f"{type(texts).__name__}. Did you mean chunk_batch([text])?"
             )
+        if isinstance(texts, Mapping):
+            # Iterating a Mapping yields its *keys*, so
+            # chunk_batch({"doc1": text1, "doc2": text2}) — an inviting call —
+            # silently chunked the two short key strings and never touched the
+            # documents in the values, returning a normal-looking BatchResult
+            # with errors=[]. Which half the caller meant is genuinely
+            # ambiguous, so reject it rather than guess.
+            raise InputError(
+                f"chunk_batch() expects a sequence of documents, got "
+                f"{type(texts).__name__}. Iterating a mapping yields its keys; "
+                f"pass chunk_batch(mapping.values()), or "
+                f"chunk_batch(mapping.items()) for (text, doc_id) pairs."
+            )
         if not isinstance(texts, Iterable):
             raise InputError(
                 f"chunk_batch() expects an iterable of documents, got "
                 f"{type(texts).__name__}."
             )
-        items = list(texts)  # materialise generators exactly once
+        # Materialise generators exactly once, element by element rather than
+        # with list(), so a generator that raises partway through does not
+        # discard everything it already yielded. The documented contract is
+        # that a failure is reported per index in BatchResult.errors and does
+        # not halt the batch; before this, a raising generator propagated its
+        # exception straight out of chunk_batch(), unlike every other kind of
+        # per-document failure.
+        items: list[Any] = []
+        iteration_error: Exception | None = None
+        try:
+            for item in texts:
+                items.append(item)
+        except Exception as exc:  # noqa: BLE001 - recorded, not swallowed
+            logger.warning(
+                "chunk_batch() input iterable raised after %d item(s): %s",
+                len(items), exc,
+            )
+            iteration_error = exc
 
         # Validate `workers` before any other work, per the documented
         # contract — a bad value should fail fast, not after partially
@@ -887,7 +937,13 @@ class LegalChunker:
                 raise ConfigurationError(f"workers ({workers}) must be >= 1")
 
         if not items:
-            return BatchResult(results=[], errors=[])
+            return BatchResult(
+                results=[],
+                errors=(
+                    [] if iteration_error is None
+                    else [_iteration_error(items, iteration_error)]
+                ),
+            )
 
         # Normalize inputs to (text, doc_id) pairs with validation.
         pairs: list[tuple[str, str | None]] = []
@@ -961,6 +1017,8 @@ class LegalChunker:
 
         # Merge early validation errors.
         result.errors.extend(early_errors)
+        if iteration_error is not None:
+            result.errors.append(_iteration_error(items, iteration_error))
         return result
 
     # ------------------------------------------------------------------
@@ -1249,6 +1307,25 @@ def _validate_config(
             validated_signals[key] = signals
 
     return validated_abbreviations, validated_signals
+
+
+def _iteration_error(items: list[Any], exc: Exception) -> BatchError:
+    """Build the synthetic :class:`BatchError` for a raising input iterable.
+
+    Args:
+        items: The documents successfully drawn from the iterable before it
+            raised; its length is the index the failure is reported at.
+        exc: The exception the iterable raised.
+
+    Returns:
+        A :class:`BatchError` describing the iteration failure.
+    """
+    return BatchError(
+        index=len(items),
+        text_preview="<input iterable>",
+        error=f"Input iterable raised after {len(items)} item(s): {exc}",
+        error_type=type(exc).__qualname__,
+    )
 
 
 def _container_key(chunk: LegalChunk) -> str:
