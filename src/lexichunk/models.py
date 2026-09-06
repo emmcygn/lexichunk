@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional, Protocol, runtime_checkable
 
+from .exceptions import ParsingError
+
 
 @runtime_checkable
 class JurisdictionPatterns(Protocol):
@@ -210,6 +212,59 @@ class LegalChunk:
     char_end: int = 0
     token_count: int = 0
     original_header: str = ""
+
+    def __post_init__(self) -> None:
+        """Enforce per-chunk structural invariants.
+
+        These four checks hold for every chunk the pipeline produces today;
+        a violation indicates an internal pipeline bug (not caller error),
+        so :class:`~lexichunk.exceptions.ParsingError` is raised rather than
+        ``ValueError`` directly (``ParsingError`` still subclasses
+        ``ValueError`` for backward-compatible ``except`` handling).
+
+        Note this checks only *per-chunk* invariants. Cross-chunk properties
+        (e.g. that chunk spans do not overlap) are not enforced here — they
+        are cross-chunk properties belonging in the test suite, and enforcing
+        them at construction time would crash on real, already-shipped
+        fixtures.
+        """
+        if self.index < 0:
+            raise ParsingError(f"LegalChunk.index must be >= 0, got {self.index}")
+        if self.char_start < 0:
+            raise ParsingError(
+                f"LegalChunk.char_start must be >= 0, got {self.char_start}"
+            )
+        if self.char_end < self.char_start:
+            raise ParsingError(
+                f"LegalChunk.char_end ({self.char_end}) must be >= "
+                f"char_start ({self.char_start})"
+            )
+        if not 0.0 <= self.classification_confidence <= 1.0:
+            raise ParsingError(
+                f"LegalChunk.classification_confidence must be in [0.0, 1.0], "
+                f"got {self.classification_confidence}"
+            )
+        if self.cross_ref_resolved > self.cross_ref_total:
+            raise ParsingError(
+                f"LegalChunk.cross_ref_resolved ({self.cross_ref_resolved}) "
+                f"cannot exceed cross_ref_total ({self.cross_ref_total})"
+            )
+
+    @property
+    def jurisdiction_value(self) -> str:
+        """The jurisdiction as a plain string.
+
+        Returns ``jurisdiction.value`` when ``jurisdiction`` is a
+        :class:`Jurisdiction` enum member, or the jurisdiction string itself
+        when it is a custom key registered via
+        :func:`~lexichunk.jurisdiction.register_jurisdiction`. Use this
+        instead of the ``x.value if isinstance(x, Enum) else x`` dance.
+        """
+        return (
+            self.jurisdiction.value
+            if isinstance(self.jurisdiction, Enum)
+            else self.jurisdiction
+        )
 
     def to_dict(self) -> dict[str, Any]:
         """Return a plain, ``json.dumps``-able dict representation.

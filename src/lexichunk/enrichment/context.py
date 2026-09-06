@@ -17,8 +17,6 @@ Typical usage::
 
 from __future__ import annotations
 
-from enum import Enum
-
 from ..models import ClauseType, LegalChunk
 
 # ---------------------------------------------------------------------------
@@ -79,8 +77,7 @@ def generate_context_header(chunk: LegalChunk) -> str:
 
     segments.append(f"[Section: {chunk.hierarchy_path}]")
     segments.append(f"[Type: {_format_clause_type(chunk.clause_type)}]")
-    jur = chunk.jurisdiction.value if isinstance(chunk.jurisdiction, Enum) else chunk.jurisdiction
-    segments.append(f"[Jurisdiction: {jur.upper()}]")
+    segments.append(f"[Jurisdiction: {chunk.jurisdiction_value.upper()}]")
 
     return " ".join(segments)
 
