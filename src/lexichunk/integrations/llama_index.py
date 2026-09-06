@@ -6,30 +6,50 @@ Install extras:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+import hashlib
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
 
 from ..chunker import LegalChunker
 from ..models import Jurisdiction
+from ..utils import build_metadata as _build_metadata
 
 if TYPE_CHECKING:
+    from llama_index.core.schema import BaseNode as _BaseNode
     from llama_index.core.schema import Document as _LIDocument
     from llama_index.core.schema import TextNode as _LITextNode
-
-    from ..models import LegalChunk
 
 # ---------------------------------------------------------------------------
 # Optional dependency probe
 # ---------------------------------------------------------------------------
 
 _LLAMA_INDEX_AVAILABLE = False
-_TextNode: Any = None
 _LlamaDocument: Any = None
+_NodeParserBase: Any = object
+_build_nodes_from_splits: Any = None
+_MetadataMode: Any = None
+_TextNode: Any = None
+
+
+def _fallback_private_attr(*_args: Any, **_kwargs: Any) -> Any:
+    """No-op stand-in for pydantic's ``PrivateAttr`` when llama-index is absent."""
+    return None
+
+
+_PrivateAttr: Any = _fallback_private_attr
 
 try:
-    from llama_index.core.schema import (  # type: ignore[assignment,no-redef]  # noqa: F401
-        Document as _LlamaDocument,
+    # Import order kept as-is (not collapsed to one multi-line import) so each
+    # `# type: ignore` comment stays attached to its own `from` line — mypy
+    # requires the ignore on that exact line, not on the aliased name inside
+    # a parenthesised multi-import block.
+    from llama_index.core.bridge.pydantic import PrivateAttr as _PrivateAttr  # type: ignore[assignment,no-redef]  # noqa: I001
+    from llama_index.core.node_parser import NodeParser as _NodeParserBase  # type: ignore[assignment,no-redef]  # noqa: I001
+    from llama_index.core.node_parser.node_utils import (  # type: ignore[assignment,no-redef]
+        build_nodes_from_splits as _build_nodes_from_splits,
     )
-    from llama_index.core.schema import TextNode as _TextNode  # type: ignore[assignment,no-redef]
+    from llama_index.core.schema import Document as _LlamaDocument  # type: ignore[assignment,no-redef]  # noqa: F401,I001
+    from llama_index.core.schema import MetadataMode as _MetadataMode  # type: ignore[assignment,no-redef]  # noqa: I001
+    from llama_index.core.schema import TextNode as _TextNode  # type: ignore[assignment,no-redef]  # noqa: I001
 
     _LLAMA_INDEX_AVAILABLE = True
 except ImportError:
@@ -37,22 +57,82 @@ except ImportError:
 
 
 # ---------------------------------------------------------------------------
+# Structural metadata keys — excluded from embedding/LLM text by default
+# ---------------------------------------------------------------------------
+
+_STRUCTURAL_METADATA_KEYS: frozenset[str] = frozenset(
+    {
+        "char_start",
+        "char_end",
+        "chunk_index",
+        "cross_references",
+        "cross_ref_total",
+        "cross_ref_resolved",
+        "hierarchy_level",
+        "token_count",
+        "original_header",
+        "classification_confidence",
+        "secondary_clause_type",
+        "document_id",
+    }
+)
+# Deliberately KEPT in the embedding / LLM text — these are semantically useful:
+#   clause_type, jurisdiction, document_section, hierarchy_path,
+#   hierarchy_identifier, context_header, defined_terms_used
+
+
+def _deterministic_id_func(i: int, document: Any) -> str:
+    """Deterministic node-id generator: hash of (doc id, doc content, split index).
+
+    The base LlamaIndex ``default_id_func`` uses ``uuid.uuid4()``, so
+    re-parsing identical input produces a brand-new, unrelated set of node
+    ids on every run — which duplicates every vector on re-indexing an
+    unchanged corpus. This function instead hashes the parent document's own
+    identifier and content together with the split index, so parsing the
+    same document twice yields the same ``node_id`` for the same split.
+
+    Args:
+        i: Index of the split within *document*.
+        document: The parent node/document being split (passed by
+            ``build_nodes_from_splits``, not the split text itself).
+
+    Returns:
+        A stable, hex-encoded SHA-256 digest string.
+    """
+    doc_id = getattr(document, "id_", "") or ""
+    try:
+        content = document.get_content(metadata_mode=_MetadataMode.NONE)
+    except Exception:
+        content = getattr(document, "text", "") or ""
+    digest_input = f"{doc_id}\x00{content}\x00{i}".encode("utf-8", errors="surrogatepass")
+    return hashlib.sha256(digest_input).hexdigest()
+
+
+# ---------------------------------------------------------------------------
 # Public class
 # ---------------------------------------------------------------------------
 
 
-class LegalNodeParser:
-    """LlamaIndex-compatible node parser for legal documents.
+class LegalNodeParser(_NodeParserBase):  # type: ignore[misc,valid-type]
+    """LlamaIndex ``NodeParser`` for legal documents.
 
     Wraps :class:`~lexichunk.chunker.LegalChunker` and returns
     ``llama_index.core.schema.TextNode`` objects with rich legal metadata
     attached to each node's ``metadata`` dict.
 
-    This class does **not** inherit from ``NodeParser`` in order to avoid a
-    hard dependency on LlamaIndex at import time.  It is duck-type compatible
-    with the LlamaIndex node-parser protocol: any pipeline that accepts a list
-    of ``TextNode`` objects will work with the output of
-    :meth:`get_nodes_from_documents` and :meth:`get_nodes_from_text`.
+    Subclassing ``llama_index.core.node_parser.NodeParser`` (rather than
+    duck-typing) means this parser gets, for free, from the base class:
+
+    - ``NodeRelationship.SOURCE`` / ``ref_doc_id`` — provenance back to the
+      parent ``Document``.
+    - ``NodeRelationship.PREVIOUS`` / ``NEXT`` sibling relationships (when
+      ``include_prev_next_rel`` is ``True``).
+    - Parent ``Document.metadata`` merge into each node's metadata (when
+      ``include_metadata`` is ``True``).
+    - ``id_func``-based node id assignment.
+
+    These are required for LlamaIndex features such as auto-merging
+    retrievers, sentence-window expansion, and provenance tracing.
 
     Args:
         jurisdiction: Legal jurisdiction — ``"uk"`` or ``"us"`` (or a
@@ -68,6 +148,22 @@ class LegalNodeParser:
             definitions to each chunk.  Defaults to ``True``.
         include_context_header: When ``True``, populate the
             ``context_header`` field on every chunk.  Defaults to ``True``.
+        document_id: Default document identifier passed to the chunker when
+            a parsed ``Document`` has no usable ``id_``.
+        include_defined_terms_context: When ``True``, also emit
+            ``defined_terms_context`` in each node's metadata.  See
+            :func:`~lexichunk.utils.build_metadata`.
+        flatten_metadata: When ``True``, JSON-encode non-scalar metadata
+            values to strings, for vector stores that only accept scalar
+            metadata.
+        excluded_embed_metadata_keys: Metadata keys to exclude from both the
+            embedding and LLM text of every produced node, in addition to
+            each source document's own exclusions. Defaults to a structural
+            set (offsets, counts, cross-references, …) that would otherwise
+            add ~40% noise to embedding text with no retrieval value;
+            ``clause_type``, ``jurisdiction``, ``document_section``,
+            ``hierarchy_path``, ``hierarchy_identifier``, ``context_header``
+            and ``defined_terms_used`` are deliberately kept.
 
     Raises:
         ImportError: If ``llama-index-core`` is not installed when the class
@@ -75,13 +171,21 @@ class LegalNodeParser:
 
     Example::
 
+        from llama_index.core.schema import Document
         from lexichunk.integrations.llama_index import LegalNodeParser
 
         parser = LegalNodeParser(jurisdiction="uk")
-        nodes = parser.get_nodes_from_text(contract_text)
+        nodes = parser.get_nodes_from_documents([Document(text=contract_text)])
         for node in nodes:
             print(node.metadata["clause_type"], node.metadata["hierarchy_path"])
     """
+
+    _chunker: Any = _PrivateAttr()
+    _document_id: Optional[str] = _PrivateAttr()
+    _include_defined_terms_context: bool = _PrivateAttr()
+    _flatten_metadata: bool = _PrivateAttr()
+    _excluded_metadata_keys: frozenset[str] = _PrivateAttr()
+    _offset_overrides: Dict[str, tuple[int, int]] = _PrivateAttr(default_factory=dict)
 
     def __init__(
         self,
@@ -91,12 +195,26 @@ class LegalNodeParser:
         min_chunk_size: int = 64,
         include_definitions: bool = True,
         include_context_header: bool = True,
+        *,
+        document_id: str | None = None,
+        include_defined_terms_context: bool = False,
+        flatten_metadata: bool = False,
+        excluded_embed_metadata_keys: Sequence[str] | None = None,
+        include_metadata: bool = True,
+        include_prev_next_rel: bool = True,
+        id_func: Any = None,
     ) -> None:
         if not _LLAMA_INDEX_AVAILABLE:
             raise ImportError(
                 "LegalNodeParser requires 'llama-index-core'. "
                 "Install it with: pip install lexichunk[llama-index]"
             )
+
+        super().__init__(
+            include_metadata=include_metadata,
+            include_prev_next_rel=include_prev_next_rel,
+            id_func=id_func or _deterministic_id_func,
+        )
 
         self._chunker = LegalChunker(
             jurisdiction=jurisdiction,
@@ -106,60 +224,25 @@ class LegalNodeParser:
             include_definitions=include_definitions,
             include_context_header=include_context_header,
         )
+        self._document_id = document_id
+        self._include_defined_terms_context = include_defined_terms_context
+        self._flatten_metadata = flatten_metadata
+        self._excluded_metadata_keys = (
+            frozenset(excluded_embed_metadata_keys)
+            if excluded_embed_metadata_keys is not None
+            else _STRUCTURAL_METADATA_KEYS
+        )
+        self._offset_overrides = {}
 
     # ------------------------------------------------------------------
-    # Primary public API
+    # Convenience API
     # ------------------------------------------------------------------
 
-    def get_nodes_from_documents(self, documents: list[_LIDocument]) -> list[_LITextNode]:
-        """Parse a list of LlamaIndex ``Document`` objects into ``TextNode`` objects.
-
-        Accepts any object that exposes either a ``.text`` attribute or a
-        ``.get_content()`` method (the standard LlamaIndex ``Document``
-        interface).  Runs the full :class:`~lexichunk.chunker.LegalChunker`
-        pipeline for each document and converts every
-        :class:`~lexichunk.models.LegalChunk` into a ``TextNode`` with a
-        structured ``metadata`` dict.
-
-        Args:
-            documents: List of LlamaIndex ``Document`` (or compatible) objects
-                to parse.
-
-        Returns:
-            Flat list of ``llama_index.core.schema.TextNode`` objects in
-            document order.  Each node's ``metadata`` contains the following
-            keys:
-
-            - ``clause_type`` (str): Clause type enum value.
-            - ``jurisdiction`` (str): Jurisdiction enum value.
-            - ``document_section`` (str): Document section enum value.
-            - ``hierarchy_path`` (str): Dot-separated clause hierarchy path.
-            - ``hierarchy_identifier`` (str): Clause identifier (e.g. ``"1.2"``).
-            - ``hierarchy_level`` (int): Depth in the clause hierarchy.
-            - ``cross_references`` (list[dict]): Detected cross-references.
-            - ``defined_terms_used`` (list[str]): Defined terms appearing in
-              the chunk.
-            - ``context_header`` (str): Contextual Retrieval header.
-            - ``char_start`` (int): Start character offset in the source text.
-            - ``char_end`` (int): End character offset in the source text.
-            - ``chunk_index`` (int): Zero-based position among all chunks.
-            - ``document_id`` (str | None): Document identifier, if set.
-
-        Raises:
-            AttributeError: If a document in *documents* exposes neither a
-                ``.text`` attribute nor a ``.get_content()`` method.
-        """
-        nodes: list[_LITextNode] = []
-        for document in documents:
-            text = _extract_text(document)
-            nodes.extend(self._nodes_from_text(text))
-        return nodes
-
-    def get_nodes_from_text(self, text: str) -> list[_LITextNode]:
+    def get_nodes_from_text(self, text: str) -> List[_LITextNode]:
         """Parse a plain-text legal document into a list of ``TextNode`` objects.
 
         Convenience method that does not require wrapping the input in a
-        LlamaIndex ``Document``.
+        LlamaIndex ``Document`` first.
 
         Args:
             text: Full legal document as a plain-text string.
@@ -168,71 +251,101 @@ class LegalNodeParser:
             List of ``llama_index.core.schema.TextNode`` objects in document
             order with legal metadata populated.
         """
-        return self._nodes_from_text(text)
+        kwargs: dict[str, Any] = {"text": text}
+        if self._document_id:
+            kwargs["doc_id"] = self._document_id
+        document = _LlamaDocument(**kwargs)
+        return self.get_nodes_from_documents([document])  # type: ignore[no-any-return]
 
     # ------------------------------------------------------------------
-    # Internal helpers
+    # NodeParser interface
     # ------------------------------------------------------------------
 
-    def _nodes_from_text(self, text: str) -> list[_LITextNode]:
-        """Run the chunker and convert results to ``TextNode`` objects.
+    def _parse_nodes(
+        self,
+        nodes: Sequence[_BaseNode],
+        show_progress: bool = False,
+        **kwargs: Any,
+    ) -> List[_BaseNode]:
+        """Chunk each input document and build ``TextNode`` objects.
+
+        Uses ``build_nodes_from_splits`` so ``NodeRelationship.SOURCE``,
+        ``ref_doc_id``, and (later, in ``_postprocess_parsed_nodes``) the
+        parent-metadata merge and ``PREVIOUS``/``NEXT`` relationships are all
+        produced by the base class.
 
         Args:
-            text: Full legal document as a plain-text string.
+            nodes: Sequence of parent ``Document``/``BaseNode`` objects.
+            show_progress: Unused; accepted for interface compatibility.
+            **kwargs: Unused; accepted for interface compatibility.
 
         Returns:
-            List of ``llama_index.core.schema.TextNode`` instances.
+            Flat list of ``TextNode`` objects across all input documents.
         """
-        chunks = self._chunker.chunk(text)
-        return [_chunk_to_text_node(chunk) for chunk in chunks]
+        all_nodes: List[Any] = []
+        for doc in nodes:
+            text = doc.get_content(metadata_mode=_MetadataMode.NONE)
+            doc_id = getattr(doc, "id_", None) or None
+            chunks = self._chunker.chunk(text, document_id=doc_id or self._document_id)
+            if not chunks:
+                continue
 
+            splits = [chunk.content for chunk in chunks]
+            built = _build_nodes_from_splits(splits, doc, ref_doc=doc, id_func=self.id_func)
 
-# ---------------------------------------------------------------------------
-# Module-level helpers
-# ---------------------------------------------------------------------------
+            for node, chunk in zip(built, chunks):
+                node.metadata.update(
+                    _build_metadata(
+                        chunk,
+                        include_defined_terms_context=self._include_defined_terms_context,
+                        flatten=self._flatten_metadata,
+                    )
+                )
+                # Explicit offsets from the chunker. `_postprocess_parsed_nodes`
+                # (called after this method returns) recomputes start/end char
+                # idx via `parent_doc.text.find(node_content)`, which returns -1
+                # whenever `chunk.content` isn't a verbatim substring of the raw
+                # document text (true whenever ancestor headers are prepended,
+                # or whitespace was normalised during sanitisation) — in that
+                # case it leaves our values alone. When `find()` *does* succeed
+                # it would silently overwrite these with raw-text offsets, which
+                # can disagree with lexichunk's (sanitised-text) offsets — so we
+                # stash the intended values and restore them, unconditionally,
+                # in our `_postprocess_parsed_nodes` override below.
+                node.start_char_idx = chunk.char_start
+                node.end_char_idx = chunk.char_end
+                self._offset_overrides[node.node_id] = (chunk.char_start, chunk.char_end)
 
+                node.excluded_embed_metadata_keys = sorted(
+                    set(node.excluded_embed_metadata_keys or []) | self._excluded_metadata_keys
+                )
+                node.excluded_llm_metadata_keys = sorted(
+                    set(node.excluded_llm_metadata_keys or []) | self._excluded_metadata_keys
+                )
 
-def _extract_text(document: _LIDocument) -> str:
-    """Extract the raw text from a LlamaIndex-compatible document object.
+            all_nodes.extend(built)
+        return all_nodes
 
-    Attempts ``.text`` first (direct attribute access), then falls back to
-    calling ``.get_content()`` (the LlamaIndex ``BaseNode`` interface).
+    def _postprocess_parsed_nodes(
+        self, nodes: List[_BaseNode], parent_doc_map: Dict[str, _LIDocument]
+    ) -> List[_BaseNode]:
+        """Restore lexichunk's char offsets after the base class post-processes nodes.
 
-    Args:
-        document: A LlamaIndex ``Document`` or any object with a ``.text``
-            attribute or ``.get_content()`` method.
+        See the caveat in :meth:`_parse_nodes`: the base implementation may
+        overwrite ``start_char_idx``/``end_char_idx`` when it manages to find
+        the node's text verbatim in the parent document. This override pins
+        lexichunk's own (sanitised-text) offsets back in place unconditionally.
 
-    Returns:
-        The document's text content as a plain string.
+        Args:
+            nodes: Nodes produced by ``_parse_nodes``.
+            parent_doc_map: Map of ``ref_doc_id`` to parent ``Document``.
 
-    Raises:
-        AttributeError: If *document* exposes neither ``.text`` nor
-            ``.get_content()``.
-    """
-    if hasattr(document, "text"):
-        return document.text  # type: ignore[no-any-return]
-    if hasattr(document, "get_content"):
-        return document.get_content()  # type: ignore[no-any-return]
-    raise AttributeError(
-        f"Document of type {type(document).__name__!r} has neither a '.text' "
-        "attribute nor a '.get_content()' method."
-    )
-
-
-from ..utils import build_metadata as _build_metadata
-
-
-def _chunk_to_text_node(chunk: LegalChunk) -> _LITextNode:
-    """Convert a :class:`~lexichunk.models.LegalChunk` to a LlamaIndex ``TextNode``.
-
-    Args:
-        chunk: A :class:`~lexichunk.models.LegalChunk` instance.
-
-    Returns:
-        A ``llama_index.core.schema.TextNode`` with ``text`` set to the
-        chunk's content and ``metadata`` populated with legal metadata.
-    """
-    return _TextNode(  # type: ignore[misc,no-any-return]
-        text=chunk.content,
-        metadata=_build_metadata(chunk),
-    )
+        Returns:
+            The same node list, with offsets restored.
+        """
+        nodes = super()._postprocess_parsed_nodes(nodes, parent_doc_map)
+        for node in nodes:
+            override = self._offset_overrides.pop(node.node_id, None)
+            if override is not None and isinstance(node, _TextNode):
+                node.start_char_idx, node.end_char_idx = override
+        return nodes
