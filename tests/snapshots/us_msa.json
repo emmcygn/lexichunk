@@ -2,23 +2,25 @@
   {
     "char_end": 610,
     "char_start": 0,
-    "classification_confidence": 0.0,
-    "clause_type": "unknown",
+    "classification_confidence": 1.0,
+    "clause_type": "preamble",
     "content_head": "'MASTER SERVICES AGREEMENT\\n\\nThis Master Services Agreement (this \"Agreement\") is '",
     "content_sha256": "c1b4a73a5be0c939e1e63dfeaace0bd45dc839258c327841853dfdf58f68a667",
-    "context_header": "[Section: MASTER SERVICES AGREEMENT] [Type: Unknown] [Jurisdiction: US]",
+    "context_header": "[Section: preamble] [Type: Preamble] [Jurisdiction: US]",
     "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Customer",
       "Effective Date",
+      "Parties",
+      "Party",
       "Provider",
       "Services"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "MASTER SERVICES AGREEMENT",
+    "document_section": "preamble",
+    "hierarchy_path": "preamble",
     "index": 0,
-    "original_header": "MASTER SERVICES AGREEMENT",
+    "original_header": "",
     "secondary_clause_type": null,
     "token_count": 152
   },
@@ -34,6 +36,7 @@
     "defined_terms_used": [
       "Agreement",
       "Customer",
+      "Parties",
       "Provider"
     ],
     "document_section": "recitals",
@@ -44,13 +47,13 @@
     "token_count": 143
   },
   {
-    "char_end": 1828,
+    "char_end": 1321,
     "char_start": 1182,
     "classification_confidence": 1.0,
     "clause_type": "definitions",
-    "content_head": "'ARTICLE I\\n\\nDEFINITIONS\\n\\n\\nSection 1.01  Definitions. As used in this Agreement, t'",
-    "content_sha256": "7206dfc70ebd4ac35b59239c2491c26234be6f63afe4775667d0b2730261e543",
-    "context_header": "[Section: Article I — ARTICLE I] [Type: Definitions] [Jurisdiction: US]",
+    "content_head": "'ARTICLE I\\nDEFINITIONS\\n\\nSection 1.01  Definitions. As used in this Agreement, the'",
+    "content_sha256": "23755e5603b5f00ba9809c1e39966e6d18860faf63b29e1cb7bffb28b142e4fb",
+    "context_header": "[Section: Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the] [Type: Definitions] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "ARTICLE I",
@@ -59,148 +62,140 @@
       },
       {
         "raw_text": "Section 1.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 2,
         "target_identifier": "1.01"
       }
     ],
     "defined_terms_used": [
-      "Affiliate",
       "Agreement"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "Article I — ARTICLE I",
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the",
     "index": 2,
-    "original_header": "Article I ARTICLE I",
+    "original_header": "Section 1.01 Definitions. As used in this Agreement, the following terms shall have the",
     "secondary_clause_type": null,
-    "token_count": 162
+    "token_count": 34
+  },
+  {
+    "char_end": 1828,
+    "char_start": 1321,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'Article I Definitions\\nSection 1.01 Definitions. As used in this Agreement, the f'",
+    "content_sha256": "32ce0a99eb882854adaaf50dea26e5fe54d46a7a3a49246cc15ba8b86fd191bb",
+    "context_header": "[Section: Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (a) — \"Affiliate\" means, with respect to any Person, any other Person that directly] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Affiliate",
+      "Agreement",
+      "control"
+    ],
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (a) — \"Affiliate\" means, with respect to any Person, any other Person that directly",
+    "index": 3,
+    "original_header": "(a) \"Affiliate\" means, with respect to any Person, any other Person that directly",
+    "secondary_clause_type": null,
+    "token_count": 154
   },
   {
     "char_end": 2134,
     "char_start": 1828,
-    "classification_confidence": 0.714,
+    "classification_confidence": 1.0,
     "clause_type": "definitions",
-    "content_head": "'DEFINITIONS\\nSection 1.01 Definitions. As used in this Agreement, the following t'",
-    "content_sha256": "39f445c79a334b226432c79596985022c02d54ab16d628ef6b2b667cfcc4882e",
-    "context_header": "[Section: DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (b) — \"Authorized User\" means any employee, contractor, or agent of Customer or its] [Type: Definitions] [Jurisdiction: US]",
-    "cross_references": [
-      {
-        "raw_text": "Section 1.01",
-        "target_chunk_index": null,
-        "target_identifier": "1.01"
-      }
-    ],
+    "content_head": "'Article I Definitions\\nSection 1.01 Definitions. As used in this Agreement, the f'",
+    "content_sha256": "2fbed935fce80dedfe5c39301e40041c0572184036b7fd0e95024698a34cd142",
+    "context_header": "[Section: Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (b) — \"Authorized User\" means any employee, contractor, or agent of Customer or its] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Authorized User",
       "Customer",
       "Services"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (b) — \"Authorized User\" means any employee, contractor, or agent of Customer or its",
-    "index": 3,
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (b) — \"Authorized User\" means any employee, contractor, or agent of Customer or its",
+    "index": 4,
     "original_header": "(b) \"Authorized User\" means any employee, contractor, or agent of Customer or its",
-    "secondary_clause_type": "acceptable_use",
-    "token_count": 101
+    "secondary_clause_type": null,
+    "token_count": 104
   },
   {
-    "char_end": 3022,
+    "char_end": 3275,
     "char_start": 2134,
-    "classification_confidence": 0.833,
+    "classification_confidence": 1.0,
     "clause_type": "definitions",
-    "content_head": "'DEFINITIONS\\nSection 1.01 Definitions. As used in this Agreement, the following t'",
-    "content_sha256": "4118a328f8f95fa86fb32e346668d40ffc255ce24d2d546de6ea794536eb1e77",
-    "context_header": "[Section: DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (c) — \"Confidential Information\" means any information disclosed by one Party (the] [Type: Definitions] [Jurisdiction: US]",
-    "cross_references": [
-      {
-        "raw_text": "Section 1.01",
-        "target_chunk_index": null,
-        "target_identifier": "1.01"
-      }
-    ],
+    "content_head": "'Article I Definitions\\nSection 1.01 Definitions. As used in this Agreement, the f'",
+    "content_sha256": "07f5edca09bba1d1d563afd2e734d5534c71376c6d14c7a605cf2605d27a871d",
+    "context_header": "[Section: Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (c) — \"Confidential Information\" means any information disclosed by one Party (the] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Confidential Information",
       "Disclosing Party",
-      "Receiving Party"
+      "Documentation",
+      "Party",
+      "Provider",
+      "Receiving Party",
+      "Services"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (c) — \"Confidential Information\" means any information disclosed by one Party (the",
-    "index": 4,
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (c) — \"Confidential Information\" means any information disclosed by one Party (the",
+    "index": 5,
     "original_header": "(c) \"Confidential Information\" means any information disclosed by one Party (the",
-    "secondary_clause_type": "confidentiality",
-    "token_count": 247
+    "secondary_clause_type": null,
+    "token_count": 312
   },
   {
     "char_end": 3689,
-    "char_start": 3022,
-    "classification_confidence": 0.417,
+    "char_start": 3275,
+    "classification_confidence": 1.0,
     "clause_type": "definitions",
-    "content_head": "'DEFINITIONS\\nSection 1.01 Definitions. As used in this Agreement, the following t'",
-    "content_sha256": "b76190365b812b01af5e223326f74a669d6c69af349afb01e3dde3f9910b039c",
-    "context_header": "[Section: DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (d) — \"Documentation\" means the technical and functional specifications, user] [Type: Definitions] [Jurisdiction: US]",
-    "cross_references": [
-      {
-        "raw_text": "Section 1.01",
-        "target_chunk_index": null,
-        "target_identifier": "1.01"
-      }
-    ],
+    "content_head": "'Article I Definitions\\nSection 1.01 Definitions. As used in this Agreement, the f'",
+    "content_sha256": "83b0512b4f0a18d9c4f6f3e366974a6a5464317f89fe6edff3bcd93b67e88da4",
+    "context_header": "[Section: Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (e) — \"Intellectual Property Rights\" means all forms of intellectual property] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
-      "Documentation",
-      "Intellectual Property Rights",
-      "Provider",
-      "Services"
+      "Intellectual Property Rights"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (d) — \"Documentation\" means the technical and functional specifications, user",
-    "index": 5,
-    "original_header": "(d) \"Documentation\" means the technical and functional specifications, user",
-    "secondary_clause_type": "intellectual_property",
-    "token_count": 192
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (e) — \"Intellectual Property Rights\" means all forms of intellectual property",
+    "index": 6,
+    "original_header": "(e) \"Intellectual Property Rights\" means all forms of intellectual property",
+    "secondary_clause_type": null,
+    "token_count": 131
   },
   {
     "char_end": 4035,
     "char_start": 3689,
-    "classification_confidence": 0.556,
+    "classification_confidence": 1.0,
     "clause_type": "definitions",
-    "content_head": "'DEFINITIONS\\nSection 1.01 Definitions. As used in this Agreement, the following t'",
-    "content_sha256": "17038ba48124c056ad1f2d4595df9b1c2b130df90f317024edae412a474b5750",
-    "context_header": "[Section: DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (f) — \"Order Form\" means a written order form, purchase order, or statement of work] [Type: Definitions] [Jurisdiction: US]",
-    "cross_references": [
-      {
-        "raw_text": "Section 1.01",
-        "target_chunk_index": null,
-        "target_identifier": "1.01"
-      }
-    ],
+    "content_head": "'Article I Definitions\\nSection 1.01 Definitions. As used in this Agreement, the f'",
+    "content_sha256": "5296362cb118c2e17d6bbfe8010034420c73fd93d826d04fd5e828b14fd30775",
+    "context_header": "[Section: Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (f) — \"Order Form\" means a written order form, purchase order, or statement of work] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Order Form",
+      "Parties",
       "Services"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (f) — \"Order Form\" means a written order form, purchase order, or statement of work",
-    "index": 6,
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (f) — \"Order Form\" means a written order form, purchase order, or statement of work",
+    "index": 7,
     "original_header": "(f) \"Order Form\" means a written order form, purchase order, or statement of work",
-    "secondary_clause_type": "governing_law",
-    "token_count": 111
+    "secondary_clause_type": null,
+    "token_count": 114
   },
   {
     "char_end": 4436,
     "char_start": 4035,
-    "classification_confidence": 0.714,
+    "classification_confidence": 1.0,
     "clause_type": "definitions",
-    "content_head": "'DEFINITIONS\\nSection 1.01 Definitions. As used in this Agreement, the following t'",
-    "content_sha256": "126b5111b01e8f07d47939025afc492c9ed6772632ef1b0b68277a234686b2ae",
-    "context_header": "[Section: DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (g) — \"Provider Technology\" means the Services, software, hardware, products,] [Type: Definitions] [Jurisdiction: US]",
-    "cross_references": [
-      {
-        "raw_text": "Section 1.01",
-        "target_chunk_index": null,
-        "target_identifier": "1.01"
-      }
-    ],
+    "content_head": "'Article I Definitions\\nSection 1.01 Definitions. As used in this Agreement, the f'",
+    "content_sha256": "b355c36b972fc0aff6581ed9b648ec7ddf709490b32886bc6c386aa856d98e06",
+    "context_header": "[Section: Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (g) — \"Provider Technology\" means the Services, software, hardware, products,] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Intellectual Property Rights",
@@ -208,56 +203,22 @@
       "Provider Technology",
       "Services"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (g) — \"Provider Technology\" means the Services, software, hardware, products,",
-    "index": 7,
-    "original_header": "(g) \"Provider Technology\" means the Services, software, hardware, products,",
-    "secondary_clause_type": "intellectual_property",
-    "token_count": 125
-  },
-  {
-    "char_end": 4812,
-    "char_start": 4436,
-    "classification_confidence": 1.0,
-    "clause_type": "definitions",
-    "content_head": "'DEFINITIONS\\nSection 1.01 Definitions. As used in this Agreement, the following t'",
-    "content_sha256": "68f97897404b7c9e993a2d8693d974e5ae900a402582f5c531c286798d0ec581",
-    "context_header": "[Section: DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (h) — \"Services\" means the services, software, and deliverables to be provided by] [Type: Definitions] [Jurisdiction: US]",
-    "cross_references": [
-      {
-        "raw_text": "Section 1.01",
-        "target_chunk_index": null,
-        "target_identifier": "1.01"
-      }
-    ],
-    "defined_terms_used": [
-      "Agreement",
-      "Customer",
-      "Order Form",
-      "Provider",
-      "Services"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (h) — \"Services\" means the services, software, and deliverables to be provided by",
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (g) — \"Provider Technology\" means the Services, software, hardware, products,",
     "index": 8,
-    "original_header": "(h) \"Services\" means the services, software, and deliverables to be provided by",
+    "original_header": "(g) \"Provider Technology\" means the Services, software, hardware, products,",
     "secondary_clause_type": null,
-    "token_count": 119
+    "token_count": 127
   },
   {
     "char_end": 5222,
-    "char_start": 4812,
-    "classification_confidence": 0.833,
+    "char_start": 4436,
+    "classification_confidence": 1.0,
     "clause_type": "definitions",
-    "content_head": "'DEFINITIONS\\nSection 1.01 Definitions. As used in this Agreement, the following t'",
-    "content_sha256": "cc132bf01df0376ac678dbcd96e1ac6a2de81b5cd8ceba34bf333eb83a7d4248",
-    "context_header": "[Section: DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (i) — \"Statement of Work\" or \"SOW\" means an Order Form that describes in detail] [Type: Definitions] [Jurisdiction: US]",
+    "content_head": "'Article I Definitions\\nSection 1.01 Definitions. As used in this Agreement, the f'",
+    "content_sha256": "1d7ccdc95359b60dde1924c68db781ee4292a3b910179ad84d511149d0340683",
+    "context_header": "[Section: Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (h) — \"Services\" means the services, software, and deliverables to be provided by] [Type: Definitions] [Jurisdiction: US]",
     "cross_references": [
-      {
-        "raw_text": "Section 1.01",
-        "target_chunk_index": null,
-        "target_identifier": "1.01"
-      },
       {
         "raw_text": "Article VIII",
         "target_chunk_index": 35,
@@ -266,26 +227,30 @@
     ],
     "defined_terms_used": [
       "Agreement",
+      "Customer",
       "Effective Date",
       "Order Form",
+      "Parties",
+      "Provider",
       "SOW",
+      "Services",
       "Term"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "DEFINITIONS > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (i) — \"Statement of Work\" or \"SOW\" means an Order Form that describes in detail",
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (h) — \"Services\" means the services, software, and deliverables to be provided by",
     "index": 9,
-    "original_header": "(i) \"Statement of Work\" or \"SOW\" means an Order Form that describes in detail",
-    "secondary_clause_type": "termination",
-    "token_count": 127
+    "original_header": "(h) \"Services\" means the services, software, and deliverables to be provided by",
+    "secondary_clause_type": null,
+    "token_count": 224
   },
   {
     "char_end": 5708,
     "char_start": 5222,
     "classification_confidence": 1.0,
     "clause_type": "definitions",
-    "content_head": "'DEFINITIONS\\nSection 1.02  Interpretation. In this Agreement, unless the context '",
-    "content_sha256": "6ce56e5adf142b5f056cbca04cd32cc048685bccaec3a28bb424d75a7178706b",
-    "context_header": "[Section: DEFINITIONS > Section 1.02 — Interpretation. In this Agreement, unless the context requires otherwise:] [Type: Definitions] [Jurisdiction: US]",
+    "content_head": "'Article I Definitions\\nSection 1.02  Interpretation. In this Agreement, unless th'",
+    "content_sha256": "ec9ae39b8065a305667cdc6fb39d258521454c496619f7f3259f60de270fdbb5",
+    "context_header": "[Section: Article I — Definitions > Section 1.02 — Interpretation. In this Agreement, unless the context requires otherwise:] [Type: Definitions] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 1.02",
@@ -297,20 +262,20 @@
       "Agreement"
     ],
     "document_section": "definitions",
-    "hierarchy_path": "DEFINITIONS > Section 1.02 — Interpretation. In this Agreement, unless the context requires otherwise:",
+    "hierarchy_path": "Article I — Definitions > Section 1.02 — Interpretation. In this Agreement, unless the context requires otherwise:",
     "index": 10,
     "original_header": "Section 1.02 Interpretation. In this Agreement, unless the context requires otherwise:",
     "secondary_clause_type": null,
-    "token_count": 124
+    "token_count": 127
   },
   {
     "char_end": 6012,
     "char_start": 5708,
-    "classification_confidence": 1.0,
-    "clause_type": "confidentiality",
-    "content_head": "'ARTICLE II\\n\\nSERVICES\\n\\n\\nSection 2.01  Provision of Services. Provider shall provi'",
-    "content_sha256": "9a3b1ac5640f7ee40fc4fa45f5d950901bf7570914433389c5b22900bccb32d9",
-    "context_header": "[Section: Article II — ARTICLE II] [Type: Confidentiality] [Jurisdiction: US]",
+    "classification_confidence": 0.9,
+    "clause_type": "services",
+    "content_head": "'ARTICLE II\\nSERVICES\\n\\nSection 2.01  Provision of Services. Provider shall provide'",
+    "content_sha256": "ea8b8cc6667e0ab57950f93725e2b3ebdb78b673df6aea30c9c1dae55944836b",
+    "context_header": "[Section: Article II — Services > Section 2.01 — Provision of Services. Provider shall provide the Services to Customer in] [Type: Services] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "ARTICLE II",
@@ -319,7 +284,7 @@
       },
       {
         "raw_text": "Section 2.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 11,
         "target_identifier": "2.01"
       }
     ],
@@ -331,20 +296,20 @@
       "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Article II — ARTICLE II",
+    "hierarchy_path": "Article II — Services > Section 2.01 — Provision of Services. Provider shall provide the Services to Customer in",
     "index": 11,
-    "original_header": "Article II ARTICLE II",
-    "secondary_clause_type": null,
+    "original_header": "Section 2.01 Provision of Services. Provider shall provide the Services to Customer in",
+    "secondary_clause_type": "confidentiality",
     "token_count": 76
   },
   {
     "char_end": 6496,
     "char_start": 6012,
-    "classification_confidence": 1.0,
-    "clause_type": "entire_agreement",
-    "content_head": "'SERVICES\\nSection 2.02  Statements of Work. The Parties may enter into one or mor'",
-    "content_sha256": "01149845c76d7221e532b8188ec302374dcf147bf843090b5311b00ac7d7f09e",
-    "context_header": "[Section: SERVICES > Section 2.02 — Statements of Work. The Parties may enter into one or more Statements of] [Type: Entire Agreement] [Jurisdiction: US]",
+    "classification_confidence": 0.875,
+    "clause_type": "services",
+    "content_head": "'Article II Services\\nSection 2.02  Statements of Work. The Parties may enter into'",
+    "content_sha256": "c4ee322594fc2e4d08ac25750666b80753e0f192ea75d28fbdaa451f590fe557",
+    "context_header": "[Section: Article II — Services > Section 2.02 — Statements of Work. The Parties may enter into one or more Statements of] [Type: Services] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 2.02",
@@ -354,23 +319,26 @@
     ],
     "defined_terms_used": [
       "Agreement",
-      "SOW"
+      "Parties",
+      "SOW",
+      "Services",
+      "control"
     ],
     "document_section": "operative",
-    "hierarchy_path": "SERVICES > Section 2.02 — Statements of Work. The Parties may enter into one or more Statements of",
+    "hierarchy_path": "Article II — Services > Section 2.02 — Statements of Work. The Parties may enter into one or more Statements of",
     "index": 12,
     "original_header": "Section 2.02 Statements of Work. The Parties may enter into one or more Statements of",
-    "secondary_clause_type": null,
-    "token_count": 123
+    "secondary_clause_type": "entire_agreement",
+    "token_count": 126
   },
   {
     "char_end": 6800,
     "char_start": 6496,
-    "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'SERVICES\\nSection 2.03  Change Orders. Either Party may request changes to the sc'",
-    "content_sha256": "dcee3509f4578bf5ee5ca1225f2080278d971f4b0c5954e83e8d1c2fa6b5a5f2",
-    "context_header": "[Section: SERVICES > Section 2.03 — Change Orders. Either Party may request changes to the scope of a SOW] [Type: Payment] [Jurisdiction: US]",
+    "classification_confidence": 0.45,
+    "clause_type": "services",
+    "content_head": "'Article II Services\\nSection 2.03  Change Orders. Either Party may request change'",
+    "content_sha256": "dc481ba0438c4bec1a1277f960c09987cb33080d0e3bb4d51db95ba950a47733",
+    "context_header": "[Section: Article II — Services > Section 2.03 — Change Orders. Either Party may request changes to the scope of a SOW] [Type: Services] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 2.03",
@@ -379,23 +347,26 @@
       }
     ],
     "defined_terms_used": [
-      "SOW"
+      "Parties",
+      "Party",
+      "SOW",
+      "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "SERVICES > Section 2.03 — Change Orders. Either Party may request changes to the scope of a SOW",
+    "hierarchy_path": "Article II — Services > Section 2.03 — Change Orders. Either Party may request changes to the scope of a SOW",
     "index": 13,
     "original_header": "Section 2.03 Change Orders. Either Party may request changes to the scope of a SOW",
-    "secondary_clause_type": null,
-    "token_count": 78
+    "secondary_clause_type": "payment",
+    "token_count": 81
   },
   {
     "char_end": 7472,
     "char_start": 6800,
-    "classification_confidence": 0.0,
-    "clause_type": "unknown",
-    "content_head": "'SERVICES\\nSection 2.04  Customer Responsibilities. Customer shall: (a) provide Pr'",
-    "content_sha256": "d606bd5d20aaf93038bfa9846d39753cf6d5dbcede07196bd9983c65c192dbbe",
-    "context_header": "[Section: SERVICES > Section 2.04 — Customer Responsibilities. Customer shall: (a) provide Provider with] [Type: Unknown] [Jurisdiction: US]",
+    "classification_confidence": 0.6,
+    "clause_type": "services",
+    "content_head": "'Article II Services\\nSection 2.04  Customer Responsibilities. Customer shall: (a)'",
+    "content_sha256": "18f1b0050407568d145b108f886d69d4c5c7a83466df7615f2b1bbd09125c497",
+    "context_header": "[Section: Article II — Services > Section 2.04 — Customer Responsibilities. Customer shall: (a) provide Provider with] [Type: Services] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 2.04",
@@ -409,29 +380,24 @@
       "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "SERVICES > Section 2.04 — Customer Responsibilities. Customer shall: (a) provide Provider with",
+    "hierarchy_path": "Article II — Services > Section 2.04 — Customer Responsibilities. Customer shall: (a) provide Provider with",
     "index": 14,
     "original_header": "Section 2.04 Customer Responsibilities. Customer shall: (a) provide Provider with",
-    "secondary_clause_type": null,
-    "token_count": 107
+    "secondary_clause_type": "governing_law",
+    "token_count": 173
   },
   {
     "char_end": 7870,
-    "char_start": 7222,
-    "classification_confidence": 0.25,
-    "clause_type": "confidentiality",
-    "content_head": "'SERVICES\\nSection 2.04 Customer Responsibilities. Customer shall: (a) provide Pro'",
-    "content_sha256": "d5a2f4c79f41fef99467a6279814574890b489f5bd51e5a89ee38974b1809c47",
-    "context_header": "[Section: SERVICES > Section 2.04 — Customer Responsibilities. Customer shall: (a) provide Provider with > (d) — comply with all applicable laws and regulations in connection with Customer's use] [Type: Confidentiality] [Jurisdiction: US]",
+    "char_start": 7472,
+    "classification_confidence": 0.321,
+    "clause_type": "services",
+    "content_head": "'Article II Services\\nSection 2.05  Subcontractors. Provider may engage subcontrac'",
+    "content_sha256": "086baf1304b67f8a244593611ebd47d759c904e8bd6b9f5cc1731f6276467a13",
+    "context_header": "[Section: Article II — Services > Section 2.05 — Subcontractors. Provider may engage subcontractors to perform portions] [Type: Services] [Jurisdiction: US]",
     "cross_references": [
       {
-        "raw_text": "Section 2.04",
-        "target_chunk_index": 14,
-        "target_identifier": "2.04"
-      },
-      {
         "raw_text": "Section 2.05",
-        "target_chunk_index": null,
+        "target_chunk_index": 15,
         "target_identifier": "2.05"
       },
       {
@@ -447,25 +413,24 @@
     ],
     "defined_terms_used": [
       "Agreement",
-      "Customer",
       "Provider",
       "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "SERVICES > Section 2.04 — Customer Responsibilities. Customer shall: (a) provide Provider with > (d) — comply with all applicable laws and regulations in connection with Customer's use",
+    "hierarchy_path": "Article II — Services > Section 2.05 — Subcontractors. Provider may engage subcontractors to perform portions",
     "index": 15,
-    "original_header": "(d) comply with all applicable laws and regulations in connection with Customer's use",
-    "secondary_clause_type": "governing_law",
-    "token_count": 185
+    "original_header": "Section 2.05 Subcontractors. Provider may engage subcontractors to perform portions",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 104
   },
   {
     "char_end": 8174,
     "char_start": 7870,
-    "classification_confidence": 0.75,
+    "classification_confidence": 0.857,
     "clause_type": "payment",
-    "content_head": "'ARTICLE III\\n\\nFEES AND PAYMENT\\n\\n\\nSection 3.01  Fees. Customer shall pay Provider '",
-    "content_sha256": "2bb56c81a430e5fee24b9cd25112a99044eb60252dbf2c24a6c52bf0b67beadd",
-    "context_header": "[Section: Article III — ARTICLE III] [Type: Payment] [Jurisdiction: US]",
+    "content_head": "'ARTICLE III\\nFEES AND PAYMENT\\n\\nSection 3.01  Fees. Customer shall pay Provider th'",
+    "content_sha256": "c59b15b080987a9d8ad5e48c9ad9840584293e8863ae58111e92e113b43e7865",
+    "context_header": "[Section: Article III — Fees and Payment > Section 3.01 — Fees. Customer shall pay Provider the fees set forth in each applicable] [Type: Payment] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "ARTICLE III",
@@ -474,7 +439,7 @@
       },
       {
         "raw_text": "Section 3.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 16,
         "target_identifier": "3.01"
       }
     ],
@@ -485,9 +450,9 @@
       "Provider"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Article III — ARTICLE III",
+    "hierarchy_path": "Article III — Fees and Payment > Section 3.01 — Fees. Customer shall pay Provider the fees set forth in each applicable",
     "index": 16,
-    "original_header": "Article III ARTICLE III",
+    "original_header": "Section 3.01 Fees. Customer shall pay Provider the fees set forth in each applicable",
     "secondary_clause_type": "confidentiality",
     "token_count": 76
   },
@@ -496,9 +461,9 @@
     "char_start": 8174,
     "classification_confidence": 0.875,
     "clause_type": "payment",
-    "content_head": "'FEES AND PAYMENT\\nSection 3.02  Invoicing and Payment. Provider shall invoice Cus'",
-    "content_sha256": "0c5ae079d5aa7fd5c9102b61106499e24ee9739e1f54a921e1b632a817e55413",
-    "context_header": "[Section: FEES AND PAYMENT > Section 3.02 — Invoicing and Payment. Provider shall invoice Customer monthly in arrears] [Type: Payment] [Jurisdiction: US]",
+    "content_head": "'Article III Fees and Payment\\nSection 3.02  Invoicing and Payment. Provider shall'",
+    "content_sha256": "006460b253b44709528cdac8176a6d51351cfd89ebe831f32f9cf18b0fa53eb9",
+    "context_header": "[Section: Article III — Fees and Payment > Section 3.02 — Invoicing and Payment. Provider shall invoice Customer monthly in arrears] [Type: Payment] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 3.02",
@@ -514,20 +479,20 @@
       "Provider"
     ],
     "document_section": "operative",
-    "hierarchy_path": "FEES AND PAYMENT > Section 3.02 — Invoicing and Payment. Provider shall invoice Customer monthly in arrears",
+    "hierarchy_path": "Article III — Fees and Payment > Section 3.02 — Invoicing and Payment. Provider shall invoice Customer monthly in arrears",
     "index": 17,
     "original_header": "Section 3.02 Invoicing and Payment. Provider shall invoice Customer monthly in arrears",
     "secondary_clause_type": "assignment",
-    "token_count": 103
+    "token_count": 106
   },
   {
     "char_end": 9034,
     "char_start": 8572,
     "classification_confidence": 0.6,
     "clause_type": "payment",
-    "content_head": "'FEES AND PAYMENT\\nSection 3.03  Late Payments. Any amounts not paid by Customer b'",
-    "content_sha256": "1ccaa9b90ef0fc693c1f35bf5e7dc59d118ffcd4a5a923555f679f88c202be58",
-    "context_header": "[Section: FEES AND PAYMENT > Section 3.03 — Late Payments. Any amounts not paid by Customer by the applicable Payment] [Type: Payment] [Jurisdiction: US]",
+    "content_head": "'Article III Fees and Payment\\nSection 3.03  Late Payments. Any amounts not paid b'",
+    "content_sha256": "c01f7646ab2264e8af74fbaff33b2b0925732615713b7ea73a541085181f54d6",
+    "context_header": "[Section: Article III — Fees and Payment > Section 3.03 — Late Payments. Any amounts not paid by Customer by the applicable Payment] [Type: Payment] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 3.03",
@@ -537,25 +502,26 @@
     ],
     "defined_terms_used": [
       "Customer",
+      "Fees",
       "Payment Due Date",
       "Provider",
       "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "FEES AND PAYMENT > Section 3.03 — Late Payments. Any amounts not paid by Customer by the applicable Payment",
+    "hierarchy_path": "Article III — Fees and Payment > Section 3.03 — Late Payments. Any amounts not paid by Customer by the applicable Payment",
     "index": 18,
     "original_header": "Section 3.03 Late Payments. Any amounts not paid by Customer by the applicable Payment",
     "secondary_clause_type": "governing_law",
-    "token_count": 119
+    "token_count": 122
   },
   {
     "char_end": 9610,
     "char_start": 9034,
     "classification_confidence": 1.0,
     "clause_type": "payment",
-    "content_head": "'FEES AND PAYMENT\\nSection 3.04  Taxes. The Fees do not include any applicable fed'",
-    "content_sha256": "870438955b989bb81ce3f4b9d1b6ea9863d820f586d3b0d99293c72f57b58907",
-    "context_header": "[Section: FEES AND PAYMENT > Section 3.04 — Taxes. The Fees do not include any applicable federal, state, local, or] [Type: Payment] [Jurisdiction: US]",
+    "content_head": "'Article III Fees and Payment\\nSection 3.04  Taxes. The Fees do not include any ap'",
+    "content_sha256": "7c6f63eb523f990c99a00982d573e060a4855ad14f59c95227339859eb2b54f7",
+    "context_header": "[Section: Article III — Fees and Payment > Section 3.04 — Taxes. The Fees do not include any applicable federal, state, local, or] [Type: Payment] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 3.04",
@@ -570,20 +536,20 @@
       "Taxes"
     ],
     "document_section": "operative",
-    "hierarchy_path": "FEES AND PAYMENT > Section 3.04 — Taxes. The Fees do not include any applicable federal, state, local, or",
+    "hierarchy_path": "Article III — Fees and Payment > Section 3.04 — Taxes. The Fees do not include any applicable federal, state, local, or",
     "index": 19,
     "original_header": "Section 3.04 Taxes. The Fees do not include any applicable federal, state, local, or",
     "secondary_clause_type": null,
-    "token_count": 148
+    "token_count": 151
   },
   {
     "char_end": 9973,
     "char_start": 9610,
-    "classification_confidence": 0.75,
+    "classification_confidence": 0.545,
     "clause_type": "payment",
-    "content_head": "'FEES AND PAYMENT\\nSection 3.05  Fee Adjustments. Provider may adjust the Fees for'",
-    "content_sha256": "455ad3aec19e3e5022231e8a446cca8306d71d8a08722dacca2c640d82d2afca",
-    "context_header": "[Section: FEES AND PAYMENT > Section 3.05 — Fee Adjustments. Provider may adjust the Fees for Services upon renewal] [Type: Payment] [Jurisdiction: US]",
+    "content_head": "'Article III Fees and Payment\\nSection 3.05  Fee Adjustments. Provider may adjust '",
+    "content_sha256": "be4f9135cc46189b936d4d507cb6189c3f978c962573c6e33031f971d67ab3b1",
+    "context_header": "[Section: Article III — Fees and Payment > Section 3.05 — Fee Adjustments. Provider may adjust the Fees for Services upon renewal] [Type: Payment] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 3.05",
@@ -599,20 +565,20 @@
       "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "FEES AND PAYMENT > Section 3.05 — Fee Adjustments. Provider may adjust the Fees for Services upon renewal",
+    "hierarchy_path": "Article III — Fees and Payment > Section 3.05 — Fee Adjustments. Provider may adjust the Fees for Services upon renewal",
     "index": 20,
     "original_header": "Section 3.05 Fee Adjustments. Provider may adjust the Fees for Services upon renewal",
-    "secondary_clause_type": "notices",
-    "token_count": 95
+    "secondary_clause_type": "services",
+    "token_count": 98
   },
   {
     "char_end": 10605,
     "char_start": 9973,
-    "classification_confidence": 0.6,
-    "clause_type": "limitation_of_liability",
-    "content_head": "'ARTICLE IV\\n\\nCONFIDENTIALITY\\n\\n\\nSection 4.01  Confidentiality Obligations. Each Pa'",
-    "content_sha256": "789da34960cd0f2f83cefdadd78c723492261a73d81886babcbf1a6e6930c09b",
-    "context_header": "[Section: Article IV — ARTICLE IV] [Type: Limitation Of Liability] [Jurisdiction: US]",
+    "classification_confidence": 0.625,
+    "clause_type": "confidentiality",
+    "content_head": "'ARTICLE IV\\nCONFIDENTIALITY\\n\\nSection 4.01  Confidentiality Obligations. Each Part'",
+    "content_sha256": "0a267fb2070a26725f28e9edc8244622bccedb157f3ac0fe8c7dd93adb05a3bd",
+    "context_header": "[Section: Article IV — Confidentiality > Section 4.01 — Confidentiality Obligations. Each Party agrees to: (a) hold the other] [Type: Confidentiality] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "ARTICLE IV",
@@ -621,7 +587,7 @@
       },
       {
         "raw_text": "Section 4.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 21,
         "target_identifier": "4.01"
       },
       {
@@ -633,13 +599,14 @@
     "defined_terms_used": [
       "Agreement",
       "Confidential Information",
-      "Disclosing Party"
+      "Disclosing Party",
+      "Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Article IV — ARTICLE IV",
+    "hierarchy_path": "Article IV — Confidentiality > Section 4.01 — Confidentiality Obligations. Each Party agrees to: (a) hold the other",
     "index": 21,
-    "original_header": "Article IV ARTICLE IV",
-    "secondary_clause_type": "confidentiality",
+    "original_header": "Section 4.01 Confidentiality Obligations. Each Party agrees to: (a) hold the other",
+    "secondary_clause_type": "limitation_of_liability",
     "token_count": 158
   },
   {
@@ -647,9 +614,9 @@
     "char_start": 10605,
     "classification_confidence": 0.556,
     "clause_type": "confidentiality",
-    "content_head": "'CONFIDENTIALITY\\nSection 4.02  Permitted Disclosures. A Receiving Party may discl'",
-    "content_sha256": "d943bb1c63e6ac9013c496038f77278fb74dd527812415451cba989a81c2672f",
-    "context_header": "[Section: CONFIDENTIALITY > Section 4.02 — Permitted Disclosures. A Receiving Party may disclose Confidential] [Type: Confidentiality] [Jurisdiction: US]",
+    "content_head": "'Article IV Confidentiality\\nSection 4.02  Permitted Disclosures. A Receiving Part'",
+    "content_sha256": "9bdbdb174d1b79f4dd763b1fc4d549979074187f79f152046c10630f6d67a3f3",
+    "context_header": "[Section: Article IV — Confidentiality > Section 4.02 — Permitted Disclosures. A Receiving Party may disclose Confidential] [Type: Confidentiality] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 4.02",
@@ -664,23 +631,24 @@
     ],
     "defined_terms_used": [
       "Disclosing Party",
+      "Party",
       "Receiving Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "CONFIDENTIALITY > Section 4.02 — Permitted Disclosures. A Receiving Party may disclose Confidential",
+    "hierarchy_path": "Article IV — Confidentiality > Section 4.02 — Permitted Disclosures. A Receiving Party may disclose Confidential",
     "index": 22,
     "original_header": "Section 4.02 Permitted Disclosures. A Receiving Party may disclose Confidential",
     "secondary_clause_type": "governing_law",
-    "token_count": 164
+    "token_count": 167
   },
   {
     "char_end": 11558,
     "char_start": 11246,
     "classification_confidence": 0.636,
     "clause_type": "confidentiality",
-    "content_head": "'CONFIDENTIALITY\\nSection 4.03  Survival. The obligations of this Article IV shall'",
-    "content_sha256": "8d446e7ff98bb5023a78badbbf4120ee01fa9649cab9dd3e780662835f12508c",
-    "context_header": "[Section: CONFIDENTIALITY > Section 4.03 — Survival. The obligations of this Article IV shall survive the expiration] [Type: Confidentiality] [Jurisdiction: US]",
+    "content_head": "'Article IV Confidentiality\\nSection 4.03  Survival. The obligations of this Artic'",
+    "content_sha256": "c2aeae8c110549f20b4bb8bcf322fb1d44ef89bd9006cfcf1e41a6d1ce4c38f3",
+    "context_header": "[Section: Article IV — Confidentiality > Section 4.03 — Survival. The obligations of this Article IV shall survive the expiration] [Type: Confidentiality] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 4.03",
@@ -697,20 +665,20 @@
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "CONFIDENTIALITY > Section 4.03 — Survival. The obligations of this Article IV shall survive the expiration",
+    "hierarchy_path": "Article IV — Confidentiality > Section 4.03 — Survival. The obligations of this Article IV shall survive the expiration",
     "index": 23,
     "original_header": "Section 4.03 Survival. The obligations of this Article IV shall survive the expiration",
     "secondary_clause_type": "termination",
-    "token_count": 82
+    "token_count": 84
   },
   {
     "char_end": 11903,
     "char_start": 11558,
     "classification_confidence": 1.0,
     "clause_type": "intellectual_property",
-    "content_head": "'ARTICLE V\\n\\nINTELLECTUAL PROPERTY\\n\\n\\nSection 5.01  Provider Ownership. As between '",
-    "content_sha256": "346fc43185d88f1dbf2a5bcdc3b6a99af83be8a722c18cdfda75ae2b0db030fa",
-    "context_header": "[Section: Article V — ARTICLE V] [Type: Intellectual Property] [Jurisdiction: US]",
+    "content_head": "'ARTICLE V\\nINTELLECTUAL PROPERTY\\n\\nSection 5.01  Provider Ownership. As between th'",
+    "content_sha256": "21ddb9448ec6fa9c4c44d8fe20158602bdeaa1afeb27fa3e28f192a641e5bc58",
+    "context_header": "[Section: Article V — Intellectual Property > Section 5.01 — Provider Ownership. As between the Parties, Provider owns all right, title,] [Type: Intellectual Property] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "ARTICLE V",
@@ -719,20 +687,21 @@
       },
       {
         "raw_text": "Section 5.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 24,
         "target_identifier": "5.01"
       }
     ],
     "defined_terms_used": [
       "Agreement",
       "Customer",
+      "Parties",
       "Provider",
       "Provider Technology"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Article V — ARTICLE V",
+    "hierarchy_path": "Article V — Intellectual Property > Section 5.01 — Provider Ownership. As between the Parties, Provider owns all right, title,",
     "index": 24,
-    "original_header": "Article V ARTICLE V",
+    "original_header": "Section 5.01 Provider Ownership. As between the Parties, Provider owns all right, title,",
     "secondary_clause_type": null,
     "token_count": 86
   },
@@ -741,9 +710,9 @@
     "char_start": 11903,
     "classification_confidence": 0.462,
     "clause_type": "intellectual_property",
-    "content_head": "'INTELLECTUAL PROPERTY\\nSection 5.02  License Grant. Subject to the terms and cond'",
-    "content_sha256": "dac3fc90612ba255cecbe65d0daa84e2b727ac2157da415293ad63f56d967833",
-    "context_header": "[Section: INTELLECTUAL PROPERTY > Section 5.02 — License Grant. Subject to the terms and conditions of this Agreement,] [Type: Intellectual Property] [Jurisdiction: US]",
+    "content_head": "'Article V Intellectual Property\\nSection 5.02  License Grant. Subject to the term'",
+    "content_sha256": "dcb81f69e7c8300d4eca5b3f68c1ba485c5df62d02f71423b1a82fbc341d48d8",
+    "context_header": "[Section: Article V — Intellectual Property > Section 5.02 — License Grant. Subject to the terms and conditions of this Agreement,] [Type: Intellectual Property] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 5.02",
@@ -761,20 +730,20 @@
       "Term"
     ],
     "document_section": "operative",
-    "hierarchy_path": "INTELLECTUAL PROPERTY > Section 5.02 — License Grant. Subject to the terms and conditions of this Agreement,",
+    "hierarchy_path": "Article V — Intellectual Property > Section 5.02 — License Grant. Subject to the terms and conditions of this Agreement,",
     "index": 25,
     "original_header": "Section 5.02 License Grant. Subject to the terms and conditions of this Agreement,",
     "secondary_clause_type": "payment",
-    "token_count": 92
+    "token_count": 94
   },
   {
     "char_end": 12820,
     "char_start": 12250,
-    "classification_confidence": 1.0,
+    "classification_confidence": 0.667,
     "clause_type": "intellectual_property",
-    "content_head": "'INTELLECTUAL PROPERTY\\nSection 5.03  Customer Data. As between the Parties, Custo'",
-    "content_sha256": "2aa4b19b3cb34dd93c342c71733195aad98907e0e71794f725242172117216b6",
-    "context_header": "[Section: INTELLECTUAL PROPERTY > Section 5.03 — Customer Data. As between the Parties, Customer owns all right, title, and] [Type: Intellectual Property] [Jurisdiction: US]",
+    "content_head": "'Article V Intellectual Property\\nSection 5.03  Customer Data. As between the Part'",
+    "content_sha256": "22b80d6974764169a6974d025959f97f99c7cc8b59a381890fdcddc641d1b41b",
+    "context_header": "[Section: Article V — Intellectual Property > Section 5.03 — Customer Data. As between the Parties, Customer owns all right, title, and] [Type: Intellectual Property] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 5.03",
@@ -786,24 +755,25 @@
       "Agreement",
       "Customer",
       "Customer Data",
+      "Parties",
       "Provider",
       "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "INTELLECTUAL PROPERTY > Section 5.03 — Customer Data. As between the Parties, Customer owns all right, title, and",
+    "hierarchy_path": "Article V — Intellectual Property > Section 5.03 — Customer Data. As between the Parties, Customer owns all right, title, and",
     "index": 26,
     "original_header": "Section 5.03 Customer Data. As between the Parties, Customer owns all right, title, and",
-    "secondary_clause_type": null,
-    "token_count": 148
+    "secondary_clause_type": "services",
+    "token_count": 150
   },
   {
     "char_end": 13307,
     "char_start": 12820,
-    "classification_confidence": 0.556,
+    "classification_confidence": 0.385,
     "clause_type": "intellectual_property",
-    "content_head": "'INTELLECTUAL PROPERTY\\nSection 5.04  Deliverables. Unless otherwise expressly agr'",
-    "content_sha256": "5ba94456c0792af7fc23b38a9c78ab5940b7728c12eb997d3de9b9a88d1a8d53",
-    "context_header": "[Section: INTELLECTUAL PROPERTY > Section 5.04 — Deliverables. Unless otherwise expressly agreed in a Statement of Work,] [Type: Intellectual Property] [Jurisdiction: US]",
+    "content_head": "'Article V Intellectual Property\\nSection 5.04  Deliverables. Unless otherwise exp'",
+    "content_sha256": "4de599de43834307769471df6e8a02214e495c06d4ecf1423cd83e5f136d1864",
+    "context_header": "[Section: Article V — Intellectual Property > Section 5.04 — Deliverables. Unless otherwise expressly agreed in a Statement of Work,] [Type: Intellectual Property] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 5.04",
@@ -819,20 +789,20 @@
       "SOW"
     ],
     "document_section": "operative",
-    "hierarchy_path": "INTELLECTUAL PROPERTY > Section 5.04 — Deliverables. Unless otherwise expressly agreed in a Statement of Work,",
+    "hierarchy_path": "Article V — Intellectual Property > Section 5.04 — Deliverables. Unless otherwise expressly agreed in a Statement of Work,",
     "index": 27,
     "original_header": "Section 5.04 Deliverables. Unless otherwise expressly agreed in a Statement of Work,",
-    "secondary_clause_type": "payment",
-    "token_count": 127
+    "secondary_clause_type": "services",
+    "token_count": 129
   },
   {
     "char_end": 13645,
     "char_start": 13307,
     "classification_confidence": 0.857,
     "clause_type": "intellectual_property",
-    "content_head": "'INTELLECTUAL PROPERTY\\nSection 5.05  Feedback. If Customer provides Provider with'",
-    "content_sha256": "43cf6b0d217641272e3635abc911e67e980974359431b43f18892e76ca3594f1",
-    "context_header": "[Section: INTELLECTUAL PROPERTY > Section 5.05 — Feedback. If Customer provides Provider with any suggestions, comments,] [Type: Intellectual Property] [Jurisdiction: US]",
+    "content_head": "'Article V Intellectual Property\\nSection 5.05  Feedback. If Customer provides Pro'",
+    "content_sha256": "0cb41f0a824d805c2406e2e9eccd68fd28ea664c9427b62ca201f3f7d766e693",
+    "context_header": "[Section: Article V — Intellectual Property > Section 5.05 — Feedback. If Customer provides Provider with any suggestions, comments,] [Type: Intellectual Property] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 5.05",
@@ -847,20 +817,20 @@
       "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "INTELLECTUAL PROPERTY > Section 5.05 — Feedback. If Customer provides Provider with any suggestions, comments,",
+    "hierarchy_path": "Article V — Intellectual Property > Section 5.05 — Feedback. If Customer provides Provider with any suggestions, comments,",
     "index": 28,
     "original_header": "Section 5.05 Feedback. If Customer provides Provider with any suggestions, comments,",
     "secondary_clause_type": "payment",
-    "token_count": 90
+    "token_count": 92
   },
   {
-    "char_end": 14195,
+    "char_end": 14300,
     "char_start": 13645,
     "classification_confidence": 1.0,
     "clause_type": "limitation_of_liability",
-    "content_head": "'ARTICLE VI\\n\\nLIMITATION OF LIABILITY\\n\\n\\nSection 6.01  Exclusion of Consequential D'",
-    "content_sha256": "5cf3b595ac8d6caa27e34191c1bd8c61915fd0f32836206a0178a38e28ec12a1",
-    "context_header": "[Section: Article VI — ARTICLE VI] [Type: Limitation Of Liability] [Jurisdiction: US]",
+    "content_head": "'ARTICLE VI\\nLIMITATION OF LIABILITY\\n\\nSection 6.01  Exclusion of Consequential Dam'",
+    "content_sha256": "79927776765b13638e41b9b3dd555d10de8bac6a1133d26a4fab3ce1b5d39880",
+    "context_header": "[Section: Article VI — Limitation of Liability > Section 6.01 — Exclusion of Consequential Damages. IN NO EVENT SHALL EITHER PARTY BE] [Type: Limitation Of Liability] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "ARTICLE VI",
@@ -869,30 +839,30 @@
       },
       {
         "raw_text": "Section 6.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 29,
         "target_identifier": "6.01"
       }
     ],
     "defined_terms_used": [],
     "document_section": "operative",
-    "hierarchy_path": "Article VI — ARTICLE VI",
+    "hierarchy_path": "Article VI — Limitation of Liability > Section 6.01 — Exclusion of Consequential Damages. IN NO EVENT SHALL EITHER PARTY BE",
     "index": 29,
-    "original_header": "Article VI ARTICLE VI",
+    "original_header": "Section 6.01 Exclusion of Consequential Damages. IN NO EVENT SHALL EITHER PARTY BE",
     "secondary_clause_type": null,
-    "token_count": 138
+    "token_count": 163
   },
   {
-    "char_end": 15306,
-    "char_start": 14195,
-    "classification_confidence": 0.6,
+    "char_end": 14836,
+    "char_start": 14300,
+    "classification_confidence": 0.75,
     "clause_type": "limitation_of_liability",
-    "content_head": "'POSSIBILITY OF SUCH DAMAGES AND NOTWITHSTANDING THE FAILURE OF ESSENTIAL PURPOSE'",
-    "content_sha256": "1d50ea401e8bac8f5ea95e787997912ac7721925df6a1662bc3fbc06bf424745",
-    "context_header": "[Section: POSSIBILITY OF SUCH DAMAGES AND NOTWITHSTANDING THE FAILURE OF ESSENTIAL PURPOSE OF] [Type: Limitation Of Liability] [Jurisdiction: US]",
+    "content_head": "'Article VI Limitation of Liability\\nSection 6.01(b)  Cap on Liability. SUBJECT TO'",
+    "content_sha256": "0c9e428c73750c90ea4216729fee1e1c49b1b1de8de3ae3417aa1bfe113d7998",
+    "context_header": "[Section: Article VI — Limitation of Liability > Section 6.01(b) — Cap on Liability. SUBJECT TO SECTION 6.02, EACH PARTY'S TOTAL] [Type: Limitation Of Liability] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 6.01(b)",
-        "target_chunk_index": null,
+        "target_chunk_index": 30,
         "target_identifier": "6.01(b)"
       },
       {
@@ -903,20 +873,20 @@
     ],
     "defined_terms_used": [],
     "document_section": "operative",
-    "hierarchy_path": "POSSIBILITY OF SUCH DAMAGES AND NOTWITHSTANDING THE FAILURE OF ESSENTIAL PURPOSE OF",
+    "hierarchy_path": "Article VI — Limitation of Liability > Section 6.01(b) — Cap on Liability. SUBJECT TO SECTION 6.02, EACH PARTY'S TOTAL",
     "index": 30,
-    "original_header": "POSSIBILITY OF SUCH DAMAGES AND NOTWITHSTANDING THE FAILURE OF ESSENTIAL PURPOSE OF",
+    "original_header": "Section 6.01(b) Cap on Liability. SUBJECT TO SECTION 6.02, EACH PARTY'S TOTAL",
     "secondary_clause_type": "payment",
-    "token_count": 160
+    "token_count": 142
   },
   {
     "char_end": 15306,
     "char_start": 14836,
-    "classification_confidence": 0.286,
-    "clause_type": "confidentiality",
-    "content_head": "'CUMULATIVE LIABILITY TO THE OTHER PARTY ARISING OUT OF OR IN CONNECTION WITH THI'",
-    "content_sha256": "135ad850d70fc5fe1634702dd1190ff10d59c890ffd8b932f76006c5e5a2191e",
-    "context_header": "[Section: CUMULATIVE LIABILITY TO THE OTHER PARTY ARISING OUT OF OR IN CONNECTION WITH THIS > Section 6.02 — Exceptions to Limitations. The limitations set forth in Section 6.01 shall] [Type: Confidentiality] [Jurisdiction: US]",
+    "classification_confidence": 0.462,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'Article VI Limitation of Liability\\nSection 6.02  Exceptions to Limitations. The '",
+    "content_sha256": "7208aef783926daa3a6ac1fdd038b8106c03998953247f7d37ae2f574ca1c0e1",
+    "context_header": "[Section: Article VI — Limitation of Liability > Section 6.02 — Exceptions to Limitations. The limitations set forth in Section 6.01 shall] [Type: Limitation Of Liability] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 6.02",
@@ -925,7 +895,7 @@
       },
       {
         "raw_text": "Section 6.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 29,
         "target_identifier": "6.01"
       },
       {
@@ -946,23 +916,24 @@
     ],
     "defined_terms_used": [
       "Customer",
-      "Fees"
+      "Fees",
+      "Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "CUMULATIVE LIABILITY TO THE OTHER PARTY ARISING OUT OF OR IN CONNECTION WITH THIS > Section 6.02 — Exceptions to Limitations. The limitations set forth in Section 6.01 shall",
+    "hierarchy_path": "Article VI — Limitation of Liability > Section 6.02 — Exceptions to Limitations. The limitations set forth in Section 6.01 shall",
     "index": 31,
     "original_header": "Section 6.02 Exceptions to Limitations. The limitations set forth in Section 6.01 shall",
-    "secondary_clause_type": "governing_law",
-    "token_count": 138
+    "secondary_clause_type": "confidentiality",
+    "token_count": 126
   },
   {
-    "char_end": 15984,
+    "char_end": 16236,
     "char_start": 15306,
-    "classification_confidence": 0.333,
+    "classification_confidence": 0.556,
     "clause_type": "indemnification",
-    "content_head": "'ARTICLE VII\\n\\nINDEMNIFICATION\\n\\n\\nSection 7.01  Indemnification by Provider. Provid'",
-    "content_sha256": "fdf6c2494de1fc53f52df1ebc73a1a5985fb8af2bd8ad5eb6711dbf5e6d34479",
-    "context_header": "[Section: Article VII — ARTICLE VII] [Type: Indemnification] [Jurisdiction: US]",
+    "content_head": "'ARTICLE VII\\nINDEMNIFICATION\\n\\nSection 7.01  Indemnification by Provider. Provider'",
+    "content_sha256": "468ce8f8e5550e8134c89619e5cf5b47ff96e4684d2ab74d04963196d542d676",
+    "context_header": "[Section: Article VII — Indemnification] [Type: Indemnification] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "ARTICLE VII",
@@ -971,8 +942,13 @@
       },
       {
         "raw_text": "Section 7.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 32,
         "target_identifier": "7.01"
+      },
+      {
+        "raw_text": "Section 7.02",
+        "target_chunk_index": 32,
+        "target_identifier": "7.02"
       }
     ],
     "defined_terms_used": [
@@ -982,85 +958,73 @@
       "Intellectual Property Rights",
       "Losses",
       "Provider",
+      "Provider Indemnitees",
       "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Article VII — ARTICLE VII",
+    "hierarchy_path": "Article VII — Indemnification",
     "index": 32,
-    "original_header": "Article VII ARTICLE VII",
+    "original_header": "Article VII Indemnification",
     "secondary_clause_type": "payment",
-    "token_count": 170
+    "token_count": 232
   },
   {
-    "char_end": 16321,
-    "char_start": 15984,
+    "char_end": 16479,
+    "char_start": 16236,
     "classification_confidence": 0.714,
     "clause_type": "indemnification",
-    "content_head": "'INDEMNIFICATION\\nSection 7.02  Indemnification by Customer. Customer shall defend'",
-    "content_sha256": "feffab20777a3c767ad33a195147c2fb97a75829daea35d450efd5cd4b49b2f5",
-    "context_header": "[Section: INDEMNIFICATION > Section 7.02 — Indemnification by Customer. Customer shall defend, indemnify, and hold] [Type: Indemnification] [Jurisdiction: US]",
-    "cross_references": [
-      {
-        "raw_text": "Section 7.02",
-        "target_chunk_index": 33,
-        "target_identifier": "7.02"
-      }
-    ],
+    "content_head": "'Article VII Indemnification\\nSection 7.02 Indemnification by Customer. Customer s'",
+    "content_sha256": "a8c860040d76e6add9160d73692c5084e918fa0f8a08cf026d225f18c4c47a7a",
+    "context_header": "[Section: Article VII — Indemnification > Section 7.02 — Indemnification by Customer. Customer shall defend, indemnify, and hold > (a) — Customer's breach of this Agreement; (b) Customer's violation of applicable law;] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Customer",
-      "Losses",
-      "Provider",
-      "Provider Indemnitees"
+      "Customer Data"
     ],
     "document_section": "operative",
-    "hierarchy_path": "INDEMNIFICATION > Section 7.02 — Indemnification by Customer. Customer shall defend, indemnify, and hold",
+    "hierarchy_path": "Article VII — Indemnification > Section 7.02 — Indemnification by Customer. Customer shall defend, indemnify, and hold > (a) — Customer's breach of this Agreement; (b) Customer's violation of applicable law;",
     "index": 33,
-    "original_header": "Section 7.02 Indemnification by Customer. Customer shall defend, indemnify, and hold",
+    "original_header": "(a) Customer's breach of this Agreement; (b) Customer's violation of applicable law;",
     "secondary_clause_type": "governing_law",
-    "token_count": 88
+    "token_count": 89
   },
   {
     "char_end": 17302,
-    "char_start": 16321,
+    "char_start": 16479,
     "classification_confidence": 0.818,
     "clause_type": "indemnification",
-    "content_head": "'INDEMNIFICATION\\nSection 7.02 Indemnification by Customer. Customer shall defend,'",
-    "content_sha256": "4534ee25bad943826bd5d6e6e46baebccd3a4638e70def7e32f601efc9d3790a",
-    "context_header": "[Section: INDEMNIFICATION > Section 7.02 — Indemnification by Customer. Customer shall defend, indemnify, and hold > (c) — Customer Data, including any allegation that Customer Data infringes any third] [Type: Indemnification] [Jurisdiction: US]",
+    "content_head": "'Article VII Indemnification\\nSection 7.03  Indemnification Procedure. The Party s'",
+    "content_sha256": "7249b98040250c4e655643562aa16b89b7f324a65a2be04d82bf06ec8ab77891",
+    "context_header": "[Section: Article VII — Indemnification > Section 7.03 — Indemnification Procedure. The Party seeking indemnification (the] [Type: Indemnification] [Jurisdiction: US]",
     "cross_references": [
       {
-        "raw_text": "Section 7.02",
-        "target_chunk_index": 33,
-        "target_identifier": "7.02"
-      },
-      {
         "raw_text": "Section 7.03",
-        "target_chunk_index": null,
+        "target_chunk_index": 34,
         "target_identifier": "7.03"
       }
     ],
     "defined_terms_used": [
-      "Customer",
-      "Customer Data",
       "Indemnified Party",
-      "Indemnifying\nParty"
+      "Indemnifying Party",
+      "Party",
+      "control"
     ],
     "document_section": "operative",
-    "hierarchy_path": "INDEMNIFICATION > Section 7.02 — Indemnification by Customer. Customer shall defend, indemnify, and hold > (c) — Customer Data, including any allegation that Customer Data infringes any third",
+    "hierarchy_path": "Article VII — Indemnification > Section 7.03 — Indemnification Procedure. The Party seeking indemnification (the",
     "index": 34,
-    "original_header": "(c) Customer Data, including any allegation that Customer Data infringes any third",
+    "original_header": "Section 7.03 Indemnification Procedure. The Party seeking indemnification (the",
     "secondary_clause_type": "covenants",
-    "token_count": 270
+    "token_count": 212
   },
   {
     "char_end": 17869,
     "char_start": 17302,
-    "classification_confidence": 0.444,
-    "clause_type": "notices",
-    "content_head": "'ARTICLE VIII\\n\\nTERM AND TERMINATION\\n\\n\\nSection 8.01  Term. This Agreement shall co'",
-    "content_sha256": "d95e470c30a105c2765cea50fad28a5819a0c8cb5c3935ebf6456c4d0d03a381",
-    "context_header": "[Section: Article VIII — ARTICLE VIII] [Type: Notices] [Jurisdiction: US]",
+    "classification_confidence": 0.5,
+    "clause_type": "termination",
+    "content_head": "'ARTICLE VIII\\nTERM AND TERMINATION\\n\\nSection 8.01  Term. This Agreement shall comm'",
+    "content_sha256": "cf72042d45ff21c425bc3530545f6bc9d3fdba3a6f08bc23d491b5e616e95a27",
+    "context_header": "[Section: Article VIII — Term and Termination] [Type: Termination] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "ARTICLE VIII",
@@ -1069,12 +1033,12 @@
       },
       {
         "raw_text": "Section 8.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 35,
         "target_identifier": "8.01"
       },
       {
         "raw_text": "Section 8.02",
-        "target_chunk_index": null,
+        "target_chunk_index": 35,
         "target_identifier": "8.02"
       }
     ],
@@ -1082,23 +1046,24 @@
       "Agreement",
       "Effective Date",
       "Order Form",
+      "Party",
       "Term"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Article VIII — ARTICLE VIII",
+    "hierarchy_path": "Article VIII — Term and Termination",
     "index": 35,
-    "original_header": "Article VIII ARTICLE VIII",
-    "secondary_clause_type": "termination",
-    "token_count": 142
+    "original_header": "Article VIII Term and Termination",
+    "secondary_clause_type": "notices",
+    "token_count": 141
   },
   {
     "char_end": 18452,
     "char_start": 17869,
-    "classification_confidence": 0.455,
-    "clause_type": "termination",
-    "content_head": "'TERM AND TERMINATION\\nSection 8.03  Termination for Cause. Either Party may termi'",
-    "content_sha256": "6123c5c8d8bee3ebfee9079ef8bdf1cb887b16be2b3138542b5d1d7f8b896d9f",
-    "context_header": "[Section: TERM AND TERMINATION > Section 8.03 — Termination for Cause. Either Party may terminate this Agreement or any] [Type: Termination] [Jurisdiction: US]",
+    "classification_confidence": 0.393,
+    "clause_type": "notices",
+    "content_head": "'Article VIII Term and Termination\\nSection 8.03  Termination for Cause. Either Pa'",
+    "content_sha256": "8a7564e60caa3bf169b746a16aebba51a88580bb29a8f436416728298e0402c5",
+    "context_header": "[Section: Article VIII — Term and Termination > Section 8.03 — Termination for Cause. Either Party may terminate this Agreement or any] [Type: Notices] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 8.03",
@@ -1108,63 +1073,55 @@
     ],
     "defined_terms_used": [
       "Agreement",
-      "Order Form"
+      "Order Form",
+      "Party",
+      "Term"
     ],
     "document_section": "operative",
-    "hierarchy_path": "TERM AND TERMINATION > Section 8.03 — Termination for Cause. Either Party may terminate this Agreement or any",
+    "hierarchy_path": "Article VIII — Term and Termination > Section 8.03 — Termination for Cause. Either Party may terminate this Agreement or any",
     "index": 36,
     "original_header": "Section 8.03 Termination for Cause. Either Party may terminate this Agreement or any",
-    "secondary_clause_type": "notices",
-    "token_count": 151
+    "secondary_clause_type": "termination",
+    "token_count": 154
   },
   {
-    "char_end": 18990,
+    "char_end": 19144,
     "char_start": 18452,
     "classification_confidence": 0.6,
     "clause_type": "termination",
-    "content_head": "'TERM AND TERMINATION\\nSection 8.04  Effect of Termination. Upon the expiration or'",
-    "content_sha256": "85ff3e656055d499251af4482e48ded8c70b5aef0abcb177d78d254c1a2742cf",
-    "context_header": "[Section: TERM AND TERMINATION > Section 8.04 — Effect of Termination. Upon the expiration or termination of this Agreement] [Type: Termination] [Jurisdiction: US]",
+    "content_head": "'Article VIII Term and Termination\\nSection 8.04  Effect of Termination. Upon the '",
+    "content_sha256": "b05b0bfba1fb1bec4e5d12f50f04661d776229e06a707c2191269fe5479192e0",
+    "context_header": "[Section: Article VIII — Term and Termination > Section 8.04 — Effect of Termination. Upon the expiration or termination of this Agreement] [Type: Termination] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 8.04",
         "target_chunk_index": 37,
         "target_identifier": "8.04"
-      }
-    ],
-    "defined_terms_used": [
-      "Agreement",
-      "Confidential Information",
-      "Customer",
-      "Fees",
-      "Order Form",
-      "Services"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "TERM AND TERMINATION > Section 8.04 — Effect of Termination. Upon the expiration or termination of this Agreement",
-    "index": 37,
-    "original_header": "Section 8.04 Effect of Termination. Upon the expiration or termination of this Agreement",
-    "secondary_clause_type": "payment",
-    "token_count": 139
-  },
-  {
-    "char_end": 19541,
-    "char_start": 18990,
-    "classification_confidence": 1.0,
-    "clause_type": "governing_law",
-    "content_head": "'Article I, Section 3.01 through 3.04, Article IV, Article V (Sections 5.01, 5.03'",
-    "content_sha256": "bac6bb30781217d7edb9bcc235c87b2b3da81b611f528a2b511519ebd05b8d1a",
-    "context_header": "[Section: Article I — , Section 3.01 through 3.04, Article IV, Article V (Sections 5.01, 5.03, and 5.05),] [Type: Governing Law] [Jurisdiction: US]",
-    "cross_references": [
+      },
       {
         "raw_text": "Article I",
         "target_chunk_index": 2,
         "target_identifier": "I"
       },
       {
-        "raw_text": "Section 3.01",
-        "target_chunk_index": null,
+        "raw_text": "Section 3.01 through 3.04",
+        "target_chunk_index": 16,
         "target_identifier": "3.01"
+      },
+      {
+        "raw_text": "Section 3.01 through 3.04",
+        "target_chunk_index": 17,
+        "target_identifier": "3.02"
+      },
+      {
+        "raw_text": "Section 3.01 through 3.04",
+        "target_chunk_index": 18,
+        "target_identifier": "3.03"
+      },
+      {
+        "raw_text": "Section 3.01 through 3.04",
+        "target_chunk_index": 19,
+        "target_identifier": "3.04"
       },
       {
         "raw_text": "Article IV",
@@ -1178,7 +1135,7 @@
       },
       {
         "raw_text": "Sections 5.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 24,
         "target_identifier": "5.01"
       },
       {
@@ -1197,39 +1154,67 @@
         "target_identifier": "VII"
       },
       {
-        "raw_text": "Section 8.04",
-        "target_chunk_index": 37,
-        "target_identifier": "8.04"
-      },
-      {
         "raw_text": "Article IX",
-        "target_chunk_index": null,
+        "target_chunk_index": 38,
+        "target_identifier": "IX"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Confidential Information",
+      "Customer",
+      "Fees",
+      "Order Form",
+      "Party",
+      "Services",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VIII — Term and Termination > Section 8.04 — Effect of Termination. Upon the expiration or termination of this Agreement",
+    "index": 37,
+    "original_header": "Section 8.04 Effect of Termination. Upon the expiration or termination of this Agreement",
+    "secondary_clause_type": "payment",
+    "token_count": 181
+  },
+  {
+    "char_end": 19541,
+    "char_start": 19144,
+    "classification_confidence": 1.0,
+    "clause_type": "governing_law",
+    "content_head": "'ARTICLE IX\\nMISCELLANEOUS\\n\\nSection 9.01  Governing Law. This Agreement shall be g'",
+    "content_sha256": "d6b80e9e7e7695807bda70e7c57b049f1e365351c578268593273396ec2e99b8",
+    "context_header": "[Section: Article IX — Miscellaneous > Section 9.01 — Governing Law. This Agreement shall be governed by and construed in] [Type: Governing Law] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE IX",
+        "target_chunk_index": 38,
         "target_identifier": "IX"
       },
       {
         "raw_text": "Section 9.01",
-        "target_chunk_index": null,
+        "target_chunk_index": 38,
         "target_identifier": "9.01"
       }
     ],
     "defined_terms_used": [
-      "Agreement"
+      "Agreement",
+      "Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Article I — , Section 3.01 through 3.04, Article IV, Article V (Sections 5.01, 5.03, and 5.05),",
+    "hierarchy_path": "Article IX — Miscellaneous > Section 9.01 — Governing Law. This Agreement shall be governed by and construed in",
     "index": 38,
-    "original_header": "Article I , Section 3.01 through 3.04, Article IV, Article V (Sections 5.01, 5.03, and 5.05),",
+    "original_header": "Section 9.01 Governing Law. This Agreement shall be governed by and construed in",
     "secondary_clause_type": null,
-    "token_count": 138
+    "token_count": 99
   },
   {
     "char_end": 20143,
     "char_start": 19541,
     "classification_confidence": 0.577,
     "clause_type": "entire_agreement",
-    "content_head": "'MISCELLANEOUS\\nSection 9.02  Entire Agreement. This Agreement, together with all '",
-    "content_sha256": "e90433dd700f94ca1793a3839957924bb8811c0a88f7c406194ecde8caef8148",
-    "context_header": "[Section: MISCELLANEOUS > Section 9.02 — Entire Agreement. This Agreement, together with all Order Forms and] [Type: Entire Agreement] [Jurisdiction: US]",
+    "content_head": "'Article IX Miscellaneous\\nSection 9.02  Entire Agreement. This Agreement, togethe'",
+    "content_sha256": "0dacf8a61a3760fbf3d87bffa8b6ce349b50ef56896f67aa313bb8426e9a6f1c",
+    "context_header": "[Section: Article IX — Miscellaneous > Section 9.02 — Entire Agreement. This Agreement, together with all Order Forms and] [Type: Entire Agreement] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 9.02",
@@ -1238,23 +1223,24 @@
       }
     ],
     "defined_terms_used": [
-      "Agreement"
+      "Agreement",
+      "Parties"
     ],
     "document_section": "operative",
-    "hierarchy_path": "MISCELLANEOUS > Section 9.02 — Entire Agreement. This Agreement, together with all Order Forms and",
+    "hierarchy_path": "Article IX — Miscellaneous > Section 9.02 — Entire Agreement. This Agreement, together with all Order Forms and",
     "index": 39,
     "original_header": "Section 9.02 Entire Agreement. This Agreement, together with all Order Forms and",
     "secondary_clause_type": "amendment",
-    "token_count": 154
+    "token_count": 156
   },
   {
     "char_end": 20487,
     "char_start": 20143,
     "classification_confidence": 0.577,
     "clause_type": "severability",
-    "content_head": "'MISCELLANEOUS\\nSection 9.03  Severability. If any provision of this Agreement is '",
-    "content_sha256": "0d14de671b9218a0a9e94d4c6e61ef36caa1fd7048dd62cdfd3c2e0bb6a6ad64",
-    "context_header": "[Section: MISCELLANEOUS > Section 9.03 — Severability. If any provision of this Agreement is held to be invalid,] [Type: Severability] [Jurisdiction: US]",
+    "content_head": "'Article IX Miscellaneous\\nSection 9.03  Severability. If any provision of this Ag'",
+    "content_sha256": "7061ccfdca7de7668d60a6f737913fd63f630b84452c14a7b3aa36b95e67bc7a",
+    "context_header": "[Section: Article IX — Miscellaneous > Section 9.03 — Severability. If any provision of this Agreement is held to be invalid,] [Type: Severability] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 9.03",
@@ -1266,20 +1252,20 @@
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "MISCELLANEOUS > Section 9.03 — Severability. If any provision of this Agreement is held to be invalid,",
+    "hierarchy_path": "Article IX — Miscellaneous > Section 9.03 — Severability. If any provision of this Agreement is held to be invalid,",
     "index": 40,
     "original_header": "Section 9.03 Severability. If any provision of this Agreement is held to be invalid,",
     "secondary_clause_type": "governing_law",
-    "token_count": 89
+    "token_count": 92
   },
   {
     "char_end": 21110,
     "char_start": 20487,
     "classification_confidence": 1.0,
     "clause_type": "notices",
-    "content_head": "'MISCELLANEOUS\\nSection 9.04  Notices. All notices required or permitted under thi'",
-    "content_sha256": "d726bd7b24cd4ca8667c0318e72589f9cd30a5b856fa56d24e9c63ec21535ce3",
-    "context_header": "[Section: MISCELLANEOUS > Section 9.04 — Notices. All notices required or permitted under this Agreement shall be] [Type: Notices] [Jurisdiction: US]",
+    "content_head": "'Article IX Miscellaneous\\nSection 9.04  Notices. All notices required or permitte'",
+    "content_sha256": "358af996e9d37cb02cb7f865d22c41dbdda5eb9bfb36ac8a11280d85c6387bd6",
+    "context_header": "[Section: Article IX — Miscellaneous > Section 9.04 — Notices. All notices required or permitted under this Agreement shall be] [Type: Notices] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 9.04",
@@ -1288,23 +1274,24 @@
       }
     ],
     "defined_terms_used": [
-      "Agreement"
+      "Agreement",
+      "Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "MISCELLANEOUS > Section 9.04 — Notices. All notices required or permitted under this Agreement shall be",
+    "hierarchy_path": "Article IX — Miscellaneous > Section 9.04 — Notices. All notices required or permitted under this Agreement shall be",
     "index": 41,
     "original_header": "Section 9.04 Notices. All notices required or permitted under this Agreement shall be",
     "secondary_clause_type": null,
-    "token_count": 159
+    "token_count": 162
   },
   {
     "char_end": 21779,
     "char_start": 21110,
     "classification_confidence": 0.826,
     "clause_type": "assignment",
-    "content_head": "'MISCELLANEOUS\\nSection 9.05  Assignment. Neither Party may assign, delegate, or t'",
-    "content_sha256": "81473179dc65c92306cee5ebbe5624bfe5b7364d992811cddef373851964a14c",
-    "context_header": "[Section: MISCELLANEOUS > Section 9.05 — Assignment. Neither Party may assign, delegate, or transfer this Agreement] [Type: Assignment] [Jurisdiction: US]",
+    "content_head": "'Article IX Miscellaneous\\nSection 9.05  Assignment. Neither Party may assign, del'",
+    "content_sha256": "0778179d8ad8094d6e2ed523aed5763ebd913f0bb72d81496b0f560309b8ddee",
+    "context_header": "[Section: Article IX — Miscellaneous > Section 9.05 — Assignment. Neither Party may assign, delegate, or transfer this Agreement] [Type: Assignment] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 9.05",
@@ -1314,23 +1301,24 @@
     ],
     "defined_terms_used": [
       "Affiliate",
-      "Agreement"
+      "Agreement",
+      "Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "MISCELLANEOUS > Section 9.05 — Assignment. Neither Party may assign, delegate, or transfer this Agreement",
+    "hierarchy_path": "Article IX — Miscellaneous > Section 9.05 — Assignment. Neither Party may assign, delegate, or transfer this Agreement",
     "index": 42,
     "original_header": "Section 9.05 Assignment. Neither Party may assign, delegate, or transfer this Agreement",
     "secondary_clause_type": "covenants",
-    "token_count": 170
+    "token_count": 173
   },
   {
     "char_end": 22036,
     "char_start": 21779,
-    "classification_confidence": 1.0,
+    "classification_confidence": 0.625,
     "clause_type": "boilerplate",
-    "content_head": "'MISCELLANEOUS\\nSection 9.06  Waiver. No failure or delay by either Party to exerc'",
-    "content_sha256": "21dbea5dfcc08e40ef1015d5a147ebf4af3440028861189d2b2dc21168fabd1b",
-    "context_header": "[Section: MISCELLANEOUS > Section 9.06 — Waiver. No failure or delay by either Party to exercise any right under] [Type: Boilerplate] [Jurisdiction: US]",
+    "content_head": "'Article IX Miscellaneous\\nSection 9.06  Waiver. No failure or delay by either Par'",
+    "content_sha256": "552d26d31ef31ab104427311ee033bc6f59368ab2a887108eaf4b2cf4a8b2219",
+    "context_header": "[Section: Article IX — Miscellaneous > Section 9.06 — Waiver. No failure or delay by either Party to exercise any right under] [Type: Boilerplate] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 9.06",
@@ -1339,23 +1327,24 @@
       }
     ],
     "defined_terms_used": [
-      "Agreement"
+      "Agreement",
+      "Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "MISCELLANEOUS > Section 9.06 — Waiver. No failure or delay by either Party to exercise any right under",
+    "hierarchy_path": "Article IX — Miscellaneous > Section 9.06 — Waiver. No failure or delay by either Party to exercise any right under",
     "index": 43,
     "original_header": "Section 9.06 Waiver. No failure or delay by either Party to exercise any right under",
     "secondary_clause_type": null,
-    "token_count": 67
+    "token_count": 70
   },
   {
     "char_end": 22698,
     "char_start": 22036,
     "classification_confidence": 0.526,
     "clause_type": "force_majeure",
-    "content_head": "'MISCELLANEOUS\\nSection 9.07  Force Majeure. Neither Party shall be liable for any'",
-    "content_sha256": "f817247e0280cc45ae75eeb9cde650f2587720e3a45348dfb37d7c7d7eaf5f97",
-    "context_header": "[Section: MISCELLANEOUS > Section 9.07 — Force Majeure. Neither Party shall be liable for any failure or delay in] [Type: Force Majeure] [Jurisdiction: US]",
+    "content_head": "'Article IX Miscellaneous\\nSection 9.07  Force Majeure. Neither Party shall be lia'",
+    "content_sha256": "b8e598d36bb7df9a273a288584c6b0c94339dc947ae90d1f788957c7d09fe30f",
+    "context_header": "[Section: Article IX — Miscellaneous > Section 9.07 — Force Majeure. Neither Party shall be liable for any failure or delay in] [Type: Force Majeure] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 9.07",
@@ -1365,23 +1354,25 @@
     ],
     "defined_terms_used": [
       "Agreement",
-      "Force Majeure Event"
+      "Force Majeure Event",
+      "Party",
+      "control"
     ],
     "document_section": "operative",
-    "hierarchy_path": "MISCELLANEOUS > Section 9.07 — Force Majeure. Neither Party shall be liable for any failure or delay in",
+    "hierarchy_path": "Article IX — Miscellaneous > Section 9.07 — Force Majeure. Neither Party shall be liable for any failure or delay in",
     "index": 44,
     "original_header": "Section 9.07 Force Majeure. Neither Party shall be liable for any failure or delay in",
     "secondary_clause_type": "notices",
-    "token_count": 169
+    "token_count": 171
   },
   {
     "char_end": 23486,
     "char_start": 22698,
-    "classification_confidence": 1.0,
+    "classification_confidence": 0.625,
     "clause_type": "boilerplate",
-    "content_head": "'MISCELLANEOUS\\nSection 9.08  Counterparts. This Agreement may be executed in one '",
-    "content_sha256": "e0b8b93417c345ace8cbaa720a112130b7040c011772922741e9989a3def1186",
-    "context_header": "[Section: MISCELLANEOUS > Section 9.08 — Counterparts. This Agreement may be executed in one or more counterparts,] [Type: Boilerplate] [Jurisdiction: US]",
+    "content_head": "'Article IX Miscellaneous\\nSection 9.08  Counterparts. This Agreement may be execu'",
+    "content_sha256": "d08ebe41e81c9174aee369551d5ec7657deac0f9b3497548379ad87828c5b3fe",
+    "context_header": "[Section: Article IX — Miscellaneous > Section 9.08 — Counterparts. This Agreement may be executed in one or more counterparts,] [Type: Boilerplate] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 9.08",
@@ -1392,23 +1383,24 @@
     "defined_terms_used": [
       "Agreement",
       "Effective Date",
+      "Parties",
       "Services"
     ],
     "document_section": "operative",
-    "hierarchy_path": "MISCELLANEOUS > Section 9.08 — Counterparts. This Agreement may be executed in one or more counterparts,",
+    "hierarchy_path": "Article IX — Miscellaneous > Section 9.08 — Counterparts. This Agreement may be executed in one or more counterparts,",
     "index": 45,
     "original_header": "Section 9.08 Counterparts. This Agreement may be executed in one or more counterparts,",
     "secondary_clause_type": null,
-    "token_count": 200
+    "token_count": 203
   },
   {
-    "char_end": 23936,
+    "char_end": 24169,
     "char_start": 23486,
-    "classification_confidence": 0.0,
-    "clause_type": "unknown",
+    "classification_confidence": 0.562,
+    "clause_type": "services",
     "content_head": "'EXHIBIT A — STATEMENT OF WORK NO. 1\\n\\n1.   Description of Services\\n\\n     Provider'",
-    "content_sha256": "03353c061cb6ac8aa287d6b19f26e8a2c980210edb0e96b0d3c4e9ca84a061f3",
-    "context_header": "[Section: EXHIBIT A — — STATEMENT OF WORK NO. 1] [Type: Unknown] [Jurisdiction: US]",
+    "content_sha256": "416ddbf1ad225631d34872d945290a19c8ce9be0de1cabc4bcc7f2b74042009b",
+    "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1] [Type: Services] [Jurisdiction: US]",
     "cross_references": [],
     "defined_terms_used": [
       "Customer",
@@ -1419,22 +1411,29 @@
       "Services"
     ],
     "document_section": "schedules",
-    "hierarchy_path": "EXHIBIT A — — STATEMENT OF WORK NO. 1",
+    "hierarchy_path": "EXHIBIT A — STATEMENT OF WORK NO. 1",
     "index": 46,
-    "original_header": "EXHIBIT A — STATEMENT OF WORK NO. 1",
-    "secondary_clause_type": null,
-    "token_count": 112
+    "original_header": "EXHIBIT A STATEMENT OF WORK NO. 1",
+    "secondary_clause_type": "payment",
+    "token_count": 170
   },
   {
-    "char_end": 24942,
-    "char_start": 23936,
-    "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'EXHIBIT A — STATEMENT OF WORK NO. 1\\n     (b)  API Integration Services: Design, '",
-    "content_sha256": "ea029d388b90af016f28db0957b8ad448502c4cd2ef61584e92db794d596f798",
-    "context_header": "[Section: EXHIBIT A — — STATEMENT OF WORK NO. 1 > (b) — API Integration Services: Design, development, and testing of RESTful API] [Type: Payment] [Jurisdiction: US]",
-    "cross_references": [],
+    "char_end": 25346,
+    "char_start": 24169,
+    "classification_confidence": 0.571,
+    "clause_type": "services",
+    "content_head": "'EXHIBIT A STATEMENT OF WORK NO. 1\\n     (c)  Training and Enablement: Delivery of'",
+    "content_sha256": "deb5864b44698ac5ef1b17aa8c219e4f023e666705f2353144a8ae190d9b64bc",
+    "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1 > (c) — Training and Enablement: Delivery of up to twenty (20) hours of end-user] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3.01",
+        "target_chunk_index": 16,
+        "target_identifier": "3.01"
+      }
+    ],
     "defined_terms_used": [
+      "Agreement",
       "Customer",
       "Effective Date",
       "Fees",
@@ -1442,36 +1441,11 @@
       "SOW Effective Date",
       "Services"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "EXHIBIT A — — STATEMENT OF WORK NO. 1 > (b) — API Integration Services: Design, development, and testing of RESTful API",
+    "document_section": "schedules",
+    "hierarchy_path": "EXHIBIT A — STATEMENT OF WORK NO. 1 > (c) — Training and Enablement: Delivery of up to twenty (20) hours of end-user",
     "index": 47,
-    "original_header": "(b) API Integration Services: Design, development, and testing of RESTful API",
-    "secondary_clause_type": null,
-    "token_count": 260
-  },
-  {
-    "char_end": 25346,
-    "char_start": 24942,
-    "classification_confidence": 0.0,
-    "clause_type": "unknown",
-    "content_head": "'EXHIBIT A — STATEMENT OF WORK NO. 1\\n          (i)   USD $97,000 upon execution o'",
-    "content_sha256": "58a49391b2525492bb6a05ed8e74d896bd3e819d1813a955347abf9f08772d07",
-    "context_header": "[Section: EXHIBIT A — — STATEMENT OF WORK NO. 1 > (i) — USD $97,000 upon execution of this Exhibit A;] [Type: Unknown] [Jurisdiction: US]",
-    "cross_references": [
-      {
-        "raw_text": "Section 3.01",
-        "target_chunk_index": null,
-        "target_identifier": "3.01"
-      }
-    ],
-    "defined_terms_used": [
-      "Agreement"
-    ],
-    "document_section": "signatures",
-    "hierarchy_path": "EXHIBIT A — — STATEMENT OF WORK NO. 1 > (i) — USD $97,000 upon execution of this Exhibit A;",
-    "index": 48,
-    "original_header": "(i) USD $97,000 upon execution of this Exhibit A;",
-    "secondary_clause_type": null,
-    "token_count": 110
+    "original_header": "(c) Training and Enablement: Delivery of up to twenty (20) hours of end-user",
+    "secondary_clause_type": "payment",
+    "token_count": 302
   }
 ]

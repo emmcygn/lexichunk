@@ -22,23 +22,18 @@
     "token_count": 213
   },
   {
-    "char_end": 2950,
+    "char_end": 2529,
     "char_start": 852,
     "classification_confidence": 1.0,
     "clause_type": "definitions",
-    "content_head": "'1.   Definitions and interpretation\\n\\n\\n1.1  In this Agreement, the following term'",
-    "content_sha256": "355011585f339ac3f0feecd3d9a576c2ea6cfdd6a5107255e5bdb3228bc84169",
-    "context_header": "[Section: 1 — Definitions and interpretation] [Type: Definitions] [Jurisdiction: UK]",
+    "content_head": "'1.   Definitions and interpretation\\n\\n1.1  In this Agreement, the following terms'",
+    "content_sha256": "15083c39cbb932552dbb6bcbf2c32ce472d4a6b2faec01251d570744cbaf8810",
+    "context_header": "[Section: 1 — Definitions and interpretation > 1.1 — In this Agreement, the following terms shall have the meanings set out below:] [Type: Definitions] [Jurisdiction: UK]",
     "cross_references": [
       {
         "raw_text": "section 3",
-        "target_chunk_index": 12,
+        "target_chunk_index": null,
         "target_identifier": "3"
-      },
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
       }
     ],
     "defined_terms_used": [
@@ -51,46 +46,44 @@
       "Confidential Information",
       "Data Protection Legislation",
       "Disclosing Party",
-      "Fees",
       "Receiving Party",
       "Services",
-      "Supplier",
-      "UK GDPR"
+      "control"
     ],
     "document_section": "definitions",
-    "hierarchy_path": "1 — Definitions and interpretation",
+    "hierarchy_path": "1 — Definitions and interpretation > 1.1 — In this Agreement, the following terms shall have the meanings set out below:",
     "index": 1,
-    "original_header": "1 Definitions and interpretation",
+    "original_header": "1.1 In this Agreement, the following terms shall have the meanings set out below:",
     "secondary_clause_type": null,
-    "token_count": 514
+    "token_count": 419
   },
   {
     "char_end": 4486,
-    "char_start": 2950,
-    "classification_confidence": 0.316,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n1 Software Development Services\\n\"Intellectua'",
-    "content_sha256": "17b70d83d462e75b483fd441675820e0ff2503f51493dc6e7a87af387ba76707",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1.__part1 — In this Agreement, the following terms shall have the meanings set out below:] [Type: Payment] [Jurisdiction: UK]",
+    "char_start": 2529,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'1 Definitions and interpretation\\n(Withdrawal) Act 2018, as amended from\\n     tim'",
+    "content_sha256": "9b435f6feacb966b95d6f15181efb8511179c3d0bbe81a77644af4270408cd8d",
+    "context_header": "[Section: 1 — Definitions and interpretation > 1.1 — In this Agreement, the following terms shall have the meanings set out below:] [Type: Definitions] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
+        "raw_text": "Schedule 2",
+        "target_chunk_index": 48,
         "target_identifier": "2"
       },
       {
         "raw_text": "Schedule 1",
-        "target_chunk_index": 1,
+        "target_chunk_index": 42,
         "target_identifier": "1"
       },
       {
         "raw_text": "Schedule 3",
-        "target_chunk_index": 12,
+        "target_chunk_index": null,
         "target_identifier": "3"
       },
       {
         "raw_text": "clause 6",
-        "target_chunk_index": 30,
+        "target_chunk_index": 27,
         "target_identifier": "6"
       }
     ],
@@ -98,112 +91,87 @@
       "Agreement",
       "Client",
       "Commencement Date",
+      "Fees",
       "Intellectual Property Rights",
       "Service Levels",
       "Services",
       "Supplier",
-      "Term"
+      "Term",
+      "UK GDPR"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1.__part1 — In this Agreement, the following terms shall have the meanings set out below:",
+    "document_section": "definitions",
+    "hierarchy_path": "1 — Definitions and interpretation > 1.1 — In this Agreement, the following terms shall have the meanings set out below:",
     "index": 2,
-    "original_header": "1.1.__part1 In this Agreement, the following terms shall have the meanings set out below:",
-    "secondary_clause_type": "intellectual_property",
-    "token_count": 396
+    "original_header": "1.1 In this Agreement, the following terms shall have the meanings set out below:",
+    "secondary_clause_type": null,
+    "token_count": 497
   },
   {
     "char_end": 4812,
     "char_start": 4486,
     "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n1 Software Development Services\\n1.2  In this'",
-    "content_sha256": "594ce4f4433cc36d7a54bc09e1a826a497766efbc3f4b35db35ec583382c8508",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.2 — In this Agreement, unless the context otherwise requires:] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "clause_type": "definitions",
+    "content_head": "'1 Definitions and interpretation\\n1.2  In this Agreement, unless the context othe'",
+    "content_sha256": "8d72da7867e36d2597fec4917d5c04a90dd5d2f2d1222b2f8cbe150788399d48",
+    "context_header": "[Section: 1 — Definitions and interpretation > 1.2 — In this Agreement, unless the context otherwise requires: > (a) — references to clauses, schedules and paragraphs are to clauses of, schedules to] [Type: Definitions] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
-      "Agreement",
-      "Services"
+      "Agreement"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.2 — In this Agreement, unless the context otherwise requires:",
+    "document_section": "definitions",
+    "hierarchy_path": "1 — Definitions and interpretation > 1.2 — In this Agreement, unless the context otherwise requires: > (a) — references to clauses, schedules and paragraphs are to clauses of, schedules to",
     "index": 3,
-    "original_header": "1.2 In this Agreement, unless the context otherwise requires:",
+    "original_header": "(a) references to clauses, schedules and paragraphs are to clauses of, schedules to",
     "secondary_clause_type": null,
-    "token_count": 99
+    "token_count": 89
   },
   {
     "char_end": 5102,
     "char_start": 4812,
-    "classification_confidence": 0.667,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n1 Software Development Services\\n1.2 In this '",
-    "content_sha256": "528002da7c9828ce560f2a4e8cfe74b5bfd4ef6f7e8ff8d3986501e9422ca4ea",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.2 — In this Agreement, unless the context otherwise requires: > (c) — a reference to a statute or statutory provision includes any subordinate] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'1 Definitions and interpretation\\n1.2 In this Agreement, unless the context other'",
+    "content_sha256": "8e494d0499e1f36f83d2425c6f8c81fad92bae7c2e11ed10d4d3eecfd371b7f7",
+    "context_header": "[Section: 1 — Definitions and interpretation > 1.2 — In this Agreement, unless the context otherwise requires: > (c) — a reference to a statute or statutory provision includes any subordinate] [Type: Definitions] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
-      "Agreement",
-      "Services"
+      "Agreement"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.2 — In this Agreement, unless the context otherwise requires: > (c) — a reference to a statute or statutory provision includes any subordinate",
+    "document_section": "definitions",
+    "hierarchy_path": "1 — Definitions and interpretation > 1.2 — In this Agreement, unless the context otherwise requires: > (c) — a reference to a statute or statutory provision includes any subordinate",
     "index": 4,
     "original_header": "(c) a reference to a statute or statutory provision includes any subordinate",
-    "secondary_clause_type": "amendment",
-    "token_count": 105
+    "secondary_clause_type": null,
+    "token_count": 96
   },
   {
-    "char_end": 5379,
+    "char_end": 5612,
     "char_start": 5102,
     "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n1 Software Development Services\\n1.2 In this '",
-    "content_sha256": "3885ceb0bde7185337451b12ea80060e5afad00e8a15d72b50213b117ae646de",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.2 — In this Agreement, unless the context otherwise requires: > (d) — a reference to a \"person\" includes any individual, company, partnership,] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "clause_type": "definitions",
+    "content_head": "'1 Definitions and interpretation\\n1.2 In this Agreement, unless the context other'",
+    "content_sha256": "2ecf6eee22b93c38426e55ffc3b9f182314fda51a73ae7ca6695678e66214f29",
+    "context_header": "[Section: 1 — Definitions and interpretation > 1.2 — In this Agreement, unless the context otherwise requires: > (d) — a reference to a \"person\" includes any individual, company, partnership,] [Type: Definitions] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
-      "Agreement",
-      "Services"
+      "Agreement"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.2 — In this Agreement, unless the context otherwise requires: > (d) — a reference to a \"person\" includes any individual, company, partnership,",
+    "document_section": "definitions",
+    "hierarchy_path": "1 — Definitions and interpretation > 1.2 — In this Agreement, unless the context otherwise requires: > (d) — a reference to a \"person\" includes any individual, company, partnership,",
     "index": 5,
     "original_header": "(d) a reference to a \"person\" includes any individual, company, partnership,",
     "secondary_clause_type": null,
-    "token_count": 101
+    "token_count": 151
   },
   {
-    "char_end": 5893,
-    "char_start": 5379,
-    "classification_confidence": 0.75,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n1 Software Development Services\\n1.2 In this '",
-    "content_sha256": "00f064e8df6aa44c812afa0341e695b995441b877c27e6dbb75ca8672239305d",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.2 — In this Agreement, unless the context otherwise requires: > (e) — any phrase introduced by the terms \"including\", \"include\", \"in particular\" or] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "char_end": 6103,
+    "char_start": 5612,
+    "classification_confidence": 1.0,
+    "clause_type": "services",
+    "content_head": "'2.   Services\\n\\n2.1  With effect from the Commencement Date and throughout the Te'",
+    "content_sha256": "7584a177a59e0ad318137f2918059016b2bb5f9a8ea474bc2f097ae6b429f290",
+    "context_header": "[Section: 2 — Services] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Client",
@@ -214,108 +182,64 @@
       "Term"
     ],
     "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.2 — In this Agreement, unless the context otherwise requires: > (e) — any phrase introduced by the terms \"including\", \"include\", \"in particular\" or",
+    "hierarchy_path": "2 — Services",
     "index": 6,
-    "original_header": "(e) any phrase introduced by the terms \"including\", \"include\", \"in particular\" or",
-    "secondary_clause_type": "covenants",
-    "token_count": 161
+    "original_header": "2 Services",
+    "secondary_clause_type": null,
+    "token_count": 122
   },
   {
     "char_end": 6506,
-    "char_start": 5893,
-    "classification_confidence": 0.857,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n2 Managed Support Services\\n2.2  The Supplier'",
-    "content_sha256": "88f0c8577e42c0338218e1393988028b91fd10820bf200f490b06c826ae947ae",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.2 — The Supplier shall provide the Services with reasonable care and skill and in] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "char_start": 6103,
+    "classification_confidence": 0.562,
+    "clause_type": "services",
+    "content_head": "'2 Services\\n2.3  The Supplier shall procure that sufficient personnel with approp'",
+    "content_sha256": "384d9d27ba0f56f4a19bf36b0c0d69e59326a1c5f742554b2f0d9009a0c88903",
+    "context_header": "[Section: 2 — Services > 2.3 — The Supplier shall procure that sufficient personnel with appropriate qualifications,] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Client",
       "Services",
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.2 — The Supplier shall provide the Services with reasonable care and skill and in",
+    "hierarchy_path": "2 — Services > 2.3 — The Supplier shall procure that sufficient personnel with appropriate qualifications,",
     "index": 7,
-    "original_header": "2.2 The Supplier shall provide the Services with reasonable care and skill and in",
+    "original_header": "2.3 The Supplier shall procure that sufficient personnel with appropriate qualifications,",
     "secondary_clause_type": "assignment",
-    "token_count": 169
+    "token_count": 103
   },
   {
-    "char_end": 6771,
+    "char_end": 6795,
     "char_start": 6506,
-    "classification_confidence": 0.5,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n2 Managed Support Services\\n2.4  The Supplier'",
-    "content_sha256": "c7ccfd8f57d21b433da629c5d4317627b10981a8aede17a9ebaa3699edc89db2",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.4 — The Supplier shall comply with all applicable laws and regulations in the performance] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "classification_confidence": 0.444,
+    "clause_type": "data_protection",
+    "content_head": "'2 Services\\n2.4  The Supplier shall comply with all applicable laws and regulatio'",
+    "content_sha256": "b0da8f9f47b7e250642605de259cabe928d614823a790a896e39707c0b1618f2",
+    "context_header": "[Section: 2 — Services > 2.4 — The Supplier shall comply with all applicable laws and regulations in the performance] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
+      "Client",
       "Data Protection Legislation",
       "Services",
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.4 — The Supplier shall comply with all applicable laws and regulations in the performance",
+    "hierarchy_path": "2 — Services > 2.4 — The Supplier shall comply with all applicable laws and regulations in the performance",
     "index": 8,
     "original_header": "2.4 The Supplier shall comply with all applicable laws and regulations in the performance",
-    "secondary_clause_type": "data_protection",
-    "token_count": 82
-  },
-  {
-    "char_end": 7104,
-    "char_start": 6771,
-    "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n2 Managed Support Services\\n2.5  The Client s'",
-    "content_sha256": "4b6a657b10b3a411109b33f1718a92d72074ff93a92726af618a6b2216657034",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.5 — The Client shall:] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
-    "defined_terms_used": [
-      "Client",
-      "Services",
-      "Supplier"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.5 — The Client shall:",
-    "index": 9,
-    "original_header": "2.5 The Client shall:",
-    "secondary_clause_type": null,
-    "token_count": 99
+    "secondary_clause_type": "services",
+    "token_count": 75
   },
   {
     "char_end": 7458,
-    "char_start": 7104,
+    "char_start": 6795,
     "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n2 Managed Support Services\\n2.5 The Client sh'",
-    "content_sha256": "b9e9543608ff28b0779a658b0515e70a5e5feb933982ac2b87a10861386dbc1f",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.5 — The Client shall: > (c) — be responsible for the acts and omissions of the Authorised Users in relation] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "clause_type": "services",
+    "content_head": "'2 Services\\n2.5 The Client shall:\\n     (a)  provide the Supplier with such inform'",
+    "content_sha256": "b25b2d8467381545187629ffaea357171bfa723c7653ba40a326bb813ec1de59",
+    "context_header": "[Section: 2 — Services > 2.5 — The Client shall: > (a) — provide the Supplier with such information, materials, access and cooperation] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Authorised Users",
@@ -324,34 +248,29 @@
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.5 — The Client shall: > (c) — be responsible for the acts and omissions of the Authorised Users in relation",
-    "index": 10,
-    "original_header": "(c) be responsible for the acts and omissions of the Authorised Users in relation",
+    "hierarchy_path": "2 — Services > 2.5 — The Client shall: > (a) — provide the Supplier with such information, materials, access and cooperation",
+    "index": 9,
+    "original_header": "(a) provide the Supplier with such information, materials, access and cooperation",
     "secondary_clause_type": null,
-    "token_count": 110
+    "token_count": 174
   },
   {
     "char_end": 8165,
     "char_start": 7458,
     "classification_confidence": 0.6,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n2 Managed Support Services\\n2.6  The Supplier'",
-    "content_sha256": "d5e90c5c1700e4c999cf97021ffc94a020cc159aba068c79c55a12fd7305f930",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.6 — The Supplier shall not be responsible for any failure or delay in the performance of] [Type: Payment] [Jurisdiction: UK]",
+    "clause_type": "services",
+    "content_head": "'2 Services\\n2.6  The Supplier shall not be responsible for any failure or delay i'",
+    "content_sha256": "7acd76d26ae25ee15058865a7127701e14ce956e9b8fcffba448a3d04ced3a85",
+    "context_header": "[Section: 2 — Services > 2.6 — The Supplier shall not be responsible for any failure or delay in the performance of] [Type: Services] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clause 2.5",
-        "target_chunk_index": 9,
+        "target_chunk_index": 8,
         "target_identifier": "2.5"
       },
       {
         "raw_text": "Schedule 4",
-        "target_chunk_index": 18,
+        "target_chunk_index": null,
         "target_identifier": "4"
       }
     ],
@@ -362,116 +281,56 @@
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.6 — The Supplier shall not be responsible for any failure or delay in the performance of",
-    "index": 11,
+    "hierarchy_path": "2 — Services > 2.6 — The Supplier shall not be responsible for any failure or delay in the performance of",
+    "index": 10,
     "original_header": "2.6 The Supplier shall not be responsible for any failure or delay in the performance of",
     "secondary_clause_type": "governing_law",
-    "token_count": 192
+    "token_count": 179
   },
   {
-    "char_end": 8624,
+    "char_end": 8906,
     "char_start": 8165,
     "classification_confidence": 1.0,
     "clause_type": "payment",
-    "content_head": "'3.   Fees and payment\\n\\n\\n3.1  In consideration of the provision of the Services, '",
-    "content_sha256": "8d61c07da35618334ca3602271c95c76a79d515d348fc9b702221bbcce3318f3",
+    "content_head": "'3.   Fees and payment\\n\\n3.1  In consideration of the provision of the Services, t'",
+    "content_sha256": "70a89a6b6111b9e6cdfbdb06fc02936bef8a6716df9f06d8dc18544e2ec8b7fd",
     "context_header": "[Section: 3 — Fees and payment] [Type: Payment] [Jurisdiction: UK]",
     "cross_references": [
       {
         "raw_text": "clause 3",
-        "target_chunk_index": 12,
+        "target_chunk_index": 11,
         "target_identifier": "3"
       },
       {
         "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
+        "target_chunk_index": 48,
         "target_identifier": "2"
       }
     ],
     "defined_terms_used": [
       "Client",
       "Fees",
+      "Payment Due Date",
       "Services",
       "Supplier"
     ],
     "document_section": "operative",
     "hierarchy_path": "3 — Fees and payment",
-    "index": 12,
+    "index": 11,
     "original_header": "3 Fees and payment",
     "secondary_clause_type": null,
-    "token_count": 115
+    "token_count": 185
   },
   {
     "char_end": 9379,
-    "char_start": 8624,
-    "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'Schedule 2\\n3.3  The Client shall pay each undisputed invoice within thirty (30) '",
-    "content_sha256": "2aff9ef9be03ea3563e37498f1e0c0d9af1b1fa79b692acaea2db3b8fc252721",
-    "context_header": "[Section: Schedule 2 > 3.3 — The Client shall pay each undisputed invoice within thirty (30) days of the date of] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
-    "defined_terms_used": [
-      "Client",
-      "Payment Due Date",
-      "Supplier"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 3.3 — The Client shall pay each undisputed invoice within thirty (30) days of the date of",
-    "index": 13,
-    "original_header": "3.3 The Client shall pay each undisputed invoice within thirty (30) days of the date of",
-    "secondary_clause_type": null,
-    "token_count": 73
-  },
-  {
-    "char_end": 9203,
     "char_start": 8906,
-    "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'Schedule 2\\n3.4 If the Client fails to pay any invoice by the Payment Due Date, t'",
-    "content_sha256": "6d23419d37d167ec035e1e7f060019b3abedfc8543c1808d076f211034c6de51",
-    "context_header": "[Section: Schedule 2 > 3.4 — If the Client fails to pay any invoice by the Payment Due Date, the Supplier may, > (a) — charge interest on the overdue amount at the rate of four percent (4%) per] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
-    "defined_terms_used": [
-      "Client",
-      "Payment Due Date",
-      "Supplier"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 3.4 — If the Client fails to pay any invoice by the Payment Due Date, the Supplier may, > (a) — charge interest on the overdue amount at the rate of four percent (4%) per",
-    "index": 14,
-    "original_header": "(a) charge interest on the overdue amount at the rate of four percent (4%) per",
-    "secondary_clause_type": null,
-    "token_count": 98
-  },
-  {
-    "char_end": 9675,
-    "char_start": 9203,
     "classification_confidence": 0.8,
     "clause_type": "payment",
-    "content_head": "'Schedule 2\\n3.4 If the Client fails to pay any invoice by the Payment Due Date, t'",
-    "content_sha256": "7703f2ebdd75a2fd54052a90bb94746ced5bf90cc0b60eabe5055ef8e6ad0ae1",
-    "context_header": "[Section: Schedule 2 > 3.4 — If the Client fails to pay any invoice by the Payment Due Date, the Supplier may, > (b) — after giving the Client not less than fifteen (15) Business Days' written notice,] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "content_head": "'3 Fees and payment\\n3.4 If the Client fails to pay any invoice by the Payment Due'",
+    "content_sha256": "cd640ab76c8035c760bf545af217d34302e69f08779da0efc47d28fa6d68fc74",
+    "context_header": "[Section: 3 — Fees and payment > 3.4 — If the Client fails to pay any invoice by the Payment Due Date, the Supplier may, > (a) — charge interest on the overdue amount at the rate of four percent (4%) per] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
-      "Agreement",
       "Client",
       "Fees",
       "Payment Due Date",
@@ -479,54 +338,64 @@
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 3.4 — If the Client fails to pay any invoice by the Payment Due Date, the Supplier may, > (b) — after giving the Client not less than fifteen (15) Business Days' written notice,",
-    "index": 15,
-    "original_header": "(b) after giving the Client not less than fifteen (15) Business Days' written notice,",
+    "hierarchy_path": "3 — Fees and payment > 3.4 — If the Client fails to pay any invoice by the Payment Due Date, the Supplier may, > (a) — charge interest on the overdue amount at the rate of four percent (4%) per",
+    "index": 12,
+    "original_header": "(a) charge interest on the overdue amount at the rate of four percent (4%) per",
     "secondary_clause_type": "notices",
-    "token_count": 142
+    "token_count": 144
   },
   {
-    "char_end": 9986,
-    "char_start": 9675,
+    "char_end": 9763,
+    "char_start": 9379,
     "classification_confidence": 1.0,
     "clause_type": "payment",
-    "content_head": "'Schedule 2\\n3.6  If the Client disputes in good faith any element of an invoice, '",
-    "content_sha256": "5cdec9514626231f4715b0e5a1cefde5175e8fad9185066d8249195c320393fe",
-    "context_header": "[Section: Schedule 2 > 3.6 — If the Client disputes in good faith any element of an invoice, the Client shall:] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
+    "content_head": "'3 Fees and payment\\n3.5  All Fees quoted and payable under this Agreement are exc'",
+    "content_sha256": "3812839a28b82cbee00b6b14547ec94a2e5b253b99310403ca0ac2708bba3380",
+    "context_header": "[Section: 3 — Fees and payment > 3.5 — All Fees quoted and payable under this Agreement are exclusive of value added tax] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Agreement",
+      "Client",
+      "Fees"
     ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Fees and payment > 3.5 — All Fees quoted and payable under this Agreement are exclusive of value added tax",
+    "index": 13,
+    "original_header": "3.5 All Fees quoted and payable under this Agreement are exclusive of value added tax",
+    "secondary_clause_type": null,
+    "token_count": 100
+  },
+  {
+    "char_end": 10078,
+    "char_start": 9763,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'3 Fees and payment\\n3.6 If the Client disputes in good faith any element of an in'",
+    "content_sha256": "c32cecb0c93280a8117801e3140ab98d2f9f0917c6515da6474f1a41119b41d9",
+    "context_header": "[Section: 3 — Fees and payment > 3.6 — If the Client disputes in good faith any element of an invoice, the Client shall: > (a) — pay the undisputed portion of such invoice by the Payment Due Date;] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Client",
+      "Fees",
       "Payment Due Date",
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 3.6 — If the Client disputes in good faith any element of an invoice, the Client shall:",
-    "index": 16,
-    "original_header": "3.6 If the Client disputes in good faith any element of an invoice, the Client shall:",
+    "hierarchy_path": "3 — Fees and payment > 3.6 — If the Client disputes in good faith any element of an invoice, the Client shall: > (a) — pay the undisputed portion of such invoice by the Payment Due Date;",
+    "index": 14,
+    "original_header": "(a) pay the undisputed portion of such invoice by the Payment Due Date;",
     "secondary_clause_type": null,
-    "token_count": 81
+    "token_count": 105
   },
   {
     "char_end": 10483,
-    "char_start": 9986,
-    "classification_confidence": 0.364,
+    "char_start": 10078,
+    "classification_confidence": 0.5,
     "clause_type": "payment",
-    "content_head": "'Schedule 2\\n3.6 If the Client disputes in good faith any element of an invoice, t'",
-    "content_sha256": "9b397643f73180d095ea8d8f835abfca74dcb5d2a89881e9bef928d8d25e55c6",
-    "context_header": "[Section: Schedule 2 > 3.6 — If the Client disputes in good faith any element of an invoice, the Client shall: > (c) — co-operate in good faith with the Supplier to resolve the dispute expeditiously.] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "content_head": "'3 Fees and payment\\n3.7  The Supplier shall be entitled to review and increase th'",
+    "content_sha256": "6b5505517b53ed6fd49c179522ee98d2271eb873cd935713fe574a43864bc503",
+    "context_header": "[Section: 3 — Fees and payment > 3.7 — The Supplier shall be entitled to review and increase the Fees annually on each] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Client",
       "Commencement Date",
@@ -534,29 +403,24 @@
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 3.6 — If the Client disputes in good faith any element of an invoice, the Client shall: > (c) — co-operate in good faith with the Supplier to resolve the dispute expeditiously.",
-    "index": 17,
-    "original_header": "(c) co-operate in good faith with the Supplier to resolve the dispute expeditiously.",
+    "hierarchy_path": "3 — Fees and payment > 3.7 — The Supplier shall be entitled to review and increase the Fees annually on each",
+    "index": 15,
+    "original_header": "3.7 The Supplier shall be entitled to review and increase the Fees annually on each",
     "secondary_clause_type": "limitation_of_liability",
-    "token_count": 148
+    "token_count": 106
   },
   {
-    "char_end": 10758,
+    "char_end": 10832,
     "char_start": 10483,
     "classification_confidence": 0.714,
     "clause_type": "confidentiality",
-    "content_head": "'Schedule 2\\n4.   Confidentiality\\n\\n\\n4.1  Each party undertakes to keep confidentia'",
-    "content_sha256": "0759fbf83bbf67723c338fbff7d4d3af03651d78f91a57847f8c904e644eb683",
-    "context_header": "[Section: Schedule 2 > 4 — Confidentiality] [Type: Confidentiality] [Jurisdiction: UK]",
+    "content_head": "'4.   Confidentiality\\n\\n4.1  Each party undertakes to keep confidential and not to'",
+    "content_sha256": "07834f5d3ef770b67ff7c7da033c3e46bb3c0f5751fe89eff2699d7d46a05c2a",
+    "context_header": "[Section: 4 — Confidentiality] [Type: Confidentiality] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clause 4",
-        "target_chunk_index": 18,
+        "target_chunk_index": 16,
         "target_identifier": "4"
       }
     ],
@@ -565,29 +429,24 @@
       "Disclosing Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 4 — Confidentiality",
-    "index": 18,
+    "hierarchy_path": "4 — Confidentiality",
+    "index": 16,
     "original_header": "4 Confidentiality",
     "secondary_clause_type": "covenants",
-    "token_count": 71
+    "token_count": 87
   },
   {
     "char_end": 11173,
-    "char_start": 10758,
+    "char_start": 10832,
     "classification_confidence": 1.0,
     "clause_type": "confidentiality",
-    "content_head": "\"Schedule 2\\n4 Confidentiality\\n4.2  Each party may disclose the other party's Conf\"",
-    "content_sha256": "02e930284a8844f3f51dbc94d0f7247285d0208c514c76ab4e5f7b328c1afaed",
-    "context_header": "[Section: Schedule 2 > 4 — Confidentiality > 4.2 — Each party may disclose the other party's Confidential Information:] [Type: Confidentiality] [Jurisdiction: UK]",
+    "content_head": "\"4 Confidentiality\\n4.2 Each party may disclose the other party's Confidential Inf\"",
+    "content_sha256": "101f37bac8f2400d97eb89011c120ef9620de68873bf6a683d09bfc0b9bede6e",
+    "context_header": "[Section: 4 — Confidentiality > 4.2 — Each party may disclose the other party's Confidential Information: > (a) — to its employees, officers, directors, Affiliates, agents or professional] [Type: Confidentiality] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clause 4",
-        "target_chunk_index": 18,
+        "target_chunk_index": 16,
         "target_identifier": "4"
       }
     ],
@@ -596,142 +455,73 @@
       "Confidential Information"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 4 — Confidentiality > 4.2 — Each party may disclose the other party's Confidential Information:",
-    "index": 19,
-    "original_header": "4.2 Each party may disclose the other party's Confidential Information:",
+    "hierarchy_path": "4 — Confidentiality > 4.2 — Each party may disclose the other party's Confidential Information: > (a) — to its employees, officers, directors, Affiliates, agents or professional",
+    "index": 17,
+    "original_header": "(a) to its employees, officers, directors, Affiliates, agents or professional",
     "secondary_clause_type": null,
-    "token_count": 111
+    "token_count": 107
   },
   {
     "char_end": 11611,
     "char_start": 11173,
     "classification_confidence": 0.5,
     "clause_type": "confidentiality",
-    "content_head": "\"Schedule 2\\n4 Confidentiality\\n4.2 Each party may disclose the other party's Confi\"",
-    "content_sha256": "7bad38bdd602f4cdd654a5000d515543672380f9f2191b867e5a3f1a35df53b3",
-    "context_header": "[Section: Schedule 2 > 4 — Confidentiality > 4.2 — Each party may disclose the other party's Confidential Information: > (b) — to the extent required by applicable law, any governmental or regulatory] [Type: Confidentiality] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "content_head": "\"4 Confidentiality\\n4.2 Each party may disclose the other party's Confidential Inf\"",
+    "content_sha256": "3972af6de145bbd3e1aa490dc9e7235dcb0c55f4fe99aee212c715662068d0c9",
+    "context_header": "[Section: 4 — Confidentiality > 4.2 — Each party may disclose the other party's Confidential Information: > (b) — to the extent required by applicable law, any governmental or regulatory] [Type: Confidentiality] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Confidential Information",
       "Disclosing Party",
       "Receiving Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 4 — Confidentiality > 4.2 — Each party may disclose the other party's Confidential Information: > (b) — to the extent required by applicable law, any governmental or regulatory",
-    "index": 20,
+    "hierarchy_path": "4 — Confidentiality > 4.2 — Each party may disclose the other party's Confidential Information: > (b) — to the extent required by applicable law, any governmental or regulatory",
+    "index": 18,
     "original_header": "(b) to the extent required by applicable law, any governmental or regulatory",
     "secondary_clause_type": "governing_law",
-    "token_count": 134
+    "token_count": 132
   },
   {
-    "char_end": 11994,
+    "char_end": 12307,
     "char_start": 11611,
     "classification_confidence": 0.714,
     "clause_type": "confidentiality",
-    "content_head": "'Schedule 2\\n4 Confidentiality\\n4.3  The obligations of confidentiality in clause 4'",
-    "content_sha256": "7093454c8ef045acc3aaa576fe2c68f846cfc3d1bf8ed6495359606269798316",
-    "context_header": "[Section: Schedule 2 > 4 — Confidentiality > 4.3 — The obligations of confidentiality in clause 4.1 shall not apply to information that:] [Type: Confidentiality] [Jurisdiction: UK]",
+    "content_head": "'4 Confidentiality\\n4.3  The obligations of confidentiality in clause 4.1 shall no'",
+    "content_sha256": "5c46c448cee252023d214514b567fc8650e28aa7160f19738cd2080839a4f491",
+    "context_header": "[Section: 4 — Confidentiality > 4.3 — The obligations of confidentiality in clause 4.1 shall not apply to information that:] [Type: Confidentiality] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clause 4.1",
-        "target_chunk_index": null,
+        "target_chunk_index": 16,
         "target_identifier": "4.1"
       }
     ],
     "defined_terms_used": [
       "Agreement",
-      "Receiving Party"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 4 — Confidentiality > 4.3 — The obligations of confidentiality in clause 4.1 shall not apply to information that:",
-    "index": 21,
-    "original_header": "4.3 The obligations of confidentiality in clause 4.1 shall not apply to information that:",
-    "secondary_clause_type": "covenants",
-    "token_count": 103
-  },
-  {
-    "char_end": 12307,
-    "char_start": 11994,
-    "classification_confidence": 0.714,
-    "clause_type": "confidentiality",
-    "content_head": "'Schedule 2\\n4 Confidentiality\\n4.3 The obligations of confidentiality in clause 4.'",
-    "content_sha256": "f88d0b5fdd1119da4aab00397bb4f1b78798cf3f7ce414f8df2563b49f3d575c",
-    "context_header": "[Section: Schedule 2 > 4 — Confidentiality > 4.3 — The obligations of confidentiality in clause 4.1 shall not apply to information that: > (c) — is received by the Receiving Party from a third party who is not under any] [Type: Confidentiality] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
-        "raw_text": "clause 4.1",
-        "target_chunk_index": null,
-        "target_identifier": "4.1"
-      }
-    ],
-    "defined_terms_used": [
       "Confidential Information",
       "Disclosing Party",
       "Receiving Party"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 4 — Confidentiality > 4.3 — The obligations of confidentiality in clause 4.1 shall not apply to information that: > (c) — is received by the Receiving Party from a third party who is not under any",
-    "index": 22,
-    "original_header": "(c) is received by the Receiving Party from a third party who is not under any",
+    "hierarchy_path": "4 — Confidentiality > 4.3 — The obligations of confidentiality in clause 4.1 shall not apply to information that:",
+    "index": 19,
+    "original_header": "4.3 The obligations of confidentiality in clause 4.1 shall not apply to information that:",
     "secondary_clause_type": "covenants",
-    "token_count": 108
+    "token_count": 178
   },
   {
-    "char_end": 12654,
+    "char_end": 12787,
     "char_start": 12307,
-    "classification_confidence": 1.0,
+    "classification_confidence": 0.75,
     "clause_type": "confidentiality",
-    "content_head": "'Schedule 2\\n4 Confidentiality\\n4.4  Each party shall take all reasonable steps to '",
-    "content_sha256": "ff520d5a2e34797f2ced80454326c5e373b4a356186af102c18411610a13265b",
-    "context_header": "[Section: Schedule 2 > 4 — Confidentiality > 4.4 — Each party shall take all reasonable steps to protect the other party's Confidential] [Type: Confidentiality] [Jurisdiction: UK]",
+    "content_head": "'4 Confidentiality\\n4.4  Each party shall take all reasonable steps to protect the'",
+    "content_sha256": "980b72e58a4176c7af8ebcbaa6d7671b6d7ad7db8cee0de5c9a48feada88e473",
+    "context_header": "[Section: 4 — Confidentiality > 4.4 — Each party shall take all reasonable steps to protect the other party's Confidential] [Type: Confidentiality] [Jurisdiction: UK]",
     "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
-    "defined_terms_used": [],
-    "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 4 — Confidentiality > 4.4 — Each party shall take all reasonable steps to protect the other party's Confidential",
-    "index": 23,
-    "original_header": "4.4 Each party shall take all reasonable steps to protect the other party's Confidential",
-    "secondary_clause_type": null,
-    "token_count": 94
-  },
-  {
-    "char_end": 13035,
-    "char_start": 12654,
-    "classification_confidence": 0.385,
-    "clause_type": "termination",
-    "content_head": "'Schedule 2\\n4 Confidentiality\\n4.5  The provisions of this clause 4 shall survive '",
-    "content_sha256": "f6a469a97dab32198f3f5cfe97e7dfe2d6227526ae7a3f1e0d1ff04eaa5d709a",
-    "context_header": "[Section: Schedule 2 > 4 — Confidentiality > 4.5 — The provisions of this clause 4 shall survive the expiry or termination of this] [Type: Termination] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
       {
         "raw_text": "clause 4",
-        "target_chunk_index": 18,
+        "target_chunk_index": 16,
         "target_identifier": "4"
       }
     ],
@@ -739,29 +529,62 @@
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 4 — Confidentiality > 4.5 — The provisions of this clause 4 shall survive the expiry or termination of this",
-    "index": 24,
-    "original_header": "4.5 The provisions of this clause 4 shall survive the expiry or termination of this",
-    "secondary_clause_type": "confidentiality",
-    "token_count": 103
+    "hierarchy_path": "4 — Confidentiality > 4.4 — Each party shall take all reasonable steps to protect the other party's Confidential",
+    "index": 20,
+    "original_header": "4.4 Each party shall take all reasonable steps to protect the other party's Confidential",
+    "secondary_clause_type": "termination",
+    "token_count": 124
+  },
+  {
+    "char_end": 12902,
+    "char_start": 12787,
+    "classification_confidence": 1.0,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'5.   Limitation of liability\\n\\n5.1  Nothing in this Agreement shall limit or excl'",
+    "content_sha256": "593f79357c2771166df6de3a67013690f049ccd592032fe8a919f58a9a80fd30",
+    "context_header": "[Section: 5 — Limitation of liability > 5.1 — Nothing in this Agreement shall limit or exclude either party's liability for:] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Agreement"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "5 — Limitation of liability > 5.1 — Nothing in this Agreement shall limit or exclude either party's liability for:",
+    "index": 21,
+    "original_header": "5.1 Nothing in this Agreement shall limit or exclude either party's liability for:",
+    "secondary_clause_type": null,
+    "token_count": 28
+  },
+  {
+    "char_end": 13182,
+    "char_start": 12902,
+    "classification_confidence": 0.857,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'5 Limitation of liability\\n5.1 Nothing in this Agreement shall limit or exclude e'",
+    "content_sha256": "78e0eccd6cfff0bbac9799d2c35ecef76b3bbab2199ee0dd11761a1a5c737840",
+    "context_header": "[Section: 5 — Limitation of liability > 5.1 — Nothing in this Agreement shall limit or exclude either party's liability for: > (a) — death or personal injury caused by its negligence or the negligence of its] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Agreement"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "5 — Limitation of liability > 5.1 — Nothing in this Agreement shall limit or exclude either party's liability for: > (a) — death or personal injury caused by its negligence or the negligence of its",
+    "index": 22,
+    "original_header": "(a) death or personal injury caused by its negligence or the negligence of its",
+    "secondary_clause_type": "representations",
+    "token_count": 97
   },
   {
     "char_end": 13829,
-    "char_start": 13035,
-    "classification_confidence": 0.857,
+    "char_start": 13182,
+    "classification_confidence": 1.0,
     "clause_type": "limitation_of_liability",
-    "content_head": "'Schedule 2\\n5 Limitation of liability\\n5.1 Nothing in this Agreement shall limit o'",
-    "content_sha256": "1b56dedc89a06afaed7fa80ad01a378e81464bb30281381e7f299b49f437b63e",
-    "context_header": "[Section: Schedule 2 > 5 — Limitation of liability > 5.1 — Nothing in this Agreement shall limit or exclude either party's liability for: > (b) — fraud or fraudulent misrepresentation; or] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "content_head": "'5 Limitation of liability\\n5.2  Subject to clause 5.1, neither party shall be lia'",
+    "content_sha256": "a1f3078c661b5f1fa5347f4e64f04000224e821e9a05bdafbb7534a9e9ee63a7",
+    "context_header": "[Section: 5 — Limitation of liability > 5.2 — Subject to clause 5.1, neither party shall be liable to the other under or in] [Type: Limitation Of Liability] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clause 5.1",
-        "target_chunk_index": null,
+        "target_chunk_index": 21,
         "target_identifier": "5.1"
       }
     ],
@@ -769,62 +592,29 @@
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 5 — Limitation of liability > 5.1 — Nothing in this Agreement shall limit or exclude either party's liability for: > (b) — fraud or fraudulent misrepresentation; or",
-    "index": 25,
-    "original_header": "(b) fraud or fraudulent misrepresentation; or",
-    "secondary_clause_type": "representations",
-    "token_count": 123
-  },
-  {
-    "char_end": 13829,
-    "char_start": 13406,
-    "classification_confidence": 1.0,
-    "clause_type": "limitation_of_liability",
-    "content_head": "'Schedule 2\\n5 Limitation of liability\\n5.2 Subject to clause 5.1, neither party sh'",
-    "content_sha256": "b36859c6b03b775d85d9c1e4228eafb11e368a5b8af8d52abe4a8eae46092b07",
-    "context_header": "[Section: Schedule 2 > 5 — Limitation of liability > 5.2 — Subject to clause 5.1, neither party shall be liable to the other under or in > (a) — loss of profits, revenue or income;] [Type: Limitation Of Liability] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
-        "raw_text": "clause 5.1",
-        "target_chunk_index": null,
-        "target_identifier": "5.1"
-      }
-    ],
-    "defined_terms_used": [],
-    "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 5 — Limitation of liability > 5.2 — Subject to clause 5.1, neither party shall be liable to the other under or in > (a) — loss of profits, revenue or income;",
-    "index": 26,
-    "original_header": "(a) loss of profits, revenue or income;",
+    "hierarchy_path": "5 — Limitation of liability > 5.2 — Subject to clause 5.1, neither party shall be liable to the other under or in",
+    "index": 23,
+    "original_header": "5.2 Subject to clause 5.1, neither party shall be liable to the other under or in",
     "secondary_clause_type": null,
-    "token_count": 136
+    "token_count": 168
   },
   {
     "char_end": 14317,
     "char_start": 13829,
     "classification_confidence": 0.688,
     "clause_type": "limitation_of_liability",
-    "content_head": "'Schedule 2\\n5 Limitation of liability\\n5.3  Subject to clauses 5.1 and 5.2, each p'",
-    "content_sha256": "a1aa2642e130a978d9133f66c73b4afd8efe479af82af020ee5cd951db4d07f2",
-    "context_header": "[Section: Schedule 2 > 5 — Limitation of liability > 5.3 — Subject to clauses 5.1 and 5.2, each party's total aggregate liability to the other] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "content_head": "\"5 Limitation of liability\\n5.3  Subject to clauses 5.1 and 5.2, each party's tota\"",
+    "content_sha256": "94822686fae86f296ca7b544dabe03e0c65f7be6c765292a237fb3cf279f3539",
+    "context_header": "[Section: 5 — Limitation of liability > 5.3 — Subject to clauses 5.1 and 5.2, each party's total aggregate liability to the other] [Type: Limitation Of Liability] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clauses 5.1",
-        "target_chunk_index": null,
+        "target_chunk_index": 21,
         "target_identifier": "5.1"
       },
       {
         "raw_text": "and 5.2",
-        "target_chunk_index": null,
+        "target_chunk_index": 23,
         "target_identifier": "5.2"
       }
     ],
@@ -835,29 +625,24 @@
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 5 — Limitation of liability > 5.3 — Subject to clauses 5.1 and 5.2, each party's total aggregate liability to the other",
-    "index": 27,
+    "hierarchy_path": "5 — Limitation of liability > 5.3 — Subject to clauses 5.1 and 5.2, each party's total aggregate liability to the other",
+    "index": 24,
     "original_header": "5.3 Subject to clauses 5.1 and 5.2, each party's total aggregate liability to the other",
     "secondary_clause_type": "payment",
-    "token_count": 131
+    "token_count": 128
   },
   {
     "char_end": 14578,
     "char_start": 14317,
     "classification_confidence": 0.818,
     "clause_type": "limitation_of_liability",
-    "content_head": "\"Schedule 2\\n5 Limitation of liability\\n5.4  In no event shall the Supplier's liabi\"",
-    "content_sha256": "f80a2edc4598217fbe6a3c0b6bcd981e85645eceee439e9db153d3fb2d0e375a",
-    "context_header": "[Section: Schedule 2 > 5 — Limitation of liability > 5.4 — In no event shall the Supplier's liability for any claims arising in connection with] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "content_head": "\"5 Limitation of liability\\n5.4  In no event shall the Supplier's liability for an\"",
+    "content_sha256": "1d7878a55c252cb35593b10eb88665deefc3ca87136c9a611fb94e05bccd6df0",
+    "context_header": "[Section: 5 — Limitation of liability > 5.4 — In no event shall the Supplier's liability for any claims arising in connection with] [Type: Limitation Of Liability] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clause 5.3",
-        "target_chunk_index": 27,
+        "target_chunk_index": 24,
         "target_identifier": "5.3"
       }
     ],
@@ -866,29 +651,24 @@
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 5 — Limitation of liability > 5.4 — In no event shall the Supplier's liability for any claims arising in connection with",
-    "index": 28,
+    "hierarchy_path": "5 — Limitation of liability > 5.4 — In no event shall the Supplier's liability for any claims arising in connection with",
+    "index": 25,
     "original_header": "5.4 In no event shall the Supplier's liability for any claims arising in connection with",
     "secondary_clause_type": "covenants",
-    "token_count": 74
+    "token_count": 71
   },
   {
     "char_end": 14855,
     "char_start": 14578,
     "classification_confidence": 0.75,
     "clause_type": "limitation_of_liability",
-    "content_head": "'Schedule 2\\n5 Limitation of liability\\n5.5  The Client acknowledges that the Fees '",
-    "content_sha256": "12506925e34b6fb7281ae583fa31ceba9ef1054079aa5e827946bb7192b5642f",
-    "context_header": "[Section: Schedule 2 > 5 — Limitation of liability > 5.5 — The Client acknowledges that the Fees have been calculated on the basis of, and] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "content_head": "'5 Limitation of liability\\n5.5  The Client acknowledges that the Fees have been c'",
+    "content_sha256": "38eb9756f5890883697f93eea84429231a50bc8a98160d8c856d3d2794c12d3c",
+    "context_header": "[Section: 5 — Limitation of liability > 5.5 — The Client acknowledges that the Fees have been calculated on the basis of, and] [Type: Limitation Of Liability] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clause 5",
-        "target_chunk_index": 27,
+        "target_chunk_index": 21,
         "target_identifier": "5"
       }
     ],
@@ -899,29 +679,24 @@
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 5 — Limitation of liability > 5.5 — The Client acknowledges that the Fees have been calculated on the basis of, and",
-    "index": 29,
+    "hierarchy_path": "5 — Limitation of liability > 5.5 — The Client acknowledges that the Fees have been calculated on the basis of, and",
+    "index": 26,
     "original_header": "5.5 The Client acknowledges that the Fees have been calculated on the basis of, and",
     "secondary_clause_type": "payment",
-    "token_count": 78
+    "token_count": 75
   },
   {
-    "char_end": 15441,
+    "char_end": 15564,
     "char_start": 14855,
-    "classification_confidence": 0.75,
+    "classification_confidence": 0.6,
     "clause_type": "termination",
-    "content_head": "'Schedule 2\\n6.   Term and termination\\n\\n\\n6.1  This Agreement shall commence on the'",
-    "content_sha256": "cc3ac9cf57402dde14ffeef75d6522afc12d675e501937216f76c5703283ac99",
-    "context_header": "[Section: Schedule 2 > 6 — Term and termination] [Type: Termination] [Jurisdiction: UK]",
+    "content_head": "'6.   Term and termination\\n\\n6.1  This Agreement shall commence on the Commencemen'",
+    "content_sha256": "0f8b0f5bd43edbdfa3e2a334c8712625262d62227e12d13db204b0391d1834b1",
+    "context_header": "[Section: 6 — Term and termination] [Type: Termination] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clause 6",
-        "target_chunk_index": 30,
+        "target_chunk_index": 27,
         "target_identifier": "6"
       }
     ],
@@ -933,96 +708,81 @@
       "Term"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 6 — Term and termination",
-    "index": 30,
+    "hierarchy_path": "6 — Term and termination",
+    "index": 27,
     "original_header": "6 Term and termination",
     "secondary_clause_type": "notices",
-    "token_count": 149
+    "token_count": 177
   },
   {
     "char_end": 15859,
-    "char_start": 15441,
-    "classification_confidence": 0.556,
+    "char_start": 15564,
+    "classification_confidence": 0.714,
     "clause_type": "termination",
-    "content_head": "'Schedule 2\\n6 Term and termination\\n6.3  Either party may terminate this Agreement'",
-    "content_sha256": "3187c447bd07e6e30902aefbdcf87482f6216d1c07009f479c7cf3087bed619a",
-    "context_header": "[Section: Schedule 2 > 6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written] [Type: Termination] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "content_head": "'6 Term and termination\\n6.3 Either party may terminate this Agreement with immedi'",
+    "content_sha256": "ff3eec46b6283faa4cbc4743b5a96478ee0028f95028d8ab5435df7e050c7515",
+    "context_header": "[Section: 6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written > (a) — the other party commits a material breach of any term of this Agreement and] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Term"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written",
-    "index": 31,
-    "original_header": "6.3 Either party may terminate this Agreement with immediate effect by giving written",
+    "hierarchy_path": "6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written > (a) — the other party commits a material breach of any term of this Agreement and",
+    "index": 28,
+    "original_header": "(a) the other party commits a material breach of any term of this Agreement and",
     "secondary_clause_type": "notices",
-    "token_count": 113
+    "token_count": 101
   },
   {
-    "char_end": 16187,
+    "char_end": 16352,
     "char_start": 15859,
     "classification_confidence": 1.0,
     "clause_type": "termination",
-    "content_head": "'Schedule 2\\n6 Term and termination\\n6.3 Either party may terminate this Agreement '",
-    "content_sha256": "f925da376f086089a26f68cfa19fde0ddce48872da9a5d37474066838eeefa2d",
-    "context_header": "[Section: Schedule 2 > 6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written > (b) — the other party becomes insolvent or is unable to pay its debts as they fall] [Type: Termination] [Jurisdiction: UK]",
+    "content_head": "'6 Term and termination\\n6.3 Either party may terminate this Agreement with immedi'",
+    "content_sha256": "4fa25685ca0d355c7bcf74d7c8c84084430fab3dd4274e4fb1b2727dca333538",
+    "context_header": "[Section: 6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written > (b) — the other party becomes insolvent or is unable to pay its debts as they fall] [Type: Termination] [Jurisdiction: UK]",
     "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
       {
         "raw_text": "section 123",
         "target_chunk_index": null,
         "target_identifier": "123"
-      }
-    ],
-    "defined_terms_used": [
-      "Agreement",
-      "Term"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written > (b) — the other party becomes insolvent or is unable to pay its debts as they fall",
-    "index": 32,
-    "original_header": "(b) the other party becomes insolvent or is unable to pay its debts as they fall",
-    "secondary_clause_type": null,
-    "token_count": 112
-  },
-  {
-    "char_end": 16527,
-    "char_start": 16187,
-    "classification_confidence": 0.714,
-    "clause_type": "termination",
-    "content_head": "'Schedule 2\\n6 Term and termination\\n6.3 Either party may terminate this Agreement '",
-    "content_sha256": "925901f695cc2689b9baf2b82da87e4dbae88b820a4640bea898f7fde3a55023",
-    "context_header": "[Section: Schedule 2 > 6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written > (c) — the other party undergoes a change of control, where \"change of control\" has] [Type: Termination] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
       },
       {
         "raw_text": "section 1124",
         "target_chunk_index": null,
         "target_identifier": "1124"
-      },
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Term",
+      "control"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written > (b) — the other party becomes insolvent or is unable to pay its debts as they fall",
+    "index": 29,
+    "original_header": "(b) the other party becomes insolvent or is unable to pay its debts as they fall",
+    "secondary_clause_type": null,
+    "token_count": 150
+  },
+  {
+    "char_end": 16592,
+    "char_start": 16352,
+    "classification_confidence": 0.75,
+    "clause_type": "termination",
+    "content_head": "'6 Term and termination\\n6.4  The Supplier may terminate this Agreement in accorda'",
+    "content_sha256": "974d1eca6d11805102257d0979fb9d3c487538ab4963c931a7f00d5e7ac79228",
+    "context_header": "[Section: 6 — Term and termination > 6.4 — The Supplier may terminate this Agreement in accordance with clause 3.4(b) above] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [
       {
         "raw_text": "clause 3.4(b)",
-        "target_chunk_index": null,
+        "target_chunk_index": 11,
         "target_identifier": "3.4(b)"
       },
       {
         "raw_text": "clause 3",
-        "target_chunk_index": 12,
+        "target_chunk_index": 11,
         "target_identifier": "3"
       }
     ],
@@ -1034,54 +794,64 @@
       "Term"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 6 — Term and termination > 6.3 — Either party may terminate this Agreement with immediate effect by giving written > (c) — the other party undergoes a change of control, where \"change of control\" has",
-    "index": 33,
-    "original_header": "(c) the other party undergoes a change of control, where \"change of control\" has",
+    "hierarchy_path": "6 — Term and termination > 6.4 — The Supplier may terminate this Agreement in accordance with clause 3.4(b) above",
+    "index": 30,
+    "original_header": "6.4 The Supplier may terminate this Agreement in accordance with clause 3.4(b) above",
     "secondary_clause_type": "payment",
-    "token_count": 115
+    "token_count": 65
   },
   {
     "char_end": 16904,
-    "char_start": 16527,
-    "classification_confidence": 0.625,
+    "char_start": 16592,
+    "classification_confidence": 0.455,
     "clause_type": "termination",
-    "content_head": "'Schedule 2\\n6 Term and termination\\n6.5  On expiry or termination of this Agreemen'",
-    "content_sha256": "bce74042e30bc544f501a63b74797fcf7ee52572738c0b77ea4883156e351987",
-    "context_header": "[Section: Schedule 2 > 6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason:] [Type: Termination] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "content_head": "'6 Term and termination\\n6.5 On expiry or termination of this Agreement for any re'",
+    "content_sha256": "578528e8412bf40cfe54d2efcfca2ef8a481289938d4a31b53bb860870846431",
+    "context_header": "[Section: 6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason: > (a) — the Client shall immediately cease to use the Services and shall promptly] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Client",
       "Services",
       "Supplier",
-      "Term"
+      "Term",
+      "control"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason:",
-    "index": 34,
-    "original_header": "6.5 On expiry or termination of this Agreement for any reason:",
-    "secondary_clause_type": "governing_law",
-    "token_count": 103
+    "hierarchy_path": "6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason: > (a) — the Client shall immediately cease to use the Services and shall promptly",
+    "index": 31,
+    "original_header": "(a) the Client shall immediately cease to use the Services and shall promptly",
+    "secondary_clause_type": "services",
+    "token_count": 99
   },
   {
-    "char_end": 17169,
+    "char_end": 17494,
     "char_start": 16904,
     "classification_confidence": 0.833,
     "clause_type": "termination",
-    "content_head": "'Schedule 2\\n6 Term and termination\\n6.5 On expiry or termination of this Agreement'",
-    "content_sha256": "4e951fd46cf5500641385b2433fb5f8c3270e9dbe8b8bc625ac8b9d461617df8",
-    "context_header": "[Section: Schedule 2 > 6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason: > (b) — the Supplier shall promptly return to the Client or destroy (at the Client's] [Type: Termination] [Jurisdiction: UK]",
+    "content_head": "'6 Term and termination\\n6.5 On expiry or termination of this Agreement for any re'",
+    "content_sha256": "3252612fd6c83211f3100096680fa60569e7368e7aeee1efd4dd3531d7ef3e53",
+    "context_header": "[Section: 6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason: > (b) — the Supplier shall promptly return to the Client or destroy (at the Client's] [Type: Termination] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
+        "raw_text": "clauses 4",
+        "target_chunk_index": 16,
+        "target_identifier": "4"
+      },
+      {
+        "raw_text": "5",
+        "target_chunk_index": 21,
+        "target_identifier": "5"
+      },
+      {
+        "raw_text": "7",
+        "target_chunk_index": 34,
+        "target_identifier": "7"
+      },
+      {
+        "raw_text": "and 8",
+        "target_chunk_index": 36,
+        "target_identifier": "8"
       }
     ],
     "defined_terms_used": [
@@ -1089,129 +859,86 @@
       "Client",
       "Confidential Information",
       "Supplier",
-      "Term"
+      "Term",
+      "control"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason: > (b) — the Supplier shall promptly return to the Client or destroy (at the Client's",
-    "index": 35,
+    "hierarchy_path": "6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason: > (b) — the Supplier shall promptly return to the Client or destroy (at the Client's",
+    "index": 32,
     "original_header": "(b) the Supplier shall promptly return to the Client or destroy (at the Client's",
     "secondary_clause_type": "confidentiality",
-    "token_count": 90
+    "token_count": 169
   },
   {
-    "char_end": 17494,
-    "char_start": 17169,
-    "classification_confidence": 1.0,
+    "char_end": 17690,
+    "char_start": 17494,
+    "classification_confidence": 0.714,
     "clause_type": "termination",
-    "content_head": "'Schedule 2\\n6 Term and termination\\n6.5 On expiry or termination of this Agreement'",
-    "content_sha256": "a3d24bf81fc0d156ba5919a01a31e78ab5cae2bf04d85eed3db7e0563cfc9473",
-    "context_header": "[Section: Schedule 2 > 6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason: > (c) — each party shall pay to the other all sums outstanding and due at the date of] [Type: Termination] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
-        "raw_text": "clauses 4",
-        "target_chunk_index": 18,
-        "target_identifier": "4"
-      },
-      {
-        "raw_text": "5",
-        "target_chunk_index": 27,
-        "target_identifier": "5"
-      },
-      {
-        "raw_text": "7",
-        "target_chunk_index": 38,
-        "target_identifier": "7"
-      },
-      {
-        "raw_text": "and 8",
-        "target_chunk_index": 39,
-        "target_identifier": "8"
-      }
-    ],
+    "content_head": "'6 Term and termination\\n6.6  Termination or expiry of this Agreement shall not af'",
+    "content_sha256": "7cec500ff61c69425788db51cbebb1e7a768c1c5554f39f765c37662ebe3a414",
+    "context_header": "[Section: 6 — Term and termination > 6.6 — Termination or expiry of this Agreement shall not affect any rights, remedies,] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Term"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 6 — Term and termination > 6.5 — On expiry or termination of this Agreement for any reason: > (c) — each party shall pay to the other all sums outstanding and due at the date of",
-    "index": 36,
-    "original_header": "(c) each party shall pay to the other all sums outstanding and due at the date of",
-    "secondary_clause_type": null,
-    "token_count": 105
+    "hierarchy_path": "6 — Term and termination > 6.6 — Termination or expiry of this Agreement shall not affect any rights, remedies,",
+    "index": 33,
+    "original_header": "6.6 Termination or expiry of this Agreement shall not affect any rights, remedies,",
+    "secondary_clause_type": "covenants",
+    "token_count": 54
   },
   {
     "char_end": 17989,
-    "char_start": 17494,
-    "classification_confidence": 0.417,
-    "clause_type": "termination",
-    "content_head": "'Schedule 2\\n6 Term and termination\\n6.6  Termination or expiry of this Agreement s'",
-    "content_sha256": "33e1dc78c187df65d08694b64e9a3ab7e30adba337914898c061692dab09bdcd",
-    "context_header": "[Section: Schedule 2 > 6 — Term and termination > 6.6 — Termination or expiry of this Agreement shall not affect any rights, remedies,] [Type: Termination] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "char_start": 17690,
+    "classification_confidence": 1.0,
+    "clause_type": "governing_law",
+    "content_head": "'7.   Governing law and jurisdiction\\n\\n7.1  This Agreement and any dispute or clai'",
+    "content_sha256": "593ff63f823e99c868511d299c739346029dce992f32bf093a545168afa6220e",
+    "context_header": "[Section: 7 — Governing law and jurisdiction > 7.1 — This Agreement and any dispute or claim (including non-contractual disputes or] [Type: Governing Law] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
-      "Agreement",
-      "Term"
+      "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 6 — Term and termination > 6.6 — Termination or expiry of this Agreement shall not affect any rights, remedies,",
-    "index": 37,
-    "original_header": "6.6 Termination or expiry of this Agreement shall not affect any rights, remedies,",
-    "secondary_clause_type": "governing_law",
-    "token_count": 132
+    "hierarchy_path": "7 — Governing law and jurisdiction > 7.1 — This Agreement and any dispute or claim (including non-contractual disputes or",
+    "index": 34,
+    "original_header": "7.1 This Agreement and any dispute or claim (including non-contractual disputes or",
+    "secondary_clause_type": null,
+    "token_count": 74
   },
   {
     "char_end": 18277,
     "char_start": 17989,
     "classification_confidence": 1.0,
     "clause_type": "governing_law",
-    "content_head": "'Schedule 2\\n7 Governing law and jurisdiction\\n7.2  Each party irrevocably agrees t'",
-    "content_sha256": "cbe2be28a9888b0aa1bfdbcfc689224dfd2ed3ae102cb71cb20c6bbecd4dc287",
-    "context_header": "[Section: Schedule 2 > 7 — Governing law and jurisdiction > 7.2 — Each party irrevocably agrees that the courts of England and Wales shall have] [Type: Governing Law] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "content_head": "'7 Governing law and jurisdiction\\n7.2  Each party irrevocably agrees that the cou'",
+    "content_sha256": "4f63ba3216109be9671d0ed63a064ab13720542a1653c1b9c3b8aaddcd1ee501",
+    "context_header": "[Section: 7 — Governing law and jurisdiction > 7.2 — Each party irrevocably agrees that the courts of England and Wales shall have] [Type: Governing Law] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 7 — Governing law and jurisdiction > 7.2 — Each party irrevocably agrees that the courts of England and Wales shall have",
-    "index": 38,
+    "hierarchy_path": "7 — Governing law and jurisdiction > 7.2 — Each party irrevocably agrees that the courts of England and Wales shall have",
+    "index": 35,
     "original_header": "7.2 Each party irrevocably agrees that the courts of England and Wales shall have",
     "secondary_clause_type": null,
-    "token_count": 83
+    "token_count": 80
   },
   {
-    "char_end": 18693,
+    "char_end": 19080,
     "char_start": 18277,
-    "classification_confidence": 0.833,
+    "classification_confidence": 0.455,
     "clause_type": "entire_agreement",
-    "content_head": "'Schedule 2\\n8.   General\\n\\n\\n8.1  This Agreement, together with the Schedules and a'",
-    "content_sha256": "32a363d2f37f468e30b47e5a0f44938b849ce0db4eb051249ad707d82bab93a0",
-    "context_header": "[Section: Schedule 2 > 8 — General] [Type: Entire Agreement] [Jurisdiction: UK]",
+    "content_head": "'8.   General\\n\\n8.1  This Agreement, together with the Schedules and any Statement'",
+    "content_sha256": "b53f3f7472f98ecf230bc89a0669da9974e8357b8ba5a80cdc89479efb336e06",
+    "context_header": "[Section: 8 — General] [Type: Entire Agreement] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "clause 2.7",
-        "target_chunk_index": null,
+        "target_chunk_index": 10,
         "target_identifier": "2.7"
       }
     ],
@@ -1219,182 +946,127 @@
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 8 — General",
-    "index": 39,
+    "hierarchy_path": "8 — General",
+    "index": 36,
     "original_header": "8 General",
-    "secondary_clause_type": "representations",
-    "token_count": 107
-  },
-  {
-    "char_end": 19080,
-    "char_start": 18693,
-    "classification_confidence": 0.556,
-    "clause_type": "amendment",
-    "content_head": "'Schedule 2\\n8 General\\n8.2  Each party acknowledges that, in entering into this Ag'",
-    "content_sha256": "629b3b7777710bacc3d39af0c4a4b9743276ec99a52fbeee69b51edec311bbb2",
-    "context_header": "[Section: Schedule 2 > 8 — General > 8.2 — Each party acknowledges that, in entering into this Agreement, it does not rely on] [Type: Amendment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
-    "defined_terms_used": [
-      "Agreement"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 8 — General > 8.2 — Each party acknowledges that, in entering into this Agreement, it does not rely on",
-    "index": 40,
-    "original_header": "8.2 Each party acknowledges that, in entering into this Agreement, it does not rely on",
-    "secondary_clause_type": "representations",
-    "token_count": 102
+    "secondary_clause_type": "services",
+    "token_count": 200
   },
   {
     "char_end": 19424,
     "char_start": 19080,
-    "classification_confidence": 0.556,
-    "clause_type": "boilerplate",
-    "content_head": "'Schedule 2\\n8 General\\n8.4  No failure or delay by either party in exercising any '",
-    "content_sha256": "5c1587997ea771ce8f15b1b97008a56722fb5d487b500569212942b9b8e1532f",
-    "context_header": "[Section: Schedule 2 > 8 — General > 8.4 — No failure or delay by either party in exercising any right, power or remedy under] [Type: Boilerplate] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "classification_confidence": 0.333,
+    "clause_type": "covenants",
+    "content_head": "'8 General\\n8.4  No failure or delay by either party in exercising any right, powe'",
+    "content_sha256": "27d4557ed80d6f1f892967a490994b3c1d819272e2af349c096f3a7cf02ffcb1",
+    "context_header": "[Section: 8 — General > 8.4 — No failure or delay by either party in exercising any right, power or remedy under] [Type: Covenants] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 8 — General > 8.4 — No failure or delay by either party in exercising any right, power or remedy under",
-    "index": 41,
+    "hierarchy_path": "8 — General > 8.4 — No failure or delay by either party in exercising any right, power or remedy under",
+    "index": 37,
     "original_header": "8.4 No failure or delay by either party in exercising any right, power or remedy under",
-    "secondary_clause_type": "covenants",
-    "token_count": 91
+    "secondary_clause_type": "boilerplate",
+    "token_count": 88
   },
   {
-    "char_end": 19927,
+    "char_end": 20138,
     "char_start": 19424,
-    "classification_confidence": 1.0,
-    "clause_type": "covenants",
-    "content_head": "'Schedule 2\\n8 General\\n8.5  If any provision or part-provision of this Agreement i'",
-    "content_sha256": "3e982606f9423f1c5bf71b045a57b8359a14c8718eb34f2142ff4976f02f398b",
-    "context_header": "[Section: Schedule 2 > 8 — General > 8.5 — If any provision or part-provision of this Agreement is or becomes invalid, illegal] [Type: Covenants] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "classification_confidence": 0.347,
+    "clause_type": "boilerplate",
+    "content_head": "'8 General\\n8.5  If any provision or part-provision of this Agreement is or become'",
+    "content_sha256": "20c8acf1e912e85e9526f0fc9b97427e53ba8234aff6cf012ea0b3f5abfd015e",
+    "context_header": "[Section: 8 — General > 8.5 — If any provision or part-provision of this Agreement is or becomes invalid, illegal] [Type: Boilerplate] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 8 — General > 8.5 — If any provision or part-provision of this Agreement is or becomes invalid, illegal",
-    "index": 42,
+    "hierarchy_path": "8 — General > 8.5 — If any provision or part-provision of this Agreement is or becomes invalid, illegal",
+    "index": 38,
     "original_header": "8.5 If any provision or part-provision of this Agreement is or becomes invalid, illegal",
-    "secondary_clause_type": null,
-    "token_count": 131
+    "secondary_clause_type": "covenants",
+    "token_count": 181
   },
   {
     "char_end": 20500,
-    "char_start": 19927,
-    "classification_confidence": 1.0,
-    "clause_type": "boilerplate",
-    "content_head": "'Schedule 2\\n8 General\\n8.6  This Agreement may be executed in any number of counte'",
-    "content_sha256": "76b89b613376d7a5a80d8a6127c08168b621644343604b44d48b9239789fbbf5",
-    "context_header": "[Section: Schedule 2 > 8 — General > 8.6 — This Agreement may be executed in any number of counterparts, each of which when] [Type: Boilerplate] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "char_start": 20138,
+    "classification_confidence": 0.0,
+    "clause_type": "unknown",
+    "content_head": "'8 General\\n8.7  Nothing in this Agreement shall constitute or be deemed to consti'",
+    "content_sha256": "e025d47133d1c0649065c4b1d0d2214e0957195ed8b9e79c260b79226d4165da",
+    "context_header": "[Section: 8 — General > 8.7 — Nothing in this Agreement shall constitute or be deemed to constitute a partnership,] [Type: Unknown] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement",
       "Client",
       "Supplier"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 8 — General > 8.6 — This Agreement may be executed in any number of counterparts, each of which when",
-    "index": 43,
-    "original_header": "8.6 This Agreement may be executed in any number of counterparts, each of which when",
+    "hierarchy_path": "8 — General > 8.7 — Nothing in this Agreement shall constitute or be deemed to constitute a partnership,",
+    "index": 39,
+    "original_header": "8.7 Nothing in this Agreement shall constitute or be deemed to constitute a partnership,",
     "secondary_clause_type": null,
-    "token_count": 148
+    "token_count": 93
   },
   {
     "char_end": 21038,
     "char_start": 20500,
     "classification_confidence": 1.0,
     "clause_type": "assignment",
-    "content_head": "'Schedule 2\\n8 General\\n8.8  Neither party may assign, novate or otherwise transfer'",
-    "content_sha256": "2fcc09322f7460ac75fe5186e01097ddc7824a0a43fdcc5cf69e764ff5adce3b",
-    "context_header": "[Section: Schedule 2 > 8 — General > 8.8 — Neither party may assign, novate or otherwise transfer any of its rights or] [Type: Assignment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "content_head": "'8 General\\n8.8  Neither party may assign, novate or otherwise transfer any of its'",
+    "content_sha256": "fc282b7447341fdd40671171e0404c6e03a8f61e353018857e4eb8e52263624b",
+    "context_header": "[Section: 8 — General > 8.8 — Neither party may assign, novate or otherwise transfer any of its rights or] [Type: Assignment] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Affiliate",
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 8 — General > 8.8 — Neither party may assign, novate or otherwise transfer any of its rights or",
-    "index": 44,
+    "hierarchy_path": "8 — General > 8.8 — Neither party may assign, novate or otherwise transfer any of its rights or",
+    "index": 40,
     "original_header": "8.8 Neither party may assign, novate or otherwise transfer any of its rights or",
     "secondary_clause_type": null,
-    "token_count": 139
+    "token_count": 137
   },
   {
     "char_end": 22155,
     "char_start": 21038,
     "classification_confidence": 1.0,
     "clause_type": "notices",
-    "content_head": "'Schedule 2\\n8 General\\n8.9  Any notice given under or in connection with this Agre'",
-    "content_sha256": "c31596b47e44c89377276a9c1a09714c48e61b14af9f7d3ef6cadd318f770604",
-    "context_header": "[Section: Schedule 2 > 8 — General > 8.9 — Any notice given under or in connection with this Agreement shall be in writing and] [Type: Notices] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "Schedule 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "content_head": "'8 General\\n8.9  Any notice given under or in connection with this Agreement shall'",
+    "content_sha256": "2739d1fa8e17016961f2f95d8e7875afd7cae3130388a91f84e961faf3d87376",
+    "context_header": "[Section: 8 — General > 8.9 — Any notice given under or in connection with this Agreement shall be in writing and] [Type: Notices] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Agreement"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Schedule 2 > 8 — General > 8.9 — Any notice given under or in connection with this Agreement shall be in writing and",
-    "index": 45,
+    "hierarchy_path": "8 — General > 8.9 — Any notice given under or in connection with this Agreement shall be in writing and",
+    "index": 41,
     "original_header": "8.9 Any notice given under or in connection with this Agreement shall be in writing and",
     "secondary_clause_type": null,
-    "token_count": 284
+    "token_count": 281
   },
   {
     "char_end": 22577,
     "char_start": 22155,
-    "classification_confidence": 0.0,
-    "clause_type": "unknown",
-    "content_head": "'SCHEDULE 1 — SERVICES DESCRIPTION\\n\\n\\n1.   Overview of Services\\n\\n\\n1.1  The Supplie'",
-    "content_sha256": "8964ec81e1677f00029aa30572ca121ee7c2125bc3a9f444fd6901e4c5ff7280",
-    "context_header": "[Section: SCHEDULE 1 — — SERVICES DESCRIPTION] [Type: Unknown] [Jurisdiction: UK]",
+    "classification_confidence": 1.0,
+    "clause_type": "services",
+    "content_head": "'SCHEDULE 1 — SERVICES DESCRIPTION\\n\\n1.   Overview of Services\\n\\n1.1  The Supplier '",
+    "content_sha256": "90a736ca89847c827749f008564f5c53edc01701c0c75bb206e3745b76faf818",
+    "context_header": "[Section: SCHEDULE 1 — SERVICES DESCRIPTION > 1 — Overview of Services > 1.1 — The Supplier shall provide the following categories of services to the Client during] [Type: Services] [Jurisdiction: UK]",
     "cross_references": [
       {
         "raw_text": "SCHEDULE 1",
-        "target_chunk_index": 1,
+        "target_chunk_index": 42,
         "target_identifier": "1"
       },
       {
         "raw_text": "clause 2.7",
-        "target_chunk_index": null,
+        "target_chunk_index": 10,
         "target_identifier": "2.7"
       }
     ],
@@ -1406,141 +1078,137 @@
       "Term"
     ],
     "document_section": "schedules",
-    "hierarchy_path": "SCHEDULE 1 — — SERVICES DESCRIPTION",
-    "index": 46,
-    "original_header": "SCHEDULE 1 — SERVICES DESCRIPTION",
+    "hierarchy_path": "SCHEDULE 1 — SERVICES DESCRIPTION > 1 — Overview of Services > 1.1 — The Supplier shall provide the following categories of services to the Client during",
+    "index": 42,
+    "original_header": "1.1 The Supplier shall provide the following categories of services to the Client during",
     "secondary_clause_type": null,
-    "token_count": 106
+    "token_count": 105
   },
   {
-    "char_end": 22878,
+    "char_end": 23030,
     "char_start": 22577,
     "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n1 Software Development Services\\n1.1 Software'",
-    "content_sha256": "725997173e402d191f418eddc32944b432c77d9dbd337fa6687bc2e5b37afe3f",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1 — Software Development Services shall be charged at the daily rates set out below, > (b) — Managed Support Services: ongoing second-line and third-line technical support] [Type: Payment] [Jurisdiction: UK]",
+    "clause_type": "services",
+    "content_head": "'SCHEDULE 1 SERVICES DESCRIPTION\\n1 Overview of Services\\n1.1 The Supplier shall pr'",
+    "content_sha256": "478834fc4198306ded67c35fcd42fac78d0645ef80c12fdd8c47eccf31bea8a5",
+    "context_header": "[Section: SCHEDULE 1 — SERVICES DESCRIPTION > 1 — Overview of Services > 1.1 — The Supplier shall provide the following categories of services to the Client during > (b) — Managed Support Services: ongoing second-line and third-line technical support] [Type: Services] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "Schedule 3",
-        "target_chunk_index": 12,
+        "target_chunk_index": null,
         "target_identifier": "3"
       }
     ],
     "defined_terms_used": [
       "Client",
       "Service Levels",
-      "Services"
+      "Services",
+      "Supplier"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1 — Software Development Services shall be charged at the daily rates set out below, > (b) — Managed Support Services: ongoing second-line and third-line technical support",
-    "index": 47,
+    "document_section": "schedules",
+    "hierarchy_path": "SCHEDULE 1 — SERVICES DESCRIPTION > 1 — Overview of Services > 1.1 — The Supplier shall provide the following categories of services to the Client during > (b) — Managed Support Services: ongoing second-line and third-line technical support",
+    "index": 43,
     "original_header": "(b) Managed Support Services: ongoing second-line and third-line technical support",
     "secondary_clause_type": null,
-    "token_count": 113
+    "token_count": 149
   },
   {
-    "char_end": 23294,
-    "char_start": 22878,
-    "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n1 Software Development Services\\n1.1 Software'",
-    "content_sha256": "7c30490a7a13cb19144a10e7557149ba96e06927d9d38c6aaa8dc5438293b936",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1 — Software Development Services shall be charged at the daily rates set out below, > (c) — Consultancy Services: technology advisory and consultancy services to assist] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "char_end": 23487,
+    "char_start": 23030,
+    "classification_confidence": 0.75,
+    "clause_type": "services",
+    "content_head": "'SCHEDULE 1 SERVICES DESCRIPTION\\n2.   Software development methodology\\n\\n2.1  The '",
+    "content_sha256": "813a8657857cf9002088196fb8966607ada8498423536b5a88d450b0b6f73b6d",
+    "context_header": "[Section: SCHEDULE 1 — SERVICES DESCRIPTION > 2 — Software development methodology] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Client",
       "Services",
       "Supplier"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1 — Software Development Services shall be charged at the daily rates set out below, > (c) — Consultancy Services: technology advisory and consultancy services to assist",
-    "index": 48,
-    "original_header": "(c) Consultancy Services: technology advisory and consultancy services to assist",
+    "document_section": "schedules",
+    "hierarchy_path": "SCHEDULE 1 — SERVICES DESCRIPTION > 2 — Software development methodology",
+    "index": 44,
+    "original_header": "2 Software development methodology",
     "secondary_clause_type": null,
-    "token_count": 142
+    "token_count": 122
+  },
+  {
+    "char_end": 23601,
+    "char_start": 23487,
+    "classification_confidence": 0.75,
+    "clause_type": "services",
+    "content_head": "'SCHEDULE 1 SERVICES DESCRIPTION\\n3.   Support service parameters\\n\\n3.1  The Manage'",
+    "content_sha256": "2b963f8ad186d0a35b6cdb9641e8036f23b7aee9d0d68031a74613b7bcacd1e9",
+    "context_header": "[Section: SCHEDULE 1 — SERVICES DESCRIPTION > 3 — Support service parameters > 3.1 — The Managed Support Services shall be provided during the following hours:] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Services"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "SCHEDULE 1 — SERVICES DESCRIPTION > 3 — Support service parameters > 3.1 — The Managed Support Services shall be provided during the following hours:",
+    "index": 45,
+    "original_header": "3.1 The Managed Support Services shall be provided during the following hours:",
+    "secondary_clause_type": null,
+    "token_count": 36
   },
   {
     "char_end": 23825,
-    "char_start": 23294,
-    "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n2 Managed Support Services\\n2.2  The Supplier'",
-    "content_sha256": "1d9d54deb09a3364bf4fc455e192dfec818cdff7dcd0678f1b3efe66c92db71b",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.2 — The Supplier shall maintain a prioritised product backlog in a project management] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
-    "defined_terms_used": [
-      "Client",
-      "Services",
-      "Supplier"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.2 — The Supplier shall maintain a prioritised product backlog in a project management",
-    "index": 49,
-    "original_header": "2.2 The Supplier shall maintain a prioritised product backlog in a project management",
-    "secondary_clause_type": null,
-    "token_count": 93
-  },
-  {
-    "char_end": 23990,
     "char_start": 23601,
-    "classification_confidence": 1.0,
-    "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n3 Expenses\\n3.1 The Client shall reimburse th'",
-    "content_sha256": "a9a94d295b3b54f02fc3992460a9aab7a0a7b6bc65abf1673584aa6460238ea8",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 3 — Expenses > 3.1 — The Client shall reimburse the Supplier for all reasonable and properly documented > (a) — Core Support Hours: 08:00 to 18:00 London time on Business Days; and] [Type: Payment] [Jurisdiction: UK]",
+    "classification_confidence": 0.75,
+    "clause_type": "services",
+    "content_head": "'SCHEDULE 1 SERVICES DESCRIPTION\\n3 Support service parameters\\n3.1 The Managed Sup'",
+    "content_sha256": "710e09758226eb1e4eeeffb1eb17a922073d9bca02e7f90b50f3e35da68dc70e",
+    "context_header": "[Section: SCHEDULE 1 — SERVICES DESCRIPTION > 3 — Support service parameters > 3.1 — The Managed Support Services shall be provided during the following hours: > (a) — Core Support Hours: 08:00 to 18:00 London time on Business Days; and] [Type: Services] [Jurisdiction: UK]",
     "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
       {
         "raw_text": "Schedule 3",
-        "target_chunk_index": 12,
+        "target_chunk_index": null,
         "target_identifier": "3"
       }
     ],
     "defined_terms_used": [
+      "Services"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "SCHEDULE 1 — SERVICES DESCRIPTION > 3 — Support service parameters > 3.1 — The Managed Support Services shall be provided during the following hours: > (a) — Core Support Hours: 08:00 to 18:00 London time on Business Days; and",
+    "index": 46,
+    "original_header": "(a) Core Support Hours: 08:00 to 18:00 London time on Business Days; and",
+    "secondary_clause_type": null,
+    "token_count": 91
+  },
+  {
+    "char_end": 23990,
+    "char_start": 23825,
+    "classification_confidence": 0.75,
+    "clause_type": "services",
+    "content_head": "'SCHEDULE 1 SERVICES DESCRIPTION\\n3 Support service parameters\\n3.2  The Supplier s'",
+    "content_sha256": "3978dbda66a81cd03b55ff235db00c48ff18929b3e8b210b103938cf15d1d1dd",
+    "context_header": "[Section: SCHEDULE 1 — SERVICES DESCRIPTION > 3 — Support service parameters > 3.2 — The Supplier shall provide the Client with access to a named account manager who] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
       "Client",
       "Supplier"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 3 — Expenses > 3.1 — The Client shall reimburse the Supplier for all reasonable and properly documented > (a) — Core Support Hours: 08:00 to 18:00 London time on Business Days; and",
-    "index": 50,
-    "original_header": "(a) Core Support Hours: 08:00 to 18:00 London time on Business Days; and",
+    "document_section": "schedules",
+    "hierarchy_path": "SCHEDULE 1 — SERVICES DESCRIPTION > 3 — Support service parameters > 3.2 — The Supplier shall provide the Client with access to a named account manager who",
+    "index": 47,
+    "original_header": "3.2 The Supplier shall provide the Client with access to a named account manager who",
     "secondary_clause_type": null,
-    "token_count": 131
+    "token_count": 56
   },
   {
-    "char_end": 24277,
+    "char_end": 24482,
     "char_start": 23990,
-    "classification_confidence": 0.875,
+    "classification_confidence": 0.636,
     "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n\\n\\n1.   Software Development Services\\n\\n\\n1.1  '",
-    "content_sha256": "c4c7d4d15b418b4e290c1f049eaa14fcbf77041816c7a1422e78fe7fa42f9001",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS] [Type: Payment] [Jurisdiction: UK]",
+    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n\\n1.   Software Development Services\\n\\n1.1  So'",
+    "content_sha256": "3a7323d44e12eea0ec444de6416cfdd274f332a086dfd8f30f79588b64744aaa",
+    "context_header": "[Section: SCHEDULE 2 — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1 — Software Development Services shall be charged at the daily rates set out below,] [Type: Payment] [Jurisdiction: UK]",
     "cross_references": [
       {
         "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
+        "target_chunk_index": 48,
         "target_identifier": "2"
       }
     ],
@@ -1548,67 +1216,56 @@
       "Services"
     ],
     "document_section": "schedules",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS",
-    "index": 51,
-    "original_header": "SCHEDULE 2 — FEES AND PAYMENT TERMS",
-    "secondary_clause_type": "confidentiality",
-    "token_count": 72
+    "hierarchy_path": "SCHEDULE 2 — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1 — Software Development Services shall be charged at the daily rates set out below,",
+    "index": 48,
+    "original_header": "1.1 Software Development Services shall be charged at the daily rates set out below,",
+    "secondary_clause_type": "services",
+    "token_count": 123
   },
   {
     "char_end": 24842,
-    "char_start": 24277,
-    "classification_confidence": 0.875,
+    "char_start": 24482,
+    "classification_confidence": 0.636,
     "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n1 Software Development Services\\n1.1 Software'",
-    "content_sha256": "08f17827049ef3ca9a337e8bff7e27069bf7484724bf13693650d7973761a400",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1 — Software Development Services shall be charged at the daily rates set out below, > (b) — Senior Developer:         £950 per day (exclusive of VAT)] [Type: Payment] [Jurisdiction: UK]",
+    "content_head": "'SCHEDULE 2 FEES AND PAYMENT TERMS\\n2.   Managed Support Services\\n\\n2.1  Managed Su'",
+    "content_sha256": "75020977be56a57fbdd05394b5562be60229b71f5a950b5e480cbf655dda4782",
+    "context_header": "[Section: SCHEDULE 2 — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.1 — Managed Support Services shall be charged at a fixed monthly retainer of] [Type: Payment] [Jurisdiction: UK]",
     "cross_references": [
       {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      },
-      {
         "raw_text": "paragraph 1.1",
-        "target_chunk_index": 2,
+        "target_chunk_index": 48,
         "target_identifier": "1.1"
       }
     ],
     "defined_terms_used": [
       "Services"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 1 — Software Development Services > 1.1 — Software Development Services shall be charged at the daily rates set out below, > (b) — Senior Developer:         £950 per day (exclusive of VAT)",
-    "index": 52,
-    "original_header": "(b) Senior Developer:         £950 per day (exclusive of VAT)",
-    "secondary_clause_type": "confidentiality",
-    "token_count": 180
+    "document_section": "schedules",
+    "hierarchy_path": "SCHEDULE 2 — FEES AND PAYMENT TERMS > 2 — Managed Support Services > 2.1 — Managed Support Services shall be charged at a fixed monthly retainer of",
+    "index": 49,
+    "original_header": "2.1 Managed Support Services shall be charged at a fixed monthly retainer of",
+    "secondary_clause_type": "services",
+    "token_count": 98
   },
   {
     "char_end": 25187,
     "char_start": 24842,
     "classification_confidence": 1.0,
     "clause_type": "payment",
-    "content_head": "'SCHEDULE 2 — FEES AND PAYMENT TERMS\\n3.   Expenses\\n\\n\\n3.1  The Client shall reimbu'",
-    "content_sha256": "b8e296d0504dde1ca09f8b1fd22c29e2c44c2d66efeaef442fa3118b4dc87302",
-    "context_header": "[Section: SCHEDULE 2 — — FEES AND PAYMENT TERMS > 3 — Expenses] [Type: Payment] [Jurisdiction: UK]",
-    "cross_references": [
-      {
-        "raw_text": "SCHEDULE 2",
-        "target_chunk_index": 51,
-        "target_identifier": "2"
-      }
-    ],
+    "content_head": "'SCHEDULE 2 FEES AND PAYMENT TERMS\\n3.   Expenses\\n\\n3.1  The Client shall reimburse'",
+    "content_sha256": "868e72546d85b3d99bbebd59aeaced281b24c1636e232c7f043f50d1c9bf12e6",
+    "context_header": "[Section: SCHEDULE 2 — FEES AND PAYMENT TERMS > 3 — Expenses > 3.1 — The Client shall reimburse the Supplier for all reasonable and properly documented] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
     "defined_terms_used": [
       "Client",
       "Services",
       "Supplier"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "SCHEDULE 2 — — FEES AND PAYMENT TERMS > 3 — Expenses",
-    "index": 53,
-    "original_header": "3 Expenses",
+    "document_section": "schedules",
+    "hierarchy_path": "SCHEDULE 2 — FEES AND PAYMENT TERMS > 3 — Expenses > 3.1 — The Client shall reimburse the Supplier for all reasonable and properly documented",
+    "index": 50,
+    "original_header": "3.1 The Client shall reimburse the Supplier for all reasonable and properly documented",
     "secondary_clause_type": null,
-    "token_count": 95
+    "token_count": 94
   }
 ]

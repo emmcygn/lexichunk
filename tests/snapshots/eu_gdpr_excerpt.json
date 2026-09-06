@@ -17,13 +17,13 @@
     "token_count": 121
   },
   {
-    "char_end": 740,
+    "char_end": 1094,
     "char_start": 487,
-    "classification_confidence": 1.0,
+    "classification_confidence": 0.333,
     "clause_type": "data_protection",
-    "content_head": "'CHAPTER I\\n\\nGENERAL PROVISIONS\\n\\n\\nArticle 1\\nSubject matter and scope\\n\\n\\n1. This Reg'",
-    "content_sha256": "bf6af7fed904d5760d67894537854b8da6dd1ca512a1801c4248101bdfdafe4b",
-    "context_header": "[Section: Chapter I — CHAPTER I] [Type: Data Protection] [Jurisdiction: EU]",
+    "content_head": "'CHAPTER I\\nGENERAL PROVISIONS\\n\\nArticle 1\\nSubject matter and scope\\n\\n1. This Regula'",
+    "content_sha256": "f2e689adf6d75c3ee6b96ec17e3b31ca61f82bd12c5741b8988a149b691dcb05",
+    "context_header": "[Section: Chapter I — General Provisions > Article 1 — Subject matter and scope > 1] [Type: Data Protection] [Jurisdiction: EU]",
     "cross_references": [
       {
         "raw_text": "CHAPTER I",
@@ -37,190 +37,111 @@
       }
     ],
     "defined_terms_used": [],
-    "document_section": "schedules",
-    "hierarchy_path": "Chapter I — CHAPTER I",
+    "document_section": "operative",
+    "hierarchy_path": "Chapter I — General Provisions > Article 1 — Subject matter and scope > 1",
     "index": 1,
-    "original_header": "Chapter I CHAPTER I",
-    "secondary_clause_type": null,
-    "token_count": 64
-  },
-  {
-    "char_end": 1094,
-    "char_start": 740,
-    "classification_confidence": 0.667,
-    "clause_type": "data_protection",
-    "content_head": "'Chapter I CHAPTER I\\nArticle 1\\n2. This Regulation protects fundamental rights and'",
-    "content_sha256": "fbd36aae003fbb7b561374c4fcc53ace4c531e7fdce79adb2e203fc318f2c088",
-    "context_header": "[Section: Chapter I — CHAPTER I > Article 1 > 2 — This Regulation protects fundamental rights and freedoms of natural persons and in particular their right to the protection of personal data.] [Type: Data Protection] [Jurisdiction: EU]",
-    "cross_references": [
-      {
-        "raw_text": "Chapter I",
-        "target_chunk_index": 1,
-        "target_identifier": "I"
-      },
-      {
-        "raw_text": "Article 1",
-        "target_chunk_index": 1,
-        "target_identifier": "1"
-      }
-    ],
-    "defined_terms_used": [],
-    "document_section": "operative",
-    "hierarchy_path": "Chapter I — CHAPTER I > Article 1 > 2 — This Regulation protects fundamental rights and freedoms of natural persons and in particular their right to the protection of personal data.",
-    "index": 2,
-    "original_header": "2 This Regulation protects fundamental rights and freedoms of natural persons and in particular their right to the protection of personal data.",
+    "original_header": "1",
     "secondary_clause_type": "confidentiality",
-    "token_count": 96
-  },
-  {
-    "char_end": 1372,
-    "char_start": 1094,
-    "classification_confidence": 0.667,
-    "clause_type": "data_protection",
-    "content_head": "'Chapter I CHAPTER I\\nArticle 2\\nMaterial scope\\n\\n\\n1. This Regulation applies to the'",
-    "content_sha256": "f06a906cd13ffced5c86cbfd82e7015e453c7d0a1dab7d3d47e8510d0d812147",
-    "context_header": "[Section: Chapter I — CHAPTER I > Article 2] [Type: Data Protection] [Jurisdiction: EU]",
-    "cross_references": [
-      {
-        "raw_text": "Chapter I",
-        "target_chunk_index": 1,
-        "target_identifier": "I"
-      },
-      {
-        "raw_text": "Article 2",
-        "target_chunk_index": 2,
-        "target_identifier": "2"
-      }
-    ],
-    "defined_terms_used": [],
-    "document_section": "operative",
-    "hierarchy_path": "Chapter I — CHAPTER I > Article 2",
-    "index": 3,
-    "original_header": "Article 2",
-    "secondary_clause_type": "definitions",
-    "token_count": 74
-  },
-  {
-    "char_end": 1637,
-    "char_start": 1372,
-    "classification_confidence": 1.0,
-    "clause_type": "data_protection",
-    "content_head": "'Chapter I CHAPTER I\\nArticle 2\\n2. This Regulation does not apply to the processin'",
-    "content_sha256": "40f3e8f0a1dd6d7735c7561faa12c4b2e0d66f2da68da8f757741629d275d233",
-    "context_header": "[Section: Chapter I — CHAPTER I > Article 2 > 2 — This Regulation does not apply to the processing of personal data:] [Type: Data Protection] [Jurisdiction: EU]",
-    "cross_references": [
-      {
-        "raw_text": "Chapter I",
-        "target_chunk_index": 1,
-        "target_identifier": "I"
-      },
-      {
-        "raw_text": "Article 2",
-        "target_chunk_index": 2,
-        "target_identifier": "2"
-      }
-    ],
-    "defined_terms_used": [],
-    "document_section": "operative",
-    "hierarchy_path": "Chapter I — CHAPTER I > Article 2 > 2 — This Regulation does not apply to the processing of personal data:",
-    "index": 4,
-    "original_header": "2 This Regulation does not apply to the processing of personal data:",
-    "secondary_clause_type": null,
-    "token_count": 74
-  },
-  {
-    "char_end": 2107,
-    "char_start": 1637,
-    "classification_confidence": 1.0,
-    "clause_type": "data_protection",
-    "content_head": "'Chapter II CHAPTER II\\nArticle 5\\n2 The controller shall be responsible for, and b'",
-    "content_sha256": "fc92e8bcc8aa3bcb1eec8614e728cab42b414a2a8b4ec13389b1317b9b42416c",
-    "context_header": "[Section: Chapter II — CHAPTER II > Article 5 > 2 — The controller shall be responsible for, and be able to demonstrate compliance with, paragraph 1. > (c) — by a natural person in the course of a purely personal or household activity;] [Type: Data Protection] [Jurisdiction: EU]",
-    "cross_references": [
-      {
-        "raw_text": "Chapter II",
-        "target_chunk_index": 2,
-        "target_identifier": "II"
-      },
-      {
-        "raw_text": "Article 5",
-        "target_chunk_index": null,
-        "target_identifier": "5"
-      },
-      {
-        "raw_text": "paragraph 1",
-        "target_chunk_index": 1,
-        "target_identifier": "1"
-      },
-      {
-        "raw_text": "Article 3",
-        "target_chunk_index": null,
-        "target_identifier": "3"
-      }
-    ],
-    "defined_terms_used": [],
-    "document_section": "operative",
-    "hierarchy_path": "Chapter II — CHAPTER II > Article 5 > 2 — The controller shall be responsible for, and be able to demonstrate compliance with, paragraph 1. > (c) — by a natural person in the course of a purely personal or household activity;",
-    "index": 5,
-    "original_header": "(c) by a natural person in the course of a purely personal or household activity;",
-    "secondary_clause_type": null,
     "token_count": 151
   },
   {
-    "char_end": 2459,
-    "char_start": 2107,
-    "classification_confidence": 0.8,
+    "char_end": 1442,
+    "char_start": 1094,
+    "classification_confidence": 0.333,
     "clause_type": "data_protection",
-    "content_head": "'Chapter I CHAPTER I\\nArticle 3\\n2. This Regulation applies to the processing of pe'",
-    "content_sha256": "c10ba8baa98832c7896940cf969872a678efce8e7a6ab2f4f4ea7420e75d4892",
-    "context_header": "[Section: Chapter I — CHAPTER I > Article 3 > 2 — This Regulation applies to the processing of personal data of data subjects who are in the Union by a controller or processor not established in the Union, where the processing activities are related to:] [Type: Data Protection] [Jurisdiction: EU]",
+    "content_head": "'Chapter I General Provisions\\nArticle 2\\nMaterial scope\\n\\n1. This Regulation applie'",
+    "content_sha256": "0ab9c0a51f6c81e4dabdee52309f66c91fda083306d560c01da6cc42d712ada7",
+    "context_header": "[Section: Chapter I — General Provisions > Article 2 — Material scope] [Type: Data Protection] [Jurisdiction: EU]",
     "cross_references": [
       {
-        "raw_text": "Chapter I",
-        "target_chunk_index": 1,
-        "target_identifier": "I"
-      },
+        "raw_text": "Article 2",
+        "target_chunk_index": 2,
+        "target_identifier": "2"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Chapter I — General Provisions > Article 2 — Material scope",
+    "index": 2,
+    "original_header": "Article 2 Material scope",
+    "secondary_clause_type": "definitions",
+    "token_count": 94
+  },
+  {
+    "char_end": 1847,
+    "char_start": 1442,
+    "classification_confidence": 0.5,
+    "clause_type": "data_protection",
+    "content_head": "'Chapter I General Provisions\\nArticle 2 Material scope\\n2 This Regulation does not'",
+    "content_sha256": "f1c8c4bab7db2dffedd5e2b34503771096d85a543c8ec187299aecd3e84a3925",
+    "context_header": "[Section: Chapter I — General Provisions > Article 2 — Material scope > 2 — This Regulation does not apply to the processing of personal data: > (a)] [Type: Data Protection] [Jurisdiction: EU]",
+    "cross_references": [
+      {
+        "raw_text": "Chapter 2",
+        "target_chunk_index": 7,
+        "target_identifier": "2"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Chapter I — General Provisions > Article 2 — Material scope > 2 — This Regulation does not apply to the processing of personal data: > (a)",
+    "index": 3,
+    "original_header": "(a)",
+    "secondary_clause_type": null,
+    "token_count": 132
+  },
+  {
+    "char_end": 2314,
+    "char_start": 1847,
+    "classification_confidence": 1.0,
+    "clause_type": "data_protection",
+    "content_head": "'Chapter I General Provisions\\nArticle 3\\nTerritorial scope\\n\\n1. This Regulation app'",
+    "content_sha256": "6152217af0daaf8fa0bababf28261023a34c02dd90d1657647315113d7b2a99b",
+    "context_header": "[Section: Chapter I — General Provisions > Article 3 — Territorial scope] [Type: Data Protection] [Jurisdiction: EU]",
+    "cross_references": [
       {
         "raw_text": "Article 3",
-        "target_chunk_index": null,
+        "target_chunk_index": 4,
         "target_identifier": "3"
       }
     ],
     "defined_terms_used": [],
     "document_section": "operative",
-    "hierarchy_path": "Chapter I — CHAPTER I > Article 3 > 2 — This Regulation applies to the processing of personal data of data subjects who are in the Union by a controller or processor not established in the Union, where the processing activities are related to:",
-    "index": 6,
-    "original_header": "2 This Regulation applies to the processing of personal data of data subjects who are in the Union by a controller or processor not established in the Union, where the processing activities are related to:",
-    "secondary_clause_type": "payment",
-    "token_count": 95
+    "hierarchy_path": "Chapter I — General Provisions > Article 3 — Territorial scope",
+    "index": 4,
+    "original_header": "Article 3 Territorial scope",
+    "secondary_clause_type": null,
+    "token_count": 124
+  },
+  {
+    "char_end": 2554,
+    "char_start": 2314,
+    "classification_confidence": 0.364,
+    "clause_type": "payment",
+    "content_head": "'Chapter I General Provisions\\nArticle 3 Territorial scope\\n2 This Regulation appli'",
+    "content_sha256": "b2420f4bf0c448ea662f8fcd801a7c094df01de8b959586c99a2ee84fa5c47d9",
+    "context_header": "[Section: Chapter I — General Provisions > Article 3 — Territorial scope > 2 — This Regulation applies to the processing of personal data of data subjects who are in the Union by a controller or proc > (a) — the offering of goods or services, irrespective of whether a payment of the data subject is required, to such data subje] [Type: Payment] [Jurisdiction: EU]",
+    "cross_references": [],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Chapter I — General Provisions > Article 3 — Territorial scope > 2 — This Regulation applies to the processing of personal data of data subjects who are in the Union by a controller or proc > (a) — the offering of goods or services, irrespective of whether a payment of the data subject is required, to such data subje",
+    "index": 5,
+    "original_header": "(a) the offering of goods or services, irrespective of whether a payment of the data subject is required, to such data subje",
+    "secondary_clause_type": "data_protection",
+    "token_count": 105
   },
   {
     "char_end": 3557,
-    "char_start": 2459,
-    "classification_confidence": 0.667,
-    "clause_type": "data_protection",
-    "content_head": "'Chapter II CHAPTER II\\nArticle 5\\n2 The controller shall be responsible for, and b'",
-    "content_sha256": "510d8ac4f5fb60845083f54ba34f593be107b351570d03385c5417a303fbadba",
-    "context_header": "[Section: Chapter II — CHAPTER II > Article 5 > 2 — The controller shall be responsible for, and be able to demonstrate compliance with, paragraph 1. > (b) — the monitoring of their behaviour as far as their behaviour takes place within the Union.] [Type: Data Protection] [Jurisdiction: EU]",
+    "char_start": 2554,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'Chapter I General Provisions\\nArticle 4\\nDefinitions\\n\\nFor the purposes of this Reg'",
+    "content_sha256": "9717645e90ba343d6f4a99e8e8b93fa4fb6f3c116abe57c090af339fbb022f34",
+    "context_header": "[Section: Chapter I — General Provisions > Article 4 — Definitions] [Type: Definitions] [Jurisdiction: EU]",
     "cross_references": [
       {
-        "raw_text": "Chapter II",
-        "target_chunk_index": 2,
-        "target_identifier": "II"
-      },
-      {
-        "raw_text": "Article 5",
-        "target_chunk_index": null,
-        "target_identifier": "5"
-      },
-      {
-        "raw_text": "paragraph 1",
-        "target_chunk_index": 1,
-        "target_identifier": "1"
-      },
-      {
         "raw_text": "Article 4",
-        "target_chunk_index": null,
+        "target_chunk_index": 6,
         "target_identifier": "4"
       }
     ],
@@ -232,123 +153,58 @@
       "Processor",
       "Recipient"
     ],
-    "document_section": "operative",
-    "hierarchy_path": "Chapter II — CHAPTER II > Article 5 > 2 — The controller shall be responsible for, and be able to demonstrate compliance with, paragraph 1. > (b) — the monitoring of their behaviour as far as their behaviour takes place within the Union.",
-    "index": 7,
-    "original_header": "(b) the monitoring of their behaviour as far as their behaviour takes place within the Union.",
-    "secondary_clause_type": "definitions",
-    "token_count": 307
+    "document_section": "definitions",
+    "hierarchy_path": "Chapter I — General Provisions > Article 4 — Definitions",
+    "index": 6,
+    "original_header": "Article 4 Definitions",
+    "secondary_clause_type": null,
+    "token_count": 258
   },
   {
-    "char_end": 3903,
+    "char_end": 4352,
     "char_start": 3557,
     "classification_confidence": 1.0,
     "clause_type": "data_protection",
-    "content_head": "'CHAPTER II\\n\\nPRINCIPLES\\n\\n\\nArticle 5\\nPrinciples relating to processing of personal'",
-    "content_sha256": "846f77b12c15245022bc94abeb99c5a1e7855882f0cfeb85a4bdd57e0e2ee5d6",
-    "context_header": "[Section: Chapter II — CHAPTER II] [Type: Data Protection] [Jurisdiction: EU]",
+    "content_head": "'CHAPTER II\\nPRINCIPLES\\n\\nArticle 5\\nPrinciples relating to processing of personal d'",
+    "content_sha256": "a621cf45b2520394a3af3b1c6b7e89878dc60015dbf454ab0658b94d441d8f06",
+    "context_header": "[Section: Chapter II — Principles > Article 5 — Principles relating to processing of personal data > 2] [Type: Data Protection] [Jurisdiction: EU]",
     "cross_references": [
       {
         "raw_text": "CHAPTER II",
-        "target_chunk_index": 2,
+        "target_chunk_index": 7,
         "target_identifier": "II"
       },
       {
         "raw_text": "Article 5",
-        "target_chunk_index": null,
+        "target_chunk_index": 7,
         "target_identifier": "5"
-      }
-    ],
-    "defined_terms_used": [],
-    "document_section": "schedules",
-    "hierarchy_path": "Chapter II — CHAPTER II",
-    "index": 8,
-    "original_header": "Chapter II CHAPTER II",
-    "secondary_clause_type": null,
-    "token_count": 87
-  },
-  {
-    "char_end": 4167,
-    "char_start": 3903,
-    "classification_confidence": 1.0,
-    "clause_type": "data_protection",
-    "content_head": "'Chapter II CHAPTER II\\nArticle 6\\n1 Processing shall be lawful only if and to the '",
-    "content_sha256": "bec8126be126f27a028c6608ff882c08802b7915729fa782edcbb4f28392f95d",
-    "context_header": "[Section: Chapter II — CHAPTER II > Article 6 > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (c) — adequate, relevant and limited to what is necessary in relation to the purposes for which they are processed;] [Type: Data Protection] [Jurisdiction: EU]",
-    "cross_references": [
-      {
-        "raw_text": "Chapter II",
-        "target_chunk_index": 2,
-        "target_identifier": "II"
-      },
-      {
-        "raw_text": "Article 6",
-        "target_chunk_index": null,
-        "target_identifier": "6"
-      }
-    ],
-    "defined_terms_used": [
-      "Processing"
-    ],
-    "document_section": "operative",
-    "hierarchy_path": "Chapter II — CHAPTER II > Article 6 > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (c) — adequate, relevant and limited to what is necessary in relation to the purposes for which they are processed;",
-    "index": 9,
-    "original_header": "(c) adequate, relevant and limited to what is necessary in relation to the purposes for which they are processed;",
-    "secondary_clause_type": null,
-    "token_count": 99
-  },
-  {
-    "char_end": 5141,
-    "char_start": 4167,
-    "classification_confidence": 1.0,
-    "clause_type": "data_protection",
-    "content_head": "'Chapter II CHAPTER II\\nArticle 6\\n1 Processing shall be lawful only if and to the '",
-    "content_sha256": "db61214633ec50e79ab345089db5b05eac4d50b110d42e43cb6ba859e38eef76",
-    "context_header": "[Section: Chapter II — CHAPTER II > Article 6 > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (f) — processed in a manner that ensures appropriate security of the personal data.] [Type: Data Protection] [Jurisdiction: EU]",
-    "cross_references": [
-      {
-        "raw_text": "Chapter II",
-        "target_chunk_index": 2,
-        "target_identifier": "II"
-      },
-      {
-        "raw_text": "Article 6",
-        "target_chunk_index": null,
-        "target_identifier": "6"
       },
       {
         "raw_text": "paragraph 1",
-        "target_chunk_index": 1,
+        "target_chunk_index": 7,
         "target_identifier": "1"
       }
     ],
-    "defined_terms_used": [
-      "Processing"
-    ],
+    "defined_terms_used": [],
     "document_section": "operative",
-    "hierarchy_path": "Chapter II — CHAPTER II > Article 6 > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (f) — processed in a manner that ensures appropriate security of the personal data.",
-    "index": 10,
-    "original_header": "(f) processed in a manner that ensures appropriate security of the personal data.",
+    "hierarchy_path": "Chapter II — Principles > Article 5 — Principles relating to processing of personal data > 2",
+    "index": 7,
+    "original_header": "2",
     "secondary_clause_type": null,
-    "token_count": 113
+    "token_count": 198
   },
   {
-    "char_end": 4809,
-    "char_start": 4488,
-    "classification_confidence": 1.0,
-    "clause_type": "data_protection",
-    "content_head": "'Chapter II CHAPTER II\\nArticle 6\\n1 Processing shall be lawful only if and to the '",
-    "content_sha256": "44dcf604115f36cf6ebbbdbb415755354adb4a5afa19efd4ab4637b60ac4564a",
-    "context_header": "[Section: Chapter II — CHAPTER II > Article 6 > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (a) — the data subject has given consent to the processing of his or her personal data for one or more specific purposes;] [Type: Data Protection] [Jurisdiction: EU]",
+    "char_end": 4488,
+    "char_start": 4352,
+    "classification_confidence": 0.0,
+    "clause_type": "unknown",
+    "content_head": "'Chapter II Principles\\nArticle 6\\nLawfulness of processing\\n\\n1. Processing shall be'",
+    "content_sha256": "c38c21bd383e54b7bb8adf6bf4a275efdf22baa3bc4c8f7988be6694abbc1b60",
+    "context_header": "[Section: Chapter II — Principles > Article 6 — Lawfulness of processing > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies:] [Type: Unknown] [Jurisdiction: EU]",
     "cross_references": [
       {
-        "raw_text": "Chapter II",
-        "target_chunk_index": 2,
-        "target_identifier": "II"
-      },
-      {
         "raw_text": "Article 6",
-        "target_chunk_index": null,
+        "target_chunk_index": 8,
         "target_identifier": "6"
       }
     ],
@@ -356,40 +212,29 @@
       "Processing"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Chapter II — CHAPTER II > Article 6 > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (a) — the data subject has given consent to the processing of his or her personal data for one or more specific purposes;",
-    "index": 11,
-    "original_header": "(a) the data subject has given consent to the processing of his or her personal data for one or more specific purposes;",
+    "hierarchy_path": "Chapter II — Principles > Article 6 — Lawfulness of processing > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies:",
+    "index": 8,
+    "original_header": "1 Processing shall be lawful only if and to the extent that at least one of the following applies:",
     "secondary_clause_type": null,
-    "token_count": 113
+    "token_count": 39
   },
   {
     "char_end": 5141,
-    "char_start": 4809,
+    "char_start": 4488,
     "classification_confidence": 1.0,
     "clause_type": "data_protection",
-    "content_head": "'Chapter II CHAPTER II\\nArticle 6\\n1 Processing shall be lawful only if and to the '",
-    "content_sha256": "369355e7a8f21126a36eadfeccfdf875172643d8b19323e170eb70c4ab71c95e",
-    "context_header": "[Section: Chapter II — CHAPTER II > Article 6 > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (d) — processing is necessary in order to protect the vital interests of the data subject or of another natural person;] [Type: Data Protection] [Jurisdiction: EU]",
-    "cross_references": [
-      {
-        "raw_text": "Chapter II",
-        "target_chunk_index": 2,
-        "target_identifier": "II"
-      },
-      {
-        "raw_text": "Article 6",
-        "target_chunk_index": null,
-        "target_identifier": "6"
-      }
-    ],
+    "content_head": "'Chapter II Principles\\nArticle 6 Lawfulness of processing\\n1 Processing shall be l'",
+    "content_sha256": "d94044bbebe9ce5739a8ec5c83c158a4ab4b77decb898915b62815bbbf894a11",
+    "context_header": "[Section: Chapter II — Principles > Article 6 — Lawfulness of processing > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (a)] [Type: Data Protection] [Jurisdiction: EU]",
+    "cross_references": [],
     "defined_terms_used": [
       "Processing"
     ],
     "document_section": "operative",
-    "hierarchy_path": "Chapter II — CHAPTER II > Article 6 > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (d) — processing is necessary in order to protect the vital interests of the data subject or of another natural person;",
-    "index": 12,
-    "original_header": "(d) processing is necessary in order to protect the vital interests of the data subject or of another natural person;",
+    "hierarchy_path": "Chapter II — Principles > Article 6 — Lawfulness of processing > 1 — Processing shall be lawful only if and to the extent that at least one of the following applies: > (a)",
+    "index": 9,
+    "original_header": "(a)",
     "secondary_clause_type": null,
-    "token_count": 116
+    "token_count": 202
   }
 ]
