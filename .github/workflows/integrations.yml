@@ -43,7 +43,7 @@ jobs:
       - name: Run tests
         env:
           HYPOTHESIS_PROFILE: ci
-        run: pytest --tb=short -q
+        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=92
 
       - name: Run benchmarks (timing disabled)
         run: pytest benchmarks --benchmark-disable -q

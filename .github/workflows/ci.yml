@@ -54,7 +54,7 @@ jobs:
           # tests/conftest.py, so a property-based failure here reproduces
           # locally with HYPOTHESIS_PROFILE=ci.
           HYPOTHESIS_PROFILE: ci
-        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=92
+        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=88
 
   test-windows:
     name: test (3.12, windows-latest)
@@ -81,4 +81,4 @@ jobs:
       - name: Run tests with coverage
         env:
           HYPOTHESIS_PROFILE: ci
-        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=92
+        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=88

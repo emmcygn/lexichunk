@@ -760,7 +760,7 @@ print(chunker.cross_ref_stats)
 
 ## Testing and quality
 
-The suite is 2151 tests at 96.9% statement coverage, with a 92% gate in CI.
+The suite is 2151 tests at 96.9% statement coverage with every optional dependency installed. CI enforces 92% on the integrations job and 88% on the dependency-free core job, where the optional-dependency tests skip.
 
 - **Snapshot tests** (`tests/test_snapshots.py`) pin the full chunk output for
   seven fixtures — a UK service agreement, UK terms and conditions, a US MSA,

@@ -80,6 +80,12 @@ def test_every_workflow_declares_least_privilege_permissions():
 
 def test_coverage_gate_is_pinned_in_ci():
     ci = _workflow("ci.yml")
-    assert ci.count("--cov-fail-under=92") == 2, (
-        "both the Linux matrix and the Windows job must enforce the gate"
+    assert ci.count("--cov-fail-under=88") == 2, (
+        "both the Linux matrix and the Windows job must enforce the core gate "
+        "(88% is what a dependency-free install measures; optional-dependency "
+        "tests skip there)"
+    )
+    integrations = _workflow("integrations.yml")
+    assert "--cov-fail-under=92" in integrations, (
+        "the integrations job installs every extra and must enforce the full gate"
     )
