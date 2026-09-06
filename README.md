@@ -11,7 +11,7 @@
 is not frozen; pin a version. See [CHANGELOG.md](CHANGELOG.md) for what changed
 and why.
 
-The core package has **zero required dependencies** — pure Python, stdlib and
+The core package has **zero required dependencies**. pure Python, stdlib and
 `re` only. The optional `llama-index` extra pulls a transitive NLTK version
 covered by an open advisory; [SECURITY.md](SECURITY.md#optional-dependency-advisory)
 records the advisory and the scoped assessment.
@@ -40,7 +40,7 @@ access to its negotiated definition from Section 1. A downstream model can
 substitute a generic meaning rather than the contract-specific one.
 
 **Destroyed hierarchy.** Section 7.2(a)(iii) can become a floating text
-fragment with no indication it belongs to Article VII — Indemnification.
+fragment with no indication it belongs to Article VII - Indemnification.
 Retrieval may then confuse operative provisions and boilerplate.
 
 **Cross-document contamination.** Without document-level metadata on every
@@ -61,7 +61,7 @@ hard problems that [Docling][docling],
 The intended pipeline is: **document converter → lexichunk → vector store**.
 Convert the PDF or DOCX to text or Markdown with the tool of your choice, then
 hand that text to lexichunk, which adds the legal structure a general-purpose
-splitter throws away — clause hierarchy, defined terms, cross-references,
+splitter throws away - clause hierarchy, defined terms, cross-references,
 clause type, jurisdiction-aware numbering. If your documents are already plain
 text or Markdown, you can skip the first step entirely.
 
@@ -78,7 +78,7 @@ Read this before adopting it.
   Unstructured or an equivalent converter upstream.
 - **Statute and external references are detected but never resolved.**
   `section 123 of the Insolvency Act 1986` and `Regulation (EU) 2016/679`
-  produce a `CrossReference` with `target_chunk_index=None` by design — they
+  produce a `CrossReference` with `target_chunk_index=None` by design - they
   point outside the document, and lexichunk resolves references only against
   the chunks it produced. Filter on `target_chunk_index is None` to route them
   to an external citator.
@@ -88,7 +88,7 @@ Read this before adopting it.
   rather than expecting coverage of every house style.
 - **`classification_confidence` is not a probability.** It is the winning
   clause type's relative dominance among the types that scored, scaled down
-  when the absolute evidence is thin —
+  when the absolute evidence is thin -
   `(best / total) * min(1.0, best / 4.0)`. It is comparable between chunks of
   the same document. It is not calibrated, so do not threshold it as if it
   were a model probability.
@@ -100,7 +100,7 @@ Read this before adopting it.
 - **`chunk.content` is not `text[char_start:char_end]` by default.** It is
   that span with the ancestor headings prepended, so a retrieved `(b)` still
   says which clause it belongs to. Pass `include_ancestor_headers=False` if
-  you need exact-slice equality — the offsets and chunk boundaries are
+  you need exact-slice equality - the offsets and chunk boundaries are
   identical either way. `include_context_header` does *not* control this; it
   governs the separate `context_header` field.
 - **Cross-reference resolution does not read the words around a reference.**
@@ -109,7 +109,7 @@ Read this before adopting it.
 - **Lettered sub-clauses are not resolution targets under their parent's
   number.** `clause 7.3(b)` is detected, and `target_identifier` is correct,
   but it resolves to clause 7.3 rather than to the `(b)` beneath it.
-- **Some documents classify entirely as `UNKNOWN`** — two contracts in a
+- **Some documents classify entirely as `UNKNOWN`** - two contracts in a
   150-contract CUAD sample, both short and unusually formatted. That is the
   classifier declining rather than misfiring;
   `PipelineMetrics.chunks_unclassified` makes it visible without iterating
@@ -125,7 +125,7 @@ Read this before adopting it.
   sentence, semicolon, enumerator, newline or word boundary inside the budget
   is cut mid-word, and that is logged once at `WARNING`.
 - **Definitions are document-scoped heuristics.** `defined_terms_context`
-  holds definitions detected in the supplied text — not authoritative
+  holds definitions detected in the supplied text - not authoritative
   meanings from legislation, case law, another agreement or an incorporated
   document. Repeated or unusually formatted definitions may need caller
   review.
@@ -137,8 +137,8 @@ Read this before adopting it.
   source evidence, unresolved references and extraction provenance rather
   than presenting parsed output as legal validation.
 - **No calibrated *retrieval* accuracy number yet.** Structural parse
-  accuracy is measured against gold annotations — see
-  [Measured accuracy](#measured-accuracy) — but end-to-end retrieval quality
+  accuracy is measured against gold annotations - see
+  [Measured accuracy](#measured-accuracy) - but end-to-end retrieval quality
   is not. The companion
   [legal-rag-eval][evalharness] harness reports the current honest position:
   on 5 fixtures and 22 queries lexichunk retrieves more annotated-relevant
@@ -185,7 +185,7 @@ second heading line, whose exhibits come *after* the signature block, and
 which says "survive execution" in an operative clause a long way before the
 real execution block.
 
-These are structural parse metrics, not retrieval metrics — see the bullet on
+These are structural parse metrics, not retrieval metrics - see the bullet on
 retrieval accuracy above.
 
 Throughput on real filings, measured on 150 CUAD contracts (US SEC exhibits):
@@ -252,7 +252,7 @@ Then pin `git+https://github.com/emmcygn/lexichunk.git@SHA` in your dependency
 manager, replacing `SHA` with that commit.
 
 **On PyPI publication:** the release workflow
-(`.github/workflows/publish.yml`) is ready — it runs CI and the integration
+(`.github/workflows/publish.yml`) is ready - it runs CI and the integration
 build, then publishes the *same verified artifact* to TestPyPI or PyPI via
 `workflow_dispatch`, or to PyPI on a `v*` tag. It requires the maintainer to
 configure PyPI/TestPyPI **trusted publishing** for this repository and to
@@ -301,7 +301,7 @@ dataclass with these fields:
 | `hierarchy` | `HierarchyNode` | Clause position: `level`, `identifier`, `title`, `parent`. |
 | `hierarchy_path` | `str` | Human-readable path, e.g. `"Article VII > Section 7.2 > (a)"`. |
 | `document_section` | `DocumentSection` | `PREAMBLE`, `RECITALS`, `DEFINITIONS`, `OPERATIVE`, `SCHEDULES` or `SIGNATURES`. |
-| `clause_type` | `ClauseType` | One of 31 types — `INDEMNIFICATION`, `CONFIDENTIALITY`, `TERMINATION`, `SERVICES`, `INSURANCE`, `AUDIT`, `NON_SOLICITATION`, `ACCEPTABLE_USE`, … , `UNKNOWN`. |
+| `clause_type` | `ClauseType` | One of 31 types - `INDEMNIFICATION`, `CONFIDENTIALITY`, `TERMINATION`, `SERVICES`, `INSURANCE`, `AUDIT`, `NON_SOLICITATION`, `ACCEPTABLE_USE`, … , `UNKNOWN`. |
 | `jurisdiction` | `Jurisdiction \| str` | `UK`, `US`, `EU`, or the string key of a registered custom jurisdiction. |
 | `cross_references` | `list[CrossReference]` | Every detected reference to another clause or instrument. |
 | `defined_terms_used` | `list[str]` | Defined terms found in this chunk's text. |
@@ -311,7 +311,7 @@ dataclass with these fields:
 | `cross_ref_total` | `int` | Number of cross-references detected in this chunk. |
 | `cross_ref_resolved` | `int` | How many of those resolved to a `target_chunk_index`. |
 | `context_header` | `str` | Prepend to `content` before embedding (Contextual Retrieval pattern). Empty unless `include_context_header=True`. |
-| `document_id` | `str \| None` | Propagated document identifier — set via `LegalChunker(document_id=...)` or `chunk(text, document_id=...)`. |
+| `document_id` | `str \| None` | Propagated document identifier - set via `LegalChunker(document_id=...)` or `chunk(text, document_id=...)`. |
 | `char_start` | `int` | Start offset of the clause body in the **sanitised** source text. |
 | `char_end` | `int` | End offset of the clause body in the **sanitised** source text. |
 | `token_count` | `int` | Approximate token count: `len(content) // chars_per_token`. |
@@ -327,9 +327,9 @@ Nested types:
 | `BatchResult` | `results: list[list[LegalChunk]]`, `errors: list[BatchError]` |
 | `BatchError` | `index: int`, `text_preview: str`, `error: str`, `error_type: str` |
 
-`target_kind` is the kind of thing the reference points at — `"clause"`,
+`target_kind` is the kind of thing the reference points at - `"clause"`,
 `"section"`, `"paragraph"`, `"schedule"`, `"exhibit"`, `"annex"`, `"chapter"`
-or `"recital"` — so a reference to `Schedule 2` is not confused with a
+or `"recital"` - so a reference to `Schedule 2` is not confused with a
 main-body `clause 2`.
 
 ### Serialisation and enums
@@ -374,10 +374,10 @@ profiles recognise common structures in:
 |---|---|---|
 | United Kingdom | `"uk"` | Commercial contracts (service, supply, employment, shareholder agreements), terms and conditions |
 | United States | `"us"` | Contracts (MSAs, NDAs, SaaS terms, employment and service agreements), terms of service, privacy policies |
-| European Union | `"eu"` | Regulations and directives (GDPR, DSA, DMA, AI Act, ePrivacy) — Chapter / Article / paragraph / Annex |
+| European Union | `"eu"` | Regulations and directives (GDPR, DSA, DMA, AI Act, ePrivacy) - Chapter / Article / paragraph / Annex |
 
 Pass `doc_type="contract"` or `doc_type="terms_conditions"`. Custom
-jurisdictions are registered with `register_jurisdiction()` — see
+jurisdictions are registered with `register_jurisdiction()` - see
 [docs/extending.md](docs/extending.md).
 
 These profiles are drafting-pattern heuristics, not jurisdictional or legal
@@ -391,7 +391,7 @@ complete, enforceable, or correctly governed by the selected law.
 | Top-level grouping | Clause (flat numbering) | Article (Roman numerals) | Chapter (Roman) / Article (Arabic) |
 | Numbering | `1`, `1.1`, `1.1.1`, `(a)`, `(i)` | `Article I`, `Section 1.01`, `(a)`, `(i)` | `Chapter I`, `Article 1`, `1.`, `(a)` |
 | Headers | Sentence case, minimal | ALL CAPS common | Mixed case |
-| Defined terms location | "Definitions" clause | "Article I — Definitions" | "Article 4 — Definitions" |
+| Defined terms location | "Definitions" clause | "Article I - Definitions" | "Article 4 - Definitions" |
 | Schedules / exhibits | "Schedule 1" | "Exhibit A" or "Schedule 1" | "Annex I" |
 | Boilerplate heading | "General" | "Miscellaneous" | "Final Provisions" |
 | Cross-reference style | "Clause 5.2", "paragraph (a)" | "Section 5.2", "Section 5.2(a)" | "Article 6(1)(a)" |
@@ -421,7 +421,7 @@ for error in results.errors:  # BatchError(index, text_preview, error, error_typ
 ```
 
 - Each element is either a plain `str` or a `(text, document_id)` tuple.
-- `texts` may be any iterable — list, tuple, generator, `dict.values()` — but
+- `texts` may be any iterable - list, tuple, generator, `dict.values()` - but
   **not** a bare `str`/`bytes` (which would be chunked character by
   character) and **not** a `Mapping` (iterating one yields its keys). Both
   raise `InputError`. Pass `chunk_batch([text])` for a single document, or
@@ -433,7 +433,7 @@ for error in results.errors:  # BatchError(index, text_preview, error, error_typ
   batch of two or fewer documents, processing is serial.
 - If the process pool cannot start, `chunk_batch()` logs a `WARNING` and falls
   back to serial execution rather than raising.
-- Custom (non-built-in) jurisdictions cannot be used with `workers > 1` —
+- Custom (non-built-in) jurisdictions cannot be used with `workers > 1` -
   custom registrations cannot be pickled to child processes. Use `workers=1`.
 
 **On Windows and macOS**, `workers > 1` requires the call to be guarded,
@@ -456,7 +456,7 @@ if __name__ == "__main__":
 
 ## LangChain integration
 
-Requires the `langchain` extra — see [Installation](#installation)
+Requires the `langchain` extra - see [Installation](#installation)
 (`python -m pip install -e ".[langchain]"` from a source checkout).
 
 `LegalTextSplitter` subclasses `langchain_core.documents.BaseDocumentTransformer`.
@@ -506,8 +506,8 @@ chunked = splitter.transform_documents(loaded_documents)
 ```
 
 Output `Document.id` is unique across a `split_documents()` call even when
-several input documents share the same `source` — the usual
-one-`Document`-per-page loader pattern — so a vector store's upsert cannot
+several input documents share the same `source` - the usual
+one-`Document`-per-page loader pattern - so a vector store's upsert cannot
 silently drop chunks.
 
 Other constructor options: `document_id=`, `include_defined_terms_context=`
@@ -519,7 +519,7 @@ non-scalar values for stores that only accept scalars), and
 
 ## LlamaIndex integration
 
-Requires the `llama-index` extra — see [Installation](#installation)
+Requires the `llama-index` extra - see [Installation](#installation)
 (`python -m pip install -e ".[llama-index]"` from a source checkout).
 
 ```python
@@ -565,7 +565,7 @@ the LlamaIndex ecosystem:
   sanitised text and cover the clause body only, so `node.text` is not
   guaranteed to be a literal substring of the source document.
 
-Building an index from those nodes is the ordinary LlamaIndex flow — it needs
+Building an index from those nodes is the ordinary LlamaIndex flow - it needs
 an embedding model and an LLM, so it is not exercised by this repository's
 tests:
 
@@ -586,7 +586,7 @@ Tested against langchain-core 1.6.2 and llama-index-core 0.14.24.
 
 `chunk()` detects headings from the text itself. When an upstream converter
 has already recovered the document's structure from its layout, hand
-lexichunk that structure instead — it is better than anything line-based can
+lexichunk that structure instead - it is better than anything line-based can
 recover from flattened text.
 
 <!-- lexichunk-doctest: skip (needs the optional `docling` converter and a PDF on disk) -->
@@ -630,7 +630,7 @@ print(chunks[0].hierarchy_path)
 | Adapter | Takes | Install |
 | --- | --- | --- |
 | `from_docling` | a `DoclingDocument` | the `docling` extra |
-| `from_unstructured` | `unstructured` elements | nothing extra — duck-typed |
+| `from_unstructured` | `unstructured` elements | nothing extra - duck-typed |
 | `from_markdown` | a Markdown string | nothing extra |
 
 lexichunk still has zero mandatory dependencies: importing
@@ -694,7 +694,7 @@ currency amounts, dates, list items). Falls back to sentence-level splitting
 when nothing is detected.
 
 **Clause chunker** splits at detected boundaries. Undersized clauses merge
-only with an adjacent sibling under the same parent — the hierarchy is never
+only with an adjacent sibling under the same parent - the hierarchy is never
 crossed to satisfy `min_chunk_size`. Oversized clauses are split with a
 cascading strategy (sentence → semicolon → enumerator → newline → word
 window) that enforces `max_chunk_size` as a hard cap.
@@ -744,7 +744,7 @@ print(metrics.total_duration_ms, metrics.chunk_count, metrics.fallback_used)
 for stage in metrics.stage_metrics:
     print(stage.name, stage.duration_ms, stage.item_count)
 
-# Structure quality — is the parse trustworthy for this document?
+# Structure quality - is the parse trustworthy for this document?
 print(metrics.clause_count, metrics.top_level_clause_count)
 print(metrics.chunks_spanning_multiple_top_level_clauses)  # should be 0
 print(metrics.heading_candidates_rejected)
@@ -768,14 +768,14 @@ print(chunker.cross_ref_stats)
 The suite is 2151 tests at 96.9% statement coverage with every optional dependency installed. CI enforces 92% on the integrations job and 88% on the dependency-free core job, where the optional-dependency tests skip.
 
 - **Snapshot tests** (`tests/test_snapshots.py`) pin the full chunk output for
-  seven fixtures — a UK service agreement, UK terms and conditions, a US MSA,
+  seven fixtures - a UK service agreement, UK terms and conditions, a US MSA,
   US terms of service, a GDPR excerpt, a PDF-extracted UK agreement and a
-  signed US MSA with exhibits — against golden JSON in `tests/snapshots/`.
+  signed US MSA with exhibits - against golden JSON in `tests/snapshots/`.
   Any behaviour change shows up as a reviewable diff. Regenerate with
   `pytest --update-snapshots`, then read the diff.
 - **Gold-fixture accuracy** (`tests/test_gold_fixtures.py`) scores the parse
   against hand-built annotations declared before the fixture text was
-  generated from them — see [Measured accuracy](#measured-accuracy).
+  generated from them - see [Measured accuracy](#measured-accuracy).
   `-s` prints the table.
 - **Invariant suite** (`tests/test_invariants.py`) asserts cross-cutting
   properties that no single stage owns: offsets stay inside the sanitised
@@ -786,7 +786,7 @@ The suite is 2151 tests at 96.9% statement coverage with every optional dependen
   with a fixed deadline, so a CI failure reproduces locally.
 - **Adversarial suites** (`tests/test_adversarial_*.py`,
   `tests/test_g7_adversarial_fixes.py`) capture bugs found by deliberately
-  hostile review passes — each test is a regression pin for a real defect.
+  hostile review passes - each test is a regression pin for a real defect.
 - **ReDoS audit** (`tests/test_redos_audit.py`) drives every regex in the
   package with pathological inputs.
 - **Heading regression** (`tests/test_heading_regression.py`) is a
@@ -833,4 +833,4 @@ pytest
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).
