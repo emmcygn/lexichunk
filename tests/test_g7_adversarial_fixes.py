@@ -74,3 +74,49 @@ The service levels are set out in this Schedule.
         )
         # Must not raise IndexError for any candidate the regex matches.
         assert extractor._find_section_end(probe, 0, 0) >= 0
+
+
+class TestC3UnicodeLineSeparators:
+    """C3 — ``_line_offsets`` counted only ``'\n'`` but ``parse()`` splits with
+    ``str.splitlines()``, which also breaks on ``\r``, ``\v``, ``\f``,
+    ``\x1c``-``\x1e``, ``\x85`` (NEL), ``\u2028`` and ``\u2029``.
+    """
+
+    SEPARATORS = ["\u2028", "\u2029", "\x85", "\x0b", "\x0c", "\x1c", "\x1d", "\x1e"]
+
+    @pytest.mark.parametrize("sep", SEPARATORS)
+    def test_chunk_survives_unicode_line_separator(self, sep: str) -> None:
+        from lexichunk import LegalChunker
+
+        chunks = LegalChunker(jurisdiction="uk").chunk(f"1. A{sep}{sep}Text\n")
+        assert isinstance(chunks, list)
+
+    @pytest.mark.parametrize("sep", SEPARATORS)
+    def test_parse_structure_survives_unicode_line_separator(self, sep: str) -> None:
+        from lexichunk.parsers.structure import parse_structure
+
+        assert isinstance(
+            parse_structure(f"1. A{sep}{sep}Text\n", Jurisdiction.UK), list
+        )
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "",
+            "\n",
+            "a",
+            "a\n",
+            "a\r\nb\n",
+            "\ufeff \x85 \u2029",
+            "1. A\u2028\u2028Text\n",
+            "x\rz\u2028q\x0cw",
+        ],
+    )
+    def test_offsets_agree_with_splitlines(self, text: str) -> None:
+        from lexichunk.parsers.structure import _line_offsets
+
+        offsets = _line_offsets(text)
+        lines = text.splitlines(keepends=True)
+        assert len(offsets) == len(lines)
+        for offset, line in zip(offsets, lines):
+            assert text[offset : offset + len(line)] == line

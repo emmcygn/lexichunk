@@ -230,21 +230,32 @@ def _adoptable_title(line: str) -> Optional[str]:
 
 
 def _line_offsets(text: str) -> list[int]:
-    """Return a list of character offsets for the start of every line.
+    """Return the character offset at which each line of *text* starts.
 
-    The first entry is always ``0``; subsequent entries point to the character
-    immediately after each ``'\\n'`` in *text*.
+    The offsets are derived from ``str.splitlines(keepends=True)`` — the exact
+    same splitting rule :meth:`StructureParser.parse` uses to build its
+    ``lines`` list — so ``len(_line_offsets(text)) == len(text.splitlines())``
+    holds for *every* input, and ``offsets[i]`` always names the start of
+    ``lines[i]``.
+
+    A hand-rolled ``'\\n'``-only scan does **not** satisfy that: ``splitlines``
+    also breaks on ``\\r``, ``\\v``, ``\\f``, ``\\x1c``–``\\x1e``, ``\\x85``
+    (NEL), ``\\u2028`` (LINE SEPARATOR) and ``\\u2029`` (PARAGRAPH SEPARATOR),
+    all of which occur in real PDF/RTF/legacy-encoding exports.  Such a scan
+    produced fewer offsets than lines and ``parse()`` then indexed past the
+    end of the list.
 
     Args:
         text: The full document string.
 
     Returns:
-        List of integer character offsets, one per line.
+        List of integer character offsets, one per line, in document order.
     """
-    offsets = [0]
-    for i, ch in enumerate(text):
-        if ch == '\n':
-            offsets.append(i + 1)
+    offsets: list[int] = []
+    position = 0
+    for line in text.splitlines(keepends=True):
+        offsets.append(position)
+        position += len(line)
     return offsets
 
 
