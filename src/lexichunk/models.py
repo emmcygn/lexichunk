@@ -196,10 +196,15 @@ class LegalChunk:
     so ``content`` is typically a superset of
     ``original_text[char_start:char_end]``.
 
-    **Mutation warning**: Mutable container fields (``cross_references``,
-    ``defined_terms_used``, ``defined_terms_context``) are populated by the
-    pipeline.  Callers should treat returned chunks as read-only; mutations may
-    affect cached state when ``enable_definition_cache`` is ``True``.
+    **Mutation**: the mutable container fields (``cross_references``,
+    ``defined_terms_used``, ``defined_terms_context``) belong to this chunk
+    alone — each is built per instance and holds no reference to the
+    chunker's definition cache, so mutating a returned chunk cannot corrupt
+    cached state.  They are still populated by the pipeline as a coherent
+    set, and metadata such as ``cross_ref_total`` is computed from them at
+    the end of the run, so editing one field in place will not update the
+    others.  Prefer ``dataclasses.replace()`` or ``to_dict()``/``from_dict()``
+    over in-place edits.
     """
 
     content: str
@@ -478,10 +483,16 @@ class BatchError:
     """Error from processing a single document in a batch.
 
     Args:
-        index: Position of the failed document in the input list.
-        text_preview: First 100 characters of the input text.
+        index: Position of the failed document in the input iterable.
+        text_preview: A preview of the failing input, at most 100
+            characters.  For a document that raised while being chunked this
+            is the start of its text; for an input element that failed
+            validation (wrong type, malformed tuple) it is ``repr()`` of that
+            element; and when the input iterable itself raised, it is the
+            literal ``"<input iterable>"``.
         error: Error message string.
-        error_type: Fully-qualified exception class name.
+        error_type: The exception class's ``__qualname__`` — for example
+            ``"InputError"``.  It does not include the module path.
     """
 
     index: int

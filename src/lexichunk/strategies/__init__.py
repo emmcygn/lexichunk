@@ -15,7 +15,20 @@ class ChunkingStrategy(Protocol):
     not need to explicitly inherit from it.
     """
 
-    def chunk(self, *args: object, **kwargs: object) -> list[LegalChunk]: ...
+    def chunk(self, *args: object, **kwargs: object) -> list[LegalChunk]:
+        """Produce chunks from the strategy's input.
+
+        The signature is intentionally loose: each concrete strategy takes
+        the input it needs — :class:`~lexichunk.strategies.fallback.FallbackChunker`
+        takes the document text, while
+        :class:`~lexichunk.strategies.clause_aware.ClauseAwareChunker` takes
+        the parsed clauses and the text.
+
+        Returns:
+            List of :class:`~lexichunk.models.LegalChunk` objects in
+            document order.
+        """
+        ...
 
 
 __all__ = ["ChunkingStrategy"]

@@ -1,8 +1,11 @@
 """Custom exception hierarchy for lexichunk.
 
-All exceptions inherit from both :class:`LexichunkError` and :class:`ValueError`
-so that existing ``except ValueError`` handlers continue to work (backward
-compatibility).
+:class:`LexichunkError` is the common base and inherits only from
+``Exception``.  Every exception this package actually raises —
+:class:`ConfigurationError`, :class:`ParsingError` and :class:`InputError` —
+inherits from both :class:`LexichunkError` and :class:`ValueError`, so an
+existing ``except ValueError`` handler keeps working.  Catch
+:class:`LexichunkError` to catch everything lexichunk raises.
 """
 
 

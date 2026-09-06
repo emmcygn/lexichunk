@@ -211,8 +211,8 @@ _CLAUSE_LABEL: re.Pattern[str] = re.compile(
 class DefinitionsExtractor:
     """Extracts capitalised defined terms and their definitions from legal text.
 
-    Supports both UK and US jurisdictions and handles straight/curly-quote
-    definition patterns.  The extractor first attempts to locate a dedicated
+    Supports every built-in jurisdiction (UK, US and EU) as well as custom
+    registered ones, and handles straight/curly-quote definition patterns.  The extractor first attempts to locate a dedicated
     definitions section; if none is found it falls back to scanning the entire
     document.
 
@@ -226,8 +226,9 @@ class DefinitionsExtractor:
         """Initialise the extractor for a given jurisdiction.
 
         Args:
-            jurisdiction: The legal jurisdiction (UK or US), or a custom
-                jurisdiction string registered via :func:`register_jurisdiction`.
+            jurisdiction: ``"uk"``, ``"us"`` or ``"eu"`` (or a
+                :class:`~lexichunk.models.Jurisdiction` enum value), or the key of a
+                custom jurisdiction registered via :func:`register_jurisdiction`.
         """
         self._jurisdiction: Jurisdiction | str = jurisdiction
         self._patterns: JurisdictionPatterns = get_patterns(jurisdiction)
@@ -774,7 +775,9 @@ def extract_defined_terms(
 
     Args:
         text: Full document text.
-        jurisdiction: The legal jurisdiction (UK or US).
+        jurisdiction: ``"uk"``, ``"us"`` or ``"eu"`` (or a
+            :class:`~lexichunk.models.Jurisdiction` enum value), or the key of a
+            custom registered jurisdiction.
 
     Returns:
         Dict mapping term name (str) to :class:`DefinedTerm`.

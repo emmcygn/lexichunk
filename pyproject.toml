@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lexichunk"
-version = "0.8.0b1"
+version = "0.9.0"
 description = "Clause-aware legal document chunking SDK for RAG pipelines"
 readme = "README.md"
 license = "MIT"
@@ -99,4 +99,7 @@ python_functions = ["test_*"]
 markers = [
     "benchmark: performance benchmarks (deselect with '-m \"not benchmark\"')",
 ]
-addopts = "--benchmark-disable"
+# --benchmark-disable keeps `pytest benchmarks/` executable in CI without
+# spending CI minutes on timing runs; --strict-markers turns a typo in a
+# @pytest.mark name into an error rather than a silently ignored marker.
+addopts = "--benchmark-disable --strict-markers"

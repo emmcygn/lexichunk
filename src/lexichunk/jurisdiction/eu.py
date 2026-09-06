@@ -120,7 +120,8 @@ def detect_level(line: str) -> tuple[int, str] | None:
         (level, identifier) where level is:
           -2 = Annex
           -1 = Chapter
-           0 = Article or Recital (n)
+           0 = Article, Recital (n), or a standalone ALL-CAPS line
+               (identifier = the line itself)
            1 = Section
            2 = Numbered paragraph (1., 2., 3.)
            3 = Alpha sub-point (a), (b)

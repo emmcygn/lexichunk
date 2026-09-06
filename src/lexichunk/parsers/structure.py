@@ -574,7 +574,13 @@ class StructureParser:
 
     Args:
         jurisdiction: The :class:`~lexichunk.models.Jurisdiction` whose
-            detection rules should be used.
+            detection rules should be used, or the string key of a built-in
+            (``"uk"``, ``"us"``, ``"eu"``) or custom registered jurisdiction.
+        doc_type: ``"contract"`` (the default) or ``"terms_conditions"``.
+            With ``"terms_conditions"`` the recitals and signature-block
+            heuristics are relaxed, which changes which clauses come back as
+            :attr:`~lexichunk.models.DocumentSection.RECITALS` and
+            :attr:`~lexichunk.models.DocumentSection.SIGNATURES`.
 
     Example::
 

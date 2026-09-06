@@ -15,6 +15,17 @@ on:
           - testpypi
           - pypi
 
+# Read-only by default. The two publish jobs raise this to `id-token: write`
+# for the PyPI trusted-publisher exchange, and nothing else needs any write.
+permissions:
+  contents: read
+
+# Publishing must never be cancelled midway, so in-progress runs are left
+# alone; the group only serialises repeated dispatches of the same ref.
+concurrency:
+  group: publish-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   test:
     uses: ./.github/workflows/ci.yml
@@ -81,6 +92,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: testpypi
     permissions:
+      # A job-level block replaces the workflow default outright, so
+      # contents: read is restated rather than inherited.
+      contents: read
       id-token: write
     steps:
       - name: Download verified distributions
@@ -102,6 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
+      contents: read
       id-token: write
     steps:
       - name: Download verified distributions

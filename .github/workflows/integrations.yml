@@ -7,6 +7,13 @@ on:
   push:
     branches: [master]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: integrations-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   integrations:
     runs-on: ubuntu-latest
@@ -34,7 +41,12 @@ jobs:
           "
 
       - name: Run tests
+        env:
+          HYPOTHESIS_PROFILE: ci
         run: pytest --tb=short -q
+
+      - name: Run benchmarks (timing disabled)
+        run: pytest benchmarks --benchmark-disable -q
 
       - name: Build sdist and wheel
         run: |

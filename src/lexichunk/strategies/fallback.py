@@ -139,7 +139,9 @@ def chunk_fallback(
 
     Args:
         text: Full document text to be chunked.
-        jurisdiction: UK or US jurisdiction for the resulting chunks.
+        jurisdiction: ``"uk"``, ``"us"`` or ``"eu"`` (or a
+            :class:`~lexichunk.models.Jurisdiction` enum value), or the key of a
+            custom registered jurisdiction.  Recorded on every chunk.
         max_chunk_size: Maximum chunk size in approximate tokens.
         min_chunk_size: Minimum chunk size; smaller trailing pieces are merged
             into the previous chunk.
@@ -164,16 +166,23 @@ class FallbackChunker:
     """Fallback sentence-level chunker for unrecognised legal document formats.
 
     Used when the structure parser finds no clause headers.  Splits text into
-    overlapping sentence windows up to ``max_chunk_size`` tokens, producing
-    minimally-populated :class:`~lexichunk.models.LegalChunk` objects.
+    consecutive, non-overlapping sentence windows of at most
+    ``max_chunk_size`` tokens, producing minimally-populated
+    :class:`~lexichunk.models.LegalChunk` objects whose ``hierarchy_path`` is
+    a positional ``chunk-N`` placeholder rather than a real clause path.
 
     Args:
-        jurisdiction: UK or US.
+        jurisdiction: ``"uk"``, ``"us"`` or ``"eu"`` (or a
+            :class:`~lexichunk.models.Jurisdiction` enum value), or the key of a
+            custom registered jurisdiction.  Recorded on every chunk.
         max_chunk_size: Maximum chunk size in approximate tokens.
         min_chunk_size: Minimum chunk size; smaller pieces are merged.
         document_id: Optional document identifier.
         chars_per_token: Number of characters per token for the approximation
             heuristic.  Defaults to 4.
+        extra_abbreviations: Additional abbreviations that must not be treated
+            as sentence boundaries.  Merged with the built-in list, which is
+            never mutated.  Defaults to ``None``.
     """
 
     def __init__(

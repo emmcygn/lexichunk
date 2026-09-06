@@ -7,7 +7,21 @@ on:
     branches: [main, master]
   workflow_call:
 
+# Read-only by default; no job here needs to write to the repository.
+permissions:
+  contents: read
+
+# A new push to the same branch supersedes the run in flight. `github.ref` is
+# used rather than the PR number so a push to master cancels only itself.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # The Linux matrix and the Windows run are deliberately separate jobs rather
+  # than one matrix with an `os` axis: adding that axis would rename the check
+  # contexts (`test (3.10)` -> `test (3.10, ubuntu-latest)`) and silently break
+  # the branch-protection required checks that reference the current names.
   test:
     name: test (${{ matrix.python-version }})
     runs-on: ubuntu-latest
@@ -35,7 +49,12 @@ jobs:
         run: mypy src/lexichunk/
 
       - name: Run tests with coverage
-        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=90
+        env:
+          # Selects the derandomised Hypothesis profile registered in
+          # tests/conftest.py, so a property-based failure here reproduces
+          # locally with HYPOTHESIS_PROFILE=ci.
+          HYPOTHESIS_PROFILE: ci
+        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=92
 
   test-windows:
     name: test (3.12, windows-latest)
@@ -60,4 +79,6 @@ jobs:
         run: mypy src/lexichunk/
 
       - name: Run tests with coverage
-        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=90
+        env:
+          HYPOTHESIS_PROFILE: ci
+        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=92

@@ -360,8 +360,9 @@ class ReferenceDetector:
         """Initialise the detector for a given jurisdiction.
 
         Args:
-            jurisdiction: One of ``Jurisdiction.UK`` or ``Jurisdiction.US``,
-                or a custom jurisdiction string.
+            jurisdiction: ``"uk"``, ``"us"`` or ``"eu"`` (or a
+                :class:`~lexichunk.models.Jurisdiction` enum value), or the key of a
+                custom jurisdiction registered via :func:`register_jurisdiction`.
         """
         self.jurisdiction: Jurisdiction | str = jurisdiction
         self._patterns: list[re.Pattern[str]] = [

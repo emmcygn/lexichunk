@@ -74,13 +74,13 @@ Regex-based detection of legal cross-references ("Section 2.1", "Clause 5(a)", "
 
 **Class**: `lexichunk.enrichment.clause_type.ClauseTypeClassifier`
 
-Keyword-based scoring with 31 clause types (definitions, representations, warranties, indemnification, data protection, etc.). Position-aware: end-of-document clause types (governing law, assignment, etc.) receive a bonus when they appear past the 75% mark. Produces `clause_type`, `classification_confidence`, and `secondary_clause_type`.
+Keyword-based scoring over 31 `ClauseType` members (definitions, representations, warranties, indemnification, data protection, etc.). 29 carry keyword signals; `PREAMBLE` is assigned structurally and `UNKNOWN` is the fallback when nothing scores. Position-aware: end-of-document clause types (governing law, assignment, etc.) receive a bonus when they appear past the 75% mark. Produces `clause_type`, `classification_confidence`, and `secondary_clause_type`.
 
 ### Stage 5: Context Enrichment
 
 **Class**: `lexichunk.enrichment.context.ContextEnricher`
 
-Generates a Contextual Retrieval header for each chunk summarising its position in the document hierarchy, clause type, and document ID. This header improves retrieval accuracy when chunks are embedded.
+Generates a Contextual Retrieval header for each chunk summarising its position in the document hierarchy, clause type, and document ID. It is meant to be prepended to the chunk text before embedding, so the vector carries the document-level context the chunk itself no longer states. lexichunk does not measure the retrieval effect of doing this; the README links the evaluation harness and describes what it does and does not establish.
 
 ### Stage 6: Defined Terms
 
@@ -116,7 +116,7 @@ Definition extraction is SHA-256-keyed so repeated calls with the same document 
 
 ### Dataclass Immutability
 
-Internal dataclasses (`ClassificationResult`, `PipelineMetrics`, `StageMetric`) use `frozen=True` with `MappingProxyType` and `tuple` for true immutability. The primary output type `LegalChunk` is a mutable dataclass — the pipeline populates its fields across stages. Callers should treat returned chunks as read-only; mutations may affect cached state.
+Internal dataclasses (`ClassificationResult`, `PipelineMetrics`, `StageMetric`) use `frozen=True` with `MappingProxyType` and `tuple` for true immutability. The primary output type `LegalChunk` is a mutable dataclass — the pipeline populates its fields across stages. Its container fields are per-instance and hold no reference to the definition cache, so mutating a returned chunk cannot corrupt cached state; but derived metadata such as `cross_ref_total` is computed once at the end of the run, so editing one field in place will not update the others. Prefer `dataclasses.replace()` or `to_dict()`/`from_dict()`.
 
 ## Observability
 
@@ -141,21 +141,27 @@ configures logging.
 
 - **DEBUG** — per-stage progress: stage start/done, item counts, timing. Safe
   to enable in development; verbose in production.
+- **INFO** — one message only: `chunk_batch()` capping the worker count to
+  the Windows `ProcessPoolExecutor` limit of 61 handles. The call still does
+  what was asked, just with fewer workers, so this is not a warning.
 - **WARNING** — emitted only when behaviour deviates from what the caller
-  asked for, not for routine operation. Examples: `chunk_batch()` falling
-  back to serial execution because the process pool could not start, the
-  worker count being capped to the platform limit, and a jurisdiction
-  being re-registered over an existing key (overriding a previous
-  registration).
+  asked for, not for routine operation. There are four: `chunk_batch()`
+  falling back to serial execution because the process pool could not start,
+  `chunk_batch()` recording that its input iterable raised partway through,
+  an indivisible run still exceeding `max_chunk_size` after every splitting
+  strategy was exhausted, and `register_jurisdiction()` overriding an
+  existing custom key.
 
-No other levels are used internally; there is no INFO-level chatter to filter out.
+No ERROR-level records are emitted: a failure the caller must know about is
+raised, not logged.
 
 ## Thread safety
 
 A single `LegalChunker` instance is safe to share across threads for
-`chunk()` and `chunk_iter()` — these methods do not mutate shared instance
-state that would race between concurrent calls beyond the definition cache,
-which is itself safe for concurrent reads/writes.
+`chunk()`, `chunk_iter()` and `chunk_with_metrics()` — these methods do not
+mutate shared instance state that would race between concurrent calls beyond
+the definition cache, which is an `OrderedDict` guarded by a
+`threading.Lock`.
 
 The `cross_ref_resolution_rate` and `cross_ref_stats` properties reflect the
 **last completed call** on that instance — they are convenience accumulators,
@@ -163,3 +169,50 @@ not per-call results, so reading them from one thread while another thread is
 mid-`chunk()` call is racy. When you need statistics tied to a specific call
 (e.g. from concurrent callers), use `chunk_with_metrics()` and read the
 returned `PipelineMetrics` object instead of the instance-level properties.
+
+## Performance baseline
+
+`benchmarks/` measures the pipeline against the shipped fixtures. The suite is
+run in CI with `pytest benchmarks --benchmark-disable`, which executes every
+benchmark body exactly once without timing it — enough to keep the benchmarks
+from rotting, without spending CI minutes on numbers that a shared runner
+cannot measure reliably.
+
+Reproduce the timings locally with:
+
+```bash
+pytest benchmarks --benchmark-enable --benchmark-columns=min,mean,stddev,rounds
+```
+
+Baseline recorded on 2026-09-06 — Python 3.11.9, Windows 11, AMD Zen 4
+(16 logical cores). These are wall-clock milliseconds for one call; treat them
+as an order-of-magnitude reference and a regression tripwire, not a
+cross-machine benchmark.
+
+| Benchmark | Input | Min | Mean | StdDev |
+|---|---|---|---|---|
+| `chunk()` UK terms and conditions | 16,948 chars | 10.6 ms | 11.6 ms | 0.8 ms |
+| `chunk()` US MSA | 25,346 chars | 16.5 ms | 17.2 ms | 0.6 ms |
+| `chunk()` UK service agreement | 25,187 chars | 18.0 ms | 19.9 ms | 2.0 ms |
+| `chunk()` US terms of service | 25,743 chars | 19.2 ms | 24.3 ms | 2.7 ms |
+| `chunk_batch()` serial, 3 docs | 75,720 chars | 67.7 ms | 71.9 ms | 5.3 ms |
+| `chunk_batch()` parallel, 2 workers, 3 docs | 75,720 chars | 434.3 ms | 482.6 ms | 36.0 ms |
+| Definition cache miss (fresh chunker per round) | 25,187 chars | 102.6 ms | 108.6 ms | 5.4 ms |
+| Definition cache hit (primed chunker) | 25,187 chars | 18.6 ms | 24.0 ms | 2.7 ms |
+
+Two of these deserve comment, because the naive reading of each is wrong.
+
+**Parallel is slower than serial here, and that is expected.** Three documents
+of ~25 KB each take about 70 ms in total; starting two `spawn` worker
+processes on Windows costs several hundred milliseconds of interpreter
+startup and pickling before any work happens. `workers > 1` only pays for
+itself on batches large enough to amortise that — hundreds of documents, or
+documents an order of magnitude larger. `chunk_batch()` already refuses to go
+parallel for two documents or fewer for this reason; the crossover point for
+your corpus is worth measuring rather than assuming.
+
+**The cache-miss benchmark is not a like-for-like comparison.** It constructs
+a new `LegalChunker` on every round, so it measures construction plus a full
+uncached run; the hit benchmark reuses a primed instance. The difference
+between the two is therefore an upper bound on what the definition cache
+saves, not a measurement of it.

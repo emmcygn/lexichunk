@@ -186,8 +186,9 @@ class LegalNodeParser(_NodeParserBase):  # type: ignore[misc,valid-type]
     retrievers, sentence-window expansion, and provenance tracing.
 
     Args:
-        jurisdiction: Legal jurisdiction — ``"uk"`` or ``"us"`` (or a
-            :class:`~lexichunk.models.Jurisdiction` enum value).
+        jurisdiction: Legal jurisdiction — ``"uk"``, ``"us"`` or ``"eu"``
+            (or a :class:`~lexichunk.models.Jurisdiction` enum value), or the
+            key of a custom registered jurisdiction.
         doc_type: Document type hint — ``"contract"`` or
             ``"terms_conditions"``.  Affects document-section detection: with
             ``"terms_conditions"`` the signature-block heuristic is relaxed
@@ -214,8 +215,8 @@ class LegalNodeParser(_NodeParserBase):  # type: ignore[misc,valid-type]
         excluded_embed_metadata_keys: Metadata keys to exclude from both the
             embedding and LLM text of every produced node, in addition to
             each source document's own exclusions. Defaults to a structural
-            set (offsets, counts, cross-references, …) that would otherwise
-            add ~40% noise to embedding text with no retrieval value;
+            set (offsets, counts, cross-references, …) that carries no
+            retrieval signal and only dilutes the embedding text;
             ``clause_type``, ``jurisdiction``, ``document_section``,
             ``hierarchy_path``, ``hierarchy_identifier``, ``context_header``
             and ``defined_terms_used`` are deliberately kept.
