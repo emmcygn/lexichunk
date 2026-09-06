@@ -1031,6 +1031,9 @@ class LegalChunker:
                     1 for c in chunks if c.token_count < self._min_chunk_size
                 ),
                 heading_candidates_rejected=heading_candidates_rejected,
+                chunks_unclassified=sum(
+                    1 for c in chunks if c.clause_type is ClauseType.UNKNOWN
+                ),
             )
 
         return chunks, metrics

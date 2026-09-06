@@ -208,3 +208,48 @@ def test_new_fields_default_to_zero_when_constructed_directly() -> None:
     assert metrics.chunks_with_multiple_clauses == 0
     assert metrics.chunks_below_min == 0
     assert metrics.heading_candidates_rejected == 0
+
+
+# ---------------------------------------------------------------------------
+# chunks_unclassified — CUAD issue 6
+# ---------------------------------------------------------------------------
+#
+# Two of 150 CUAD contracts produced chunks where *every* chunk came back
+# ClauseType.UNKNOWN: both short and unusually formatted (one a Chinese-English
+# photovoltaic cooperation agreement, one a bank outsourcing agreement that
+# reduced to a single chunk). That is the classifier declining rather than
+# misfiring, which is the right failure direction — but it means those
+# documents carry no clause metadata at all, and nothing in the metrics said
+# so. Detecting it should not require iterating the chunks yourself.
+
+
+def test_an_entirely_unclassified_document_is_visible_in_the_metrics() -> None:
+    text = (
+        "50MWp Photovoltaic Cooperation. Party A and Party B hereby cooperate "
+        "on the project in Ningxia. The total capacity is 50MWp."
+    )
+    chunks, metrics = LegalChunker(
+        jurisdiction="us", min_chunk_size=0
+    ).chunk_with_metrics(text)
+
+    assert all(c.clause_type.value == "unknown" for c in chunks)
+    assert metrics.chunks_unclassified == metrics.chunk_count
+    # fallback_used is the companion signal: it says whether the structure
+    # parser found anything to classify in the first place.
+    assert metrics.fallback_used is True
+
+
+@pytest.mark.parametrize("fixture_name,jurisdiction,doc_type", FIXTURE_CONFIGS)
+def test_real_fixtures_are_mostly_classified(
+    fixture_name: str, jurisdiction: str, doc_type: str
+) -> None:
+    """A few unclassified chunks are normal; all of them is the alarm."""
+    chunks, metrics = make_chunker(jurisdiction, doc_type).chunk_with_metrics(
+        load_fixture(fixture_name)
+    )
+    assert metrics.chunks_unclassified == sum(
+        1 for c in chunks if c.clause_type.value == "unknown"
+    )
+    assert metrics.chunks_unclassified < metrics.chunk_count, (
+        f"{fixture_name} carries no clause metadata at all"
+    )

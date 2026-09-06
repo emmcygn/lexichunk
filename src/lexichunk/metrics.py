@@ -76,6 +76,17 @@ class PipelineMetrics:
             list items inside a fees clause.  A sudden jump against a
             comparable document usually means the extraction layer changed,
             not the contract.
+        chunks_unclassified: Number of chunks whose ``clause_type`` is
+            ``ClauseType.UNKNOWN`` — the classifier declining rather than
+            guessing, which is the right failure direction but leaves those
+            chunks with no clause metadata to filter or route on.  Some
+            unclassified chunks are normal (a signature block, a table of
+            fees).  ``chunks_unclassified == chunk_count`` is the signal
+            worth alerting on: it means the document carries *no* clause
+            metadata at all.  A CUAD evaluation saw this on 2 of 150
+            contracts, both short and unusually formatted.  Read it next to
+            ``fallback_used``, which says whether the structure parser found
+            anything to classify in the first place.
     """
 
     total_duration_ms: float
@@ -92,3 +103,4 @@ class PipelineMetrics:
     chunks_with_multiple_clauses: int = 0
     chunks_below_min: int = 0
     heading_candidates_rejected: int = 0
+    chunks_unclassified: int = 0

@@ -147,6 +147,7 @@ lexichunk at a new corpus and cannot eyeball 4,000 documents.
 | `chunks_with_multiple_clauses` | Chunks that gathered more than one *distinct* clause identifier. | Informational. Sub-clause grouping is how `min_chunk_size` is honoured without crossing hierarchy. The pieces of one over-sized clause are not counted — they share an identifier. |
 | `chunks_below_min` | Chunks under `min_chunk_size` tokens. | Expected to be non-zero: `min_chunk_size` is a preference, hierarchy is a fact. A short, structurally isolated clause is emitted short rather than folded into a neighbour. |
 | `heading_candidates_rejected` | Lines `detect_level` proposed as headings that the plausibility gate then vetoed. | Table-of-contents entries, running headers, wrapped ALL-CAPS paragraphs, fee-schedule list items. A jump against a comparable document points at the extraction layer. |
+| `chunks_unclassified` | Chunks whose `clause_type` is `UNKNOWN` — the classifier declining rather than guessing. | Some are normal (a signature block, a fee table). `chunks_unclassified == chunk_count` is the one worth alerting on: the document carries *no* clause metadata at all. A CUAD evaluation saw that on 2 of 150 contracts, both short and unusually formatted. Read it next to `fallback_used`. |
 | `fallback_used` | The sentence-level `FallbackChunker` ran because Stage 1 found no structure. | On a numbered contract this means detection failed outright. |
 
 ```python
@@ -159,19 +160,20 @@ print(
     f"{metrics.chunk_count} chunks; "
     f"{metrics.chunks_with_multiple_clauses} grouped, "
     f"{metrics.chunks_below_min} short, "
-    f"{metrics.heading_candidates_rejected} heading candidates rejected"
+    f"{metrics.heading_candidates_rejected} heading candidates rejected, "
+    f"{metrics.chunks_unclassified} unclassified"
 )
 ```
 
 Reference values for the bundled fixtures at the default 512/64 sizes:
 
-| Fixture | clauses | top-level | chunks | spanning | grouped | below min | rejected |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `uk_service_agreement` | 113 | 11 | 51 | 0 | 32 | 4 | 1 |
-| `uk_terms_conditions` | 71 | 11 | 32 | 0 | 21 | 2 | 1 |
-| `us_msa` | 71 | 12 | 48 | 0 | 16 | 1 | 14 |
-| `us_terms_of_service` | 80 | 12 | 48 | 0 | 17 | 0 | 5 |
-| `eu_gdpr_excerpt` | 37 | 3 | 10 | 0 | 8 | 1 | 2 |
+| Fixture | clauses | top-level | chunks | spanning | grouped | below min | rejected | unclassified |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `uk_service_agreement` | 113 | 11 | 51 | 0 | 32 | 4 | 1 | 1 |
+| `uk_terms_conditions` | 71 | 11 | 32 | 0 | 21 | 2 | 1 | 0 |
+| `us_msa` | 74 | 12 | 50 | 0 | 17 | 2 | 14 | 0 |
+| `us_terms_of_service` | 80 | 12 | 48 | 0 | 17 | 0 | 6 | 1 |
+| `eu_gdpr_excerpt` | 37 | 3 | 10 | 0 | 8 | 1 | 2 | 1 |
 
 ## Logging and observability
 
