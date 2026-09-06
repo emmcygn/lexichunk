@@ -230,9 +230,26 @@ class LegalTextSplitter(_BaseTransformer):  # type: ignore[misc,valid-type]
         input ``metadata`` dict, updated with the lexichunk-produced keys
         (lexichunk's keys win on any collision). When ``metadata_prefix`` is
         set, lexichunk's keys are namespaced with that prefix before the
-        merge, so they cannot collide with caller keys at all. Output
-        ``Document.id`` is set to ``f"{document_id}:{chunk.index}"`` when a
-        ``document_id`` was resolved.
+        merge, so they cannot collide with caller keys at all.
+
+        **Output ids are unique across the whole call.** ``chunk.index``
+        restarts at 0 for every input ``Document`` (each is chunked
+        independently), so ``f"{document_id}:{chunk.index}"`` alone collides
+        under the standard loader pattern of one ``Document`` per PDF/DOCX
+        page, where every page shares ``metadata["source"]``. Feeding such
+        output to a vector store's ``add_documents`` (which upserts by id)
+        silently stores only the last chunk for each colliding id and drops
+        the rest. Therefore:
+
+        * ``f"{document_id}:{chunk.index}"`` when that ``document_id`` is
+          resolved for exactly one input document (the common case — the id
+          format is unchanged);
+        * ``f"{document_id}:{doc_ordinal}:{chunk.index}"``, where
+          ``doc_ordinal`` is the document's 0-based position in this call,
+          when the same ``document_id`` is resolved for two or more inputs.
+
+        ``documents`` is materialised into a list so the ordinal and the
+        recurrence count can be determined before any id is assigned.
 
         Args:
             documents: Iterable of ``langchain_core.documents.Document``
@@ -242,9 +259,16 @@ class LegalTextSplitter(_BaseTransformer):  # type: ignore[misc,valid-type]
             Flat list of ``Document`` objects, in input-document order, each
             carrying the source document's metadata merged with lexichunk's.
         """
+        document_list = list(documents)
+        resolved_ids = [self._resolve_document_id(d) for d in document_list]
+        id_counts: dict[str, int] = {}
+        for resolved in resolved_ids:
+            if resolved is not None:
+                id_counts[resolved] = id_counts.get(resolved, 0) + 1
+
         output: list[_LCDocument] = []
-        for document in documents:
-            document_id = self._resolve_document_id(document)
+        for doc_ordinal, document in enumerate(document_list):
+            document_id = resolved_ids[doc_ordinal]
             chunks = self._chunker.chunk(document.page_content, document_id=document_id)
             caller_metadata = document.metadata or {}
             for chunk in chunks:
@@ -261,7 +285,11 @@ class LegalTextSplitter(_BaseTransformer):  # type: ignore[misc,valid-type]
                 merged_metadata.update(lexichunk_metadata)
                 new_doc = _Document(page_content=chunk.content, metadata=merged_metadata)
                 if document_id is not None:
-                    new_doc.id = f"{document_id}:{chunk.index}"
+                    new_doc.id = (
+                        f"{document_id}:{doc_ordinal}:{chunk.index}"
+                        if id_counts[document_id] > 1
+                        else f"{document_id}:{chunk.index}"
+                    )
                 output.append(new_doc)
         return output
 

@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import pytest
 
+from lexichunk.integrations.langchain import _LANGCHAIN_AVAILABLE
+from lexichunk.integrations.llama_index import _LLAMA_INDEX_AVAILABLE
 from lexichunk.models import Jurisdiction
 from lexichunk.parsers.definitions import DefinitionsExtractor
 
@@ -196,3 +198,79 @@ class TestC5RegistryNameType:
         with pytest.raises(ConfigurationError):
             register_jurisdiction(b"uk", self._patterns(), lambda s: None)  # type: ignore[arg-type]
         assert registered_jurisdictions() == before
+
+
+langchain_required = pytest.mark.skipif(
+    not _LANGCHAIN_AVAILABLE, reason="langchain-core not installed"
+)
+llama_index_required = pytest.mark.skipif(
+    not _LLAMA_INDEX_AVAILABLE, reason="llama-index-core not installed"
+)
+
+
+@langchain_required
+class TestC1LangChainIdCollisions:
+    """C1 — ``Document.id`` was ``f"{document_id}:{chunk.index}"`` and
+    ``chunk.index`` restarts at 0 per input document, so the standard
+    one-``Document``-per-page loader pattern (all pages sharing
+    ``metadata["source"]``) produced duplicate ids and a vector store keyed on
+    id silently dropped chunks.
+    """
+
+    @staticmethod
+    def _page(n: int) -> str:
+        body = " ".join(f"word{n}" for _ in range(80))
+        return (
+            f"1. Clause {n}\n\nBody text for page {n}. {body}\n\n"
+            f"2. Second Clause {n}\n\nMore body for page {n}. {body}\n"
+        )
+
+    def _splitter(self):
+        from lexichunk.integrations.langchain import LegalTextSplitter
+
+        return LegalTextSplitter(jurisdiction="uk")
+
+    def test_one_document_per_page_yields_unique_ids(self) -> None:
+        from langchain_core.documents import Document
+
+        pages = [
+            Document(page_content=self._page(i), metadata={"source": "msa.pdf", "page": i})
+            for i in range(8)
+        ]
+        out = self._splitter().split_documents(pages)
+        ids = [d.id for d in out]
+        assert len(out) > len(pages)
+        assert len(set(ids)) == len(ids)
+
+    def test_distinct_ids_keep_the_two_part_format(self) -> None:
+        from langchain_core.documents import Document
+
+        pages = [
+            Document(page_content=self._page(i), metadata={"source": f"p{i}.pdf"})
+            for i in range(3)
+        ]
+        out = self._splitter().split_documents(pages)
+        assert all(d.id.count(":") == 1 for d in out)
+        assert len({d.id for d in out}) == len(out)
+
+    def test_recurring_id_uses_the_three_part_format(self) -> None:
+        from langchain_core.documents import Document
+
+        pages = [
+            Document(page_content=self._page(i), metadata={"source": "msa.pdf"})
+            for i in range(3)
+        ]
+        out = self._splitter().split_documents(pages)
+        assert all(d.id.startswith("msa.pdf:") and d.id.count(":") == 2 for d in out)
+        ordinals = {d.id.split(":")[1] for d in out}
+        assert ordinals == {"0", "1", "2"}
+
+    def test_generator_input_is_accepted(self) -> None:
+        from langchain_core.documents import Document
+
+        def gen():
+            for i in range(3):
+                yield Document(page_content=self._page(i), metadata={"source": "msa.pdf"})
+
+        out = self._splitter().split_documents(gen())
+        assert len({d.id for d in out}) == len(out)
