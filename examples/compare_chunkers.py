@@ -379,7 +379,7 @@ def demo_side_by_side() -> None:
         "  No defined terms                  | Definitions attached to each chunk\n"
         "  No cross-reference tracking       | In-document cross-refs resolved;\n"
         "                                    |   statute refs detected, not resolved\n"
-        "  No clause type classification     | 31 keyword-scored clause types\n"
+        "  No clause type classification     | 31 clause types classified\n"
         "  No document-level metadata        | document_id on every chunk\n"
         "  No context for embedding          | context_header for Contextual Retrieval\n"
     )

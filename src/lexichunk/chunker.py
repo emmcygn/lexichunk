@@ -869,10 +869,11 @@ class LegalChunker:
                 (the default) picks ``min(cpu_count, len(texts))``. When
                 *workers* is 1, or the batch has 2 or fewer documents,
                 processing is serial (no subprocess overhead) regardless
-                of *workers*. On Windows, *workers* is silently capped at
-                61 (the ``WaitForMultipleObjects`` handle limit
-                underlying :class:`~concurrent.futures.ProcessPoolExecutor`),
-                logged at ``INFO`` when it actually reduces the count.
+                of *workers*. On Windows, *workers* is capped at 61 (the
+                ``WaitForMultipleObjects`` handle limit underlying
+                :class:`~concurrent.futures.ProcessPoolExecutor`) rather
+                than raising; the cap is logged at ``INFO`` when it
+                actually reduces the count.
 
         Returns:
             :class:`~lexichunk.models.BatchResult` containing per-document

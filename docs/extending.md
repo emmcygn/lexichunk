@@ -72,8 +72,8 @@ def house_detect_level(line: str) -> Optional[tuple[int, str]]:
 `detect_level` is deliberately **stateless and permissive**: it only has to recognise the *shape* of a header. Before a match is accepted, `StructureParser` applies a jurisdiction-agnostic **heading-plausibility gate** that looks at the surrounding lines and can reject the match. The gate is reject-only — it never promotes a line to a header — so a rejected line simply stays body text, exactly as if `detect_level` had returned `None`. It currently rejects:
 
 - table-of-contents entries (leader dots or a right-aligned page number);
-- a container-level match (levels `-1`/`-2` — Schedule, Exhibit, Annex, Chapter) that is neither at column 0 nor preceded by a blank line, i.e. a word-wrapped cross-reference such as `"     Schedule 2."`;
-- a standalone ALL-CAPS level-0 heading that is page furniture (`CONFIDENTIAL`, `TABLE OF CONTENTS`, `PAGE …`), is longer than eight words, is not preceded by a blank line, or continues an unterminated ALL-CAPS paragraph;
+- a container-level match (levels `-1`/`-2` — Schedule, Exhibit, Annex, Chapter) that is not at column 0, not preceded by a blank line, and not preceded by a line ending in sentence-final punctuation (`.!?:;`) — i.e. a word-wrapped cross-reference such as `"     Schedule 2."`. The third alternative exists because a real `Schedule 2` heading is routinely typed directly under the last line of the preceding clause;
+- a standalone ALL-CAPS level-0 heading that is page furniture (`CONFIDENTIAL`, `TABLE OF CONTENTS`, `PAGE …`), is longer than `structure._MAX_ALLCAPS_WORDS` words (currently 10), is not preceded by a blank line, or continues an unterminated ALL-CAPS paragraph;
 - a numeric level-0 heading whose remainder reads as prose (a long, `.`/`;`-terminated sentence) or starts with a unit or month word (`3 Business Days after …`);
 - any heading whose remainder begins with a comma — that is a wrapped sentence, not a heading.
 
@@ -138,7 +138,10 @@ The extra signals are merged with the built-in signals — they do not replace t
 
 ### How Classification Works
 
-1. Each chunk's content is scanned for keyword matches against all 31 clause types.
+1. Each chunk's content is scanned for keyword matches. There are 31
+   `ClauseType` members and 29 of them carry signals: `PREAMBLE` is assigned
+   structurally rather than by keyword, and `UNKNOWN` is the fallback when
+   nothing scores, so both have empty signal lists in `CLAUSE_SIGNALS`.
 2. Scoring is phrase-length weighted, not a flat count: each signal match adds a
    weight equal to the number of words in that signal (`len(signal.split())`).
    A multi-word phrase like `"limitation of liability"` therefore contributes

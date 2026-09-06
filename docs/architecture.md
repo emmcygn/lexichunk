@@ -74,7 +74,7 @@ Regex-based detection of legal cross-references ("Section 2.1", "Clause 5(a)", "
 
 **Class**: `lexichunk.enrichment.clause_type.ClauseTypeClassifier`
 
-Keyword-based scoring with 31 clause types (definitions, representations, warranties, indemnification, data protection, etc.). Position-aware: end-of-document clause types (governing law, assignment, etc.) receive a bonus when they appear past the 75% mark. Produces `clause_type`, `classification_confidence`, and `secondary_clause_type`.
+Keyword-based scoring over 31 `ClauseType` members (definitions, representations, warranties, indemnification, data protection, etc.). 29 carry keyword signals; `PREAMBLE` is assigned structurally and `UNKNOWN` is the fallback when nothing scores. Position-aware: end-of-document clause types (governing law, assignment, etc.) receive a bonus when they appear past the 75% mark. Produces `clause_type`, `classification_confidence`, and `secondary_clause_type`.
 
 ### Stage 5: Context Enrichment
 
@@ -158,9 +158,10 @@ raised, not logged.
 ## Thread safety
 
 A single `LegalChunker` instance is safe to share across threads for
-`chunk()` and `chunk_iter()` — these methods do not mutate shared instance
-state that would race between concurrent calls beyond the definition cache,
-which is itself safe for concurrent reads/writes.
+`chunk()`, `chunk_iter()` and `chunk_with_metrics()` — these methods do not
+mutate shared instance state that would race between concurrent calls beyond
+the definition cache, which is an `OrderedDict` guarded by a
+`threading.Lock`.
 
 The `cross_ref_resolution_rate` and `cross_ref_stats` properties reflect the
 **last completed call** on that instance — they are convenience accumulators,

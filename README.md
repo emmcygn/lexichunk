@@ -499,8 +499,10 @@ window) that enforces `max_chunk_size` as a hard cap.
 **Cross-reference detection and resolution** run in two passes: detect first,
 then resolve `target_chunk_index` once every chunk exists.
 
-**Clause classifier** scores each chunk against 31 clause types using keyword
-signals with phrase-length weighting and position-aware bonuses.
+**Clause classifier** scores each chunk with keyword signals, weighted by
+phrase length and with position-aware bonuses. There are 31 `ClauseType`
+members; 29 carry signals, while `PREAMBLE` is assigned structurally and
+`UNKNOWN` is the fallback when nothing scores.
 
 **Term extractor** scans the definitions section for `"[Term]" means`,
 `'the Company' means`, hereinafter constructions and inline parenthetical
