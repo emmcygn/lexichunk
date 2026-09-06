@@ -106,6 +106,28 @@ The core pipeline uses only Python stdlib and `re`. This keeps the install size 
 
 `JurisdictionPatterns` is a `@runtime_checkable` Protocol, not an abstract class. Users add jurisdictions by creating any object with the required attributes and calling `register_jurisdiction()` — no inheritance needed.
 
+### Choosing a jurisdiction (and why there is no `"auto"`)
+
+Pass the jurisdiction the document is drafted under: `us` for a US agreement,
+`uk` for a UK one, `eu` for an EU instrument. That advice used to be wrong for
+US contracts, which is worth stating plainly because the workaround circulated:
+the `us` profile once required a literal `Section` or `ARTICLE` marker, so on
+US SEC filings — whose dominant style is bare `1. Definitions.` / `1.1` — `uk`
+recovered structure that `us` missed, and "use `uk` for US contracts" was
+genuinely the better advice. It no longer is. Both profiles now recognise the
+same bare-decimal numbering, and `us` adds `ARTICLE N`, `Section N.NN`,
+`Exhibit A` and letter-named attachments on top.
+
+A `jurisdiction="auto"` that sniffs the numbering style was considered and not
+built. Its whole value was papering over that gap. With the gap closed, the
+three profiles differ mainly in what they add — Roman-numeral articles and
+exhibits for `us`, `Chapter`/`Annex`/`Recital` for `eu` — so sampling heading
+lines to guess between them buys little and introduces a silent, per-document
+mode change that is unpleasant to debug when it guesses wrong. If your corpus
+is genuinely mixed, run the one you expect and watch
+`top_level_clause_count` and `fallback_used`; those say more than a guess
+would.
+
 ### Two-Pass Cross-References
 
 Cross-references are detected in Stage 3 (before chunking boundaries are final) and resolved in Stage 7 (after all chunks have identifiers). This two-pass design ensures resolution works even when a reference points forward in the document.

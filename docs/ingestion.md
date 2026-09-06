@@ -224,6 +224,8 @@ against.
 object `chunk_with_metrics()` does. Two fields read differently on this path:
 `clause_count` is the number of sections you supplied, and
 `heading_candidates_rejected` is always `0`, because no heading detection ran.
+`chunks_unclassified` is worth watching here too — a converter that produced
+sections but no usable text shows up as `chunks_unclassified == chunk_count`.
 The one to assert on is unchanged:
 
 ```python
