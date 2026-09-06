@@ -49,18 +49,26 @@ _ALLCAPS_LINE_AHEAD: re.Pattern[str] = re.compile(
     r"\n[ \t]*(?=[A-Z][A-Z \t&/-]{2,}[ \t]*(?:\n|$))"
 )
 
-# A clause-entry marker ("1.2", "(a)", "(iv)") left dangling at the end of a
-# captured definition body.  When definitions are separated by a single
-# newline rather than a blank line, the next entry's own marker sits between
-# the end of this definition and the quote that opens the next term, so it is
-# captured as part of this definition's text ("the first thing. 1.2").
+# A clause-entry marker ("1.2", "(a)", "(iv)", "Section 1.2", "Article II")
+# left dangling at the end of a captured definition body.  When definitions
+# are separated by a single newline rather than a blank line, the next entry's
+# own marker sits between the end of this definition and the quote that opens
+# the next term, so it is captured as part of this definition's text
+# ("the first thing. 1.2").
 #
 # The leading ``\n`` is load-bearing: it is what distinguishes that dangling
 # marker from a number that legitimately ends the sentence, as in
 # ``"Gamma" shall have the meaning set forth in Section 3.`` — so this is
 # applied to the raw slice, before newlines are collapsed to spaces.
 _TRAILING_CLAUSE_LABEL: re.Pattern[str] = re.compile(
-    r"\n[ \t]*(?:\d+(?:\.\d+)*\.?|\([a-z]\)|\([ivxlc]+\))[ \t]*\Z"
+    r"\n[ \t]*(?:"
+    r"\d+(?:\.\d+)*\.?"
+    r"|\([a-z]\)"
+    r"|\([ivxlc]+\)"
+    r"|(?:Section|Article|Clause|Paragraph|Chapter)\s+"
+    r"(?:\d+(?:\.\d+)*\.?|[IVXLC]+\.?)"
+    r")[ \t]*\Z",
+    re.IGNORECASE,
 )
 
 # How far back a "hereinafter" definition looks for its body.

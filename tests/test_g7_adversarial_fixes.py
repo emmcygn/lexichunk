@@ -1204,3 +1204,28 @@ class TestH14LlamaIndexDeterminism:
     def test_the_derived_identifier_is_not_a_uuid(self) -> None:
         header = self._nodes()[0].metadata["context_header"]
         assert "[Document: lexichunk-" in header
+
+
+class TestH8UsStyleDanglingMarker:
+    """H8, US layout — the dangling next-entry marker is spelled
+    ``Section 1.2`` rather than a bare number.
+    """
+
+    def test_us_section_marker_does_not_leak_into_the_body(self) -> None:
+        document = (
+            "1. DEFINITIONS\n"
+            'Section 1.1 "Alpha" means the first thing.\n'
+            'Section 1.2 "Bravo" means the second thing.\n'
+            'Section 1.3 "Charlie" means the third thing.\n'
+        )
+        terms = DefinitionsExtractor(Jurisdiction.US).extract(document)
+        assert terms["Alpha"].definition == "the first thing."
+        assert terms["Bravo"].definition == "the second thing."
+        assert terms["Charlie"].definition == "the third thing."
+
+    def test_sentence_final_section_reference_survives(self) -> None:
+        terms = DefinitionsExtractor(Jurisdiction.US).extract(
+            '"Gamma" shall have the meaning set forth in Section 3.\n'
+            '"business day" means any day other than a Saturday.\n'
+        )
+        assert terms["Gamma"].definition == "set forth in Section 3."
