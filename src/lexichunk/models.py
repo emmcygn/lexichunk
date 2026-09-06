@@ -187,6 +187,77 @@ class HierarchyNode:
 
 
 @dataclass
+class Section:
+    """One structural unit handed to lexichunk by an *external* parser.
+
+    This is the input type for
+    :meth:`~lexichunk.chunker.LegalChunker.chunk_documents`.  Where
+    :meth:`~lexichunk.chunker.LegalChunker.chunk` has to *find* clause
+    boundaries in a wall of text, a caller who already ran Docling,
+    ``unstructured``, or their own converter over the source knows exactly
+    where the headings were — and that knowledge is usually better than
+    anything line-based detection can recover from the flattened text.
+    ``Section`` is how they hand it over.
+
+    **``text`` is the body, not the heading.**  The heading is carried
+    separately in ``identifier`` and ``title``, exactly as an upstream
+    parser reports it (a Docling ``SectionHeaderItem`` and the ``TextItem``
+    objects beneath it).  ``chunk_documents`` reconstructs a document by
+    emitting a header line built from ``identifier``/``title`` followed by
+    ``text``, so putting the heading in ``text`` as well duplicates it.
+
+    Attributes:
+        identifier: The section's own label — ``"5.2"``, ``"Article IV"``,
+            ``"Schedule 1"``, or, for an unnumbered heading, the heading
+            text itself.  May be left empty when *title* is set, in which
+            case the title is used as the identifier.
+        title: Heading text after the identifier (``"Payment Terms"``), or
+            ``None``.
+        text: The section's body text, excluding its own heading and
+            excluding any nested subsection's text (nest those as their own
+            ``Section`` records).
+        level: Hierarchy level, following the same scale the built-in
+            jurisdictions use — negative for containers (``-1`` Schedule,
+            ``-2`` Exhibit), ``0`` top-level clause or Article, ``1``
+            subsection, ``2`` sub-subsection, ``3`` alpha sub-clause, ``4``
+            roman sub-clause.  Only the *ordering* matters: a section
+            nests under the nearest preceding section with a strictly
+            smaller level.
+        parent_identifier: Identifier of the enclosing section.  Optional —
+            when ``None``, the parent is inferred from *level* using the
+            same stack discipline the structure parser uses.  Supply it when
+            your source has explicit parentage and you would rather not rely
+            on levels alone.
+        char_start: Optional offset of this section's body in the caller's
+            own source text (whatever the upstream parser read).  When every
+            section carries both offsets, ``chunk_documents`` populates
+            ``raw_char_start``/``raw_char_end`` on the resulting chunks, so
+            a chunk can be pointed back at the original file.
+        char_end: Exclusive counterpart to *char_start*.
+    """
+
+    identifier: str
+    title: Optional[str]
+    text: str
+    level: int
+    parent_identifier: Optional[str] = None
+    char_start: Optional[int] = None
+    char_end: Optional[int] = None
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a plain, ``json.dumps``-able dict representation."""
+        return {
+            "identifier": self.identifier,
+            "title": self.title,
+            "text": self.text,
+            "level": self.level,
+            "parent_identifier": self.parent_identifier,
+            "char_start": self.char_start,
+            "char_end": self.char_end,
+        }
+
+
+@dataclass
 class LegalChunk:
     """A single chunk of legal text with full metadata.
 

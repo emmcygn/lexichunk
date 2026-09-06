@@ -33,6 +33,7 @@ from .models import (
     Jurisdiction,
     JurisdictionPatterns,
     LegalChunk,
+    Section,
 )
 
 __version__ = "0.8.0b1"
@@ -40,6 +41,7 @@ __all__ = [
     "LegalChunker",
     "ClassificationHook",
     "LegalChunk",
+    "Section",
     "HierarchyNode",
     "CrossReference",
     "ClassificationResult",

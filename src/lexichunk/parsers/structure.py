@@ -844,6 +844,32 @@ class StructureParser:
             for c in clauses
         ]
 
+    def classify_document_section(
+        self, identifier: str, title: str, level: int
+    ) -> DocumentSection:
+        """Classify a heading into a :class:`DocumentSection`.
+
+        The public entry point to the same rules :meth:`parse` applies to
+        each heading it finds, for callers that already have structure from
+        somewhere else — :meth:`~lexichunk.chunker.LegalChunker.chunk_documents`
+        uses it to classify externally-parsed sections so they land in the
+        same buckets a natively-parsed document would.
+
+        Note this classifies one heading *in isolation*: the inheritance
+        rule (a clause inside a Schedule is part of the schedules however
+        neutrally its own heading reads) is applied by the caller, which is
+        the only place that knows the ancestry.
+
+        Args:
+            identifier: The clause identifier (e.g. ``"1"``, ``"Article I"``).
+            title: The heading text, or the empty string.
+            level: The numeric hierarchy level.
+
+        Returns:
+            A :class:`~lexichunk.models.DocumentSection` member.
+        """
+        return self._detect_document_section(identifier, title, level)
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------

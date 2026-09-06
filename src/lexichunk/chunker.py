@@ -28,12 +28,13 @@ import time
 import unicodedata
 from bisect import bisect_left, bisect_right
 from collections import OrderedDict
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Callable, Iterator, Optional
+from typing import Any, Callable, Iterator, Literal, Optional, overload
 
 logger = logging.getLogger(__name__)
 
+from .documents import build_document
 from .enrichment.clause_type import ClassificationResult, ClauseTypeClassifier
 from .enrichment.context import ContextEnricher
 from .exceptions import ConfigurationError, InputError
@@ -47,6 +48,7 @@ from .models import (
     HierarchyNode,
     Jurisdiction,
     LegalChunk,
+    Section,
 )
 from .offsets import OffsetMap, sanitize_with_map
 from .parsers.definitions import DefinitionsExtractor
@@ -503,7 +505,6 @@ class LegalChunker:
                 f"document_id must be a string or None, got {type(document_id).__name__}"
             )
         doc_id = document_id if document_id is not None else self._document_id
-        fallback_used = False
 
         # ------------------------------------------------------------------
         # Stage 1: Structure parsing
@@ -522,6 +523,210 @@ class LegalChunker:
                 len(clauses), elapsed,
             )
             stage_metrics.append(StageMetric("structure_parsing", elapsed, len(clauses)))
+
+        return self._run_stages(
+            text,
+            clauses,
+            doc_id,
+            collect_metrics=collect_metrics,
+            pipeline_start=pipeline_start,
+            stage_metrics=stage_metrics,
+            input_chars=input_chars,
+            heading_candidates_rejected=heading_candidates_rejected,
+            raw_span=offset_map.to_raw_span if offset_map is not None else None,
+        )
+
+    # ------------------------------------------------------------------
+    # Pre-parsed structure entry point
+    # ------------------------------------------------------------------
+
+    @overload
+    def chunk_documents(
+        self,
+        sections: Sequence[Section] | Sequence[ParsedClause],
+        *,
+        document_id: Optional[str] = ...,
+        return_metrics: Literal[False] = ...,
+    ) -> list[LegalChunk]: ...
+
+    @overload
+    def chunk_documents(
+        self,
+        sections: Sequence[Section] | Sequence[ParsedClause],
+        *,
+        document_id: Optional[str] = ...,
+        return_metrics: Literal[True],
+    ) -> tuple[list[LegalChunk], PipelineMetrics]: ...
+
+    def chunk_documents(
+        self,
+        sections: Sequence[Section] | Sequence[ParsedClause],
+        *,
+        document_id: Optional[str] = None,
+        return_metrics: bool = False,
+    ) -> list[LegalChunk] | tuple[list[LegalChunk], PipelineMetrics]:
+        """Chunk a document whose structure you already have.
+
+        Runs stages 2–8 — chunking, cross-reference detection,
+        classification, context headers, defined terms, resolution — on
+        structure supplied by an *external* parser, skipping lexichunk's own
+        line-based heading detection entirely.
+
+        This is the "after Docling, not instead of Docling" path.  A PDF's
+        own layout, or a DOCX's own outline, records where the headings were;
+        flattening that to text and re-detecting headings throws the
+        information away and then guesses at it.  When you have it, hand it
+        over.
+
+        Input is either a sequence of :class:`~lexichunk.models.Section`
+        records — the usual case, and what
+        :mod:`lexichunk.ingestion` produces — or a sequence of ready-made
+        :class:`~lexichunk.parsers.structure.ParsedClause` objects, for a
+        caller who has written a full parser of their own.  The two must not
+        be mixed in one call.
+
+        A document text is reconstructed from the sections, with a header
+        line per section and a blank line between them, and each clause's
+        ``content`` is the exact slice of it that the clause owns.  Every
+        invariant ``chunk()`` guarantees therefore still holds: chunk bodies
+        are literal slices, spans tile without overlap, ``max_chunk_size`` is
+        a hard cap.  ``chunk.char_start``/``char_end`` index that
+        reconstructed text, **not** your original source.  To get back to the
+        source, give each section a ``char_start``/``char_end`` — when all of
+        them carry both, ``raw_char_start``/``raw_char_end`` are populated on
+        every chunk.
+
+        Args:
+            sections: The structure to chunk, in document order.
+            document_id: Override ``document_id`` for this call.  Falls back
+                to the value passed to ``__init__``.
+            return_metrics: When ``True``, return
+                ``(chunks, PipelineMetrics)`` instead of just the chunks.
+                A flag rather than a second ``chunk_with_metrics_documents``
+                method: the metrics are the same object
+                :meth:`chunk_with_metrics` returns, and the call already
+                takes keyword-only arguments, so a flag keeps one entry point
+                instead of two names that would have to stay in step.
+                ``PipelineMetrics.clause_count`` is the number of sections
+                you supplied and ``heading_candidates_rejected`` is ``0``,
+                because no heading detection ran.
+
+        Returns:
+            The chunks, or ``(chunks, metrics)`` when *return_metrics* is
+            ``True``.
+
+        Raises:
+            InputError: If *sections* is not a sequence, is empty, mixes
+                record types, contains an invalid record, or *document_id*
+                is not ``None``/``str``.
+
+        Example::
+
+            from lexichunk import LegalChunker
+            from lexichunk.ingestion import from_markdown
+
+            chunker = LegalChunker(jurisdiction="uk")
+            chunks = chunker.chunk_documents(from_markdown(markdown_text))
+        """
+        if document_id is not None and not isinstance(document_id, str):
+            raise InputError(
+                f"document_id must be a string or None, got "
+                f"{type(document_id).__name__}"
+            )
+        doc_id = document_id if document_id is not None else self._document_id
+
+        pipeline_start = time.perf_counter() if return_metrics else 0.0
+        stage_metrics: list[StageMetric] = []
+
+        # Every caller-supplied string is sanitised *before* the document is
+        # assembled, so the reconstruction is sanitised by construction and
+        # each clause's content is still an exact slice of it. Sanitising the
+        # assembled text instead would shift offsets out from under the
+        # clauses that were built from the unsanitised pieces.
+        text, clauses, source_spans = build_document(
+            sections,
+            self._structure_parser.classify_document_section,
+            self._sanitize_input,
+        )
+        if len(text) > self._MAX_INPUT_CHARS:
+            raise InputError(
+                f"Reconstructed document too large ({len(text)} chars). "
+                f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
+            )
+        if self._sanitize_input(text) != text:  # pragma: no cover - defensive
+            raise InputError(
+                "The reconstructed document is not stable under sanitisation, "
+                "which would break the exact-slice offset invariant. This "
+                "means a section's text composes with its neighbour's under "
+                "Unicode NFC; please report it with the offending sections."
+            )
+
+        if return_metrics:
+            stage_metrics.append(
+                StageMetric("structure_parsing", 0.0, len(clauses))
+            )
+
+        chunks, metrics = self._run_stages(
+            text,
+            clauses,
+            doc_id,
+            collect_metrics=return_metrics,
+            pipeline_start=pipeline_start,
+            stage_metrics=stage_metrics,
+            input_chars=len(text),
+            heading_candidates_rejected=0,
+            raw_span=source_spans,
+        )
+        if return_metrics:
+            return chunks, metrics  # type: ignore[return-value]
+        return chunks
+
+    def _run_stages(
+        self,
+        text: str,
+        clauses: list[ParsedClause],
+        doc_id: Optional[str],
+        *,
+        collect_metrics: bool,
+        pipeline_start: float,
+        stage_metrics: list[StageMetric],
+        input_chars: int,
+        heading_candidates_rejected: int,
+        raw_span: Callable[[int, int], tuple[int, int]] | None = None,
+    ) -> tuple[list[LegalChunk], PipelineMetrics | None]:
+        """Run pipeline stages 2–8 over an already-parsed clause list.
+
+        Split out of :meth:`_run_pipeline` so that :meth:`chunk_documents`
+        can supply structure from an external parser (Docling, unstructured,
+        a markdown converter) and get exactly the same downstream treatment
+        — chunking, cross-references, classification, context headers,
+        defined terms, resolution — without lexichunk's own line-based
+        heading detection ever running.
+
+        Args:
+            text: The document text *clauses* index into.  Chunk bodies are
+                sliced from it directly, so the clauses' ``char_start`` and
+                ``content`` must agree with it.
+            clauses: Parsed clauses in document order.
+            doc_id: The resolved document identifier, or ``None``.
+            collect_metrics: Time each stage and build
+                :class:`PipelineMetrics`.
+            pipeline_start: ``time.perf_counter()`` at pipeline entry.
+            stage_metrics: Accumulator the earlier stages already wrote to.
+            input_chars: Character count of *text*.
+            heading_candidates_rejected: Stage 1's rejection count, or ``0``
+                when the structure parser was bypassed.
+            raw_span: Optional ``(start, end) -> (raw_start, raw_end)``
+                mapping used to populate ``raw_char_start``/``raw_char_end``.
+                :meth:`~lexichunk.offsets.OffsetMap.to_raw_span` for
+                :meth:`chunk`; a section-span lookup for
+                :meth:`chunk_documents`.
+
+        Returns:
+            ``(chunks, metrics)`` — *metrics* is ``None`` when
+            *collect_metrics* is ``False``.
+        """
+        fallback_used = False
 
         # ------------------------------------------------------------------
         # Stage 2: Chunking
@@ -774,9 +979,9 @@ class LegalChunker:
             )
             stage_metrics.append(StageMetric("cross_reference_resolution", elapsed, resolved_count))
 
-        if offset_map is not None:
+        if raw_span is not None:
             for chunk in chunks:
-                chunk.raw_char_start, chunk.raw_char_end = offset_map.to_raw_span(
+                chunk.raw_char_start, chunk.raw_char_end = raw_span(
                     chunk.char_start, chunk.char_end
                 )
 
