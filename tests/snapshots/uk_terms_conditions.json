@@ -1,0 +1,939 @@
+[
+  {
+    "char_end": 947,
+    "char_start": 0,
+    "classification_confidence": 1.0,
+    "clause_type": "preamble",
+    "content_head": "'TERMS AND CONDITIONS\\n\\nCloudVault Analytics Platform\\n\\nVersion 3.2 — Effective Dat'",
+    "content_sha256": "ba6a8f568a03ec380b3be9f63a1366879e9d63644572455f3c209c855f52dec5",
+    "context_header": "[Section: preamble] [Type: Preamble] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Order Form",
+      "Platform",
+      "Terms"
+    ],
+    "document_section": "preamble",
+    "hierarchy_path": "preamble",
+    "index": 0,
+    "original_header": "",
+    "secondary_clause_type": null,
+    "token_count": 236
+  },
+  {
+    "char_end": 3070,
+    "char_start": 947,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'1.   Definitions\\n\\n\\n1.1  In these Terms, the following words and expressions shal'",
+    "content_sha256": "7d5b246ba5a3e03ccc0f645273c592e136ccc1e1fd9b27fe04800ae3e6f1c9a8",
+    "context_header": "[Section: 1 — Definitions] [Type: Definitions] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 2",
+        "target_chunk_index": 4,
+        "target_identifier": "2"
+      },
+      {
+        "raw_text": "section 3",
+        "target_chunk_index": 7,
+        "target_identifier": "3"
+      },
+      {
+        "raw_text": "clause 5",
+        "target_chunk_index": 15,
+        "target_identifier": "5"
+      }
+    ],
+    "defined_terms_used": [
+      "Account",
+      "Authorised Users",
+      "CloudVault",
+      "Customer",
+      "Customer Data",
+      "Data Protection Legislation",
+      "Documentation",
+      "Fees",
+      "Intellectual Property Rights",
+      "Order Form",
+      "Personal Data",
+      "Platform",
+      "Terms",
+      "UK GDPR"
+    ],
+    "document_section": "definitions",
+    "hierarchy_path": "1 — Definitions",
+    "index": 1,
+    "original_header": "1 Definitions",
+    "secondary_clause_type": null,
+    "token_count": 517
+  },
+  {
+    "char_end": 3437,
+    "char_start": 3070,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'1 Definitions\\n\"Permitted Purpose\" means the Customer\\'s internal business purpose'",
+    "content_sha256": "b723e188b295d6ff411ed3e2fba044c64975d77731a4536201c673fa2c4201f3",
+    "context_header": "[Section: 1 — Definitions > 1.1.__part1 — In these Terms, the following words and expressions shall have the meanings given] [Type: Definitions] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Account",
+      "Customer",
+      "Permitted Purpose",
+      "Platform",
+      "Subscription Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "1 — Definitions > 1.1.__part1 — In these Terms, the following words and expressions shall have the meanings given",
+    "index": 2,
+    "original_header": "1.1.__part1 In these Terms, the following words and expressions shall have the meanings given",
+    "secondary_clause_type": null,
+    "token_count": 93
+  },
+  {
+    "char_end": 3781,
+    "char_start": 3437,
+    "classification_confidence": 0.714,
+    "clause_type": "definitions",
+    "content_head": "'1 Definitions\\n1.2  References to clauses are to clauses of these Terms. Clause h'",
+    "content_sha256": "3870439847ef4bebc7e425a8c60b00dea5eb9afff3c346fa4167c23158acd708",
+    "context_header": "[Section: 1 — Definitions > 1.2 — References to clauses are to clauses of these Terms. Clause headings are for] [Type: Definitions] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Order Form",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "1 — Definitions > 1.2 — References to clauses are to clauses of these Terms. Clause headings are for",
+    "index": 3,
+    "original_header": "1.2 References to clauses are to clauses of these Terms. Clause headings are for",
+    "secondary_clause_type": "covenants",
+    "token_count": 89
+  },
+  {
+    "char_end": 4128,
+    "char_start": 3781,
+    "classification_confidence": 0.6,
+    "clause_type": "payment",
+    "content_head": "\"2.   Access to the Platform\\n\\n\\n2.1  Subject to these Terms and the Customer's tim\"",
+    "content_sha256": "8db3ed95ef4e0b4041d323bcc4ae825bed0f08e3f0d039ea5c8a4d8ba1e3071a",
+    "context_header": "[Section: 2 — Access to the Platform] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Documentation",
+      "Fees",
+      "Permitted Purpose",
+      "Platform",
+      "Subscription Term",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "2 — Access to the Platform",
+    "index": 4,
+    "original_header": "2 Access to the Platform",
+    "secondary_clause_type": "intellectual_property",
+    "token_count": 87
+  },
+  {
+    "char_end": 4417,
+    "char_start": 4128,
+    "classification_confidence": 0.667,
+    "clause_type": "account_security",
+    "content_head": "'2 Access to the Platform\\n2.2  The Customer shall procure that each Authorised Us'",
+    "content_sha256": "d83f46f29f503150f1ca4b08b19fc1647a13e3bfe5364e9ff9f69c3b0c150ac1",
+    "context_header": "[Section: 2 — Access to the Platform > 2.2 — The Customer shall procure that each Authorised User keeps their login credentials] [Type: Account Security] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Account",
+      "Customer",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "2 — Access to the Platform > 2.2 — The Customer shall procure that each Authorised User keeps their login credentials",
+    "index": 5,
+    "original_header": "2.2 The Customer shall procure that each Authorised User keeps their login credentials",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 78
+  },
+  {
+    "char_end": 5059,
+    "char_start": 4417,
+    "classification_confidence": 0.5,
+    "clause_type": "covenants",
+    "content_head": "'2 Access to the Platform\\n2.3  The Customer shall notify CloudVault immediately a'",
+    "content_sha256": "9bfff748c6ea7819e302ce74bab6c68c54589ee088a321c50356537470dd92f1",
+    "context_header": "[Section: 2 — Access to the Platform > 2.3 — The Customer shall notify CloudVault immediately at security@cloudvault.io upon] [Type: Covenants] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Platform",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "2 — Access to the Platform > 2.3 — The Customer shall notify CloudVault immediately at security@cloudvault.io upon",
+    "index": 6,
+    "original_header": "2.3 The Customer shall notify CloudVault immediately at security@cloudvault.io upon",
+    "secondary_clause_type": "account_security",
+    "token_count": 167
+  },
+  {
+    "char_end": 5362,
+    "char_start": 5059,
+    "classification_confidence": 0.714,
+    "clause_type": "acceptable_use",
+    "content_head": "'3.   Acceptable use\\n\\n\\n3.1  The Customer shall not, and shall ensure that its Aut'",
+    "content_sha256": "dddb14a27db7e35715d7f74fa591d7060d2ece05db8f13d160b644f763ab542d",
+    "context_header": "[Section: 3 — Acceptable use] [Type: Acceptable Use] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Authorised Users",
+      "Customer",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Acceptable use",
+    "index": 7,
+    "original_header": "3 Acceptable use",
+    "secondary_clause_type": "covenants",
+    "token_count": 76
+  },
+  {
+    "char_end": 5724,
+    "char_start": 5362,
+    "classification_confidence": 0.385,
+    "clause_type": "intellectual_property",
+    "content_head": "'3 Acceptable use\\n3.1 The Customer shall not, and shall ensure that its Authorise'",
+    "content_sha256": "79c94be374e7b4989cb5d6c9a77a4fd459ccc424bc788a63a6e289417f7b3f07",
+    "context_header": "[Section: 3 — Acceptable use > 3.1 — The Customer shall not, and shall ensure that its Authorised Users do not, use > (b) — infringe or misappropriate the Intellectual Property Rights, privacy rights,] [Type: Intellectual Property] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Authorised Users",
+      "Customer",
+      "Intellectual Property Rights"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Acceptable use > 3.1 — The Customer shall not, and shall ensure that its Authorised Users do not, use > (b) — infringe or misappropriate the Intellectual Property Rights, privacy rights,",
+    "index": 8,
+    "original_header": "(b) infringe or misappropriate the Intellectual Property Rights, privacy rights,",
+    "secondary_clause_type": "acceptable_use",
+    "token_count": 115
+  },
+  {
+    "char_end": 6002,
+    "char_start": 5724,
+    "classification_confidence": 0.714,
+    "clause_type": "acceptable_use",
+    "content_head": "'3 Acceptable use\\n3.1 The Customer shall not, and shall ensure that its Authorise'",
+    "content_sha256": "e809c0d3269ffd0ca41fa88cb7011595d45d0176b4afedd7c11fa84419a918a4",
+    "context_header": "[Section: 3 — Acceptable use > 3.1 — The Customer shall not, and shall ensure that its Authorised Users do not, use > (d) — attempt to gain unauthorised access to any part of the Platform or to any] [Type: Acceptable Use] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Authorised Users",
+      "Customer",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Acceptable use > 3.1 — The Customer shall not, and shall ensure that its Authorised Users do not, use > (d) — attempt to gain unauthorised access to any part of the Platform or to any",
+    "index": 9,
+    "original_header": "(d) attempt to gain unauthorised access to any part of the Platform or to any",
+    "secondary_clause_type": "covenants",
+    "token_count": 94
+  },
+  {
+    "char_end": 6420,
+    "char_start": 6002,
+    "classification_confidence": 0.385,
+    "clause_type": "acceptable_use",
+    "content_head": "'3 Acceptable use\\n3.1 The Customer shall not, and shall ensure that its Authorise'",
+    "content_sha256": "2b8665ca4d89f496b1992720378442c8cb7c8fedc5995d32a048ed3a444072ab",
+    "context_header": "[Section: 3 — Acceptable use > 3.1 — The Customer shall not, and shall ensure that its Authorised Users do not, use > (f) — reverse engineer, decompile, disassemble, or attempt to derive the source code] [Type: Acceptable Use] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Authorised Users",
+      "Customer",
+      "Permitted Purpose",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Acceptable use > 3.1 — The Customer shall not, and shall ensure that its Authorised Users do not, use > (f) — reverse engineer, decompile, disassemble, or attempt to derive the source code",
+    "index": 10,
+    "original_header": "(f) reverse engineer, decompile, disassemble, or attempt to derive the source code",
+    "secondary_clause_type": "user_restrictions",
+    "token_count": 129
+  },
+  {
+    "char_end": 6731,
+    "char_start": 6420,
+    "classification_confidence": 0.556,
+    "clause_type": "acceptable_use",
+    "content_head": "'3 Acceptable use\\n3.2  CloudVault may, at its sole discretion and without prior n'",
+    "content_sha256": "6e1594fa38aefbf99a44720389efefc149ccf3c45d736ea0a9ab763cab2f775a",
+    "context_header": "[Section: 3 — Acceptable use > 3.2 — CloudVault may, at its sole discretion and without prior notice, remove or disable] [Type: Acceptable Use] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 3.1",
+        "target_chunk_index": null,
+        "target_identifier": "3.1"
+      }
+    ],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Customer Data"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Acceptable use > 3.2 — CloudVault may, at its sole discretion and without prior notice, remove or disable",
+    "index": 11,
+    "original_header": "3.2 CloudVault may, at its sole discretion and without prior notice, remove or disable",
+    "secondary_clause_type": "governing_law",
+    "token_count": 82
+  },
+  {
+    "char_end": 7304,
+    "char_start": 6731,
+    "classification_confidence": 1.0,
+    "clause_type": "data_protection",
+    "content_head": "'4.   Data protection\\n\\n\\n4.1  Each party shall comply with the Data Protection Leg'",
+    "content_sha256": "74dfe55201f915960ce928fb34d537551b2ef0a8eb91d3ecb5ad35c84b9a1015",
+    "context_header": "[Section: 4 — Data protection] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Customer Data",
+      "Data Protection Legislation",
+      "Personal Data",
+      "Platform",
+      "UK GDPR"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "4 — Data protection",
+    "index": 12,
+    "original_header": "4 Data protection",
+    "secondary_clause_type": null,
+    "token_count": 143
+  },
+  {
+    "char_end": 7918,
+    "char_start": 7304,
+    "classification_confidence": 1.0,
+    "clause_type": "data_protection",
+    "content_head": "'4 Data protection\\n4.3  The Customer acts as data controller in respect of Person'",
+    "content_sha256": "2715f6bfc20775a87fef38cc2bd6aa30dfa6b6bf6004c595e3a355a3cd4bf55c",
+    "context_header": "[Section: 4 — Data protection > 4.3 — The Customer acts as data controller in respect of Personal Data submitted via] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Personal Data",
+      "Platform",
+      "UK GDPR"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "4 — Data protection > 4.3 — The Customer acts as data controller in respect of Personal Data submitted via",
+    "index": 13,
+    "original_header": "4.3 The Customer acts as data controller in respect of Personal Data submitted via",
+    "secondary_clause_type": null,
+    "token_count": 158
+  },
+  {
+    "char_end": 8266,
+    "char_start": 7918,
+    "classification_confidence": 0.769,
+    "clause_type": "data_protection",
+    "content_head": "'4 Data protection\\n4.5  CloudVault shall notify the Customer without undue delay '",
+    "content_sha256": "a2f8f4ac83156fe2b8a0c81445511877668c5ae19ebbd7ed670ccaa2afa1c0f7",
+    "context_header": "[Section: 4 — Data protection > 4.5 — CloudVault shall notify the Customer without undue delay upon becoming aware of a] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Customer Data",
+      "Personal Data",
+      "UK GDPR"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "4 — Data protection > 4.5 — CloudVault shall notify the Customer without undue delay upon becoming aware of a",
+    "index": 14,
+    "original_header": "4.5 CloudVault shall notify the Customer without undue delay upon becoming aware of a",
+    "secondary_clause_type": "covenants",
+    "token_count": 91
+  },
+  {
+    "char_end": 8579,
+    "char_start": 8266,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'5.   Fees, billing and payment\\n\\n\\n5.1  The Customer shall pay the Fees in advance'",
+    "content_sha256": "34f1a288aa20b9addefbf8639c6978cfa14153719a54b525af61b7ade3805fb5",
+    "context_header": "[Section: 5 — Fees, billing and payment] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Fees",
+      "Order Form"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "5 — Fees, billing and payment",
+    "index": 15,
+    "original_header": "5 Fees, billing and payment",
+    "secondary_clause_type": null,
+    "token_count": 78
+  },
+  {
+    "char_end": 8837,
+    "char_start": 8579,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'5 Fees, billing and payment\\n5.2  CloudVault shall collect payment via the paymen'",
+    "content_sha256": "54a7d5808e9ab0cb2de64c9ad4b0d993fae92c241eb2a2a23d2dd318bb384a0d",
+    "context_header": "[Section: 5 — Fees, billing and payment > 5.2 — CloudVault shall collect payment via the payment method specified in the Order Form.] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Fees",
+      "Order Form"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "5 — Fees, billing and payment > 5.2 — CloudVault shall collect payment via the payment method specified in the Order Form.",
+    "index": 16,
+    "original_header": "5.2 CloudVault shall collect payment via the payment method specified in the Order Form.",
+    "secondary_clause_type": null,
+    "token_count": 71
+  },
+  {
+    "char_end": 9262,
+    "char_start": 8837,
+    "classification_confidence": 0.778,
+    "clause_type": "payment",
+    "content_head": "'5 Fees, billing and payment\\n5.3  If any payment is not received by the due date '",
+    "content_sha256": "cea0ae7651eaf5d07f471872cab6d3f3e7fae87df884cbea65f28f765302fba1",
+    "context_header": "[Section: 5 — Fees, billing and payment > 5.3 — If any payment is not received by the due date (whether because a payment method] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Fees",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "5 — Fees, billing and payment > 5.3 — If any payment is not received by the due date (whether because a payment method",
+    "index": 17,
+    "original_header": "5.3 If any payment is not received by the due date (whether because a payment method",
+    "secondary_clause_type": "notices",
+    "token_count": 113
+  },
+  {
+    "char_end": 9674,
+    "char_start": 9262,
+    "classification_confidence": 0.571,
+    "clause_type": "payment",
+    "content_head": "'5 Fees, billing and payment\\n5.4  CloudVault may increase the Fees at the start o'",
+    "content_sha256": "1df3749bf4e7557961558fcad04400ab797b5ea071f69ef9cdce13c9143b3d61",
+    "context_header": "[Section: 5 — Fees, billing and payment > 5.4 — CloudVault may increase the Fees at the start of each Renewal Term by giving the] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Fees",
+      "Subscription Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "5 — Fees, billing and payment > 5.4 — CloudVault may increase the Fees at the start of each Renewal Term by giving the",
+    "index": 18,
+    "original_header": "5.4 CloudVault may increase the Fees at the start of each Renewal Term by giving the",
+    "secondary_clause_type": "notices",
+    "token_count": 110
+  },
+  {
+    "char_end": 10203,
+    "char_start": 9674,
+    "classification_confidence": 0.538,
+    "clause_type": "payment",
+    "content_head": "'5 Fees, billing and payment\\n5.5  All Fees paid are non-refundable except as expr'",
+    "content_sha256": "be6555735ba2dc9814284ba51b64138cbe09364eef8113ae0b36995ec47d1e4d",
+    "context_header": "[Section: 5 — Fees, billing and payment > 5.5 — All Fees paid are non-refundable except as expressly set out in these Terms or] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Documentation",
+      "Fees",
+      "Intellectual Property Rights",
+      "Platform",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "5 — Fees, billing and payment > 5.5 — All Fees paid are non-refundable except as expressly set out in these Terms or",
+    "index": 19,
+    "original_header": "5.5 All Fees paid are non-refundable except as expressly set out in these Terms or",
+    "secondary_clause_type": "governing_law",
+    "token_count": 139
+  },
+  {
+    "char_end": 10605,
+    "char_start": 10203,
+    "classification_confidence": 1.0,
+    "clause_type": "intellectual_property",
+    "content_head": "'6 Intellectual property\\n6.2  Subject to clause 6.1, all Intellectual Property Ri'",
+    "content_sha256": "bd3dbc1c2b24ca4aca89b4abce46aec6872e9b99abd4215d926cdba112a8fc2d",
+    "context_header": "[Section: 6 — Intellectual property > 6.2 — Subject to clause 6.1, all Intellectual Property Rights in the Customer Data shall] [Type: Intellectual Property] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 6.1",
+        "target_chunk_index": null,
+        "target_identifier": "6.1"
+      }
+    ],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Customer Data",
+      "Intellectual Property Rights",
+      "Platform",
+      "Subscription Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "6 — Intellectual property > 6.2 — Subject to clause 6.1, all Intellectual Property Rights in the Customer Data shall",
+    "index": 20,
+    "original_header": "6.2 Subject to clause 6.1, all Intellectual Property Rights in the Customer Data shall",
+    "secondary_clause_type": null,
+    "token_count": 106
+  },
+  {
+    "char_end": 10912,
+    "char_start": 10605,
+    "classification_confidence": 1.0,
+    "clause_type": "intellectual_property",
+    "content_head": "'6 Intellectual property\\n6.3  CloudVault may use aggregated, anonymised, and de-i'",
+    "content_sha256": "ee9648c4750d2d11fa8c84b3850355913e8b16a4fa276655b434b9053290f3fb",
+    "context_header": "[Section: 6 — Intellectual property > 6.3 — CloudVault may use aggregated, anonymised, and de-identified data derived from] [Type: Intellectual Property] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "6 — Intellectual property > 6.3 — CloudVault may use aggregated, anonymised, and de-identified data derived from",
+    "index": 21,
+    "original_header": "6.3 CloudVault may use aggregated, anonymised, and de-identified data derived from",
+    "secondary_clause_type": null,
+    "token_count": 82
+  },
+  {
+    "char_end": 11217,
+    "char_start": 10912,
+    "classification_confidence": 0.857,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'7.   Limitation of liability\\n\\n\\n7.1  Nothing in these Terms shall limit or exclud'",
+    "content_sha256": "e23708b73e49086ae338d39baee34f432a3fc88cf1dc562ccea173e2e33dc7c9",
+    "context_header": "[Section: 7 — Limitation of liability] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Limitation of liability",
+    "index": 22,
+    "original_header": "7 Limitation of liability",
+    "secondary_clause_type": "representations",
+    "token_count": 77
+  },
+  {
+    "char_end": 11522,
+    "char_start": 11217,
+    "classification_confidence": 0.75,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'7 Limitation of liability\\n7.2  Subject to clause 7.1, to the maximum extent perm'",
+    "content_sha256": "7455c125181470f88a5e0ff522ef5204029450da03aa93969bf78d6d8238569a",
+    "context_header": "[Section: 7 — Limitation of liability > 7.2 — Subject to clause 7.1, to the maximum extent permitted by applicable law, neither] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 7.1",
+        "target_chunk_index": null,
+        "target_identifier": "7.1"
+      }
+    ],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Limitation of liability > 7.2 — Subject to clause 7.1, to the maximum extent permitted by applicable law, neither",
+    "index": 23,
+    "original_header": "7.2 Subject to clause 7.1, to the maximum extent permitted by applicable law, neither",
+    "secondary_clause_type": "governing_law",
+    "token_count": 83
+  },
+  {
+    "char_end": 11854,
+    "char_start": 11522,
+    "classification_confidence": 0.75,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'7 Limitation of liability\\n7.2 Subject to clause 7.1, to the maximum extent permi'",
+    "content_sha256": "dbc34196534fc41de9e247f2b02c33a01a9a6a80363561aa5bbb85a17f3e13d7",
+    "context_header": "[Section: 7 — Limitation of liability > 7.2 — Subject to clause 7.1, to the maximum extent permitted by applicable law, neither > (b) — loss of anticipated savings;] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 7.1",
+        "target_chunk_index": null,
+        "target_identifier": "7.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Limitation of liability > 7.2 — Subject to clause 7.1, to the maximum extent permitted by applicable law, neither > (b) — loss of anticipated savings;",
+    "index": 24,
+    "original_header": "(b) loss of anticipated savings;",
+    "secondary_clause_type": "governing_law",
+    "token_count": 111
+  },
+  {
+    "char_end": 12177,
+    "char_start": 11854,
+    "classification_confidence": 0.733,
+    "clause_type": "limitation_of_liability",
+    "content_head": "\"7 Limitation of liability\\n7.3  Subject to clauses 7.1 and 7.2, CloudVault's tota\"",
+    "content_sha256": "ada86a3590e16d3ae57459e700b320edacfe0ddf6f822af09bd924c0918e4d0a",
+    "context_header": "[Section: 7 — Limitation of liability > 7.3 — Subject to clauses 7.1 and 7.2, CloudVault's total aggregate liability to the] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clauses 7.1",
+        "target_chunk_index": null,
+        "target_identifier": "7.1"
+      },
+      {
+        "raw_text": "and 7.2",
+        "target_chunk_index": 23,
+        "target_identifier": "7.2"
+      }
+    ],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Fees",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Limitation of liability > 7.3 — Subject to clauses 7.1 and 7.2, CloudVault's total aggregate liability to the",
+    "index": 25,
+    "original_header": "7.3 Subject to clauses 7.1 and 7.2, CloudVault's total aggregate liability to the",
+    "secondary_clause_type": "payment",
+    "token_count": 87
+  },
+  {
+    "char_end": 12737,
+    "char_start": 12177,
+    "classification_confidence": 0.6,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'7 Limitation of liability\\n7.4  The Customer acknowledges that the Fees reflect t'",
+    "content_sha256": "6e7ee253295141e9b6dad45df6db908542344a2b6a4d6c4ab54ce87254c6be57",
+    "context_header": "[Section: 7 — Limitation of liability > 7.4 — The Customer acknowledges that the Fees reflect the allocation of risk set out in] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 7",
+        "target_chunk_index": 22,
+        "target_identifier": "7"
+      },
+      {
+        "raw_text": "clause 8",
+        "target_chunk_index": 27,
+        "target_identifier": "8"
+      }
+    ],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Fees",
+      "Order Form",
+      "Subscription Term",
+      "Subscription Term and any\n     subsequent Renewal Terms",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Limitation of liability > 7.4 — The Customer acknowledges that the Fees reflect the allocation of risk set out in",
+    "index": 26,
+    "original_header": "7.4 The Customer acknowledges that the Fees reflect the allocation of risk set out in",
+    "secondary_clause_type": "termination",
+    "token_count": 147
+  },
+  {
+    "char_end": 13481,
+    "char_start": 12737,
+    "classification_confidence": 0.556,
+    "clause_type": "termination",
+    "content_head": "'8 Term and termination\\n8.2  Unless either party gives written notice to terminat'",
+    "content_sha256": "439f46f9e93e3447a41f357f3956bb9d1c6dd4f07c526bfae58dd9ad8f7d8a9d",
+    "context_header": "[Section: 8 — Term and termination > 8.2 — Unless either party gives written notice to terminate not less than thirty (30) days] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Subscription Term",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "8 — Term and termination > 8.2 — Unless either party gives written notice to terminate not less than thirty (30) days",
+    "index": 27,
+    "original_header": "8.2 Unless either party gives written notice to terminate not less than thirty (30) days",
+    "secondary_clause_type": "notices",
+    "token_count": 88
+  },
+  {
+    "char_end": 13481,
+    "char_start": 13066,
+    "classification_confidence": 0.588,
+    "clause_type": "termination",
+    "content_head": "'8 Term and termination\\n8.3 Either party may terminate these Terms immediately by'",
+    "content_sha256": "89a32fd3c9479eb3f425bbc2ba674e22e4c5b9d077c0adddb5749b036f79d04f",
+    "context_header": "[Section: 8 — Term and termination > 8.3 — Either party may terminate these Terms immediately by written notice if: > (a) — the other party commits a material breach of these Terms and (where remediable)] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "8 — Term and termination > 8.3 — Either party may terminate these Terms immediately by written notice if: > (a) — the other party commits a material breach of these Terms and (where remediable)",
+    "index": 28,
+    "original_header": "(a) the other party commits a material breach of these Terms and (where remediable)",
+    "secondary_clause_type": "notices",
+    "token_count": 129
+  },
+  {
+    "char_end": 14261,
+    "char_start": 13481,
+    "classification_confidence": 0.75,
+    "clause_type": "termination",
+    "content_head": "'8 Term and termination\\n8.4  CloudVault may terminate these Terms immediately and'",
+    "content_sha256": "8c55622870efc06f4210ed9d5f2218870059e3440e00ef960c0d542571e4f1af",
+    "context_header": "[Section: 8 — Term and termination > 8.4 — CloudVault may terminate these Terms immediately and without liability to the] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 3",
+        "target_chunk_index": 7,
+        "target_identifier": "3"
+      }
+    ],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "8 — Term and termination > 8.4 — CloudVault may terminate these Terms immediately and without liability to the",
+    "index": 29,
+    "original_header": "8.4 CloudVault may terminate these Terms immediately and without liability to the",
+    "secondary_clause_type": "acceptable_use",
+    "token_count": 74
+  },
+  {
+    "char_end": 14149,
+    "char_start": 13756,
+    "classification_confidence": 1.0,
+    "clause_type": "termination",
+    "content_head": "'8 Term and termination\\n8.5 On termination or expiry of these Terms for any reaso'",
+    "content_sha256": "6d56afa974fa453c4a2bfa3b1ece648f25fe3269e9b44231d99357c974a59825",
+    "context_header": "[Section: 8 — Term and termination > 8.5 — On termination or expiry of these Terms for any reason: > (a) — the Customer's right to access and use the Platform shall immediately cease;] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Customer Data",
+      "Platform",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "8 — Term and termination > 8.5 — On termination or expiry of these Terms for any reason: > (a) — the Customer's right to access and use the Platform shall immediately cease;",
+    "index": 30,
+    "original_header": "(a) the Customer's right to access and use the Platform shall immediately cease;",
+    "secondary_clause_type": null,
+    "token_count": 119
+  },
+  {
+    "char_end": 14537,
+    "char_start": 14149,
+    "classification_confidence": 0.476,
+    "clause_type": "termination",
+    "content_head": "'8 Term and termination\\n8.5 On termination or expiry of these Terms for any reaso'",
+    "content_sha256": "ba6b2e50d022900f1d79218423ecf45688f26a741b610f3e122e34fa4627d858",
+    "context_header": "[Section: 8 — Term and termination > 8.5 — On termination or expiry of these Terms for any reason: > (c) — clauses 1, 4, 6.1, 7, 9, and 10 shall continue in full force and effect after] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clauses 1",
+        "target_chunk_index": 1,
+        "target_identifier": "1"
+      },
+      {
+        "raw_text": "4",
+        "target_chunk_index": 12,
+        "target_identifier": "4"
+      },
+      {
+        "raw_text": "6.1",
+        "target_chunk_index": null,
+        "target_identifier": "6.1"
+      },
+      {
+        "raw_text": "7",
+        "target_chunk_index": 22,
+        "target_identifier": "7"
+      },
+      {
+        "raw_text": "9",
+        "target_chunk_index": 32,
+        "target_identifier": "9"
+      }
+    ],
+    "defined_terms_used": [
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "8 — Term and termination > 8.5 — On termination or expiry of these Terms for any reason: > (c) — clauses 1, 4, 6.1, 7, 9, and 10 shall continue in full force and effect after",
+    "index": 31,
+    "original_header": "(c) clauses 1, 4, 6.1, 7, 9, and 10 shall continue in full force and effect after",
+    "secondary_clause_type": "governing_law",
+    "token_count": 118
+  },
+  {
+    "char_end": 14956,
+    "char_start": 14537,
+    "classification_confidence": 0.528,
+    "clause_type": "governing_law",
+    "content_head": "'9 Governing law and dispute resolution\\n9.2  The parties shall use their reasonab'",
+    "content_sha256": "d65c618143a6f0bcfe3f4ebd1a46d7c50aafacd922a8dc8a8ea80b0d69fea839",
+    "context_header": "[Section: 9 — Governing law and dispute resolution > 9.2 — The parties shall use their reasonable endeavours to negotiate in good faith to] [Type: Governing Law] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "9 — Governing law and dispute resolution > 9.2 — The parties shall use their reasonable endeavours to negotiate in good faith to",
+    "index": 32,
+    "original_header": "9.2 The parties shall use their reasonable endeavours to negotiate in good faith to",
+    "secondary_clause_type": "dispute_resolution",
+    "token_count": 114
+  },
+  {
+    "char_end": 15332,
+    "char_start": 14956,
+    "classification_confidence": 0.778,
+    "clause_type": "entire_agreement",
+    "content_head": "'10.  General\\n\\n\\n10.1 These Terms, together with any Order Form and any data proce'",
+    "content_sha256": "01d1a5c1444789532933e45b51b6bf63c5d0a3be44df6bc790d418fc609301d5",
+    "context_header": "[Section: 10 — General] [Type: Entire Agreement] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 4.2",
+        "target_chunk_index": null,
+        "target_identifier": "4.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Platform",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "10 — General",
+    "index": 33,
+    "original_header": "10 General",
+    "secondary_clause_type": "representations",
+    "token_count": 94
+  },
+  {
+    "char_end": 15774,
+    "char_start": 15332,
+    "classification_confidence": 0.333,
+    "clause_type": "governing_law",
+    "content_head": "'10 General\\n10.2 No failure or delay by either party to enforce any right or prov'",
+    "content_sha256": "b53d801a29fbdfa111951bf2fe2a63fa2a7062499ce1ecaffd64f282d58232f6",
+    "context_header": "[Section: 10 — General > 10.2 — No failure or delay by either party to enforce any right or provision of these] [Type: Governing Law] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "10 — General > 10.2 — No failure or delay by either party to enforce any right or provision of these",
+    "index": 34,
+    "original_header": "10.2 No failure or delay by either party to enforce any right or provision of these",
+    "secondary_clause_type": "severability",
+    "token_count": 113
+  },
+  {
+    "char_end": 16148,
+    "char_start": 15774,
+    "classification_confidence": 0.733,
+    "clause_type": "assignment",
+    "content_head": "'10 General\\n10.4 The Customer may not assign, novate, or transfer its rights or o'",
+    "content_sha256": "2d98c2ef62d639132d1663368eb865f39f917119f1113dc3fc0d0df8946bf4d8",
+    "context_header": "[Section: 10 — General > 10.4 — The Customer may not assign, novate, or transfer its rights or obligations under] [Type: Assignment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "10 — General > 10.4 — The Customer may not assign, novate, or transfer its rights or obligations under",
+    "index": 35,
+    "original_header": "10.4 The Customer may not assign, novate, or transfer its rights or obligations under",
+    "secondary_clause_type": "covenants",
+    "token_count": 96
+  },
+  {
+    "char_end": 16624,
+    "char_start": 16148,
+    "classification_confidence": 1.0,
+    "clause_type": "termination",
+    "content_head": "'10 General\\n10.5 CloudVault may update these Terms from time to time by posting r'",
+    "content_sha256": "8d81beee28533e121d1425024336e8b5170a6b0ba3d8c38a1cce1f07e3332aa5",
+    "context_header": "[Section: 10 — General > 10.5 — CloudVault may update these Terms from time to time by posting revised Terms on its] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 8.3(a)",
+        "target_chunk_index": null,
+        "target_identifier": "8.3(a)"
+      }
+    ],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Platform",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "10 — General > 10.5 — CloudVault may update these Terms from time to time by posting revised Terms on its",
+    "index": 36,
+    "original_header": "10.5 CloudVault may update these Terms from time to time by posting revised Terms on its",
+    "secondary_clause_type": null,
+    "token_count": 121
+  },
+  {
+    "char_end": 16948,
+    "char_start": 16624,
+    "classification_confidence": 0.0,
+    "clause_type": "unknown",
+    "content_head": "'10 General\\n10.6 Nothing in these Terms creates, or shall be construed as creatin'",
+    "content_sha256": "7712a992e016e66f27b647d0a95759e8e71ed8645e6596370592d8a41bb08413",
+    "context_header": "[Section: 10 — General > 10.6 — Nothing in these Terms creates, or shall be construed as creating, any partnership,] [Type: Unknown] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "CloudVault",
+      "Customer",
+      "Terms"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "10 — General > 10.6 — Nothing in these Terms creates, or shall be construed as creating, any partnership,",
+    "index": 37,
+    "original_header": "10.6 Nothing in these Terms creates, or shall be construed as creating, any partnership,",
+    "secondary_clause_type": null,
+    "token_count": 84
+  }
+]

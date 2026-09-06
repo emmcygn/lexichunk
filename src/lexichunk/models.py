@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, Protocol, runtime_checkable
+from typing import Any, Optional, Protocol, runtime_checkable
 
 
 @runtime_checkable
@@ -25,16 +25,36 @@ class JurisdictionPatterns(Protocol):
     signature_markers: tuple[str, ...]
 
 
-class Jurisdiction(Enum):
-    """Supported legal jurisdictions."""
+class Jurisdiction(str, Enum):
+    """Supported legal jurisdictions.
+
+    Inherits from ``str`` so instances compare equal to their raw string
+    value (``Jurisdiction.UK == "uk"``) and can be used anywhere a plain
+    string is expected (e.g. dict keys, JSON serialisation without a custom
+    encoder).  ``__str__`` is defined explicitly to return ``.value`` because
+    the default ``str(str_enum_member)`` behaviour changed between Python
+    3.10 (returns the raw value) and 3.11+ (returns ``"ClassName.MEMBER"``
+    unless overridden) — the explicit override keeps ``str(x)`` and
+    ``f"{x}"`` consistent across interpreter versions.
+    """
 
     UK = "uk"
     US = "us"
     EU = "eu"
 
+    def __str__(self) -> str:
+        return self.value
 
-class ClauseType(Enum):
-    """Legal clause type classification."""
+
+class ClauseType(str, Enum):
+    """Legal clause type classification.
+
+    Inherits from ``str`` so instances compare equal to their raw string
+    value (``ClauseType.PAYMENT == "payment"``) and can be used anywhere a
+    plain string is expected.  ``__str__`` is defined explicitly to return
+    ``.value`` for consistent behaviour across Python 3.10 vs 3.11+ (see
+    :class:`Jurisdiction` docstring for details).
+    """
 
     DEFINITIONS = "definitions"
     REPRESENTATIONS = "representations"
@@ -64,9 +84,19 @@ class ClauseType(Enum):
     ACCOUNT_SECURITY = "account_security"
     UNKNOWN = "unknown"
 
+    def __str__(self) -> str:
+        return self.value
 
-class DocumentSection(Enum):
-    """High-level document section classification."""
+
+class DocumentSection(str, Enum):
+    """High-level document section classification.
+
+    Inherits from ``str`` so instances compare equal to their raw string
+    value (``DocumentSection.OPERATIVE == "operative"``) and can be used
+    anywhere a plain string is expected.  ``__str__`` is defined explicitly
+    to return ``.value`` for consistent behaviour across Python 3.10 vs
+    3.11+ (see :class:`Jurisdiction` docstring for details).
+    """
 
     PREAMBLE = "preamble"
     RECITALS = "recitals"
@@ -74,6 +104,9 @@ class DocumentSection(Enum):
     OPERATIVE = "operative"
     SCHEDULES = "schedules"
     SIGNATURES = "signatures"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 @dataclass
@@ -84,6 +117,14 @@ class CrossReference:
     target_identifier: str
     target_chunk_index: Optional[int] = None
 
+    def to_dict(self) -> dict[str, Any]:
+        """Return a plain, ``json.dumps``-able dict representation."""
+        return {
+            "raw_text": self.raw_text,
+            "target_identifier": self.target_identifier,
+            "target_chunk_index": self.target_chunk_index,
+        }
+
 
 @dataclass
 class DefinedTerm:
@@ -92,6 +133,14 @@ class DefinedTerm:
     term: str
     definition: str
     source_clause: str
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a plain, ``json.dumps``-able dict representation."""
+        return {
+            "term": self.term,
+            "definition": self.definition,
+            "source_clause": self.source_clause,
+        }
 
 
 @dataclass
@@ -102,6 +151,15 @@ class HierarchyNode:
     identifier: str
     title: Optional[str] = None
     parent: Optional[str] = None
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a plain, ``json.dumps``-able dict representation."""
+        return {
+            "level": self.level,
+            "identifier": self.identifier,
+            "title": self.title,
+            "parent": self.parent,
+        }
 
 
 @dataclass
@@ -152,6 +210,107 @@ class LegalChunk:
     char_end: int = 0
     token_count: int = 0
     original_header: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a plain, ``json.dumps``-able dict representation.
+
+        No custom JSON encoder is required: enums are rendered as their
+        ``.value`` string, nested dataclasses are recursively converted via
+        their own ``to_dict()``, and mutable containers (lists/dicts) are
+        copied rather than aliased — mutating the returned dict never
+        affects this chunk.  ``jurisdiction`` is rendered as its string
+        value whether it is a :class:`Jurisdiction` enum member or a
+        registered custom jurisdiction string.
+        """
+        jurisdiction_value = (
+            self.jurisdiction.value
+            if isinstance(self.jurisdiction, Jurisdiction)
+            else self.jurisdiction
+        )
+        return {
+            "content": self.content,
+            "index": self.index,
+            "hierarchy": self.hierarchy.to_dict(),
+            "hierarchy_path": self.hierarchy_path,
+            "document_section": self.document_section.value,
+            "clause_type": self.clause_type.value,
+            "jurisdiction": jurisdiction_value,
+            "cross_references": [ref.to_dict() for ref in self.cross_references],
+            "defined_terms_used": list(self.defined_terms_used),
+            "defined_terms_context": dict(self.defined_terms_context),
+            "classification_confidence": self.classification_confidence,
+            "secondary_clause_type": (
+                self.secondary_clause_type.value
+                if self.secondary_clause_type is not None
+                else None
+            ),
+            "cross_ref_total": self.cross_ref_total,
+            "cross_ref_resolved": self.cross_ref_resolved,
+            "context_header": self.context_header,
+            "document_id": self.document_id,
+            "char_start": self.char_start,
+            "char_end": self.char_end,
+            "token_count": self.token_count,
+            "original_header": self.original_header,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> "LegalChunk":
+        """Reconstruct a :class:`LegalChunk` from a :meth:`to_dict` output.
+
+        Enum-valued fields are reconstructed from their string ``.value``.
+        An unrecognised ``jurisdiction`` string (i.e. not a built-in
+        :class:`Jurisdiction` value) is kept as a plain string, matching the
+        custom-jurisdiction registration mechanism.
+        """
+        hierarchy_d = d["hierarchy"]
+        hierarchy = HierarchyNode(
+            level=hierarchy_d["level"],
+            identifier=hierarchy_d["identifier"],
+            title=hierarchy_d.get("title"),
+            parent=hierarchy_d.get("parent"),
+        )
+
+        jurisdiction_raw = d["jurisdiction"]
+        jurisdiction: Jurisdiction | str
+        try:
+            jurisdiction = Jurisdiction(jurisdiction_raw)
+        except ValueError:
+            jurisdiction = jurisdiction_raw
+
+        secondary = d.get("secondary_clause_type")
+
+        return cls(
+            content=d["content"],
+            index=d["index"],
+            hierarchy=hierarchy,
+            hierarchy_path=d["hierarchy_path"],
+            document_section=DocumentSection(d["document_section"]),
+            clause_type=ClauseType(d["clause_type"]),
+            jurisdiction=jurisdiction,
+            cross_references=[
+                CrossReference(
+                    raw_text=r["raw_text"],
+                    target_identifier=r["target_identifier"],
+                    target_chunk_index=r.get("target_chunk_index"),
+                )
+                for r in d.get("cross_references", [])
+            ],
+            defined_terms_used=list(d.get("defined_terms_used", [])),
+            defined_terms_context=dict(d.get("defined_terms_context", {})),
+            classification_confidence=d.get("classification_confidence", 0.0),
+            secondary_clause_type=(
+                ClauseType(secondary) if secondary is not None else None
+            ),
+            cross_ref_total=d.get("cross_ref_total", 0),
+            cross_ref_resolved=d.get("cross_ref_resolved", 0),
+            context_header=d.get("context_header", ""),
+            document_id=d.get("document_id"),
+            char_start=d.get("char_start", 0),
+            char_end=d.get("char_end", 0),
+            token_count=d.get("token_count", 0),
+            original_header=d.get("original_header", ""),
+        )
 
 
 @dataclass

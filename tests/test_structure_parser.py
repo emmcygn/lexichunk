@@ -1,5 +1,7 @@
 """Tests for StructureParser and jurisdiction detect_level functions."""
 
+from pathlib import Path
+
 import pytest
 
 from lexichunk.jurisdiction.uk import detect_level as uk_detect_level
@@ -279,3 +281,93 @@ def test_roman_to_int_mixed_invalid_raises():
     """String mixing valid and invalid chars raises ValueError."""
     with pytest.raises(ValueError, match="Invalid Roman numeral character"):
         roman_to_int("XIV2")
+
+
+# ---------------------------------------------------------------------------
+# ParsedClause.uid / parent_uid — stable identifiers (Phase 0, mechanical)
+# ---------------------------------------------------------------------------
+
+_FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+_UID_FIXTURE_CASES = [
+    ("uk_service_agreement.txt", Jurisdiction.UK, "contract"),
+    ("uk_terms_conditions.txt", Jurisdiction.UK, "terms_conditions"),
+    ("us_msa.txt", Jurisdiction.US, "contract"),
+    ("us_terms_of_service.txt", Jurisdiction.US, "terms_conditions"),
+    ("eu_gdpr_excerpt.txt", Jurisdiction.EU, "contract"),
+]
+
+
+def _assert_uids_unique_and_parents_earlier(clauses: list[ParsedClause]) -> None:
+    uids = [c.uid for c in clauses]
+    assert len(uids) == len(set(uids)), f"duplicate uids found: {uids}"
+
+    uid_order: dict[str, int] = {c.uid: i for i, c in enumerate(clauses)}
+    for clause in clauses:
+        if clause.parent_uid is not None:
+            assert clause.parent_uid in uid_order, (
+                f"clause uid={clause.uid} has parent_uid={clause.parent_uid} "
+                f"which does not exist"
+            )
+            assert int(clause.parent_uid) < int(clause.uid), (
+                f"clause uid={clause.uid} parent_uid={clause.parent_uid} "
+                f"is not numerically earlier"
+            )
+
+
+@pytest.mark.parametrize("filename,jurisdiction,doc_type", _UID_FIXTURE_CASES)
+def test_uids_unique_and_parent_earlier_on_fixtures(filename, jurisdiction, doc_type):
+    text = (_FIXTURES_DIR / filename).read_text(encoding="utf-8")
+    clauses = StructureParser(jurisdiction, doc_type=doc_type).parse(text)
+    assert clauses, f"expected at least one clause for {filename}"
+    _assert_uids_unique_and_parents_earlier(clauses)
+
+
+def test_uids_unique_and_parent_earlier_on_synthetic_doc():
+    text = (
+        "1. Confidentiality\n"
+        "1.1 Scope\n"
+        "This clause applies broadly.\n"
+        "2. Termination\n"
+        "3. Governing Law\n"
+    )
+    clauses = StructureParser(Jurisdiction.UK, doc_type="contract").parse(text)
+    _assert_uids_unique_and_parents_earlier(clauses)
+
+
+def test_uid_is_monotonic_counter_string():
+    """uid values are '0', '1', '2', ... assigned in creation (opening) order."""
+    text = (
+        "1. Confidentiality\n"
+        "1.1 Scope\n"
+        "Text.\n"
+        "2. Termination\n"
+    )
+    clauses = StructureParser(Jurisdiction.UK, doc_type="contract").parse(text)
+    uids = sorted(int(c.uid) for c in clauses)
+    assert uids == list(range(len(clauses)))
+
+
+def test_top_level_clause_parent_uid_is_none():
+    text = "1. Confidentiality\nSome text.\n2. Termination\nMore text.\n"
+    clauses = StructureParser(Jurisdiction.UK, doc_type="contract").parse(text)
+    top_level = [c for c in clauses if c.parent_identifier is None]
+    assert top_level, "expected at least one top-level clause"
+    for clause in top_level:
+        assert clause.parent_uid is None
+
+
+def test_parsed_clause_uid_defaults_when_not_specified():
+    """Construction sites that don't pass uid/parent_uid still work (defaults)."""
+    clause = ParsedClause(
+        identifier="(a)",
+        title=None,
+        content="text",
+        level=1,
+        parent_identifier="1",
+        document_section=DocumentSection.OPERATIVE,
+        char_start=0,
+        char_end=4,
+    )
+    assert clause.uid == ""
+    assert clause.parent_uid is None

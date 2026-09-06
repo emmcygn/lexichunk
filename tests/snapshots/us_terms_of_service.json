@@ -1,0 +1,1691 @@
+[
+  {
+    "char_end": 17478,
+    "char_start": 0,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'TERMS OF SERVICE\\n\\nStrata Software Platform\\n\\nLast Updated: January 10, 2024\\nEffec'",
+    "content_sha256": "02a37cdb80de8a725e715e047d19ad4812e3ca07a028a52f6ba6ad32bbbd5469",
+    "context_header": "[Section: TERMS OF SERVICE] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1",
+        "target_chunk_index": 1,
+        "target_identifier": "1"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "TERMS OF SERVICE",
+    "index": 0,
+    "original_header": "TERMS OF SERVICE",
+    "secondary_clause_type": null,
+    "token_count": 197
+  },
+  {
+    "char_end": 1208,
+    "char_start": 788,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "b9872a22c1368b1791ed8d125f22a75852b93b86c62212d38ea7ab8fa2f5db0f",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.1 — \"Account\" means a Customer-specific account enabling access to the Platform,] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.1",
+        "target_chunk_index": 1,
+        "target_identifier": "1.1"
+      },
+      {
+        "raw_text": "Section 2.3",
+        "target_chunk_index": null,
+        "target_identifier": "2.3"
+      },
+      {
+        "raw_text": "Section 1.2",
+        "target_chunk_index": null,
+        "target_identifier": "1.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Account",
+      "Authorized Users",
+      "Order Form",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.1 — \"Account\" means a Customer-specific account enabling access to the Platform,",
+    "index": 1,
+    "original_header": "Section 1.1 \"Account\" means a Customer-specific account enabling access to the Platform,",
+    "secondary_clause_type": null,
+    "token_count": 125
+  },
+  {
+    "char_end": 1622,
+    "char_start": 1208,
+    "classification_confidence": 0.667,
+    "clause_type": "data_protection",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "6d4ac958065c91a25b436d916b5889361ec381d47f0b2d4fc90557ccd41f7941",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.3 — \"Customer Content\" means any data, files, documents, information, and other] [Type: Data Protection] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.3",
+        "target_chunk_index": 2,
+        "target_identifier": "1.3"
+      },
+      {
+        "raw_text": "Section 1.4",
+        "target_chunk_index": null,
+        "target_identifier": "1.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Authorized Users",
+      "Customer Content",
+      "Documentation",
+      "Personal Information",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.3 — \"Customer Content\" means any data, files, documents, information, and other",
+    "index": 2,
+    "original_header": "Section 1.3 \"Customer Content\" means any data, files, documents, information, and other",
+    "secondary_clause_type": "definitions",
+    "token_count": 124
+  },
+  {
+    "char_end": 1945,
+    "char_start": 1622,
+    "classification_confidence": 0.667,
+    "clause_type": "intellectual_property",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "4c5e7a356d296ad30c205daebdd14e1b4a98186c15e6aca6869fdf25a8ae469e",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.5 — \"Intellectual Property Rights\" means all patents, patent applications,] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.5",
+        "target_chunk_index": 3,
+        "target_identifier": "1.5"
+      }
+    ],
+    "defined_terms_used": [
+      "Intellectual Property Rights",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.5 — \"Intellectual Property Rights\" means all patents, patent applications,",
+    "index": 3,
+    "original_header": "Section 1.5 \"Intellectual Property Rights\" means all patents, patent applications,",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 101
+  },
+  {
+    "char_end": 2523,
+    "char_start": 1945,
+    "classification_confidence": 0.444,
+    "clause_type": "data_protection",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "d2449923eef3beab24cff411408d5db0f88a82b00c7d6976282b50957e1b8ff1",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.6 — \"Order Form\" means a written or online ordering document or subscription] [Type: Data Protection] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.6",
+        "target_chunk_index": 4,
+        "target_identifier": "1.6"
+      },
+      {
+        "raw_text": "Section 1.7",
+        "target_chunk_index": null,
+        "target_identifier": "1.7"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Personal Information",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.6 — \"Order Form\" means a written or online ordering document or subscription",
+    "index": 4,
+    "original_header": "Section 1.6 \"Order Form\" means a written or online ordering document or subscription",
+    "secondary_clause_type": "payment",
+    "token_count": 165
+  },
+  {
+    "char_end": 2962,
+    "char_start": 2523,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "b33aef06a403492429c4a54c41acd4f0de64ec567eacab277521a0d98c24801c",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.8 — \"Platform\" means Strata's proprietary software-as-a-service platform,] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.8",
+        "target_chunk_index": 5,
+        "target_identifier": "1.8"
+      },
+      {
+        "raw_text": "Section 1.9",
+        "target_chunk_index": null,
+        "target_identifier": "1.9"
+      },
+      {
+        "raw_text": "Section 2.5",
+        "target_chunk_index": 14,
+        "target_identifier": "2.5"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform",
+      "Professional Services",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.8 — \"Platform\" means Strata's proprietary software-as-a-service platform,",
+    "index": 5,
+    "original_header": "Section 1.8 \"Platform\" means Strata's proprietary software-as-a-service platform,",
+    "secondary_clause_type": null,
+    "token_count": 130
+  },
+  {
+    "char_end": 3342,
+    "char_start": 2962,
+    "classification_confidence": 0.667,
+    "clause_type": "payment",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "147e82dc29a675d97df9cf15d0080b5b6f2c06aa4f3f9880f2b515048d52de65",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.10 — \"Subscription Fees\" means the recurring fees for access to the Platform as] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.10",
+        "target_chunk_index": 6,
+        "target_identifier": "1.10"
+      },
+      {
+        "raw_text": "Section 1.11",
+        "target_chunk_index": null,
+        "target_identifier": "1.11"
+      },
+      {
+        "raw_text": "Section 7.1",
+        "target_chunk_index": 32,
+        "target_identifier": "7.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Account",
+      "Order Form",
+      "Platform",
+      "Professional Services",
+      "Subscription Fees",
+      "Subscription Term",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.10 — \"Subscription Fees\" means the recurring fees for access to the Platform as",
+    "index": 6,
+    "original_header": "Section 1.10 \"Subscription Fees\" means the recurring fees for access to the Platform as",
+    "secondary_clause_type": "definitions",
+    "token_count": 115
+  },
+  {
+    "char_end": 4000,
+    "char_start": 3342,
+    "classification_confidence": 0.5,
+    "clause_type": "payment",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "6907f75a3675bf09245298fee52fe4f2b727886a4d4a6cedab9c292fca12135b",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.12 — \"Third-Party Services\" means services, applications, or data sources] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.12",
+        "target_chunk_index": 7,
+        "target_identifier": "1.12"
+      },
+      {
+        "raw_text": "Section 2",
+        "target_chunk_index": 8,
+        "target_identifier": "2"
+      },
+      {
+        "raw_text": "Section 2.1",
+        "target_chunk_index": null,
+        "target_identifier": "2.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Documentation",
+      "Order Form",
+      "Platform",
+      "Subscription Fees",
+      "Subscription Term",
+      "TERMS",
+      "Third-Party Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 1.12 — \"Third-Party Services\" means services, applications, or data sources",
+    "index": 7,
+    "original_header": "Section 1.12 \"Third-Party Services\" means services, applications, or data sources",
+    "secondary_clause_type": "definitions",
+    "token_count": 185
+  },
+  {
+    "char_end": 4522,
+    "char_start": 4000,
+    "classification_confidence": 0.6,
+    "clause_type": "user_restrictions",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "e3787ef18ea82d95262ec3c9aaa0da6f1db4bfea96f38291f115a61af8c3d990",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User] [Type: User Restrictions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.2",
+        "target_chunk_index": 8,
+        "target_identifier": "2.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Documentation",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User",
+    "index": 8,
+    "original_header": "Section 2.2 Restrictions. Customer shall not, and shall not permit any Authorized User",
+    "secondary_clause_type": "governing_law",
+    "token_count": 151
+  },
+  {
+    "char_end": 4818,
+    "char_start": 4522,
+    "classification_confidence": 0.333,
+    "clause_type": "assignment",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "71ec0c07eda7acdaee1edc97a245d1b7c03d32655fbe75779c220cedf9ef1738",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User > (c) — sublicense, sell, resell, transfer, assign, or otherwise dispose of the] [Type: Assignment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.2",
+        "target_chunk_index": 8,
+        "target_identifier": "2.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User > (c) — sublicense, sell, resell, transfer, assign, or otherwise dispose of the",
+    "index": 9,
+    "original_header": "(c) sublicense, sell, resell, transfer, assign, or otherwise dispose of the",
+    "secondary_clause_type": "covenants",
+    "token_count": 116
+  },
+  {
+    "char_end": 5105,
+    "char_start": 4818,
+    "classification_confidence": 0.667,
+    "clause_type": "notices",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "7cca0fa628a374c954b47f14f8d2a9e09db8058ddea08c1815c63b84c099cbcf",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User > (e) — remove, alter, or obscure any proprietary notices, labels, or marks on the] [Type: Notices] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.2",
+        "target_chunk_index": 8,
+        "target_identifier": "2.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Documentation",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User > (e) — remove, alter, or obscure any proprietary notices, labels, or marks on the",
+    "index": 10,
+    "original_header": "(e) remove, alter, or obscure any proprietary notices, labels, or marks on the",
+    "secondary_clause_type": "covenants",
+    "token_count": 114
+  },
+  {
+    "char_end": 5919,
+    "char_start": 5105,
+    "classification_confidence": 0.636,
+    "clause_type": "account_security",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "75067932047821274948107f4c0b7069db007d6f8bc947fb3233e2f2ba55162b",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User > (g) — use the Platform in violation of any applicable law or regulation, including] [Type: Account Security] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.2",
+        "target_chunk_index": 8,
+        "target_identifier": "2.2"
+      },
+      {
+        "raw_text": "Section 2.3",
+        "target_chunk_index": null,
+        "target_identifier": "2.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Account",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User > (g) — use the Platform in violation of any applicable law or regulation, including",
+    "index": 11,
+    "original_header": "(g) use the Platform in violation of any applicable law or regulation, including",
+    "secondary_clause_type": "governing_law",
+    "token_count": 164
+  },
+  {
+    "char_end": 5919,
+    "char_start": 5594,
+    "classification_confidence": 0.778,
+    "clause_type": "account_security",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "ad8db3a9b4d00b8347c4f436c9faf96da6a5fe906c771582f89db4bc02596d4a",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.3 — Account Security. Customer is responsible for maintaining the security of > (c) — notify Strata promptly at security@strataplatform.io upon discovering any] [Type: Account Security] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.3",
+        "target_chunk_index": null,
+        "target_identifier": "2.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Account",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.3 — Account Security. Customer is responsible for maintaining the security of > (c) — notify Strata promptly at security@strataplatform.io upon discovering any",
+    "index": 12,
+    "original_header": "(c) notify Strata promptly at security@strataplatform.io upon discovering any",
+    "secondary_clause_type": "covenants",
+    "token_count": 123
+  },
+  {
+    "char_end": 6202,
+    "char_start": 5919,
+    "classification_confidence": 0.714,
+    "clause_type": "acceptable_use",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "86c5189c7cecd704fc101a00f4297a1d9c76bf8e0508b0d605e41d6bfcb2df48",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.4 — Acceptable Use Policy. Customer's use of the Platform is also subject to] [Type: Acceptable Use] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.4",
+        "target_chunk_index": 13,
+        "target_identifier": "2.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.4 — Acceptable Use Policy. Customer's use of the Platform is also subject to",
+    "index": 13,
+    "original_header": "Section 2.4 Acceptable Use Policy. Customer's use of the Platform is also subject to",
+    "secondary_clause_type": "notices",
+    "token_count": 91
+  },
+  {
+    "char_end": 6543,
+    "char_start": 6202,
+    "classification_confidence": 0.0,
+    "clause_type": "unknown",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "ab833ac2e168be0bb1b1f13621909aaa6389a97f7dc16047d1136f2c4577284a",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.5 — Professional Services. The parties may agree to Professional Services under] [Type: Unknown] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.5",
+        "target_chunk_index": 14,
+        "target_identifier": "2.5"
+      }
+    ],
+    "defined_terms_used": [
+      "Professional Services",
+      "SOW",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.5 — Professional Services. The parties may agree to Professional Services under",
+    "index": 14,
+    "original_header": "Section 2.5 Professional Services. The parties may agree to Professional Services under",
+    "secondary_clause_type": null,
+    "token_count": 105
+  },
+  {
+    "char_end": 6979,
+    "char_start": 6543,
+    "classification_confidence": 1.0,
+    "clause_type": "user_restrictions",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "74e36eb48c9e723cb4c21b1b683f669a8d4b5c18159fec3a69436f35d7ad6a86",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.6 — Third-Party Services. The Platform may allow Customer to integrate or] [Type: User Restrictions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.6",
+        "target_chunk_index": 15,
+        "target_identifier": "2.6"
+      },
+      {
+        "raw_text": "Section 3",
+        "target_chunk_index": 16,
+        "target_identifier": "3"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform",
+      "TERMS",
+      "Third-Party Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 2.6 — Third-Party Services. The Platform may allow Customer to integrate or",
+    "index": 15,
+    "original_header": "Section 2.6 Third-Party Services. The Platform may allow Customer to integrate or",
+    "secondary_clause_type": null,
+    "token_count": 129
+  },
+  {
+    "char_end": 7440,
+    "char_start": 6979,
+    "classification_confidence": 0.333,
+    "clause_type": "data_protection",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "4a7809c153568f2cc631a2d660c014443ba98771aa217fb8fab2f6dd34db0f52",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 3.1 — Prohibited Content. Customer shall not upload, store, process, or transmit] [Type: Data Protection] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3.1",
+        "target_chunk_index": 16,
+        "target_identifier": "3.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Intellectual Property Rights",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 3.1 — Prohibited Content. Customer shall not upload, store, process, or transmit",
+    "index": 16,
+    "original_header": "Section 3.1 Prohibited Content. Customer shall not upload, store, process, or transmit",
+    "secondary_clause_type": "intellectual_property",
+    "token_count": 135
+  },
+  {
+    "char_end": 7775,
+    "char_start": 7440,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "951ddfa648e919ca84048cf80fd904d302d99293352b0ef8d988283baefa47f9",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 3.2 — Usage Limits. Customer's use of the Platform is subject to the usage limits] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3.2",
+        "target_chunk_index": 17,
+        "target_identifier": "3.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 3.2 — Usage Limits. Customer's use of the Platform is subject to the usage limits",
+    "index": 17,
+    "original_header": "Section 3.2 Usage Limits. Customer's use of the Platform is subject to the usage limits",
+    "secondary_clause_type": null,
+    "token_count": 104
+  },
+  {
+    "char_end": 8344,
+    "char_start": 7775,
+    "classification_confidence": 0.667,
+    "clause_type": "representations",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "5126f247a635c47d0eb179ebeaf1ec14cda1af9063925759f863e96931f6245d",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 3.3 — Export Compliance. Customer agrees to comply fully with all applicable] [Type: Representations] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3.3",
+        "target_chunk_index": 18,
+        "target_identifier": "3.3"
+      },
+      {
+        "raw_text": "Section 4",
+        "target_chunk_index": 19,
+        "target_identifier": "4"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 3.3 — Export Compliance. Customer agrees to comply fully with all applicable",
+    "index": 18,
+    "original_header": "Section 3.3 Export Compliance. Customer agrees to comply fully with all applicable",
+    "secondary_clause_type": "data_protection",
+    "token_count": 162
+  },
+  {
+    "char_end": 8680,
+    "char_start": 8344,
+    "classification_confidence": 0.6,
+    "clause_type": "data_protection",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "a51226dc192ebaaf415fb1e263df74b51f6626e20ea6fdd277c8f03f79631c07",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.1 — Privacy Policy. Strata's collection and use of Personal Information is] [Type: Data Protection] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.1",
+        "target_chunk_index": 19,
+        "target_identifier": "4.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Personal Information",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.1 — Privacy Policy. Strata's collection and use of Personal Information is",
+    "index": 19,
+    "original_header": "Section 4.1 Privacy Policy. Strata's collection and use of Personal Information is",
+    "secondary_clause_type": "governing_law",
+    "token_count": 104
+  },
+  {
+    "char_end": 9074,
+    "char_start": 8680,
+    "classification_confidence": 1.0,
+    "clause_type": "intellectual_property",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "48f7e09a563ae4a6b5f1ecf3f55d03d805cfd0533212eaa35eee5097564fe899",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.2 — Customer Content Ownership. As between the parties, Customer retains all] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.2",
+        "target_chunk_index": 20,
+        "target_identifier": "4.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.2 — Customer Content Ownership. As between the parties, Customer retains all",
+    "index": 20,
+    "original_header": "Section 4.2 Customer Content Ownership. As between the parties, Customer retains all",
+    "secondary_clause_type": null,
+    "token_count": 119
+  },
+  {
+    "char_end": 9529,
+    "char_start": 9074,
+    "classification_confidence": 1.0,
+    "clause_type": "data_protection",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "df093167f19fdf757136a7a29926715af81c2cbf0c8cb96c412ee7ed663823b8",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.3 — Data Processing. To the extent Strata processes Personal Information] [Type: Data Protection] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.3",
+        "target_chunk_index": 21,
+        "target_identifier": "4.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "DPA",
+      "Personal Information",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.3 — Data Processing. To the extent Strata processes Personal Information",
+    "index": 21,
+    "original_header": "Section 4.3 Data Processing. To the extent Strata processes Personal Information",
+    "secondary_clause_type": null,
+    "token_count": 134
+  },
+  {
+    "char_end": 9976,
+    "char_start": 9529,
+    "classification_confidence": 0.4,
+    "clause_type": "covenants",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "451c5eb001a56e7d649c66f34b8e8651308a253825ce07d0a7bfa8daa4929a44",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.4 — Data Security. Strata implements industry-standard technical and] [Type: Covenants] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.4",
+        "target_chunk_index": 22,
+        "target_identifier": "4.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.4 — Data Security. Strata implements industry-standard technical and",
+    "index": 22,
+    "original_header": "Section 4.4 Data Security. Strata implements industry-standard technical and",
+    "secondary_clause_type": "account_security",
+    "token_count": 132
+  },
+  {
+    "char_end": 10403,
+    "char_start": 9976,
+    "classification_confidence": 0.714,
+    "clause_type": "termination",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "9bdae919624d5437ddd53221baf4e0c5b45e544fdcac39a655e4f3d4380664f7",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.5 — Data Retention and Deletion. Upon expiration or termination of the] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.5",
+        "target_chunk_index": 23,
+        "target_identifier": "4.5"
+      },
+      {
+        "raw_text": "Section 5",
+        "target_chunk_index": 24,
+        "target_identifier": "5"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Subscription Term",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 4.5 — Data Retention and Deletion. Upon expiration or termination of the",
+    "index": 23,
+    "original_header": "Section 4.5 Data Retention and Deletion. Upon expiration or termination of the",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 127
+  },
+  {
+    "char_end": 10888,
+    "char_start": 10403,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "905f0b7a7100e6ba7796361a2f077541131f62f8a0f83bb7e5cfbd941d84fa80",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.1 — Subscription Fees. Customer shall pay the Subscription Fees in accordance] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.1",
+        "target_chunk_index": 24,
+        "target_identifier": "5.1"
+      },
+      {
+        "raw_text": "Section 5.2",
+        "target_chunk_index": null,
+        "target_identifier": "5.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Subscription Fees",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.1 — Subscription Fees. Customer shall pay the Subscription Fees in accordance",
+    "index": 24,
+    "original_header": "Section 5.1 Subscription Fees. Customer shall pay the Subscription Fees in accordance",
+    "secondary_clause_type": null,
+    "token_count": 142
+  },
+  {
+    "char_end": 11277,
+    "char_start": 10888,
+    "classification_confidence": 0.556,
+    "clause_type": "payment",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "6fb3dd99b94c0f1d6103666bf6104fbb9b307d1907735f17a8cfd8f3376c9f28",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.3 — Late Payments. If any payment is not received when due, Strata may: (a)] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.3",
+        "target_chunk_index": 25,
+        "target_identifier": "5.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.3 — Late Payments. If any payment is not received when due, Strata may: (a)",
+    "index": 25,
+    "original_header": "Section 5.3 Late Payments. If any payment is not received when due, Strata may: (a)",
+    "secondary_clause_type": "governing_law",
+    "token_count": 117
+  },
+  {
+    "char_end": 11552,
+    "char_start": 11277,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "c7c5e627c1164e338cb2c8b998959b0bf2b410ba4462ff45c8c2ca33026189b9",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.4 — Taxes. The Subscription Fees do not include any applicable sales, use,] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.4",
+        "target_chunk_index": 26,
+        "target_identifier": "5.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Subscription Fees",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.4 — Taxes. The Subscription Fees do not include any applicable sales, use,",
+    "index": 26,
+    "original_header": "Section 5.4 Taxes. The Subscription Fees do not include any applicable sales, use,",
+    "secondary_clause_type": null,
+    "token_count": 89
+  },
+  {
+    "char_end": 11971,
+    "char_start": 11552,
+    "classification_confidence": 0.5,
+    "clause_type": "payment",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "c09eeab5620b4ae3203c0463fcb965c896b913da16fda2d16941cf82f325ec0b",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.5 — Fee Increases. Strata may increase Subscription Fees upon renewal of any] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.5",
+        "target_chunk_index": 27,
+        "target_identifier": "5.5"
+      },
+      {
+        "raw_text": "Section 7.2",
+        "target_chunk_index": 33,
+        "target_identifier": "7.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Platform",
+      "Subscription Fees",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.5 — Fee Increases. Strata may increase Subscription Fees upon renewal of any",
+    "index": 27,
+    "original_header": "Section 5.5 Fee Increases. Strata may increase Subscription Fees upon renewal of any",
+    "secondary_clause_type": "notices",
+    "token_count": 125
+  },
+  {
+    "char_end": 12310,
+    "char_start": 11971,
+    "classification_confidence": 0.25,
+    "clause_type": "governing_law",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "52f29645f9942b29e69ea0b3f5b3607749d9804c78e3082d606a6d975b1cc9bc",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.6 — No Refunds. Except as expressly provided in these Terms or required by] [Type: Governing Law] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.6",
+        "target_chunk_index": 28,
+        "target_identifier": "5.6"
+      },
+      {
+        "raw_text": "Section 7.4",
+        "target_chunk_index": 35,
+        "target_identifier": "7.4"
+      },
+      {
+        "raw_text": "Section 6",
+        "target_chunk_index": 29,
+        "target_identifier": "6"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 5.6 — No Refunds. Except as expressly provided in these Terms or required by",
+    "index": 28,
+    "original_header": "Section 5.6 No Refunds. Except as expressly provided in these Terms or required by",
+    "secondary_clause_type": "payment",
+    "token_count": 105
+  },
+  {
+    "char_end": 12686,
+    "char_start": 12310,
+    "classification_confidence": 0.333,
+    "clause_type": "intellectual_property",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "d0d5b1a7ea2c3d00a9164ceab1ad435f50df00dc7cca49aa1e3d4e29da9e3aaa",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 6.1 — Strata Ownership. Strata and its licensors own all right, title, and] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 6.1",
+        "target_chunk_index": 29,
+        "target_identifier": "6.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Documentation",
+      "Intellectual Property Rights",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 6.1 — Strata Ownership. Strata and its licensors own all right, title, and",
+    "index": 29,
+    "original_header": "Section 6.1 Strata Ownership. Strata and its licensors own all right, title, and",
+    "secondary_clause_type": "user_restrictions",
+    "token_count": 114
+  },
+  {
+    "char_end": 13124,
+    "char_start": 12686,
+    "classification_confidence": 0.333,
+    "clause_type": "confidentiality",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "c06f8a342e49c55d2306b8fc4c5c8a21418b88289ea0888f50b9412e33f200f2",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 6.2 — Feedback. If Customer or any Authorized User provides Strata with any] [Type: Confidentiality] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 6.2",
+        "target_chunk_index": 30,
+        "target_identifier": "6.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Feedback",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 6.2 — Feedback. If Customer or any Authorized User provides Strata with any",
+    "index": 30,
+    "original_header": "Section 6.2 Feedback. If Customer or any Authorized User provides Strata with any",
+    "secondary_clause_type": "payment",
+    "token_count": 130
+  },
+  {
+    "char_end": 13524,
+    "char_start": 13124,
+    "classification_confidence": 0.667,
+    "clause_type": "governing_law",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "95cc2b8d56caf3c0bdbedb2196f88ede67e4c4e94167da538fc5a2242c9e8c49",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 6.3 — Usage Data. Strata may collect and use aggregated, anonymized data] [Type: Governing Law] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 6.3",
+        "target_chunk_index": 31,
+        "target_identifier": "6.3"
+      },
+      {
+        "raw_text": "Section 7",
+        "target_chunk_index": 32,
+        "target_identifier": "7"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Platform",
+      "TERMS",
+      "Usage Data"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 6.3 — Usage Data. Strata may collect and use aggregated, anonymized data",
+    "index": 31,
+    "original_header": "Section 6.3 Usage Data. Strata may collect and use aggregated, anonymized data",
+    "secondary_clause_type": "termination",
+    "token_count": 120
+  },
+  {
+    "char_end": 13953,
+    "char_start": 13524,
+    "classification_confidence": 0.667,
+    "clause_type": "notices",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "8c6399694f6abe1eb8186a6644481b5a7ed1aa232c025d9cbe43496548052959",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.1 — Term. These Terms commence on the Effective Date and continue until all] [Type: Notices] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.1",
+        "target_chunk_index": 32,
+        "target_identifier": "7.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Subscription Term",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.1 — Term. These Terms commence on the Effective Date and continue until all",
+    "index": 32,
+    "original_header": "Section 7.1 Term. These Terms commence on the Effective Date and continue until all",
+    "secondary_clause_type": "termination",
+    "token_count": 127
+  },
+  {
+    "char_end": 14292,
+    "char_start": 13953,
+    "classification_confidence": 0.385,
+    "clause_type": "termination",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "456e31c84c95ae71b6d0801c03fa9f547db7208d1e162456e90a2429fc5fad83",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.2 — Termination for Convenience. Either party may terminate these Terms or] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.2",
+        "target_chunk_index": 33,
+        "target_identifier": "7.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Subscription Fees",
+      "Subscription Term",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.2 — Termination for Convenience. Either party may terminate these Terms or",
+    "index": 33,
+    "original_header": "Section 7.2 Termination for Convenience. Either party may terminate these Terms or",
+    "secondary_clause_type": "notices",
+    "token_count": 105
+  },
+  {
+    "char_end": 14881,
+    "char_start": 14292,
+    "classification_confidence": 0.556,
+    "clause_type": "termination",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "efe44e48f2ccc091fbb0c8fceb53bbb262fc8c3b7dace8fc4c9e4e37aa1d21ed",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.3 — Termination for Cause. Either party may terminate these Terms or any] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.3",
+        "target_chunk_index": 34,
+        "target_identifier": "7.3"
+      },
+      {
+        "raw_text": "Section 2.2",
+        "target_chunk_index": 8,
+        "target_identifier": "2.2"
+      },
+      {
+        "raw_text": "Section 3.1",
+        "target_chunk_index": 16,
+        "target_identifier": "3.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.3 — Termination for Cause. Either party may terminate these Terms or any",
+    "index": 34,
+    "original_header": "Section 7.3 Termination for Cause. Either party may terminate these Terms or any",
+    "secondary_clause_type": "assignment",
+    "token_count": 167
+  },
+  {
+    "char_end": 15219,
+    "char_start": 14881,
+    "classification_confidence": 0.714,
+    "clause_type": "termination",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "d3f1d80ba7cb4f786936e3bbd3bb9e08632d816af0f56ccfd89486b8e64bee0f",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.4 — Refunds on Termination for Cause by Customer. If Customer terminates these] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.4",
+        "target_chunk_index": 35,
+        "target_identifier": "7.4"
+      },
+      {
+        "raw_text": "Section 7.3",
+        "target_chunk_index": 34,
+        "target_identifier": "7.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Subscription Fees",
+      "Subscription Term",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.4 — Refunds on Termination for Cause by Customer. If Customer terminates these",
+    "index": 35,
+    "original_header": "Section 7.4 Refunds on Termination for Cause by Customer. If Customer terminates these",
+    "secondary_clause_type": "payment",
+    "token_count": 105
+  },
+  {
+    "char_end": 15815,
+    "char_start": 15219,
+    "classification_confidence": 0.6,
+    "clause_type": "termination",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "0ddd4d1a68995c9b8b9560fa1956017564c846c93cfaa793facce1c4c535af1b",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.5 — Effect of Termination. Upon expiration or termination of these Terms for] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.5",
+        "target_chunk_index": 36,
+        "target_identifier": "7.5"
+      },
+      {
+        "raw_text": "Section\n4.5",
+        "target_chunk_index": 23,
+        "target_identifier": "4.5"
+      },
+      {
+        "raw_text": "Section 7.3",
+        "target_chunk_index": 34,
+        "target_identifier": "7.3"
+      },
+      {
+        "raw_text": "Section 1",
+        "target_chunk_index": 1,
+        "target_identifier": "1"
+      },
+      {
+        "raw_text": "Section 3",
+        "target_chunk_index": 16,
+        "target_identifier": "3"
+      },
+      {
+        "raw_text": "Section 5",
+        "target_chunk_index": 24,
+        "target_identifier": "5"
+      },
+      {
+        "raw_text": "Section 6",
+        "target_chunk_index": 29,
+        "target_identifier": "6"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Subscription Fees",
+      "Subscription Term",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.5 — Effect of Termination. Upon expiration or termination of these Terms for",
+    "index": 36,
+    "original_header": "Section 7.5 Effect of Termination. Upon expiration or termination of these Terms for",
+    "secondary_clause_type": "payment",
+    "token_count": 169
+  },
+  {
+    "char_end": 16400,
+    "char_start": 15815,
+    "classification_confidence": 1.0,
+    "clause_type": "warranties",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "02d8e9818cb2230ee58b3fddd508f34d8bc5b0f0b6d88442d65d69093ad1d99e",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.5 — , Section 8, Section 9, Section 10, and Section 11.] [Type: Warranties] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.5",
+        "target_chunk_index": 36,
+        "target_identifier": "7.5"
+      },
+      {
+        "raw_text": "Section 8",
+        "target_chunk_index": 38,
+        "target_identifier": "8"
+      },
+      {
+        "raw_text": "Section 9",
+        "target_chunk_index": 42,
+        "target_identifier": "9"
+      },
+      {
+        "raw_text": "Section 10",
+        "target_chunk_index": 43,
+        "target_identifier": "10"
+      },
+      {
+        "raw_text": "Section 11",
+        "target_chunk_index": 46,
+        "target_identifier": "11"
+      },
+      {
+        "raw_text": "Section 8.1",
+        "target_chunk_index": null,
+        "target_identifier": "8.1"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 7.5 — , Section 8, Section 9, Section 10, and Section 11.",
+    "index": 37,
+    "original_header": "Section 7.5 , Section 8, Section 9, Section 10, and Section 11.",
+    "secondary_clause_type": null,
+    "token_count": 167
+  },
+  {
+    "char_end": 16825,
+    "char_start": 16400,
+    "classification_confidence": 1.0,
+    "clause_type": "warranties",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "bdf7ea903dcb4a83a98fb17aa035bef3e5dcd56ada029326f263e64ec0f40359",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 8.2 — No Guarantee of Availability. STRATA DOES NOT WARRANT THAT THE PLATFORM] [Type: Warranties] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 8.2",
+        "target_chunk_index": 38,
+        "target_identifier": "8.2"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 8.2 — No Guarantee of Availability. STRATA DOES NOT WARRANT THAT THE PLATFORM",
+    "index": 38,
+    "original_header": "Section 8.2 No Guarantee of Availability. STRATA DOES NOT WARRANT THAT THE PLATFORM",
+    "secondary_clause_type": null,
+    "token_count": 126
+  },
+  {
+    "char_end": 17478,
+    "char_start": 16825,
+    "classification_confidence": 0.667,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRAT'",
+    "content_sha256": "633da55435e7e0d9ad30fde2f9e408432a7f01baf23e65fee7ec0a486648ce07",
+    "context_header": "[Section: PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 8.3 — Third-Party Disclaimer. STRATA MAKES NO WARRANTY REGARDING ANY] [Type: Limitation Of Liability] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 8.3",
+        "target_chunk_index": 39,
+        "target_identifier": "8.3"
+      },
+      {
+        "raw_text": "Section 9",
+        "target_chunk_index": 42,
+        "target_identifier": "9"
+      },
+      {
+        "raw_text": "Section 9.1",
+        "target_chunk_index": null,
+        "target_identifier": "9.1"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE ACCESSING OR USING THE STRATA > Section 8.3 — Third-Party Disclaimer. STRATA MAKES NO WARRANTY REGARDING ANY",
+    "index": 39,
+    "original_header": "Section 8.3 Third-Party Disclaimer. STRATA MAKES NO WARRANTY REGARDING ANY",
+    "secondary_clause_type": "warranties",
+    "token_count": 184
+  },
+  {
+    "char_end": 18200,
+    "char_start": 17478,
+    "classification_confidence": 0.75,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'EVEN IF STRATA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND REGARDLES'",
+    "content_sha256": "a5ae2909b7f10f3ad1ad059f6f401d472fa744fe17411119aecbb1b2f12b965d",
+    "context_header": "[Section: EVEN IF STRATA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND REGARDLESS OF] [Type: Limitation Of Liability] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 9.2",
+        "target_chunk_index": null,
+        "target_identifier": "9.2"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "EVEN IF STRATA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND REGARDLESS OF",
+    "index": 40,
+    "original_header": "EVEN IF STRATA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND REGARDLESS OF",
+    "secondary_clause_type": "payment",
+    "token_count": 180
+  },
+  {
+    "char_end": 18773,
+    "char_start": 18200,
+    "classification_confidence": 0.304,
+    "clause_type": "governing_law",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "0649e9645ce2d0952c743102c76f6aa4c5852def18c2986b0e274faee0312b37",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA] [Type: Governing Law] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 9.3",
+        "target_chunk_index": null,
+        "target_identifier": "9.3"
+      },
+      {
+        "raw_text": "Section 9.1",
+        "target_chunk_index": null,
+        "target_identifier": "9.1"
+      },
+      {
+        "raw_text": "Section 9.2",
+        "target_chunk_index": null,
+        "target_identifier": "9.2"
+      },
+      {
+        "raw_text": "Section 5",
+        "target_chunk_index": 24,
+        "target_identifier": "5"
+      },
+      {
+        "raw_text": "Section 10",
+        "target_chunk_index": 43,
+        "target_identifier": "10"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA",
+    "index": 41,
+    "original_header": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA",
+    "secondary_clause_type": "payment",
+    "token_count": 143
+  },
+  {
+    "char_end": 19046,
+    "char_start": 18773,
+    "classification_confidence": 0.667,
+    "clause_type": "payment",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "bda3cae82342cc13867938495750b93e4222a8e65ded613817d04ddb5d67bff8",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 9.4 — Essential Basis. THE PARTIES ACKNOWLEDGE THAT THE LIMITATIONS OF LIABILITY] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 9.4",
+        "target_chunk_index": 42,
+        "target_identifier": "9.4"
+      },
+      {
+        "raw_text": "SECTION 9",
+        "target_chunk_index": 42,
+        "target_identifier": "9"
+      },
+      {
+        "raw_text": "Section 10",
+        "target_chunk_index": 43,
+        "target_identifier": "10"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 9.4 — Essential Basis. THE PARTIES ACKNOWLEDGE THAT THE LIMITATIONS OF LIABILITY",
+    "index": 42,
+    "original_header": "Section 9.4 Essential Basis. THE PARTIES ACKNOWLEDGE THAT THE LIMITATIONS OF LIABILITY",
+    "secondary_clause_type": "indemnification",
+    "token_count": 89
+  },
+  {
+    "char_end": 20305,
+    "char_start": 19046,
+    "classification_confidence": 0.323,
+    "clause_type": "indemnification",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "4817db81c773a26280c02bfaa9957e807fcf96b88842a4e7ca7bf2f3e230a0da",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 10.1 — Indemnification by Strata. Strata shall defend, indemnify, and hold] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 10.1",
+        "target_chunk_index": 43,
+        "target_identifier": "10.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Claims",
+      "Customer\nIndemnitees",
+      "Customer Content",
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 10.1 — Indemnification by Strata. Strata shall defend, indemnify, and hold",
+    "index": 43,
+    "original_header": "Section 10.1 Indemnification by Strata. Strata shall defend, indemnify, and hold",
+    "secondary_clause_type": "intellectual_property",
+    "token_count": 335
+  },
+  {
+    "char_end": 20810,
+    "char_start": 20305,
+    "classification_confidence": 0.476,
+    "clause_type": "indemnification",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "ec589b840d910929a4e903d55d4daeada2601795d90aa3d2512516fab0ff7da3",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 10.2 — Indemnification by Customer. Customer shall defend, indemnify, and hold] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 10.2",
+        "target_chunk_index": 44,
+        "target_identifier": "10.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Claims",
+      "Customer Content",
+      "Strata Indemnitees",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 10.2 — Indemnification by Customer. Customer shall defend, indemnify, and hold",
+    "index": 44,
+    "original_header": "Section 10.2 Indemnification by Customer. Customer shall defend, indemnify, and hold",
+    "secondary_clause_type": "governing_law",
+    "token_count": 147
+  },
+  {
+    "char_end": 21394,
+    "char_start": 20810,
+    "classification_confidence": 0.818,
+    "clause_type": "indemnification",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "bfa0ddc6002fa9c1c769e9d7d7ed59514d084c26bd1034bd15bbc764ea7a0e00",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 10.3 — Indemnification Procedure. The Indemnified Party shall: (a) promptly notify] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 10.3",
+        "target_chunk_index": 45,
+        "target_identifier": "10.3"
+      },
+      {
+        "raw_text": "Section 11",
+        "target_chunk_index": 46,
+        "target_identifier": "11"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 10.3 — Indemnification Procedure. The Indemnified Party shall: (a) promptly notify",
+    "index": 45,
+    "original_header": "Section 10.3 Indemnification Procedure. The Indemnified Party shall: (a) promptly notify",
+    "secondary_clause_type": "payment",
+    "token_count": 166
+  },
+  {
+    "char_end": 21853,
+    "char_start": 21394,
+    "classification_confidence": 0.826,
+    "clause_type": "governing_law",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "32232d9b44661c0ea1dd41903107c23cc3a5cef6c3bdec032d9fda951cf2ebd2",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.1 — Governing Law. These Terms shall be governed by and construed in accordance] [Type: Governing Law] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.1",
+        "target_chunk_index": 46,
+        "target_identifier": "11.1"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.1 — Governing Law. These Terms shall be governed by and construed in accordance",
+    "index": 46,
+    "original_header": "Section 11.1 Governing Law. These Terms shall be governed by and construed in accordance",
+    "secondary_clause_type": "payment",
+    "token_count": 135
+  },
+  {
+    "char_end": 22435,
+    "char_start": 21853,
+    "classification_confidence": 0.52,
+    "clause_type": "entire_agreement",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "7efe882a480bdb1cf51b5db6328f2004c4f85e268fab11fe0a0065e1959f4404",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.2 — Entire Agreement. These Terms, together with all Order Forms, the Privacy] [Type: Entire Agreement] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.2",
+        "target_chunk_index": 47,
+        "target_identifier": "11.2"
+      }
+    ],
+    "defined_terms_used": [
+      "DPA",
+      "Order Form",
+      "SOW",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.2 — Entire Agreement. These Terms, together with all Order Forms, the Privacy",
+    "index": 47,
+    "original_header": "Section 11.2 Entire Agreement. These Terms, together with all Order Forms, the Privacy",
+    "secondary_clause_type": "payment",
+    "token_count": 166
+  },
+  {
+    "char_end": 22916,
+    "char_start": 22435,
+    "classification_confidence": 0.455,
+    "clause_type": "amendment",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "9e1eb3b5aff60497d053d97ec59e8d9b8be6da9f59dbd74350e8f04c314e8f07",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.3 — Modifications. Strata may modify these Terms from time to time by posting] [Type: Amendment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.3",
+        "target_chunk_index": 48,
+        "target_identifier": "11.3"
+      },
+      {
+        "raw_text": "Section\n7.2",
+        "target_chunk_index": 33,
+        "target_identifier": "7.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.3 — Modifications. Strata may modify these Terms from time to time by posting",
+    "index": 48,
+    "original_header": "Section 11.3 Modifications. Strata may modify these Terms from time to time by posting",
+    "secondary_clause_type": "payment",
+    "token_count": 141
+  },
+  {
+    "char_end": 23496,
+    "char_start": 22916,
+    "classification_confidence": 0.826,
+    "clause_type": "assignment",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "c706f2cebb4bdd38f5bb587b37e3d65a93b49aafe2c203d61c8c3e5163d28f7e",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.4 — Assignment. Customer may not assign, transfer, or delegate these Terms or] [Type: Assignment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.4",
+        "target_chunk_index": 49,
+        "target_identifier": "11.4"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.4 — Assignment. Customer may not assign, transfer, or delegate these Terms or",
+    "index": 49,
+    "original_header": "Section 11.4 Assignment. Customer may not assign, transfer, or delegate these Terms or",
+    "secondary_clause_type": "payment",
+    "token_count": 165
+  },
+  {
+    "char_end": 23979,
+    "char_start": 23496,
+    "classification_confidence": 0.536,
+    "clause_type": "severability",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "29c48963a222caa1a8d0f1fc8019f49636388e1ba836baa10439938f9a4a668a",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.5 — Severability. If any provision of these Terms is held invalid, illegal, or] [Type: Severability] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.5",
+        "target_chunk_index": 50,
+        "target_identifier": "11.5"
+      },
+      {
+        "raw_text": "Section 11.6",
+        "target_chunk_index": null,
+        "target_identifier": "11.6"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.5 — Severability. If any provision of these Terms is held invalid, illegal, or",
+    "index": 50,
+    "original_header": "Section 11.5 Severability. If any provision of these Terms is held invalid, illegal, or",
+    "secondary_clause_type": "boilerplate",
+    "token_count": 141
+  },
+  {
+    "char_end": 24489,
+    "char_start": 23979,
+    "classification_confidence": 0.733,
+    "clause_type": "notices",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "37b1c48691faf81211ee7438e88b2113ad04914ebeb8e3cd9d57c30584339e2e",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.7 — Notices. Notices to Strata shall be sent to Strata Technologies, Inc.,] [Type: Notices] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.7",
+        "target_chunk_index": 51,
+        "target_identifier": "11.7"
+      }
+    ],
+    "defined_terms_used": [
+      "Account",
+      "Order Form",
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.7 — Notices. Notices to Strata shall be sent to Strata Technologies, Inc.,",
+    "index": 51,
+    "original_header": "Section 11.7 Notices. Notices to Strata shall be sent to Strata Technologies, Inc.,",
+    "secondary_clause_type": "payment",
+    "token_count": 148
+  },
+  {
+    "char_end": 25002,
+    "char_start": 24489,
+    "classification_confidence": 0.476,
+    "clause_type": "force_majeure",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "d6996c98defccfec28c615f0263795b32cc5eb7de5767d0ec84b2648c8f9c3be",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.8 — Force Majeure. Neither party shall be in default or liable for any delay] [Type: Force Majeure] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.8",
+        "target_chunk_index": 52,
+        "target_identifier": "11.8"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.8 — Force Majeure. Neither party shall be in default or liable for any delay",
+    "index": 52,
+    "original_header": "Section 11.8 Force Majeure. Neither party shall be in default or liable for any delay",
+    "secondary_clause_type": "notices",
+    "token_count": 149
+  },
+  {
+    "char_end": 25307,
+    "char_start": 25002,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "a152a1c71604d6f8e7b78ea4f1f1586129e75cbe99598e8a68a67f4b1019b55c",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.9 — Relationship of the Parties. The parties are independent contractors.] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.9",
+        "target_chunk_index": 53,
+        "target_identifier": "11.9"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.9 — Relationship of the Parties. The parties are independent contractors.",
+    "index": 53,
+    "original_header": "Section 11.9 Relationship of the Parties. The parties are independent contractors.",
+    "secondary_clause_type": null,
+    "token_count": 97
+  },
+  {
+    "char_end": 25743,
+    "char_start": 25307,
+    "classification_confidence": 0.556,
+    "clause_type": "boilerplate",
+    "content_head": "'SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRA'",
+    "content_sha256": "7492ac38ba9797463bd670fbd2288da60bb4b5f29bc29702a95548bc8f84fbc1",
+    "context_header": "[Section: SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.10 — Counterparts; Electronic Signatures. These Terms may be accepted and] [Type: Boilerplate] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.10",
+        "target_chunk_index": 54,
+        "target_identifier": "11.10"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "SUBSCRIPTION FEES REFLECT THE ALLOCATION OF RISK UNDER THESE TERMS AND THAT STRATA > Section 11.10 — Counterparts; Electronic Signatures. These Terms may be accepted and",
+    "index": 54,
+    "original_header": "Section 11.10 Counterparts; Electronic Signatures. These Terms may be accepted and",
+    "secondary_clause_type": "payment",
+    "token_count": 129
+  }
+]

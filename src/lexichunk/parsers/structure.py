@@ -47,6 +47,18 @@ class ParsedClause:
             order.  Populated during parsing but the flat list returned by
             :meth:`StructureParser.parse` is ordered by ``char_start``, not
             nested.
+        uid: Stable identifier assigned by :meth:`StructureParser.parse`, a
+            monotonically increasing counter (as a string) in the order
+            clauses are opened while walking the document.  Distinct from
+            ``identifier``, which is derived from the clause's own heading
+            text and is not guaranteed unique (e.g. repeated ``"(a)"``
+            sub-clauses under different parents).  Defaults to ``""`` for
+            construction sites that don't assign one explicitly.
+        parent_uid: ``uid`` of the enclosing clause that was open on the
+            parser's stack when this clause was created, or ``None`` for
+            top-level clauses and the synthetic preamble.  Always refers to
+            a clause with a strictly smaller ``uid`` (its parent was opened
+            — and thus assigned a uid — first).
     """
 
     identifier: str
@@ -58,6 +70,8 @@ class ParsedClause:
     char_start: int
     char_end: int
     children: list[ParsedClause] = field(default_factory=list)
+    uid: str = ""
+    parent_uid: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------
@@ -204,6 +218,13 @@ class StructureParser:
         # Buffer for text before the first clause header (preamble text).
         preamble_lines: list[str] = []
 
+        # Monotonic counter assigning a stable `uid` to every ParsedClause in
+        # the order it is *opened* (created), not the order it closes or its
+        # final char_start-sorted position.  Because a clause's parent is
+        # always already open (and thus already assigned a uid) when the
+        # child is created, parent_uid always names a strictly smaller uid.
+        uid_counter = 0
+
         def _close_clause(clause: ParsedClause, content_lines: list[str], end_char: int) -> None:
             """Finalise a clause: set content and char_end, append to results."""
             clause.content = ''.join(content_lines)
@@ -255,7 +276,10 @@ class StructureParser:
                     char_start=0,
                     char_end=char_pos,
                     children=[],
+                    uid=str(uid_counter),
+                    parent_uid=None,
                 )
+                uid_counter += 1
                 result_clauses.append(preamble_clause)
                 preamble_lines = []
 
@@ -270,7 +294,10 @@ class StructureParser:
                 char_start=char_pos,
                 char_end=char_pos,  # temporary; overwritten on close
                 children=[],
+                uid=str(uid_counter),
+                parent_uid=stack[-1][0].uid if stack else None,
             )
+            uid_counter += 1
 
             # Register as a child of the current top-of-stack (if any).
             if stack:
@@ -297,7 +324,10 @@ class StructureParser:
                 char_start=0,
                 char_end=end_of_text,
                 children=[],
+                uid=str(uid_counter),
+                parent_uid=None,
             )
+            uid_counter += 1
             result_clauses.append(preamble_clause)
         else:
             # Flush any preamble that was never flushed (shouldn't happen if
@@ -319,7 +349,10 @@ class StructureParser:
                         )
                     ],
                     children=[],
+                    uid=str(uid_counter),
+                    parent_uid=None,
                 )
+                uid_counter += 1
                 result_clauses.append(preamble_clause)
 
             while stack:
