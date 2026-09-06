@@ -220,6 +220,11 @@
     "context_header": "[Section: Article I — Definitions > Section 1.01 — Definitions. As used in this Agreement, the following terms shall have the > (h) — \"Services\" means the services, software, and deliverables to be provided by] [Type: Definitions] [Jurisdiction: US]",
     "cross_references": [
       {
+        "raw_text": "Exhibit A",
+        "target_chunk_index": 46,
+        "target_identifier": "A"
+      },
+      {
         "raw_text": "Article VIII",
         "target_chunk_index": 35,
         "target_identifier": "VIII"
@@ -1401,7 +1406,13 @@
     "content_head": "'EXHIBIT A — STATEMENT OF WORK NO. 1\\n\\n1.   Description of Services\\n\\n     Provider'",
     "content_sha256": "416ddbf1ad225631d34872d945290a19c8ce9be0de1cabc4bcc7f2b74042009b",
     "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1] [Type: Services] [Jurisdiction: US]",
-    "cross_references": [],
+    "cross_references": [
+      {
+        "raw_text": "EXHIBIT A",
+        "target_chunk_index": 46,
+        "target_identifier": "A"
+      }
+    ],
     "defined_terms_used": [
       "Customer",
       "Effective Date",
@@ -1426,6 +1437,11 @@
     "content_sha256": "deb5864b44698ac5ef1b17aa8c219e4f023e666705f2353144a8ae190d9b64bc",
     "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1 > (c) — Training and Enablement: Delivery of up to twenty (20) hours of end-user] [Type: Services] [Jurisdiction: US]",
     "cross_references": [
+      {
+        "raw_text": "Exhibit A",
+        "target_chunk_index": 46,
+        "target_identifier": "A"
+      },
       {
         "raw_text": "Section 3.01",
         "target_chunk_index": 16,

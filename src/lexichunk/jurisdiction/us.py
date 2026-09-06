@@ -79,8 +79,23 @@ class USPatterns:
         re.MULTILINE | re.IGNORECASE
     ))
 
+    # The trailing ``(?-i:[A-Z])(?![A-Za-z])`` alternative is what makes
+    # "Exhibit A" a reference. US agreements name their attachments by
+    # letter -- "attached hereto as Exhibit A", "the form set out in
+    # Exhibit B" -- and ``detect_level`` already recognises ``EXHIBIT A``
+    # as a container heading, so without this a document contained an
+    # Exhibit A chunk that no reference could ever resolve to. Worse, it
+    # was inconsistent: ``Exhibit C`` happened to resolve, because C is a
+    # Roman numeral, while A, B and D did not.
+    #
+    # The scoped ``(?-i:...)`` turns IGNORECASE off for that one
+    # alternative so it matches a genuinely capitalised letter, and the
+    # lookahead requires the letter to stand alone -- "Schedule Terms" is
+    # not a reference to a schedule named "T".
     cross_ref: re.Pattern = field(default_factory=lambda: re.compile(
-        r'\b(?:Sections?|Articles?|Exhibits?|Schedules?|Clauses?)\s+(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*|[IVXLC]+)',
+        r'\b(?:Sections?|Articles?|Exhibits?|Schedules?|Clauses?)\s+'
+        r'(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*|[IVXLC]+'
+        r'|(?-i:[A-Z])(?![A-Za-z]))',
         re.IGNORECASE
     ))
 
