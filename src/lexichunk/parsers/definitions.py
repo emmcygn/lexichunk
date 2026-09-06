@@ -5,7 +5,7 @@ from __future__ import annotations
 import bisect
 import logging
 import re
-from typing import Union
+from typing import Optional, Union
 
 from .._patterns import (
     CLOSE_QUOTE,
@@ -73,6 +73,19 @@ _TRAILING_CLAUSE_LABEL: re.Pattern[str] = re.compile(
 
 # How far back a "hereinafter" definition looks for its body.
 _HEREINAFTER_LOOKBACK: int = 500
+
+# Two blank lines — a paragraph boundary, and one of the conditions that ends
+# a definition body.  Compiled once; it used to be re-looked-up per call.
+_DOUBLE_BLANK_LINE: re.Pattern[str] = re.compile(r"\n\s*\n\s*\n")
+
+# How far past the best-known body end each stop-condition search may look.
+# See :meth:`DefinitionsExtractor._extract_definition_body`: only the earliest
+# match start matters, so a search need only cover the current boundary plus
+# the widest span any stop pattern can match.  Every stop pattern matches a
+# quoted term and a keyword, a blank-line pair, or a single line, so 4 KB is
+# orders of magnitude more than enough; the value exists to make the loop
+# linear in the document rather than quadratic, not to be tight.
+_STOP_SEARCH_SLACK: int = 4096
 
 # Runs of whitespace inside a captured term name.
 _TERM_WHITESPACE: re.Pattern[str] = re.compile(r"\s+")
@@ -257,6 +270,16 @@ class DefinitionsExtractor:
             self._clause_header_re = _EU_CLAUSE_HEADER
         else:
             self._clause_header_re = _US_CLAUSE_HEADER
+
+        # Built once per extractor rather than per definition.  This pattern
+        # is assembled from the jurisdiction's clause-header regex, so it used
+        # to be re-assembled and cache-looked-up on every
+        # :meth:`_extract_definition_body` call — hundreds of times on a
+        # contract with a long definitions article.
+        self._blank_then_header_re: re.Pattern[str] = re.compile(
+            r"\n[ \t]*\n[ \t]*(?=" + self._clause_header_re.pattern + r")",
+            re.MULTILINE,
+        )
 
     # ------------------------------------------------------------------
     # Public API
@@ -689,7 +712,32 @@ class DefinitionsExtractor:
         remaining = text[match_end:]
 
         # Find the earliest termination point from any stop condition.
+        #
+        # Every search below is bounded to the best boundary found so far plus
+        # _STOP_SEARCH_SLACK.  Unbounded, this loop was quadratic in the
+        # document: each of the ~14 stop patterns scanned from the definition
+        # to the end of the text, once per definition.  A pattern with no
+        # further match anywhere -- the common case, since most documents use
+        # two or three definition forms, not fourteen -- paid a full scan
+        # every time.  On a 292k-character CUAD contract with 414 definitions
+        # that was 20 seconds, against 0.04s median for the corpus, and it
+        # scaled with content rather than length: synthetic text of twice the
+        # size chunked in 2% of the time because it had nothing to define.
+        #
+        # Bounding is safe because only the *earliest* start matters.  A match
+        # starting at or after `stop` cannot lower it, and one starting before
+        # `stop` is still found so long as it spans less than the slack --
+        # which every stop pattern does by a wide margin (they match a quoted
+        # term and a keyword, a blank-line pair, or a single line).
         stop = len(remaining)
+
+        def note(match: Optional[re.Match[str]]) -> None:
+            nonlocal stop
+            if match is not None and match.start() < stop:
+                stop = match.start()
+
+        def limit() -> int:
+            return min(len(remaining), stop + _STOP_SEARCH_SLACK)
 
         # 1. Next definition match — every start pattern the extractor uses.
         for pat in (
@@ -697,31 +745,17 @@ class DefinitionsExtractor:
             _DEFINITION_PAREN_PLURAL,
             _DEFINITION_HEREINAFTER,
         ):
-            m = pat.search(remaining)
-            if m:
-                stop = min(stop, m.start())
+            note(pat.search(remaining, 0, limit()))
 
         # 2. Two consecutive blank lines (paragraph boundary).
-        double_blank = re.search(r"\n\s*\n\s*\n", remaining)
-        if double_blank:
-            stop = min(stop, double_blank.start())
+        note(_DOUBLE_BLANK_LINE.search(remaining, 0, limit()))
 
         # 3. Blank line immediately followed by a clause-header line.
-        blank_then_header = re.search(
-            r"\n[ \t]*\n[ \t]*(?="
-            + self._clause_header_re.pattern
-            + r")",
-            remaining,
-            re.MULTILINE,
-        )
-        if blank_then_header:
-            stop = min(stop, blank_then_header.start())
+        note(self._blank_then_header_re.search(remaining, 0, limit()))
 
         # 4. A standalone ALL-CAPS line — an operative heading typed directly
         #    under the last definition of a section, with no blank line.
-        allcaps_ahead = _ALLCAPS_LINE_AHEAD.search(remaining)
-        if allcaps_ahead:
-            stop = min(stop, allcaps_ahead.start())
+        note(_ALLCAPS_LINE_AHEAD.search(remaining, 0, limit()))
 
         # 5. Drop a dangling next-entry marker.  Stop condition 1 ends the
         #    body at the quote that opens the *next* term, so when entries are
