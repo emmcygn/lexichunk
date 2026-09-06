@@ -46,6 +46,7 @@ from .models import (
     Jurisdiction,
     LegalChunk,
 )
+from .offsets import OffsetMap, sanitize_with_map
 from .parsers.definitions import DefinitionsExtractor
 from .parsers.references import ReferenceDetector, resolve_references
 from .parsers.structure import StructureParser
@@ -255,11 +256,51 @@ class LegalChunker:
         """
         return LegalChunker._sanitize_input(text)
 
+    @staticmethod
+    def sanitize_with_map(text: str) -> tuple[str, OffsetMap]:
+        """Sanitise *text* and return the offset map back to the raw input.
+
+        Same output string as :meth:`sanitize`, plus an
+        :class:`~lexichunk.offsets.OffsetMap` that converts between
+        sanitised offsets (what every ``LegalChunk.char_start`` /
+        ``char_end`` refers to) and offsets into the string you passed in.
+
+        Use this when you need to point at the original file — highlighting
+        a chunk in a source viewer, citing back into a PDF text layer,
+        producing a redline against the untouched bytes.  If you only want
+        the offsets on the chunks themselves, pass ``raw_offsets=True`` to
+        :meth:`chunk` instead and read ``raw_char_start``/``raw_char_end``.
+
+        Args:
+            text: Raw input text.
+
+        Returns:
+            ``(sanitised_text, offset_map)``.
+
+        Raises:
+            TypeError: If *text* is not a ``str``.
+
+        Example::
+
+            sanitised, offsets = LegalChunker.sanitize_with_map(raw)
+            chunk = chunker.chunk(raw)[0]
+            start, end = offsets.to_raw_span(chunk.char_start, chunk.char_end)
+            assert LegalChunker.sanitize(raw[start:end]) == \\
+                sanitised[chunk.char_start:chunk.char_end]
+        """
+        return sanitize_with_map(text)
+
     # ------------------------------------------------------------------
     # Primary public API
     # ------------------------------------------------------------------
 
-    def chunk(self, text: str, document_id: Optional[str] = None) -> list[LegalChunk]:
+    def chunk(
+        self,
+        text: str,
+        document_id: Optional[str] = None,
+        *,
+        raw_offsets: bool = False,
+    ) -> list[LegalChunk]:
         """Chunk a legal document into enriched :class:`~lexichunk.models.LegalChunk` objects.
 
         Runs the full pipeline:
@@ -277,6 +318,13 @@ class LegalChunker:
             document_id: Override ``document_id`` for this call.  Falls back
                 to the value passed to ``__init__``.  Must be ``None`` or a
                 ``str``.
+            raw_offsets: When ``True``, also populate ``raw_char_start`` and
+                ``raw_char_end`` on every chunk with offsets into *text* as
+                you passed it in, before sanitisation stripped the BOM,
+                folded CRLF, dropped null bytes and applied NFC.  They stay
+                at their ``-1`` sentinel otherwise.  See
+                :meth:`sanitize_with_map` for the mapping this uses and for
+                the run-boundary semantics it guarantees.
 
         Returns:
             List of :class:`~lexichunk.models.LegalChunk` objects in document
@@ -293,11 +341,17 @@ class LegalChunker:
                 Both subclass ``ValueError``, so a bare
                 ``except ValueError`` catches either.
         """
-        chunks, _ = self._run_pipeline(text, document_id, collect_metrics=False)
+        chunks, _ = self._run_pipeline(
+            text, document_id, collect_metrics=False, raw_offsets=raw_offsets
+        )
         return chunks
 
     def chunk_with_metrics(
-        self, text: str, document_id: Optional[str] = None
+        self,
+        text: str,
+        document_id: Optional[str] = None,
+        *,
+        raw_offsets: bool = False,
     ) -> tuple[list[LegalChunk], PipelineMetrics]:
         """Chunk a legal document and return pipeline metrics.
 
@@ -311,11 +365,15 @@ class LegalChunker:
             text: Full legal document as a plain-text string.
             document_id: Override ``document_id`` for this call.  Falls back
                 to the value passed to ``__init__``.
+            raw_offsets: As for :meth:`chunk` — populate
+                ``raw_char_start``/``raw_char_end`` on every chunk.
 
         Returns:
             A ``(chunks, metrics)`` tuple.
         """
-        chunks, metrics = self._run_pipeline(text, document_id, collect_metrics=True)
+        chunks, metrics = self._run_pipeline(
+            text, document_id, collect_metrics=True, raw_offsets=raw_offsets
+        )
         # metrics is guaranteed non-None when collect_metrics=True; cast for
         # type checkers without relying on assert (stripped by python -O).
         return chunks, metrics  # type: ignore[return-value]
@@ -329,6 +387,7 @@ class LegalChunker:
         text: str,
         document_id: Optional[str],
         collect_metrics: bool,
+        raw_offsets: bool = False,
     ) -> tuple[list[LegalChunk], PipelineMetrics | None]:
         """Run the full chunking pipeline.
 
@@ -337,6 +396,8 @@ class LegalChunker:
             document_id: Override document ID for this call.
             collect_metrics: When ``True``, time each stage and return
                 :class:`PipelineMetrics`.
+            raw_offsets: When ``True``, track the sanitisation offset map and
+                populate ``raw_char_start``/``raw_char_end`` on every chunk.
 
         Returns:
             ``(chunks, metrics)`` — *metrics* is ``None`` when
@@ -365,7 +426,11 @@ class LegalChunker:
                 f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
             )
 
-        text = self._sanitize_input(text)
+        offset_map: OffsetMap | None = None
+        if raw_offsets:
+            text, offset_map = sanitize_with_map(text)
+        else:
+            text = self._sanitize_input(text)
 
         if not text or not text.strip():
             self._last_cross_ref_stats = {"total": 0, "resolved": 0, "rate": 1.0}
@@ -662,6 +727,12 @@ class LegalChunker:
             )
             stage_metrics.append(StageMetric("cross_reference_resolution", elapsed, resolved_count))
 
+        if offset_map is not None:
+            for chunk in chunks:
+                chunk.raw_char_start, chunk.raw_char_end = offset_map.to_raw_span(
+                    chunk.char_start, chunk.char_end
+                )
+
         logger.debug(
             "Pipeline complete: %d chunks, %d defined terms",
             len(chunks), dt_count,
@@ -757,7 +828,11 @@ class LegalChunker:
         return self._structure_parser.parse_structure(text)
 
     def chunk_iter(
-        self, text: str, document_id: Optional[str] = None
+        self,
+        text: str,
+        document_id: Optional[str] = None,
+        *,
+        raw_offsets: bool = False,
     ) -> Iterator[LegalChunk]:
         """Yield chunks from a legal document one at a time.
 
@@ -769,11 +844,15 @@ class LegalChunker:
         Args:
             text: Full legal document as a plain-text string.
             document_id: Override ``document_id`` for this call.
+            raw_offsets: As for :meth:`chunk` — populate
+                ``raw_char_start``/``raw_char_end`` on every chunk.
 
         Yields:
             :class:`~lexichunk.models.LegalChunk` objects in document order.
         """
-        yield from self.chunk(text, document_id=document_id)
+        yield from self.chunk(
+            text, document_id=document_id, raw_offsets=raw_offsets
+        )
 
     def clear_definition_cache(self) -> None:
         """Clear the definition extraction cache.

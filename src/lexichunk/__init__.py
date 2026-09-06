@@ -16,6 +16,7 @@ from .jurisdiction import (
     unregister_jurisdiction,
 )
 from .metrics import PipelineMetrics, StageMetric
+from .offsets import OffsetMap, sanitize_with_map
 
 # Library hygiene: don't emit "no handlers found" warnings for consumers who
 # haven't configured logging. See docs/architecture.md "Logging and
@@ -50,6 +51,8 @@ __all__ = [
     "BatchError",
     "PipelineMetrics",
     "StageMetric",
+    "OffsetMap",
+    "sanitize_with_map",
     "register_jurisdiction",
     "unregister_jurisdiction",
     "registered_jurisdictions",

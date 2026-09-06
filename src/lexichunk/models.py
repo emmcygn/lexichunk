@@ -235,6 +235,16 @@ class LegalChunk:
     token_count: int = 0
     original_header: str = ""
 
+    # Provenance of ``clause_type``: ``"keyword"`` for the built-in scorer,
+    # ``"hook"`` when a ``classification_hook`` overrode it.
+    classification_source: str = "keyword"
+
+    # Offsets into the *raw* text the caller passed in, before sanitisation.
+    # ``-1`` means "not computed" — populate them by passing
+    # ``raw_offsets=True`` to :meth:`~lexichunk.chunker.LegalChunker.chunk`.
+    raw_char_start: int = -1
+    raw_char_end: int = -1
+
     def __post_init__(self) -> None:
         """Enforce per-chunk structural invariants.
 
@@ -271,6 +281,21 @@ class LegalChunk:
                 f"LegalChunk.cross_ref_resolved ({self.cross_ref_resolved}) "
                 f"cannot exceed cross_ref_total ({self.cross_ref_total})"
             )
+        # Raw offsets are optional: -1/-1 means "not computed". When they
+        # *are* computed they obey the same ordering rule as the sanitised
+        # pair, and both must be populated together.
+        raw_unset = self.raw_char_start == -1 and self.raw_char_end == -1
+        if not raw_unset:
+            if self.raw_char_start < 0 or self.raw_char_end < 0:
+                raise ParsingError(
+                    f"LegalChunk raw offsets must both be >= 0 or both be -1, "
+                    f"got ({self.raw_char_start}, {self.raw_char_end})"
+                )
+            if self.raw_char_end < self.raw_char_start:
+                raise ParsingError(
+                    f"LegalChunk.raw_char_end ({self.raw_char_end}) must be >= "
+                    f"raw_char_start ({self.raw_char_start})"
+                )
 
     @property
     def jurisdiction_value(self) -> str:
@@ -329,6 +354,9 @@ class LegalChunk:
             "char_end": self.char_end,
             "token_count": self.token_count,
             "original_header": self.original_header,
+            "classification_source": self.classification_source,
+            "raw_char_start": self.raw_char_start,
+            "raw_char_end": self.raw_char_end,
         }
 
     @classmethod
@@ -470,6 +498,9 @@ class LegalChunk:
             char_end=d.get("char_end", 0),
             token_count=d.get("token_count", 0),
             original_header=d.get("original_header", ""),
+            classification_source=d.get("classification_source", "keyword"),
+            raw_char_start=d.get("raw_char_start", -1),
+            raw_char_end=d.get("raw_char_end", -1),
         )
 
 
