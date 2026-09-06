@@ -240,7 +240,7 @@ class LegalChunker:
         return self._jurisdiction
 
     # ------------------------------------------------------------------
-    # Input sanitization
+    # Input sanitisation
     # ------------------------------------------------------------------
 
     @staticmethod
@@ -248,9 +248,9 @@ class LegalChunker:
         """Sanitize raw input text before processing.
 
         - Strips UTF-8 BOM (``\\ufeff``)
-        - Normalizes ``\\r\\n`` → ``\\n``, stray ``\\r`` → ``\\n``
+        - Normalises ``\\r\\n`` → ``\\n``, stray ``\\r`` → ``\\n``
         - Removes null bytes (``\\x00``)
-        - Applies Unicode NFC normalization
+        - Applies Unicode NFC normalisation
         """
         text = text.replace("\ufeff", "")
         text = text.replace("\r\n", "\n").replace("\r", "\n")
@@ -263,7 +263,7 @@ class LegalChunker:
         """Public alias of the internal input-sanitisation step.
 
         :meth:`chunk`, :meth:`get_defined_terms`, and :meth:`parse_structure`
-        all sanitise their input before any further processing -- stripping a
+        all sanitise their input before any further processing — stripping a
         UTF-8 BOM, normalising line endings (CRLF/CR to LF), removing null
         bytes, and applying Unicode NFC normalisation.
         Every ``LegalChunk.char_start``/``char_end`` offset indexes into
