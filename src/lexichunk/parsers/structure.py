@@ -403,19 +403,88 @@ _INHERITED_SECTIONS: frozenset[DocumentSection] = frozenset({
 })
 
 
-def _keyword_pattern(keywords: tuple[str, ...]) -> re.Pattern[str]:
-    """Compile *keywords* into a whole-word alternation (plural tolerated)."""
-    alternation = '|'.join(re.escape(kw) for kw in keywords)
-    return re.compile(rf'\b(?:{alternation})s?\b')
+# ---------------------------------------------------------------------------
+# Document-section classification
+# ---------------------------------------------------------------------------
+#
+# These rules deliberately do *not* search for a keyword anywhere in the
+# heading.  A bare substring search labelled "Background Checks" (a vetting
+# obligation) as RECITALS and "Execution of Services" (a performance clause)
+# as SIGNATURES — with the wrong label baked into ``document_section``,
+# ``clause_type`` and the ``context_header`` that is embedded and shown to a
+# downstream LLM.  A keyword now has to be the heading's *head word* or its
+# whole text.
+
+# Words that may sit between real keywords in a heading without making it
+# something else ("Definitions and Interpretation", "Background and Recitals").
+_HEADING_CONNECTIVES = frozenset({'and', 'or', 'the', 'of', 'a', 'an', '&'})
+
+# A heading is RECITALS only when it *is* one of these (modulo connectives) —
+# never merely because it contains one.
+_RECITAL_TITLE_WORDS = frozenset({
+    'recital', 'recitals', 'background', 'whereas', 'preliminary',
+})
+
+# A heading is DEFINITIONS when its head word is one of these, or when the
+# whole heading is built from them plus connectives.
+_DEFINITION_HEAD_WORDS = frozenset({
+    'definition', 'definitions', 'interpretation', 'interpretations',
+    'defined',
+})
+
+# A heading is SIGNATURES only when it opens with an unambiguous execution
+# formula (or with one of the jurisdiction's own ``signature_markers``).
+# "Execution of the Works" and "Execution of Services" must not match.
+_SIGNATURE_HEAD_RE = re.compile(
+    r'^(?:'
+    r'in\s+witness\s+whereof'
+    r'|signed\s+(?:by|for\s+and\s+on\s+behalf)'
+    r'|executed\s+as\s+a\s+deed'
+    r'|signature(?:s)?(?:\s+page)?'
+    r'|execution\s+(?:page|block|version)'
+    r')\b'
+)
+
+_WORD_RE = re.compile(r"[a-z0-9&'-]+")
 
 
-_SIGNATURE_KEYWORD_RE = _keyword_pattern(
-    ('signature', 'execution', 'in witness', 'signed')
-)
-_RECITAL_KEYWORD_RE = _keyword_pattern(('recital', 'background', 'whereas'))
-_DEFINITION_KEYWORD_RE = _keyword_pattern(
-    ('definition', 'interpretation', 'defined term')
-)
+def _heading_words(heading: str) -> list[str]:
+    """Return the lower-case word tokens of *heading*."""
+    return _WORD_RE.findall(heading.lower())
+
+
+def _is_keyword_heading(
+    words: list[str],
+    keywords: frozenset[str],
+    *,
+    head_word_only: bool,
+) -> bool:
+    """Return ``True`` when *words* is a heading *about* one of *keywords*.
+
+    Args:
+        words: Lower-case word tokens of the heading.
+        keywords: The keyword set to test against.
+        head_word_only: When ``True``, matching the first non-connective word
+            is enough ("Definitions and Interpretation").  When ``False``,
+            *every* non-connective word must be a keyword, so
+            "Background Checks" does not match while "Background" and
+            "Background and Recitals" do.
+
+    Returns:
+        ``True`` if the heading qualifies.
+    """
+    # Bare numbers are part of the label, not of the subject matter:
+    # "Recital (1)" and "Recitals 1-5" are still recitals.
+    significant = [
+        word
+        for word in words
+        if word not in _HEADING_CONNECTIVES and not word.isdigit()
+    ]
+    if not significant:
+        return False
+    if head_word_only:
+        return significant[0] in keywords
+    return all(word in keywords for word in significant)
 
 
 def _get_section_roles(
@@ -1057,13 +1126,28 @@ class StructureParser:
           assigns a role to ``level`` (typically ``SCHEDULES`` for
           Schedule/Exhibit/Annex levels).  A mapping to ``OPERATIVE`` — or
           no mapping at all — falls through to the keyword rules.
-        * **SIGNATURES**: title/identifier matches ``"signature"``,
-          ``"execution"``, ``"in witness"`` or ``"signed"`` as whole words,
-          or one of the jurisdiction's ``signature_markers``.
-        * **RECITALS**: title/identifier matches ``"recital"``,
-          ``"background"`` or ``"whereas"`` as whole words.
-        * **DEFINITIONS**: title/identifier matches ``"definition"``,
-          ``"interpretation"`` or ``"defined term"`` as whole words.
+        * **SIGNATURES**: the heading *opens with* an execution formula
+          (``"IN WITNESS WHEREOF"``, ``"SIGNED by"``, ``"SIGNED for and on
+          behalf"``, ``"EXECUTED as a deed"``, ``"Signature page"``,
+          ``"Execution page"``) or with one of the jurisdiction's
+          ``signature_markers``.  A performance clause such as ``"Execution
+          of Services"`` deliberately does **not** match.
+        * **RECITALS**: the *whole* heading is built from ``"recital(s)"``,
+          ``"background"``, ``"whereas"`` or ``"preliminary"`` plus
+          connectives.  ``"Background Checks"`` — a vetting obligation —
+          deliberately does **not** match.
+        * **DEFINITIONS**: the heading's *head word* is ``"definition(s)"``,
+          ``"interpretation(s)"`` or ``"defined"`` (so both ``"Definitions"``
+          and ``"Definitions and Interpretation"`` match).
+
+        These three rules match on the heading text — ``title`` when there is
+        one, otherwise ``identifier`` (an ALL-CAPS fallback heading carries
+        its text there).  They are deliberately anchored rather than
+        substring searches: an unanchored search labelled ``"2. Background
+        Checks"`` as ``RECITALS`` with classification confidence 1.00 and
+        ``"2. Execution of Services"`` as ``SIGNATURES``, and that label is
+        baked into ``clause_type`` and into the ``context_header`` that gets
+        embedded and shown to a downstream LLM.
         * **PREAMBLE**: identifier is literally ``"preamble"`` or
           ``"whereas"``.
         * **OPERATIVE**: everything else.
@@ -1076,7 +1160,6 @@ class StructureParser:
         Returns:
             A :class:`~lexichunk.models.DocumentSection` member.
         """
-        combined = (identifier + ' ' + title).lower()
         is_tc = self._doc_type == "terms_conditions"
 
         # Container roles (Schedule / Exhibit / Annex / Chapter) come from
@@ -1086,22 +1169,41 @@ class StructureParser:
         if role is not None and role is not DocumentSection.OPERATIVE:
             return role
 
+        # The heading text these rules classify.  An ALL-CAPS fallback heading
+        # carries its text in ``identifier`` with an empty ``title``, so fall
+        # back to the identifier when there is no title.
+        heading = title.strip() or identifier.strip()
+        words = _heading_words(heading)
+
         # Signature blocks — skip for T&C documents (false positives).
+        # The heading must *open with* an execution formula, so a performance
+        # clause titled "Execution of Services" stays OPERATIVE.
         if not is_tc and (
-            _SIGNATURE_KEYWORD_RE.search(combined) is not None
+            _SIGNATURE_HEAD_RE.match(heading.lower()) is not None
             or (
                 self._signature_markers is not None
-                and self._signature_markers.search(combined) is not None
+                and self._signature_markers.match(heading.lower()) is not None
             )
         ):
             return DocumentSection.SIGNATURES
 
         # Recitals / background — skip for T&C documents (false positives).
-        if not is_tc and _RECITAL_KEYWORD_RE.search(combined) is not None:
+        # Whole-heading match only: "Background Checks" is a vetting
+        # obligation, not the recitals.
+        if not is_tc and _is_keyword_heading(
+            words, _RECITAL_TITLE_WORDS, head_word_only=False
+        ):
             return DocumentSection.RECITALS
 
-        # Definitions sections.
-        if _DEFINITION_KEYWORD_RE.search(combined) is not None:
+        # Definitions sections — head word is enough, so both "Definitions"
+        # and "Definitions and Interpretation" match.
+        if _is_keyword_heading(
+            words, _DEFINITION_HEAD_WORDS, head_word_only=True
+        ) or (
+            len(words) >= 2
+            and words[0] == 'defined'
+            and words[1].startswith('term')
+        ):
             return DocumentSection.DEFINITIONS
 
         # Synthetic preamble node (level == -99) or identifier keyword.

@@ -452,3 +452,118 @@ class TestH1ContainerHeadingAfterTerminalPunctuation:
         )
         clauses = StructureParser(Jurisdiction.UK).parse(document)
         assert not [c for c in clauses if c.level == -1]
+
+
+class TestH3DocumentSectionClassification:
+    """H3 — ``_detect_document_section`` searched for keywords anywhere in
+    ``identifier + " " + title``, so ordinary operative clauses were labelled
+    RECITALS or SIGNATURES.  The wrong label reaches ``clause_type`` and the
+    ``context_header`` that is embedded and shown to a downstream LLM.
+    """
+
+    OPERATIVE_TITLES = [
+        "Background Checks",
+        "Background Screening and Vetting",
+        "Execution of Services",
+        "Execution of the Works",
+        "Signing Authority",
+        "Recital of Facts by the Supplier",
+        "Confidentiality",
+    ]
+    RECITAL_TITLES = ["Recitals", "Recital", "Background", "Background and Recitals"]
+    DEFINITION_TITLES = [
+        "Definitions",
+        "Definitions and Interpretation",
+        "Interpretation",
+        "Defined Terms",
+    ]
+    SIGNATURE_TITLES = [
+        "IN WITNESS WHEREOF",
+        "SIGNED by the Supplier",
+        "SIGNED for and on behalf of the Company",
+        "EXECUTED as a deed",
+        "Signature Page",
+        "Signatures",
+    ]
+
+    def _section(self, title: str):
+        from lexichunk.parsers.structure import StructureParser
+
+        return StructureParser(Jurisdiction.UK)._detect_document_section("2", title, 0)
+
+    @pytest.mark.parametrize("title", OPERATIVE_TITLES)
+    def test_operative_clause_is_not_mislabelled(self, title: str) -> None:
+        from lexichunk.models import DocumentSection
+
+        assert self._section(title) is DocumentSection.OPERATIVE
+
+    @pytest.mark.parametrize("title", RECITAL_TITLES)
+    def test_real_recital_heading_still_matches(self, title: str) -> None:
+        from lexichunk.models import DocumentSection
+
+        assert self._section(title) is DocumentSection.RECITALS
+
+    @pytest.mark.parametrize("title", DEFINITION_TITLES)
+    def test_real_definitions_heading_still_matches(self, title: str) -> None:
+        from lexichunk.models import DocumentSection
+
+        assert self._section(title) is DocumentSection.DEFINITIONS
+
+    @pytest.mark.parametrize("title", SIGNATURE_TITLES)
+    def test_real_signature_heading_still_matches(self, title: str) -> None:
+        from lexichunk.models import DocumentSection
+
+        assert self._section(title) is DocumentSection.SIGNATURES
+
+    def test_eu_recital_label_with_a_number_still_matches(self) -> None:
+        from lexichunk.models import DocumentSection
+        from lexichunk.parsers.structure import StructureParser
+
+        section = StructureParser(Jurisdiction.EU)._detect_document_section(
+            "Recital 1", "Recital (1)", 0
+        )
+        assert section is DocumentSection.RECITALS
+
+    def test_background_checks_clause_end_to_end(self) -> None:
+        """The full pipeline used to report RECITALS with confidence 1.00.
+
+        ``document_section`` is now OPERATIVE, so the structural override that
+        forced ``clause_type`` to RECITALS at confidence 1.00 no longer fires.
+        The residual weak RECITALS *content* score — the word "Background"
+        appears in the clause's own heading line, and ``CLAUSE_SIGNALS`` lists
+        it as a one-word RECITALS signal — is the library's ordinary keyword
+        heuristic and is reported with correspondingly low confidence.
+        """
+        from lexichunk import LegalChunker
+        from lexichunk.models import DocumentSection
+
+        document = (
+            "AGREEMENT\n\n1. Scope\n\n"
+            "The scope of this agreement covers the following matters.\n\n"
+            "2. Background Checks\n\n"
+            "The Supplier shall carry out enhanced DBS checks on all personnel "
+            "engaged in the delivery of the Services.\n\n"
+            "3. Term\n\nOne year.\n"
+        )
+        chunks = LegalChunker(jurisdiction="uk").chunk(document)
+        clause = [c for c in chunks if c.hierarchy.title == "Background Checks"]
+        assert len(clause) == 1
+        assert clause[0].document_section is DocumentSection.OPERATIVE
+        assert clause[0].classification_confidence < 0.5
+
+    def test_execution_of_services_clause_end_to_end(self) -> None:
+        from lexichunk import LegalChunker
+        from lexichunk.models import DocumentSection
+
+        document = (
+            "AGREEMENT\n\n1. Scope\n\n"
+            "The scope of this agreement covers the following matters.\n\n"
+            "2. Execution of Services\n\n"
+            "The Supplier shall perform the Services with reasonable skill "
+            "and care throughout the term.\n\n"
+            "3. Term\n\nOne year.\n"
+        )
+        chunks = LegalChunker(jurisdiction="uk").chunk(document)
+        clause = [c for c in chunks if c.hierarchy.title == "Execution of Services"]
+        assert len(clause) == 1
+        assert clause[0].document_section is DocumentSection.OPERATIVE
