@@ -103,14 +103,23 @@ class TestRegistration:
         fn = get_detect_level("de")
         assert fn is _eu_detect_level
 
-    def test_overwrite_builtin(self) -> None:
-        """Overwriting a built-in jurisdiction is allowed."""
+    def test_overwrite_builtin_requires_override(self) -> None:
+        """Overwriting a built-in jurisdiction without override=True is refused."""
+        with pytest.raises(ConfigurationError, match="built-in"):
+            register_jurisdiction("uk", EUPatterns(), _eu_detect_level)
+        # Unaffected: still the original built-in.
+        assert get_patterns("uk") is UK_PATTERNS
+
+    def test_overwrite_builtin_with_override(self) -> None:
+        """override=True allows overwriting a built-in jurisdiction."""
         eu = EUPatterns()
-        register_jurisdiction("uk", eu, _eu_detect_level)
-        assert get_patterns("uk") is eu
-        # Restore original (use imported uk_detect_level directly, not
-        # get_detect_level() which reads from the already-overwritten registry)
-        _JURISDICTION_REGISTRY["uk"] = (UK_PATTERNS, uk_detect_level)
+        try:
+            register_jurisdiction("uk", eu, _eu_detect_level, override=True)
+            assert get_patterns("uk") is eu
+        finally:
+            # Restore original — using the imported UK_PATTERNS/uk_detect_level
+            # directly (never by reading the mutated registry back).
+            register_jurisdiction("uk", UK_PATTERNS, uk_detect_level, override=True)
 
     def test_invalid_empty_name(self) -> None:
         with pytest.raises(ConfigurationError, match="non-empty"):

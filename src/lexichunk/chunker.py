@@ -16,13 +16,17 @@ Orchestrates the full pipeline:
 from __future__ import annotations
 
 import concurrent.futures
+import concurrent.futures.process
 import hashlib
 import logging
 import os
 import re
 import sys
+import threading
 import time
 import unicodedata
+from collections import OrderedDict
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Iterator, Optional
 
@@ -58,7 +62,11 @@ class LegalChunker:
     Args:
         jurisdiction: ``"uk"`` or ``"us"`` (or a :class:`Jurisdiction` enum value).
         doc_type: Document type hint — ``"contract"`` or ``"terms_conditions"``.
-            Currently informational; reserved for future specialisation.
+            Affects document-section detection: with ``"terms_conditions"``,
+            the signature-block heuristic is relaxed (recitals/signature
+            keyword matching is skipped), which changes which chunks are
+            classified as :attr:`~lexichunk.models.DocumentSection.SIGNATURES`
+            (and :attr:`~lexichunk.models.DocumentSection.RECITALS`).
         max_chunk_size: Maximum chunk size in approximate tokens (1 token ≈ 4
             characters).  Enforced as a hard cap.  Defaults to 512.
         min_chunk_size: Minimum chunk size in approximate tokens.  Clauses
@@ -71,7 +79,13 @@ class LegalChunker:
         include_context_header: When ``True``, populate ``context_header`` on
             every chunk.  Defaults to ``True``.
         document_id: Optional document identifier embedded in every chunk and
-            in the context header.
+            in the context header.  Must be ``None`` or a ``str``; invalid
+            values raise :class:`~lexichunk.exceptions.ConfigurationError`
+            here in ``__init__`` (the same rule is re-checked per call in
+            :meth:`chunk`, where a violation raises
+            :class:`~lexichunk.exceptions.InputError` instead — both
+            exception types subclass ``ValueError``, so a bare
+            ``except ValueError`` catches either).
         chars_per_token: Number of characters per token used for the
             approximate token count heuristic.  Defaults to 4.
 
@@ -83,6 +97,17 @@ class LegalChunker:
         chunks = chunker.chunk(contract_text)
         for chunk in chunks:
             print(chunk.clause_type, chunk.hierarchy_path)
+
+    Thread safety:
+        A single :class:`LegalChunker` instance is safe to share across
+        threads for :meth:`chunk`, :meth:`chunk_with_metrics`, and
+        :meth:`chunk_iter` — the definition cache is protected by an
+        internal lock. The :attr:`cross_ref_stats` and
+        :attr:`cross_ref_resolution_rate` properties are **not**
+        thread-safe in the sense of being call-scoped: they reflect
+        whichever ``chunk()`` call finished last, so under concurrent use
+        from multiple threads you may read another thread's numbers. Use
+        :meth:`chunk_with_metrics` for statistics scoped to a single call.
     """
 
     _MAX_INPUT_CHARS = 10_000_000  # ~10 MB, configurable via subclass
@@ -103,21 +128,30 @@ class LegalChunker:
         enable_definition_cache: bool = True,
         max_cache_size: int = 128,
     ) -> None:
-        # Normalise jurisdiction: try enum first, then registry lookup.
-        if isinstance(jurisdiction, str):
+        # Normalise jurisdiction: Jurisdiction enum, then a stripped/lowered
+        # str looked up first against the enum, then the registry.  A
+        # string with padding/casing (" UK ") now resolves to the enum
+        # member, not a downgraded plain string.
+        if isinstance(jurisdiction, Jurisdiction):
+            self._jurisdiction: Jurisdiction | str = jurisdiction
+        elif isinstance(jurisdiction, str):
+            key = jurisdiction.strip().lower()
             try:
-                self._jurisdiction: Jurisdiction | str = Jurisdiction(jurisdiction.lower())
+                self._jurisdiction = Jurisdiction(key)
             except ValueError:
-                # Not a built-in enum value — check the registry.
                 from .jurisdiction import _JURISDICTION_REGISTRY
-                if jurisdiction.lower().strip() not in _JURISDICTION_REGISTRY:
+                if key not in _JURISDICTION_REGISTRY:
                     raise ConfigurationError(
-                        f"Unknown jurisdiction {jurisdiction!r}. "
-                        f"Register it with register_jurisdiction() first."
-                    )
-                self._jurisdiction = jurisdiction.lower().strip()
+                        f"Unknown jurisdiction {jurisdiction!r}. Built-ins: "
+                        f"{', '.join(sorted(j.value for j in Jurisdiction))}. "
+                        f"Register others with register_jurisdiction() first."
+                    ) from None
+                self._jurisdiction = key
         else:
-            self._jurisdiction = jurisdiction
+            raise ConfigurationError(
+                f"jurisdiction must be a str or Jurisdiction, got "
+                f"{type(jurisdiction).__name__}"
+            )
 
         if doc_type not in self._VALID_DOC_TYPES:
             raise ConfigurationError(
@@ -126,25 +160,19 @@ class LegalChunker:
             )
         self._doc_type = doc_type
 
-        if max_chunk_size < 1:
-            raise ConfigurationError(
-                f"max_chunk_size ({max_chunk_size}) must be >= 1"
-            )
-        if min_chunk_size < 0:
-            raise ConfigurationError(
-                f"min_chunk_size ({min_chunk_size}) must be >= 0"
-            )
-        if max_chunk_size < min_chunk_size:
-            raise ConfigurationError(
-                f"max_chunk_size ({max_chunk_size}) must be >= "
-                f"min_chunk_size ({min_chunk_size})"
-            )
+        validated_abbreviations, validated_signals = _validate_config(
+            max_chunk_size=max_chunk_size,
+            min_chunk_size=min_chunk_size,
+            chars_per_token=chars_per_token,
+            max_cache_size=max_cache_size,
+            include_definitions=include_definitions,
+            include_context_header=include_context_header,
+            enable_definition_cache=enable_definition_cache,
+            extra_abbreviations=extra_abbreviations,
+            extra_clause_signals=extra_clause_signals,
+        )
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
-        if chars_per_token < 1:
-            raise ConfigurationError(
-                f"chars_per_token ({chars_per_token}) must be >= 1"
-            )
         self._chars_per_token = chars_per_token
         self._include_definitions = include_definitions
         self._include_context_header = include_context_header
@@ -153,11 +181,12 @@ class LegalChunker:
                 f"document_id must be a string or None, got {type(document_id).__name__}"
             )
         self._document_id = document_id
-        self._extra_abbreviations = extra_abbreviations
-        self._extra_clause_signals = extra_clause_signals
+        self._extra_abbreviations = validated_abbreviations
+        self._extra_clause_signals = validated_signals
         self._enable_definition_cache = enable_definition_cache
-        self._max_cache_size = max(max_cache_size, 1)
-        self._definition_cache: dict[str, dict[str, DefinedTerm]] = {}
+        self._max_cache_size = max_cache_size
+        self._definition_cache: OrderedDict[str, dict[str, DefinedTerm]] = OrderedDict()
+        self._cache_lock = threading.Lock()
         self._last_cross_ref_stats: dict[str, int | float] = {}
 
         # Instantiate pipeline components.
@@ -167,9 +196,21 @@ class LegalChunker:
         self._definitions_extractor = DefinitionsExtractor(self._jurisdiction)
         self._reference_detector = ReferenceDetector(self._jurisdiction)
         self._clause_type_classifier = ClauseTypeClassifier(
-            extra_signals=extra_clause_signals,
+            extra_signals=self._extra_clause_signals,
         )
         self._context_enricher = ContextEnricher()
+
+    @property
+    def jurisdiction(self) -> Jurisdiction | str:
+        """The normalised jurisdiction for this chunker instance.
+
+        A :class:`~lexichunk.models.Jurisdiction` enum member for built-ins
+        (``"uk"``, ``"us"``, ``"eu"`` -- including whitespace/casing variants
+        passed to ``__init__``, e.g. ``" UK "``), or the lowercase, stripped
+        registry key ``str`` for a custom jurisdiction registered via
+        :func:`~lexichunk.jurisdiction.register_jurisdiction`.
+        """
+        return self._jurisdiction
 
     # ------------------------------------------------------------------
     # Input sanitization
@@ -189,6 +230,29 @@ class LegalChunker:
         text = text.replace("\x00", "")
         text = unicodedata.normalize("NFC", text)
         return text
+
+    @staticmethod
+    def sanitize(text: str) -> str:
+        """Public alias of the internal input-sanitisation step.
+
+        :meth:`chunk`, :meth:`get_defined_terms`, and :meth:`parse_structure`
+        all sanitise their input before any further processing -- stripping a
+        UTF-8 BOM, normalising line endings (CRLF/CR to LF), removing null
+        bytes, and applying Unicode NFC normalisation.
+        Every ``LegalChunk.char_start``/``char_end`` offset indexes into
+        *this sanitised string*, not the raw text you originally passed in.
+        If you need to align those offsets against your original source
+        (e.g. for highlighting), call ``LegalChunker.sanitize(text)``
+        yourself first and index into its result.
+
+        Args:
+            text: Raw input text.
+
+        Returns:
+            The sanitised text, identical to what the pipeline processes
+            internally.
+        """
+        return LegalChunker._sanitize_input(text)
 
     # ------------------------------------------------------------------
     # Primary public API
@@ -210,13 +274,23 @@ class LegalChunker:
         Args:
             text: Full legal document as a plain-text string.
             document_id: Override ``document_id`` for this call.  Falls back
-                to the value passed to ``__init__``.
+                to the value passed to ``__init__``.  Must be ``None`` or a
+                ``str``.
 
         Returns:
             List of :class:`~lexichunk.models.LegalChunk` objects in document
             order with all metadata populated.  Returned chunks are fully
             enriched; callers should not mutate the list or its elements if the
             chunker instance is reused with caching enabled.
+
+        Raises:
+            InputError: If *text* is not a ``str``, *text* exceeds the
+                maximum supported input size, or *document_id* is not
+                ``None``/``str``. Note this is the same ``document_id`` rule
+                enforced in ``__init__`` — but a violation *there* raises
+                :class:`~lexichunk.exceptions.ConfigurationError` instead.
+                Both subclass ``ValueError``, so a bare
+                ``except ValueError`` catches either.
         """
         chunks, _ = self._run_pipeline(text, document_id, collect_metrics=False)
         return chunks
@@ -306,7 +380,7 @@ class LegalChunker:
             if isinstance(self._jurisdiction, Jurisdiction)
             else self._jurisdiction
         )
-        logger.info(
+        logger.debug(
             "Chunking document (%d chars, jurisdiction=%s, doc_type=%s)",
             len(text), jur_label, self._doc_type,
         )
@@ -365,7 +439,10 @@ class LegalChunker:
             chunks = chunker.chunk(clauses, text)
         else:
             # No structure detected — fall back to sentence-level splitting.
-            logger.warning(
+            # DEBUG, not WARNING: this is a normal, first-class code path
+            # (FallbackChunker), and the fact is already available
+            # programmatically via PipelineMetrics.fallback_used.
+            logger.debug(
                 "No clause structure detected — falling back to sentence-level splitting"
             )
             fallback_used = True
@@ -485,16 +562,29 @@ class LegalChunker:
         if self._include_definitions:
             if self._enable_definition_cache:
                 cache_key = hashlib.sha256(text.encode("utf-8")).hexdigest()
-                if cache_key in self._definition_cache:
-                    logger.debug("Definition cache hit (key=%s…)", cache_key[:12])
-                    defined_terms = self._definition_cache[cache_key]
-                else:
+                with self._cache_lock:
+                    hit = self._definition_cache.get(cache_key)
+                    if hit is not None:
+                        # True LRU: touching an entry moves it to the
+                        # most-recently-used end.
+                        self._definition_cache.move_to_end(cache_key)
+                        defined_terms = hit
+                if defined_terms is None:
+                    logger.debug("Definition cache miss (key=%s…)", cache_key[:12])
+                    # Extraction runs outside the lock so a slow parse on one
+                    # document never blocks other threads' cache lookups.
                     defined_terms = self._definitions_extractor.extract(text)
-                    self._definition_cache[cache_key] = defined_terms
-                    # Evict oldest entry (FIFO) when cache exceeds max size.
-                    while len(self._definition_cache) > self._max_cache_size:
-                        oldest = next(iter(self._definition_cache))
-                        del self._definition_cache[oldest]
+                    with self._cache_lock:
+                        self._definition_cache[cache_key] = defined_terms
+                        self._definition_cache.move_to_end(cache_key)
+                        # Evict least-recently-used entries. popitem(last=False)
+                        # is atomic under the lock, so concurrent evictions
+                        # cannot race on the same key (unlike the old
+                        # next(iter(...)); del pattern).
+                        while len(self._definition_cache) > self._max_cache_size:
+                            self._definition_cache.popitem(last=False)
+                else:
+                    logger.debug("Definition cache hit (key=%s…)", cache_key[:12])
             else:
                 defined_terms = self._definitions_extractor.extract(text)
             _attach_defined_terms(chunks, defined_terms)
@@ -561,17 +651,34 @@ class LegalChunker:
     def get_defined_terms(self, text: str) -> dict[str, DefinedTerm]:
         """Extract all defined terms from a legal document.
 
+        Applies the same input guards as :meth:`chunk`: an empty or
+        whitespace-only document short-circuits to ``{}`` without invoking
+        the extractor, and input larger than ``_MAX_INPUT_CHARS`` (~10 MB)
+        raises :class:`~lexichunk.exceptions.InputError`.
+
         Args:
             text: Full legal document as a plain-text string.
 
         Returns:
             Dict mapping term name to :class:`~lexichunk.models.DefinedTerm`.
+
+        Raises:
+            InputError: If *text* is not a ``str``, or exceeds the maximum
+                supported input size.
         """
         if not isinstance(text, str):
             raise InputError(
                 f"Expected str, got {type(text).__name__}."
             )
-        return self._definitions_extractor.extract(self._sanitize_input(text))
+        text = self._sanitize_input(text)
+        if not text or not text.strip():
+            return {}
+        if len(text) > self._MAX_INPUT_CHARS:
+            raise InputError(
+                f"Input text too large ({len(text)} chars). "
+                f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
+            )
+        return self._definitions_extractor.extract(text)
 
     def parse_structure(self, text: str) -> list[HierarchyNode]:
         """Return the parsed document structure as a list of hierarchy nodes.
@@ -579,18 +686,35 @@ class LegalChunker:
         Useful for debugging and visualising the document hierarchy before
         chunking.
 
+        Applies the same input guards as :meth:`chunk`: an empty or
+        whitespace-only document short-circuits to ``[]`` without invoking
+        the parser, and input larger than ``_MAX_INPUT_CHARS`` (~10 MB)
+        raises :class:`~lexichunk.exceptions.InputError`.
+
         Args:
             text: Full legal document as a plain-text string.
 
         Returns:
             List of :class:`~lexichunk.models.HierarchyNode` objects in
             document order.
+
+        Raises:
+            InputError: If *text* is not a ``str``, or exceeds the maximum
+                supported input size.
         """
         if not isinstance(text, str):
             raise InputError(
                 f"Expected str, got {type(text).__name__}."
             )
-        return self._structure_parser.parse_structure(self._sanitize_input(text))
+        text = self._sanitize_input(text)
+        if not text or not text.strip():
+            return []
+        if len(text) > self._MAX_INPUT_CHARS:
+            raise InputError(
+                f"Input text too large ({len(text)} chars). "
+                f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
+            )
+        return self._structure_parser.parse_structure(text)
 
     def chunk_iter(
         self, text: str, document_id: Optional[str] = None
@@ -618,7 +742,8 @@ class LegalChunker:
         across different document versions whose definitions may have
         changed.
         """
-        self._definition_cache.clear()
+        with self._cache_lock:
+            self._definition_cache.clear()
 
     @property
     def cross_ref_resolution_rate(self) -> float:
@@ -635,12 +760,17 @@ class LegalChunker:
 
         Returns a dict with ``total``, ``resolved``, and ``rate`` keys.
         Empty dict if ``chunk()`` has not been called.
+
+        Not call-scoped under concurrency: if this instance is shared
+        across threads, this reflects whichever ``chunk()`` call finished
+        most recently, which may not be the call your thread made. Use
+        :meth:`chunk_with_metrics` for statistics scoped to one call.
         """
         return dict(self._last_cross_ref_stats)
 
     def chunk_batch(
         self,
-        texts: list[str | tuple[str, str | None]],
+        texts: Iterable[str | tuple[str, str | None]],
         workers: int | None = None,
     ) -> BatchResult:
         """Chunk multiple documents in one call, with optional parallelism.
@@ -648,30 +778,91 @@ class LegalChunker:
         Each element of *texts* is either a plain text string or a
         ``(text, document_id)`` tuple.  Documents that raise during
         processing are recorded as errors and do not halt the batch.
+        Any iterable is accepted (not just a list) and is materialised
+        exactly once — including a generator, which today only worked "by
+        accident" and is now a deliberate, documented part of the contract.
 
         Args:
-            texts: List of documents to chunk.
-            workers: Number of parallel worker processes.  Defaults to
-                ``min(cpu_count, len(texts))``.  When *workers* is 1 or
-                the batch has ≤2 documents, processing is serial (no
-                subprocess overhead).
+            texts: An iterable of documents to chunk.  **Not** a bare
+                ``str``/``bytes``/``bytearray`` — those raise
+                :class:`~lexichunk.exceptions.InputError` (a bare string
+                is itself an iterable of one-character strings, which
+                would otherwise silently chunk it one character at a
+                time). Pass ``chunk_batch([text])`` for a single document.
+            workers: Number of parallel worker **processes**. ``None``
+                (the default) picks ``min(cpu_count, len(texts))``. When
+                *workers* is 1, or the batch has 2 or fewer documents,
+                processing is serial (no subprocess overhead) regardless
+                of *workers*. On Windows, *workers* is silently capped at
+                61 (the ``WaitForMultipleObjects`` handle limit
+                underlying :class:`~concurrent.futures.ProcessPoolExecutor`),
+                logged at ``INFO`` when it actually reduces the count.
 
         Returns:
             :class:`~lexichunk.models.BatchResult` containing per-document
             chunk lists and any errors.
 
         Raises:
-            ConfigurationError: If a custom (non-built-in) jurisdiction
-                is used with ``workers > 1``, since custom registrations
+            InputError: If *texts* is a ``str``/``bytes``/``bytearray``, or
+                is not iterable at all.
+            ConfigurationError: If *workers* is not an ``int`` or is ``< 1``;
+                or if a custom (non-built-in) jurisdiction is used with
+                effective parallel processing, since custom registrations
                 cannot be pickled to child processes.
+
+        Note:
+            **Windows/macOS entry-point guard.** ``workers > 1`` starts
+            worker *processes* via :class:`~concurrent.futures.ProcessPoolExecutor`.
+            On platforms using the ``spawn`` start method (Windows and
+            macOS), the calling script **must** guard its entry point with
+            ``if __name__ == "__main__":`` — otherwise the workers
+            re-import and re-execute the calling module. If the pool
+            cannot start for this reason (or any other spawn-time
+            ``RuntimeError``/``OSError``), lexichunk logs a ``WARNING`` and
+            falls back to processing the batch serially rather than
+            raising out of ``chunk_batch`` — this preserves the "errors do
+            not halt the batch" contract even when the *entire* pool fails
+            to start, not just an individual document.
+
+            **Cache asymmetry.** In serial mode, this instance's
+            definition cache (see :attr:`_definition_cache`) is shared
+            across every document in the batch, so duplicate documents
+            benefit from cache hits. In parallel mode, each document is
+            processed by a *fresh* :class:`LegalChunker` in its own worker
+            process with an empty cache — duplicate content is never
+            deduplicated across documents, and nothing is added to this
+            instance's own cache.
         """
-        if not texts:
+        if isinstance(texts, (str, bytes, bytearray)):
+            raise InputError(
+                f"chunk_batch() expects a sequence of documents, got "
+                f"{type(texts).__name__}. Did you mean chunk_batch([text])?"
+            )
+        if not isinstance(texts, Iterable):
+            raise InputError(
+                f"chunk_batch() expects an iterable of documents, got "
+                f"{type(texts).__name__}."
+            )
+        items = list(texts)  # materialise generators exactly once
+
+        # Validate `workers` before any other work, per the documented
+        # contract — a bad value should fail fast, not after partially
+        # processing the batch.
+        if workers is not None:
+            if isinstance(workers, bool) or not isinstance(workers, int):
+                raise ConfigurationError(
+                    f"workers must be an int, got {type(workers).__name__}"
+                )
+            if workers < 1:
+                raise ConfigurationError(f"workers ({workers}) must be >= 1")
+
+        if not items:
             return BatchResult(results=[], errors=[])
 
         # Normalize inputs to (text, doc_id) pairs with validation.
         pairs: list[tuple[str, str | None]] = []
         early_errors: list[BatchError] = []
-        for i, item in enumerate(texts):
+        for i, item in enumerate(items):
             if isinstance(item, tuple):
                 if len(item) != 2:
                     early_errors.append(BatchError(
@@ -712,13 +903,16 @@ class LegalChunker:
             cpu = os.cpu_count() or 1
             effective_workers = min(cpu, len(pairs))
         else:
-            if workers < 1:
-                raise ConfigurationError(f"workers ({workers}) must be >= 1")
             effective_workers = workers
 
         # Cap to platform limit (Windows: max 61 workers).
-        if sys.platform == "win32":
-            effective_workers = min(effective_workers, 61)
+        if sys.platform == "win32" and effective_workers > 61:
+            logger.info(
+                "workers (%d) exceeds the Windows ProcessPoolExecutor limit "
+                "of 61 handles; using 61",
+                effective_workers,
+            )
+            effective_workers = 61
 
         # Serial fallback for small batches or workers=1.
         use_parallel = effective_workers > 1 and len(pairs) > 2
@@ -794,26 +988,42 @@ class LegalChunker:
         results: list[list[LegalChunk]] = [[] for _ in pairs]
         errors: list[BatchError] = []
 
-        with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as pool:
-            future_to_idx: dict[concurrent.futures.Future[list[LegalChunk]], int] = {}
-            for i, (text, doc_id) in enumerate(pairs):
-                if i in skip_indices:
-                    continue
-                fut = pool.submit(_chunk_single, config, text, doc_id)
-                future_to_idx[fut] = i
+        try:
+            with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as pool:
+                future_to_idx: dict[concurrent.futures.Future[list[LegalChunk]], int] = {}
+                for i, (text, doc_id) in enumerate(pairs):
+                    if i in skip_indices:
+                        continue
+                    fut = pool.submit(_chunk_single, config, text, doc_id)
+                    future_to_idx[fut] = i
 
-            for fut in concurrent.futures.as_completed(future_to_idx):
-                idx = future_to_idx[fut]
-                try:
-                    results[idx] = fut.result()
-                except Exception as exc:
-                    text_preview = pairs[idx][0][:100]
-                    errors.append(BatchError(
-                        index=idx,
-                        text_preview=text_preview,
-                        error=str(exc),
-                        error_type=type(exc).__qualname__,
-                    ))
+                for fut in concurrent.futures.as_completed(future_to_idx):
+                    idx = future_to_idx[fut]
+                    try:
+                        results[idx] = fut.result()
+                    except Exception as exc:
+                        text_preview = pairs[idx][0][:100]
+                        errors.append(BatchError(
+                            index=idx,
+                            text_preview=text_preview,
+                            error=str(exc),
+                            error_type=type(exc).__qualname__,
+                        ))
+        except (RuntimeError, OSError, concurrent.futures.process.BrokenProcessPool) as exc:
+            # The pool itself failed to start (or died outright) — e.g. no
+            # `if __name__ == "__main__":` guard on spawn platforms. This is
+            # NOT the same as an individual document failing (handled
+            # above); it means every future submitted so far is unusable.
+            # Fall back to serial processing so the documented "errors do
+            # not halt the batch" contract still holds even in this case.
+            logger.warning(
+                "Parallel batch could not start (%s: %s); falling back to "
+                "serial processing. On Windows and macOS, "
+                "chunk_batch(workers>1) requires the calling script to "
+                "guard its entry point with: if __name__ == '__main__':",
+                type(exc).__name__, exc,
+            )
+            return self._chunk_batch_serial(pairs, skip_indices)
 
         return BatchResult(results=results, errors=errors)
 
@@ -839,6 +1049,23 @@ class _ChunkerConfig:
     extra_clause_signals: dict[ClauseType, list[str]] | None
     enable_definition_cache: bool
     max_cache_size: int
+
+    def __post_init__(self) -> None:
+        # Re-run the same validation LegalChunker.__init__ uses, so this
+        # dataclass and __init__ cannot silently drift apart (a forgotten
+        # edit here used to only surface the first time an unstructured
+        # document reached a worker process).
+        _validate_config(
+            max_chunk_size=self.max_chunk_size,
+            min_chunk_size=self.min_chunk_size,
+            chars_per_token=self.chars_per_token,
+            max_cache_size=self.max_cache_size,
+            include_definitions=self.include_definitions,
+            include_context_header=self.include_context_header,
+            enable_definition_cache=self.enable_definition_cache,
+            extra_abbreviations=self.extra_abbreviations,
+            extra_clause_signals=self.extra_clause_signals,
+        )
 
 
 def _chunk_single(
@@ -871,16 +1098,159 @@ def _chunk_single(
 # ---------------------------------------------------------------------------
 
 
+def _validate_config(
+    *,
+    max_chunk_size: object,
+    min_chunk_size: object,
+    chars_per_token: object,
+    max_cache_size: object,
+    include_definitions: object,
+    include_context_header: object,
+    enable_definition_cache: object,
+    extra_abbreviations: object,
+    extra_clause_signals: object,
+) -> tuple[list[str] | None, dict[ClauseType, list[str]] | None]:
+    """Validate and normalise shared :class:`LegalChunker` configuration.
+
+    Used by both :meth:`LegalChunker.__init__` and
+    :meth:`_ChunkerConfig.__post_init__` so the two validation paths cannot
+    drift out of sync — previously, adding a constructor parameter required
+    four coordinated edits, and a forgotten one would silently drop that
+    setting in parallel batch mode with no test to catch it.
+
+    Args:
+        max_chunk_size: Must be an ``int`` (not ``bool``), ``>= 1``.
+        min_chunk_size: Must be an ``int`` (not ``bool``), ``>= 0``, and
+            ``<= max_chunk_size``.
+        chars_per_token: Must be an ``int`` (not ``bool``), ``>= 1``.
+        max_cache_size: Must be an ``int`` (not ``bool``), ``>= 1`` (no
+            longer silently clamped to 1 when out of range).
+        include_definitions: Must be a ``bool``.
+        include_context_header: Must be a ``bool``.
+        enable_definition_cache: Must be a ``bool``.
+        extra_abbreviations: ``None`` or a ``list``/``tuple`` of non-empty
+            ``str``.
+        extra_clause_signals: ``None`` or a :class:`~collections.abc.Mapping`
+            with :class:`~lexichunk.models.ClauseType` keys and
+            ``list``/``tuple`` of non-empty, non-whitespace ``str`` values.
+
+    Returns:
+        ``(extra_abbreviations, extra_clause_signals)`` as freshly
+        deep-copied values safe to store on an instance — later mutation of
+        the caller's original objects cannot reach the classifier or
+        fallback chunker.
+
+    Raises:
+        ConfigurationError: On any invalid value.
+    """
+
+    def _check_int(name: str, value: object, minimum: int) -> None:
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise ConfigurationError(
+                f"{name} must be an int, got {type(value).__name__}"
+            )
+        if value < minimum:
+            raise ConfigurationError(f"{name} ({value}) must be >= {minimum}")
+
+    _check_int("max_chunk_size", max_chunk_size, 1)
+    _check_int("min_chunk_size", min_chunk_size, 0)
+    assert isinstance(max_chunk_size, int) and isinstance(min_chunk_size, int)
+    if max_chunk_size < min_chunk_size:
+        raise ConfigurationError(
+            f"max_chunk_size ({max_chunk_size}) must be >= "
+            f"min_chunk_size ({min_chunk_size})"
+        )
+    _check_int("chars_per_token", chars_per_token, 1)
+    _check_int("max_cache_size", max_cache_size, 1)
+
+    for name, value in (
+        ("include_definitions", include_definitions),
+        ("include_context_header", include_context_header),
+        ("enable_definition_cache", enable_definition_cache),
+    ):
+        if not isinstance(value, bool):
+            raise ConfigurationError(
+                f"{name} must be a bool, got {type(value).__name__}"
+            )
+
+    validated_abbreviations: list[str] | None = None
+    if extra_abbreviations is not None:
+        if not isinstance(extra_abbreviations, (list, tuple)):
+            raise ConfigurationError(
+                f"extra_abbreviations must be a list or tuple of str, got "
+                f"{type(extra_abbreviations).__name__}"
+            )
+        for i, item in enumerate(extra_abbreviations):
+            if not isinstance(item, str) or not item:
+                raise ConfigurationError(
+                    f"extra_abbreviations[{i}] must be a non-empty str, "
+                    f"got {item!r}"
+                )
+        validated_abbreviations = list(extra_abbreviations)
+
+    validated_signals: dict[ClauseType, list[str]] | None = None
+    if extra_clause_signals is not None:
+        if not isinstance(extra_clause_signals, Mapping):
+            raise ConfigurationError(
+                f"extra_clause_signals must be a Mapping, got "
+                f"{type(extra_clause_signals).__name__}"
+            )
+        validated_signals = {}
+        for key, value in extra_clause_signals.items():
+            if not isinstance(key, ClauseType):
+                hint = f" — use ClauseType.{key.upper()}" if isinstance(key, str) else ""
+                raise ConfigurationError(
+                    f"extra_clause_signals keys must be ClauseType members, "
+                    f"got {key!r} ({type(key).__name__}){hint}"
+                )
+            if not isinstance(value, (list, tuple)):
+                raise ConfigurationError(
+                    f"extra_clause_signals[{key!r}] must be a list or tuple "
+                    f"of str, got {type(value).__name__}"
+                )
+            signals: list[str] = []
+            for i, sig in enumerate(value):
+                if not isinstance(sig, str) or not sig.strip():
+                    raise ConfigurationError(
+                        f"extra_clause_signals[{key!r}][{i}] must be a "
+                        f"non-empty, non-whitespace str, got {sig!r}"
+                    )
+                signals.append(sig)
+            validated_signals[key] = signals
+
+    return validated_abbreviations, validated_signals
+
+
 def _attach_defined_terms(
     chunks: list[LegalChunk],
     defined_terms: dict[str, DefinedTerm],
 ) -> None:
     """Attach relevant defined terms to each chunk in-place.
 
-    For each chunk, scans ``chunk.content`` for occurrences of each known
-    defined term.  When a term is found:
+    Builds a **single** alternation regex for the whole document (longest
+    term first, escaped) and scans each chunk's content with one
+    ``finditer()`` pass, instead of running one ``re.search()`` per
+    chunk per term. This is O(chunks) rather than O(chunks × terms) — on a
+    54-chunk / 20-term fixture this stage previously accounted for over a
+    third of total pipeline wall time.
 
-    - Appends it to ``chunk.defined_terms_used``.
+    The alternation is wrapped as a **zero-width lookahead**
+    (``\\b(?=(?:term1|term2|...)\\b)``) rather than an ordinary consuming
+    match. A consuming ``finditer`` would advance past the *entire* matched
+    alternative, silently hiding any other, shorter defined term that
+    starts at the same position (e.g. "SOW" inside "SOW Effective Date" —
+    two independent defined terms in the same document). The zero-width
+    form only *locates* candidate start positions; at each one, a small
+    per-first-character bucket of individually compiled term patterns
+    determines exactly which term(s) start there. This matches the
+    semantics of running ``re.search()`` per term independently (every
+    term that occurs anywhere is found, regardless of overlap), just in a
+    single regex pass over the content instead of one Python-level loop
+    iteration per term.
+
+    For each chunk, in document order of first occurrence:
+
+    - Appends the term to ``chunk.defined_terms_used``.
     - Adds it to ``chunk.defined_terms_context`` (term → definition text).
 
     Args:
@@ -890,10 +1260,39 @@ def _attach_defined_terms(
     if not defined_terms:
         return
 
+    # Longest-first is cosmetic here (candidate-position detection does not
+    # depend on ordering, since the bucket check re-verifies every term
+    # independently) but keeps the alternation's own match preference
+    # sensible if it is ever inspected directly.
+    terms = sorted((t for t in defined_terms if t), key=len, reverse=True)
+    if not terms:
+        return
+
+    alternation = '|'.join(re.escape(t) for t in terms)
+    candidate_pattern = re.compile(r'\b(?=(?:' + alternation + r')\b)')
+
+    # Group individually compiled term patterns by first character, so the
+    # per-position check below only re-tests the handful of terms that
+    # could plausibly start there.
+    by_first_char: dict[str, list[tuple[str, re.Pattern[str]]]] = {}
+    for term in terms:
+        by_first_char.setdefault(term[0], []).append(
+            (term, re.compile(re.escape(term) + r'\b'))
+        )
+
     for chunk in chunks:
         content = chunk.content
-        for term, dt in defined_terms.items():
-            if re.search(r'\b' + re.escape(term) + r'\b', content):
-                if term not in chunk.defined_terms_used:
-                    chunk.defined_terms_used.append(term)
-                    chunk.defined_terms_context[term] = dt.definition
+        seen: set[str] = set()
+        for match in candidate_pattern.finditer(content):
+            pos = match.start()
+            for term, term_pattern in by_first_char.get(content[pos], ()):
+                if term in seen:
+                    continue
+                if not term_pattern.match(content, pos):
+                    continue
+                seen.add(term)
+                dt = defined_terms.get(term)
+                if dt is None:
+                    continue
+                chunk.defined_terms_used.append(term)
+                chunk.defined_terms_context[term] = dt.definition

@@ -247,7 +247,7 @@ def test_invalid_jurisdiction_raises_error():
 def test_jurisdiction_enum_accepted():
     """Passing a Jurisdiction enum value directly must be accepted."""
     chunker = LegalChunker(jurisdiction=Jurisdiction.UK)
-    assert chunker._jurisdiction == Jurisdiction.UK
+    assert chunker.jurisdiction == Jurisdiction.UK
 
 
 def test_empty_text_returns_empty(uk_chunker):
@@ -433,7 +433,7 @@ def test_invalid_jurisdiction_string_raises_value_error():
 def test_jurisdiction_enum_us_accepted():
     """Passing a Jurisdiction enum value directly works."""
     chunker = LegalChunker(jurisdiction=Jurisdiction.US)
-    assert chunker._jurisdiction == Jurisdiction.US
+    assert chunker.jurisdiction == Jurisdiction.US
 
 
 def test_max_lt_min_chunk_size_raises_error():
