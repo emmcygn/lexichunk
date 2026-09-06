@@ -18,6 +18,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from ..models import DocumentSection
+
 
 @dataclass
 class EUPatterns:
@@ -96,6 +98,20 @@ class EUPatterns:
 EU_PATTERNS = EUPatterns()
 
 
+#: Optional per-jurisdiction mapping from hierarchy level to
+#: :class:`~lexichunk.models.DocumentSection`.  Read by
+#: :class:`~lexichunk.parsers.structure.StructureParser`; any level absent
+#: from this mapping defaults to ``OPERATIVE``.
+#:
+#: Note that an EU Chapter (level -1) is a *grouping of operative
+#: Articles*, not an attachment -- unlike the UK/US Schedule that shares
+#: the same level number.  Only an Annex (level -2) is SCHEDULES.
+SECTION_ROLES: dict[int, DocumentSection] = {
+    -1: DocumentSection.OPERATIVE,  # Chapter
+    -2: DocumentSection.SCHEDULES,  # Annex
+}
+
+
 def detect_level(line: str) -> tuple[int, str] | None:
     """Detect the hierarchy level and identifier of a line for EU documents.
 
@@ -103,12 +119,18 @@ def detect_level(line: str) -> tuple[int, str] | None:
         (level, identifier) where level is:
           -2 = Annex
           -1 = Chapter
-           0 = Article
+           0 = Article or Recital (n)
            1 = Section
            2 = Numbered paragraph (1., 2., 3.)
            3 = Alpha sub-point (a), (b)
            4 = Roman sub-point (i), (ii)
         Returns None if not a clause header.
+
+    Note:
+        Detection is deliberately permissive: ``StructureParser`` applies
+        a heading-plausibility gate to every match, so page furniture and
+        wrapped ALL-CAPS disclaimers are filtered out there rather than
+        here.
     """
     s = line.lstrip()
 
@@ -119,6 +141,10 @@ def detect_level(line: str) -> tuple[int, str] | None:
     m = re.match(r'^(?:CHAPTER|Chapter)\s+([IVXLC]+)', s)
     if m:
         return (-1, f'Chapter {m.group(1)}')
+
+    m = re.match(r'^(?:RECITAL|Recital)\s+\(?(\d+)\)?', s)
+    if m:
+        return (0, f'Recital {m.group(1)}')
 
     m = re.match(r'^(?:ARTICLE|Article)\s+(\d+)', s)
     if m:

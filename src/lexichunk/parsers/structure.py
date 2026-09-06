@@ -9,10 +9,11 @@ functions and is itself consumed by the chunker.
 from __future__ import annotations
 
 import re
+import sys
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
-from ..jurisdiction import get_detect_level
+from ..jurisdiction import get_detect_level, get_patterns
 from ..models import DocumentSection, HierarchyNode, Jurisdiction
 
 # ---------------------------------------------------------------------------
@@ -79,12 +80,65 @@ class ParsedClause:
 # ---------------------------------------------------------------------------
 
 
+# Maximum number of characters kept from a heading line's remainder when it
+# is used as a clause ``title``.  Longer remainders are almost always body
+# text that happens to follow an identifier on the same line.
+MAX_TITLE_CHARS = 120
+
+# A remainder that ends like a sentence and has more words than this is
+# treated as prose, not as a heading title.
+_MAX_TITLE_WORDS = 12
+
+# Separator characters that may sit between an identifier and its title
+# (``"SCHEDULE 2 - FEES"``, ``"Article I — Definitions"``).
+_TITLE_SEPARATORS = "-–—:"
+
+
+def _remainder_after_identifier(line: str, identifier: str) -> str:
+    """Return the raw text of *line* that follows *identifier*.
+
+    The identifier token itself (plus an optional trailing dot, any
+    whitespace, and a single leading ``-``/``–``/``—``/``:``
+    separator) is removed.  Matching is case-insensitive so that a
+    normalised identifier such as ``"Chapter I"`` still strips the literal
+    ``"CHAPTER I"`` written in the document.
+
+    Args:
+        line: The raw header line as found in the source text.
+        identifier: The identifier string as returned by ``detect_level``.
+
+    Returns:
+        The remaining text, stripped of surrounding whitespace (possibly
+        the empty string).
+    """
+    s = line.lstrip()
+    escaped = re.escape(identifier)
+    pattern = rf"^{escaped}\.?\s*(?:[{re.escape(_TITLE_SEPARATORS)}]\s*)?"
+    remainder = re.sub(pattern, "", s, count=1, flags=re.IGNORECASE)
+    return remainder.strip()
+
+
+def _is_sentence_shaped(remainder: str) -> bool:
+    """Return ``True`` when *remainder* reads as prose rather than a title."""
+    return (
+        remainder.endswith((".", ";"))
+        and len(remainder.split()) > _MAX_TITLE_WORDS
+    )
+
+
 def _extract_title(line: str, identifier: str) -> Optional[str]:
     """Return the heading text that follows *identifier* on *line*.
 
     The function strips the identifier token itself (including any trailing
-    dot, closing parenthesis or similar punctuation) from the stripped line
-    and returns whatever non-empty text remains on that line, or ``None``.
+    dot, a separator dash/colon and surrounding whitespace) from the
+    stripped line and returns whatever non-empty text remains, subject to
+    two hygiene rules:
+
+    * a remainder that is *sentence-shaped* (more than 12 words and ending
+      in ``.`` or ``;``) is body text that happens to share the header
+      line, and yields ``None``;
+    * anything longer than :data:`MAX_TITLE_CHARS` is truncated, so a
+      runaway remainder cannot flood ``hierarchy_path``.
 
     Args:
         line: The raw header line as found in the source text.
@@ -92,19 +146,16 @@ def _extract_title(line: str, identifier: str) -> Optional[str]:
             (e.g. ``"1.1"`` or ``"(a)"``).
 
     Returns:
-        The heading text, or ``None`` if only whitespace remains.
+        The heading text, or ``None`` if nothing usable remains.
     """
-    s = line.lstrip()
-
-    # Build an escaped version of the identifier so we can reliably locate it.
-    escaped = re.escape(identifier)
-
-    # The identifier may be followed by an optional dot / closing paren, then
-    # optional whitespace before the title text starts.
-    pattern = rf'^{escaped}\.?\s*'
-    remainder = re.sub(pattern, '', s, count=1)
-    title = remainder.strip()
-    return title if title else None
+    remainder = _remainder_after_identifier(line, identifier)
+    if not remainder:
+        return None
+    if _is_sentence_shaped(remainder):
+        return None
+    if len(remainder) > MAX_TITLE_CHARS:
+        remainder = remainder[:MAX_TITLE_CHARS].rstrip()
+    return remainder or None
 
 
 def _line_offsets(text: str) -> list[int]:
@@ -124,6 +175,154 @@ def _line_offsets(text: str) -> list[int]:
         if ch == '\n':
             offsets.append(i + 1)
     return offsets
+
+
+# ---------------------------------------------------------------------------
+# Heading-plausibility constants
+# ---------------------------------------------------------------------------
+
+# A table-of-contents entry: leader dots (or a wide gutter) followed by a
+# right-aligned page number.
+_TOC_LEADER_RE = re.compile(r'(?:\.{4,}\s*|\s{3,})\d+$')
+
+# Shape of a standalone ALL-CAPS line.  Matches the fallback branch that the
+# US and EU ``detect_level`` functions use for un-numbered headings.
+_ALLCAPS_RE = re.compile(r'[A-Z][A-Z \t]+')
+
+# ALL-CAPS lines that are page furniture rather than headings.
+_ALLCAPS_DENYLIST = frozenset({
+    'CONFIDENTIAL',
+    'CONFIDENTIAL AND PROPRIETARY',
+    'DRAFT',
+    'PRIVILEGED',
+    'PRIVILEGED AND CONFIDENTIAL',
+    'TABLE OF CONTENTS',
+})
+
+# Quote characters that mark a numbered line as a defined-term entry
+# (``1. "Term" means ...``) rather than as prose.
+_OPENING_QUOTES = '"\u201c\u2018\''
+
+# ``PAGE 3``/``PAGE 3 OF 12`` footers.
+_PAGE_RE = re.compile(r'PAGE\b')
+
+# Maximum number of words an ALL-CAPS fallback heading may contain.
+_MAX_ALLCAPS_WORDS = 8
+
+# A numeric top-level heading whose remainder is longer than this *and* ends
+# like a sentence is body text, not a heading.
+_MAX_NUMERIC_HEADING_REMAINDER = 80
+
+# First words that mark ``"3 Business Days after receipt..."`` /
+# ``"1. January 2024 is the Effective Date"`` as body text rather than as a
+# numbered clause heading.
+# Deliberately excludes ordinals that double as heading words
+# ("second", "per", "percent").
+_UNIT_WORDS = frozenset({
+    'business', 'calendar', 'working',
+    'day', 'days', 'week', 'weeks', 'month', 'months', 'year', 'years',
+    'hour', 'hours', 'minute', 'minutes',
+    'january', 'february', 'march', 'april', 'may', 'june', 'july',
+    'august', 'september', 'october', 'november', 'december',
+})
+
+# Single-letter sub-clause labels that are both a valid alpha label and a
+# valid Roman numeral, mapped to the alpha label that must immediately
+# precede them for the alpha reading to win.
+_ROMAN_AMBIGUOUS = {'i': 'h', 'v': 'u', 'x': 'w', 'l': 'k', 'c': 'b'}
+
+_SINGLE_ALPHA_SUB_RE = re.compile(r'^\(([a-z])\)$')
+
+# Level assigned to a sub-label resolved as a Roman numeral.  Shared by the
+# UK, US and EU jurisdictions.
+_ROMAN_SUB_LEVEL = 4
+_ALPHA_SUB_LEVEL = 3
+
+
+def _keyword_pattern(keywords: tuple[str, ...]) -> re.Pattern[str]:
+    """Compile *keywords* into a whole-word alternation (plural tolerated)."""
+    alternation = '|'.join(re.escape(kw) for kw in keywords)
+    return re.compile(rf'\b(?:{alternation})s?\b')
+
+
+_SIGNATURE_KEYWORD_RE = _keyword_pattern(
+    ('signature', 'execution', 'in witness', 'signed')
+)
+_RECITAL_KEYWORD_RE = _keyword_pattern(('recital', 'background', 'whereas'))
+_DEFINITION_KEYWORD_RE = _keyword_pattern(
+    ('definition', 'interpretation', 'defined term')
+)
+
+
+def _get_section_roles(
+    detect_level_fn: Callable[[str], tuple[int, str] | None],
+) -> dict[int, DocumentSection]:
+    """Return the ``SECTION_ROLES`` mapping declared by a jurisdiction.
+
+    The mapping is an *optional* module-level attribute of the module that
+    defines the jurisdiction's ``detect_level`` function.  It assigns a
+    :class:`~lexichunk.models.DocumentSection` to a hierarchy level so that,
+    for example, UK/US level ``-1`` (Schedule) is ``SCHEDULES`` while EU
+    level ``-1`` (Chapter) is ``OPERATIVE``.
+
+    Args:
+        detect_level_fn: The jurisdiction's ``detect_level`` callable.
+
+    Returns:
+        A ``{level: DocumentSection}`` dict — empty when the jurisdiction
+        declares no mapping (in which case every level defaults to
+        ``OPERATIVE``).
+    """
+    module_name = getattr(detect_level_fn, '__module__', None)
+    module = sys.modules.get(module_name) if module_name else None
+    roles = getattr(module, 'SECTION_ROLES', None)
+    if not isinstance(roles, dict):
+        return {}
+    return {
+        level: role
+        for level, role in roles.items()
+        if isinstance(level, int) and isinstance(role, DocumentSection)
+    }
+
+
+def _compile_signature_markers(
+    jurisdiction: Jurisdiction | str,
+) -> Optional[re.Pattern[str]]:
+    """Compile a jurisdiction's ``signature_markers`` into one pattern.
+
+    Args:
+        jurisdiction: The jurisdiction whose pattern object should be read.
+
+    Returns:
+        A compiled whole-word alternation, or ``None`` when the
+        jurisdiction declares no usable markers.
+    """
+    markers = getattr(get_patterns(jurisdiction), 'signature_markers', ())
+    cleaned = [
+        marker.strip().lower()
+        for marker in markers
+        if isinstance(marker, str) and marker.strip()
+    ]
+    if not cleaned:
+        return None
+    alternation = '|'.join(re.escape(marker) for marker in cleaned)
+    return re.compile(rf'\b(?:{alternation})\b')
+
+
+def _is_allcaps_fallback(stripped: str, level: int, identifier: str) -> bool:
+    """Return ``True`` when a match came from an ALL-CAPS level-0 fallback.
+
+    The US and EU ``detect_level`` functions end with a branch that accepts
+    any standalone ALL-CAPS line as a level-0 heading, returning the line
+    itself as the identifier.  That signature — level 0, identifier equal to
+    the stripped line, and the line being ALL-CAPS — is what this detects,
+    without the parser needing to know which jurisdiction it is using.
+    """
+    return (
+        level == 0
+        and identifier == stripped
+        and _ALLCAPS_RE.fullmatch(stripped) is not None
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -160,6 +359,13 @@ class StructureParser:
         self._detect_level: Callable[[str], tuple[int, str] | None] = (
             get_detect_level(jurisdiction)
         )
+        self._section_roles = _get_section_roles(self._detect_level)
+        self._signature_markers = _compile_signature_markers(jurisdiction)
+        #: Number of ``detect_level`` matches rejected by
+        #: :meth:`_is_plausible_heading` during the most recent
+        #: :meth:`parse` call.  Reset at the start of every parse so a
+        #: reused parser instance always reports the current document.
+        self.last_rejected_headings: int = 0
 
     # ------------------------------------------------------------------
     # Public API
@@ -191,11 +397,7 @@ class StructureParser:
         # First pass: collect (line_index, level, identifier) for all headers
         # and build a mapping from line_index -> (level, identifier).
         # ------------------------------------------------------------------
-        header_map: dict[int, tuple[int, str]] = {}
-        for idx, line in enumerate(lines):
-            result = self._detect_level(line)
-            if result is not None:
-                header_map[idx] = result
+        header_map = self._collect_headers(lines)
 
         # ------------------------------------------------------------------
         # Second pass: build clauses.
@@ -392,6 +594,197 @@ class StructureParser:
     # Internal helpers
     # ------------------------------------------------------------------
 
+    def _collect_headers(self, lines: list[str]) -> dict[int, tuple[int, str]]:
+        """Run ``detect_level`` over *lines* and keep the plausible matches.
+
+        Three things happen here, in order, for every line:
+
+        1. the jurisdiction's ``detect_level`` proposes ``(level,
+           identifier)``;
+        2. :meth:`_is_plausible_heading` may veto the proposal (rejections
+           are counted in :attr:`last_rejected_headings`);
+        3. an accepted single-letter sub-label that is ambiguous between an
+           alpha and a Roman reading (``(i)``, ``(v)``, ``(x)``, ``(l)``,
+           ``(c)``) is resolved using the previous alpha label seen at the
+           same indent — ``(i)`` right after ``(h)`` is alpha, anything else
+           is Roman.
+
+        Args:
+            lines: The document's lines, as produced by ``splitlines``.
+
+        Returns:
+            Mapping from line index to the accepted ``(level, identifier)``.
+        """
+        header_map: dict[int, tuple[int, str]] = {}
+        rejected = 0
+
+        # Last *alpha* sub-label accepted at a given indent (and overall),
+        # used to disambiguate (i)/(v)/(x)/(l)/(c).  Cleared whenever a
+        # more senior header opens a new sub-label namespace.
+        prev_alpha_by_indent: dict[int, str] = {}
+        prev_alpha: Optional[str] = None
+
+        for idx, line in enumerate(lines):
+            result = self._detect_level(line)
+            if result is None:
+                continue
+            if not self._is_plausible_heading(lines, idx, result):
+                rejected += 1
+                continue
+
+            level, identifier = result
+            indent = len(line) - len(line.lstrip())
+
+            single_alpha = _SINGLE_ALPHA_SUB_RE.match(identifier)
+            if level == _ALPHA_SUB_LEVEL and single_alpha is not None:
+                predecessor = _ROMAN_AMBIGUOUS.get(single_alpha.group(1))
+                if predecessor is not None:
+                    previous = prev_alpha_by_indent.get(indent, prev_alpha)
+                    if previous != f'({predecessor})':
+                        level = _ROMAN_SUB_LEVEL
+
+            if level < _ALPHA_SUB_LEVEL:
+                prev_alpha_by_indent.clear()
+                prev_alpha = None
+            elif level == _ALPHA_SUB_LEVEL and single_alpha is not None:
+                prev_alpha_by_indent[indent] = identifier
+                prev_alpha = identifier
+
+            header_map[idx] = (level, identifier)
+
+        self.last_rejected_headings = rejected
+        return header_map
+
+    def _is_plausible_heading(
+        self,
+        lines: list[str],
+        idx: int,
+        result: tuple[int, str],
+    ) -> bool:
+        """Return ``True`` when ``lines[idx]`` really looks like a heading.
+
+        ``detect_level`` is a stateless, per-line regex match: anything
+        *shaped* like a header is one.  This gate adds the surrounding-line
+        context that a single ``re.match`` cannot see.  It is **reject-only**
+        — it never promotes a line to a heading, so a false negative simply
+        leaves the line as body text (the same outcome as no match at all).
+
+        Rules:
+
+        * **Table of contents** — leader dots or a wide gutter followed by a
+          right-aligned page number.
+        * **Wrapped sentences** — a remainder that opens with a comma is the
+          middle of a sentence (``"Article I, Section 3.01 through 3.04,
+          Article IV, ..."`` in a survival clause), not a heading.
+        * **Containers** (levels ``-1``/``-2``: Schedule, Exhibit, Annex,
+          Chapter) must either start at column 0 or follow a blank line;
+          this rejects a word-wrapped ``"     Schedule 2."`` inside a
+          clause, which would otherwise re-parent the rest of the document.
+        * **ALL-CAPS fallback headings** must follow a blank line, contain
+          at most eight words, not be page furniture (``CONFIDENTIAL``,
+          ``TABLE OF CONTENTS``, ``PAGE 3 OF 12`` …), and not continue an
+          ALL-CAPS paragraph that was left unterminated on the previous
+          non-blank line.
+        * **Numeric top-level clauses** must not read as prose — a long
+          remainder ending in ``.``/``;``, or one starting with a unit or
+          month word (``3 Business Days …``), is body text.  A remainder
+          opening with a quote is exempt from the prose test: that is the
+          numbered-definition layout ``1. "Term" means …``.
+
+        Args:
+            lines: The document's lines.
+            idx: Index of the candidate line.
+            result: The ``(level, identifier)`` proposed by ``detect_level``.
+
+        Returns:
+            ``True`` to accept the heading, ``False`` to reject it.
+        """
+        level, identifier = result
+        line = lines[idx]
+        stripped = line.strip()
+        if not stripped:
+            return False
+
+        # (a) Table-of-contents entry.
+        if _TOC_LEADER_RE.search(line.rstrip()):
+            return False
+
+        # Text after the identifier; used by rules (d) and (e) below.
+        remainder = _remainder_after_identifier(line, identifier)
+
+        # (b) Container levels must be blank-separated or start at column 0.
+        if level in (-1, -2):
+            starts_at_column_0 = not line[:1].isspace()
+            blank_before = idx > 0 and not lines[idx - 1].strip()
+            if not (starts_at_column_0 or blank_before):
+                return False
+
+        # (c) ALL-CAPS level-0 fallback.
+        if _is_allcaps_fallback(stripped, level, identifier):
+            if idx == 0 or lines[idx - 1].strip():
+                return False
+            if len(stripped.split()) > _MAX_ALLCAPS_WORDS:
+                return False
+            if stripped in _ALLCAPS_DENYLIST or _PAGE_RE.match(stripped):
+                return False
+            if self._continues_allcaps_paragraph(lines, idx):
+                return False
+
+        # (d) Numeric top-level clause.
+        if level == 0 and identifier.isdigit():
+            if remainder:
+                first_word = remainder.split()[0].strip('.,;:()').lower()
+                if first_word in _UNIT_WORDS:
+                    return False
+                upper = remainder.upper()
+                if upper in _ALLCAPS_DENYLIST or _PAGE_RE.match(upper):
+                    return False
+                # A numbered definition entry (`1. "Term" means ...`) is
+                # long and semicolon-terminated but *is* a heading, so
+                # the prose test does not apply to it.
+                if (
+                    remainder[0] not in _OPENING_QUOTES
+                    and len(remainder) > _MAX_NUMERIC_HEADING_REMAINDER
+                    and remainder.endswith(('.', ';'))
+                ):
+                    return False
+
+        # (e) A heading's text never *continues* the previous line: a
+        #     remainder that opens with a comma is a wrapped sentence
+        #     (`"Article I, Section 3.01 through 3.04, ..."`).
+        if remainder.startswith(','):
+            return False
+
+        return True
+
+    def _continues_allcaps_paragraph(self, lines: list[str], idx: int) -> bool:
+        """Return ``True`` when ``lines[idx]`` continues an ALL-CAPS block.
+
+        A wrapped ALL-CAPS disclaimer looks exactly like a run of ALL-CAPS
+        "headings".  If the previous non-blank line is itself ALL-CAPS, does
+        not end with sentence punctuation, and is not a *structural* header
+        (``ARTICLE I``, ``CHAPTER II`` …), then this line is the rest of
+        that paragraph rather than a new heading.
+        """
+        j = idx - 1
+        while j >= 0 and not lines[j].strip():
+            j -= 1
+        if j < 0:
+            return False
+
+        previous = lines[j].strip()
+        if _ALLCAPS_RE.fullmatch(previous) is None:
+            return False
+        if previous.endswith(('.', '!', '?', ':', ';')):
+            return False
+
+        previous_result = self._detect_level(lines[j])
+        if previous_result is not None and not _is_allcaps_fallback(
+            previous, previous_result[0], previous_result[1]
+        ):
+            return False
+        return True
+
     def _detect_document_section(
         self,
         identifier: str,
@@ -406,13 +799,17 @@ class StructureParser:
 
         Rules (evaluated in order — first match wins):
 
-        * **SCHEDULES**: ``level`` is ``-1`` (Schedule) or ``-2`` (Exhibit).
-        * **SIGNATURES**: title/identifier contains ``"signature"``,
-          ``"execution"``, ``"in witness"``, or ``"signed"``.
-        * **RECITALS**: title/identifier contains ``"recital"``,
-          ``"background"``, or ``"whereas"``.
-        * **DEFINITIONS**: title/identifier contains ``"definition"``,
-          ``"interpretation"``, or ``"defined term"``.
+        * **Container role**: the jurisdiction's ``SECTION_ROLES`` mapping
+          assigns a role to ``level`` (typically ``SCHEDULES`` for
+          Schedule/Exhibit/Annex levels).  A mapping to ``OPERATIVE`` — or
+          no mapping at all — falls through to the keyword rules.
+        * **SIGNATURES**: title/identifier matches ``"signature"``,
+          ``"execution"``, ``"in witness"`` or ``"signed"`` as whole words,
+          or one of the jurisdiction's ``signature_markers``.
+        * **RECITALS**: title/identifier matches ``"recital"``,
+          ``"background"`` or ``"whereas"`` as whole words.
+        * **DEFINITIONS**: title/identifier matches ``"definition"``,
+          ``"interpretation"`` or ``"defined term"`` as whole words.
         * **PREAMBLE**: identifier is literally ``"preamble"`` or
           ``"whereas"``.
         * **OPERATIVE**: everything else.
@@ -428,25 +825,29 @@ class StructureParser:
         combined = (identifier + ' ' + title).lower()
         is_tc = self._doc_type == "terms_conditions"
 
-        # Schedules / Exhibits are identified purely by level.
-        if level in (-1, -2):
-            return DocumentSection.SCHEDULES
+        # Container roles (Schedule / Exhibit / Annex / Chapter) come from
+        # the jurisdiction's SECTION_ROLES map; OPERATIVE means "no special
+        # role", so fall through to the keyword rules below.
+        role = self._section_roles.get(level)
+        if role is not None and role is not DocumentSection.OPERATIVE:
+            return role
 
         # Signature blocks — skip for T&C documents (false positives).
-        if not is_tc and any(
-            kw in combined
-            for kw in ('signature', 'execution', 'in witness', 'signed')
+        if not is_tc and (
+            _SIGNATURE_KEYWORD_RE.search(combined) is not None
+            or (
+                self._signature_markers is not None
+                and self._signature_markers.search(combined) is not None
+            )
         ):
             return DocumentSection.SIGNATURES
 
         # Recitals / background — skip for T&C documents (false positives).
-        if not is_tc and any(
-            kw in combined for kw in ('recital', 'background', 'whereas')
-        ):
+        if not is_tc and _RECITAL_KEYWORD_RE.search(combined) is not None:
             return DocumentSection.RECITALS
 
         # Definitions sections.
-        if any(kw in combined for kw in ('definition', 'interpretation', 'defined term')):
+        if _DEFINITION_KEYWORD_RE.search(combined) is not None:
             return DocumentSection.DEFINITIONS
 
         # Synthetic preamble node (level == -99) or identifier keyword.
