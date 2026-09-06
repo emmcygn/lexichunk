@@ -60,9 +60,11 @@ class LegalChunker:
         doc_type: Document type hint — ``"contract"`` or ``"terms_conditions"``.
             Currently informational; reserved for future specialisation.
         max_chunk_size: Maximum chunk size in approximate tokens (1 token ≈ 4
-            characters).  Defaults to 512.
+            characters).  Enforced as a hard cap.  Defaults to 512.
         min_chunk_size: Minimum chunk size in approximate tokens.  Clauses
-            smaller than this are merged with their neighbour.  Defaults to 64.
+            smaller than this are merged with an adjacent sibling where the
+            hierarchy allows; where it does not, a short chunk is emitted
+            rather than folding unrelated clauses together.  Defaults to 64.
         include_definitions: When ``True``, attach relevant defined-term
             definitions to each chunk via ``defined_terms_context``.
             Defaults to ``True``.
@@ -358,6 +360,7 @@ class LegalChunker:
                 min_chunk_size=self._min_chunk_size,
                 document_id=doc_id,
                 chars_per_token=self._chars_per_token,
+                extra_abbreviations=self._extra_abbreviations,
             )
             chunks = chunker.chunk(clauses, text)
         else:
@@ -411,7 +414,17 @@ class LegalChunker:
             logger.debug("Stage 3: cross_reference_detection — start")
             t0 = time.perf_counter()
         for chunk in chunks:
-            chunk.cross_references = self._reference_detector.detect(chunk.content)
+            # Detect on the chunk's own body only — `content` may have ancestor
+            # headers prepended, and a reference sitting in a heading must not
+            # be attributed to every descendant chunk.  The body is the trailing
+            # `char_end - char_start` characters of `content` by construction.
+            body_len = chunk.char_end - chunk.char_start
+            body = (
+                chunk.content[-body_len:]
+                if 0 < body_len <= len(chunk.content)
+                else chunk.content
+            )
+            chunk.cross_references = self._reference_detector.detect(body)
         if collect_metrics:
             ref_count = sum(len(c.cross_references) for c in chunks)
             elapsed = (time.perf_counter() - t0) * 1000

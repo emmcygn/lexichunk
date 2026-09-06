@@ -85,6 +85,43 @@ _SENTENCE_BOUNDARY = re.compile(r'(?<=[.!?])\s+(?=[A-Z])')
 _NUMBER_DOT = re.compile(r'\d+\.\d')
 
 
+def sentence_boundary_positions(
+    text: str, abbrev_pattern: re.Pattern[str]
+) -> list[int]:
+    """Return the character offsets at which a new sentence starts in *text*.
+
+    Candidate boundaries come from :data:`_SENTENCE_BOUNDARY` (sentence-ending
+    punctuation followed by whitespace and a capital).  A candidate is rejected
+    when the dot belongs to a known abbreviation (per *abbrev_pattern*) or sits
+    inside a numeric literal such as ``$1.5`` / ``§ 3.1``.
+
+    Shared by :class:`FallbackChunker` and
+    :class:`~lexichunk.strategies.clause_aware.ClauseAwareChunker` so that
+    ``extra_abbreviations`` applies identically on both chunking paths.
+
+    Args:
+        text: The string to scan.
+        abbrev_pattern: Compiled pattern from :func:`_compile_abbreviations`.
+
+    Returns:
+        Sorted list of offsets, each strictly greater than 0 and strictly less
+        than ``len(text)``, pointing at the first character of a sentence.
+    """
+    abbrev_ends: set[int] = {m.end() for m in abbrev_pattern.finditer(text)}
+    number_dot_ends: set[int] = {m.end() - 1 for m in _NUMBER_DOT.finditer(text)}
+
+    positions: list[int] = []
+    for match in _SENTENCE_BOUNDARY.finditer(text):
+        # The punctuation character sits just before the whitespace gap.
+        punct_pos = match.start()
+        if punct_pos in abbrev_ends:
+            continue
+        if punct_pos in number_dot_ends:
+            continue
+        positions.append(match.end())
+    return positions
+
+
 from ..utils import approx_tokens as _approx_tokens
 
 # ---------------------------------------------------------------------------
@@ -171,9 +208,13 @@ class FallbackChunker:
            reached.
         3. When a window is full, emit it as a :class:`~lexichunk.models.LegalChunk`
            and start a new window.
-        4. Merge any trailing window whose size is below ``min_chunk_size``
-           into the previous chunk.
+        4. Merge *every* window whose size is below ``min_chunk_size`` into its
+           neighbour — not only the trailing one — provided the combined window
+           still fits within ``max_chunk_size``.
         5. Assign sequential indices.
+
+        ``content`` is the exact ``text[char_start:char_end]`` slice, so a
+        caller can reproduce a chunk by slicing the (sanitised) source.
 
         Each chunk gets:
 
@@ -200,45 +241,51 @@ class FallbackChunker:
         # Each window is represented as a list of (sentence, char_offset) pairs.
         windows: list[list[tuple[str, int]]] = []
         current_window: list[tuple[str, int]] = []
-        current_tokens: int = 0
 
         for sentence, offset in sentences:
-            sentence_tokens = _approx_tokens(sentence, self._chars_per_token)
-
-            # If adding this sentence would exceed the cap *and* we already
-            # have content in the window, flush before adding.
-            if current_tokens + sentence_tokens > self._max_chunk_size and current_window:
-                windows.append(current_window)
-                current_window = []
-                current_tokens = 0
+            # If adding this sentence would push the window's *exact* slice
+            # over the cap — and the window already has content — flush first.
+            if current_window:
+                prospective = current_window + [(sentence, offset)]
+                if self._window_tokens(text, prospective) > self._max_chunk_size:
+                    windows.append(current_window)
+                    current_window = []
 
             current_window.append((sentence, offset))
-            current_tokens += sentence_tokens
 
         # Flush the last window.
         if current_window:
             windows.append(current_window)
 
-        # Merge a tiny trailing window into the previous one.
-        if len(windows) > 1:
-            last_tokens = _approx_tokens(
-                " ".join(s for s, _ in windows[-1]),
-                self._chars_per_token,
-            )
-            if last_tokens < self._min_chunk_size:
-                windows[-2].extend(windows[-1])
-                windows.pop()
+        # Merge under-sized windows.  Every window is checked (not just the
+        # last), and a merge is only performed when the combined window still
+        # fits within max_chunk_size — so fixing an under-run can never create
+        # an over-run.
+        merged_windows: list[list[tuple[str, int]]] = []
+        for window in windows:
+            if merged_windows:
+                previous = merged_windows[-1]
+                if (
+                    self._window_tokens(text, previous) < self._min_chunk_size
+                    or self._window_tokens(text, window) < self._min_chunk_size
+                ):
+                    combined = previous + window
+                    if self._window_tokens(text, combined) <= self._max_chunk_size:
+                        merged_windows[-1] = combined
+                        continue
+            merged_windows.append(window)
+        windows = merged_windows
 
         # Build LegalChunk objects.
         chunks: list[LegalChunk] = []
         for index, window in enumerate(windows):
-            window_text = " ".join(s for s, _ in window)
             # char_start is the offset of the first sentence in the window;
             # char_end is derived by adding the length of the last sentence
-            # to its starting offset.
-            char_start = window[0][1]
-            last_sentence, last_offset = window[-1]
-            char_end = last_offset + len(last_sentence)
+            # to its starting offset.  ``content`` is the *exact* slice between
+            # them — never a ``' '.join`` reconstruction — so that
+            # ``text[char_start:char_end] == content`` holds byte for byte.
+            char_start, char_end = self._window_span(window)
+            window_text = text[char_start:char_end]
 
             identifier = f"chunk-{index}"
             chunk = LegalChunk(
@@ -267,6 +314,18 @@ class FallbackChunker:
     # Private helpers
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _window_span(window: list[tuple[str, int]]) -> tuple[int, int]:
+        """Return the ``(char_start, char_end)`` span covered by *window*."""
+        char_start = window[0][1]
+        last_sentence, last_offset = window[-1]
+        return char_start, last_offset + len(last_sentence)
+
+    def _window_tokens(self, text: str, window: list[tuple[str, int]]) -> int:
+        """Approximate token count of the exact text slice *window* covers."""
+        start, end = self._window_span(window)
+        return _approx_tokens(text[start:end], self._chars_per_token)
+
     def _split_sentences(self, text: str) -> list[tuple[str, int]]:
         """Split text into sentences, returning ``(sentence, char_offset)`` pairs.
 
@@ -291,28 +350,7 @@ class FallbackChunker:
             are stripped of leading and trailing whitespace; empty strings are
             omitted.
         """
-        # Collect the character positions of all abbreviation matches so we
-        # can quickly test whether a candidate boundary is a false positive.
-        abbrev_ends: set[int] = {m.end() for m in self._abbrev_pattern.finditer(text)}
-        number_dot_ends: set[int] = {m.end() - 1 for m in _NUMBER_DOT.finditer(text)}
-
-        # Find all candidate split positions (the position of the whitespace
-        # that follows the sentence-ending punctuation).
-        split_positions: list[int] = []
-        for match in _SENTENCE_BOUNDARY.finditer(text):
-            boundary_start = match.start()  # position of the whitespace gap
-            # The punctuation character sits just before the whitespace gap.
-            punct_pos = boundary_start  # inclusive end of the previous token
-
-            # Reject if the dot is part of a known abbreviation.
-            if punct_pos in abbrev_ends:
-                continue
-
-            # Reject if the dot is inside a number literal (e.g. "§ 3.1 ").
-            if punct_pos in number_dot_ends:
-                continue
-
-            split_positions.append(match.end())  # start of next sentence
+        split_positions = sentence_boundary_positions(text, self._abbrev_pattern)
 
         # Build (sentence, offset) pairs from the split positions.
         sentences: list[tuple[str, int]] = []
