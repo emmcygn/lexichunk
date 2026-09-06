@@ -16,7 +16,7 @@ sanitisation, exposing :meth:`OffsetMap.to_raw`,
 from __future__ import annotations
 
 import unicodedata
-from bisect import bisect_left
+from bisect import bisect_left, bisect_right
 
 __all__ = ["OffsetMap", "sanitize_with_map"]
 
@@ -42,14 +42,12 @@ class OffsetMap:
     :meth:`to_raw` is non-decreasing but not necessarily strictly
     increasing.
 
-    Because of that, ``raw[to_raw(a):to_raw(b)]`` re-sanitises to exactly
-    ``sanitised[a:b]`` whenever *a* and *b* each sit at the start of a run
-    — which is every index for the transformations that actually occur in
-    text extracted from real documents (BOM, CRLF, nulls, NFD sequences),
-    since each of those runs yields at most one sanitised character.  The
-    one exception is a rare NFC *expansion* (``U+0958`` normalises to two
-    characters), where several sanitised indices share one raw index and a
-    span that starts mid-run is widened to the run start.
+    :meth:`to_raw_span` returns the smallest raw run envelope that covers a
+    sanitised span.  Re-sanitising that raw slice reproduces the requested
+    text exactly when both boundaries fall between runs.  If a boundary
+    splits a run that produced multiple sanitised characters, no raw offset
+    can represent that fragment exactly; the returned raw slice covers the
+    whole run and its sanitised form is therefore a superset of the fragment.
 
     Args:
         to_raw_offsets: For each sanitised index, the raw index its run
@@ -137,9 +135,9 @@ class OffsetMap:
             end: Exclusive sanitised end offset; must be ``>= start``.
 
         Returns:
-            ``(raw_start, raw_end)``.  Re-sanitising
-            ``raw[raw_start:raw_end]`` reproduces ``sanitised[start:end]``
-            (see the class docstring for the one expansion caveat).
+            ``(raw_start, raw_end)`` covering every raw run that contributed
+            to the sanitised span.  See the class docstring for the contract
+            when a boundary falls inside a multi-output run.
 
         Raises:
             IndexError: If either endpoint is out of range.
@@ -150,6 +148,16 @@ class OffsetMap:
         if end < start:
             raise ValueError(
                 f"end ({end}) must be >= start ({start}) in to_raw_span()"
+            )
+        if end == start or self._offsets is None or end == self._sanitised_length:
+            return raw_start, raw_end
+        final_run_start = self._offsets[end - 1]
+        if raw_end == final_run_start:
+            next_run = bisect_right(self._offsets, final_run_start, lo=end)
+            raw_end = (
+                self._offsets[next_run]
+                if next_run < self._sanitised_length
+                else self._raw_length
             )
         return raw_start, raw_end
 

@@ -2,18 +2,18 @@
 
 ## Supported Versions
 
-lexichunk is a source-distributed public beta. It is not yet published on
-PyPI; `v0.9.0` is the first tagged release, and installs are expected to pin
-that tag (or a reviewed commit SHA).
+lexichunk is a public beta distributed through
+[PyPI](https://pypi.org/project/lexichunk/) and GitHub. Version `0.9.0` was
+the first PyPI release. Pin a released version or a reviewed commit SHA.
 
-Security fixes target the latest commit published on the repository's default
-branch, and are folded into the next tag. Older tags, older commits and forks
-are not maintained as separate release lines.
+Security fixes target the latest commit on the repository's default branch
+and the next release. Update to the latest published release when fixes
+become available; older releases and forks are not maintained separately.
 
 | Reference | Supported |
 | --------- | --------- |
 | default branch (`master`) | :white_check_mark: |
-| `v0.9.0` | :white_check_mark: |
+| latest published release | :white_check_mark: |
 | earlier commits / pre-release tags | :x: |
 
 ## Reporting a Vulnerability

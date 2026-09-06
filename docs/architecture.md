@@ -269,11 +269,10 @@ Two exits:
 
 With `include_ancestor_headers=False`, `content ==
 sanitized_text[char_start:char_end]` exactly and `original_header` is empty.
-Chunk **boundaries do not move** when you flip the flag — only what is
-prepended at each boundary changes — so nothing positional needs re-deriving.
-The prefix also stops counting against `max_chunk_size`, which is why the
-flag is honoured in the size accounting and not merely at the point the
-strings are joined.
+The prefix also stops counting against `max_chunk_size`. Chunk boundaries
+can therefore change when you flip this flag: text that needed splitting
+with an ancestor header may fit without it. Recompute chunk-dependent
+indexes and citations when changing the configuration.
 
 `include_context_header` does **not** control any of this. That flag governs
 the separate `context_header` field (`[Section: ...] [Type: ...]
@@ -282,6 +281,11 @@ the separate `context_header` field (`[Section: ...] [Type: ...]
 Finally, the offsets index the *sanitised* text, not the raw text passed in.
 For offsets into the raw input, pass `raw_offsets=True` and read
 `raw_char_start` / `raw_char_end`.
+
+Raw spans are covering source ranges. A boundary inside a Unicode
+normalisation run can widen to cover the entire original run, so adjacent
+raw spans may overlap. Exact per-chunk reconstruction is guaranteed only
+when boundaries fall between runs, not inside a multi-character NFC result.
 
 ---
 

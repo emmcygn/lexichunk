@@ -86,6 +86,17 @@ the file it came from. Without them the fields stay at their `-1` sentinel and
 only `char_start`/`char_end` — which index the *reconstructed* text — are
 available.
 
+Body offsets must describe the original `Section.text` before sanitisation.
+The SDK maps normalised body positions back through CRLF and Unicode changes.
+For a heading-only section, offsets describe its original heading; a generated
+heading chunk covers that source range rather than an empty span. A boundary
+inside a multi-output Unicode normalisation run covers the whole original
+run, so neighboring raw spans can overlap. These are source-highlighting
+ranges, not a guarantee that concatenating raw slices reproduces chunk text.
+The low-level `build_document()` helper omits the source-span index when a
+custom sanitiser produces body text different from the built-in sanitiser;
+it does not guess source offsets for arbitrary transformations.
+
 ## Levels come from the numbering
 
 This is the part that makes the adapters worth using rather than writing

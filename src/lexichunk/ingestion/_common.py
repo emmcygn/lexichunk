@@ -117,6 +117,9 @@ class SectionAccumulator:
         self._blocks: list[str] = []
         self._start: Optional[int] = None
         self._end: Optional[int] = None
+        self._line_source_start: Optional[int] = None
+        self._line_source_end: Optional[int] = None
+        self._line_source_aligned = True
         self._heading_span: Optional[tuple[int, int]] = None
         self._open = False
 
@@ -172,6 +175,7 @@ class SectionAccumulator:
         """
         if not text or not text.strip():
             return
+        self._line_source_aligned = False
         self._blocks.append(text.strip("\n"))
         self._widen(char_start, char_end)
 
@@ -196,6 +200,18 @@ class SectionAccumulator:
             char_end: Optional exclusive end of that span.
         """
         self._blocks.append(line)
+        if char_start is None or char_end is None:
+            self._line_source_aligned = False
+        elif self._line_source_start is None:
+            self._line_source_start = char_start
+            self._line_source_end = char_end
+        elif (
+            self._line_source_end is None
+            or char_start != self._line_source_end + len(self._separator)
+        ):
+            self._line_source_aligned = False
+        else:
+            self._line_source_end = char_end
         if line.strip():
             self._widen(char_start, char_end)
 
@@ -210,9 +226,20 @@ class SectionAccumulator:
 
     def flush(self) -> None:
         """Emit the section currently open, if it has anything in it."""
-        body = self._separator.join(self._blocks).strip("\n").rstrip()
+        untrimmed_body = self._separator.join(self._blocks)
+        leading_trimmed = len(untrimmed_body) - len(
+            untrimmed_body.lstrip("\r\n")
+        )
+        body = untrimmed_body[leading_trimmed:].rstrip()
         if self._open or body.strip():
             start, end = self._start, self._end
+            if (
+                body
+                and self._line_source_aligned
+                and self._line_source_start is not None
+            ):
+                start = self._line_source_start + leading_trimmed
+                end = start + len(body)
             if start is None and end is None and self._heading_span is not None:
                 start, end = self._heading_span
             self._sections.append(
@@ -231,6 +258,9 @@ class SectionAccumulator:
         self._blocks = []
         self._start = None
         self._end = None
+        self._line_source_start = None
+        self._line_source_end = None
+        self._line_source_aligned = True
         self._heading_span = None
         self._open = False
 

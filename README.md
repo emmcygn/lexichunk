@@ -11,7 +11,10 @@
 is not frozen; pin a version. See [CHANGELOG.md](CHANGELOG.md) for what changed
 and why.
 
-The core package has **zero required dependencies**. pure Python, stdlib and
+This branch prepares the `0.9.1` patch release. Its fixes are not available
+from PyPI until the corresponding release is published.
+
+The core package has **zero required dependencies**. Pure Python, stdlib and
 `re` only. The optional `llama-index` extra pulls a transitive NLTK version
 covered by an open advisory; [SECURITY.md](SECURITY.md#optional-dependency-advisory)
 records the advisory and the scoped assessment.
@@ -100,8 +103,8 @@ Read this before adopting it.
 - **`chunk.content` is not `text[char_start:char_end]` by default.** It is
   that span with the ancestor headings prepended, so a retrieved `(b)` still
   says which clause it belongs to. Pass `include_ancestor_headers=False` if
-  you need exact-slice equality - the offsets and chunk boundaries are
-  identical either way. `include_context_header` does *not* control this; it
+  you need exact-slice equality. Removing the prefix frees chunk budget, so
+  boundaries can change. `include_context_header` does *not* control this; it
   governs the separate `context_header` field.
 - **Cross-reference resolution does not read the words around a reference.**
   "paragraph 2 of Schedule 2", written from the main body, resolves to
@@ -163,12 +166,12 @@ see [Evaluating lexichunk](docs/adoption-guide.md).
 
 ## Measured accuracy
 
-Two fixtures ship with hand-built gold annotations whose structure was
+Two synthetic fixtures ship with gold annotations whose structure was
 declared *before* the document text was generated from it, so the answer key
 was never read back from the parser. Reproduce with
 `python -m pytest tests/test_gold_fixtures.py -s`.
 
-| | UK, PDF-extracted (26 KB) | US, signed MSA (22 KB) |
+| | Simulated UK PDF extraction (26 KB) | Synthetic US MSA (22 KB) |
 | --- | --- | --- |
 | Heading recall / precision | 100% / 100% | 100% / 100% |
 | Top-level boundary recall / precision | 100% / 100% | 100% / 100% |
@@ -188,30 +191,28 @@ real execution block.
 These are structural parse metrics, not retrieval metrics - see the bullet on
 retrieval accuracy above.
 
-Throughput on real filings, measured on 150 CUAD contracts (US SEC exhibits):
+Historical 0.9.0 throughput on 150 CUAD contracts (US SEC exhibits):
 median 0.042 s per contract, worst case 0.84 s on a 292,000-character
 co-development agreement.
 
 ### External benchmarks
 
-Measured against public, third-party-labelled datasets by the companion
-harness ([legal-rag-eval](https://github.com/emmcygn/legal-rag-eval),
-`docs/external_evals.md`, reproducible with `make evals`). Numbers below were
-taken at commit `b99eb10`, before this release's bare-decimal US heading fix,
-so the US structure-recall figure is a floor.
+The companion [legal-rag-eval](https://github.com/emmcygn/legal-rag-eval)
+harness evaluates clause classification on LEDGAR and answer-span containment
+on CUAD. Its [versioned external evaluation report](https://github.com/emmcygn/legal-rag-eval/blob/7fd1cce4884890030b6a7a8b061d54f7757360df/docs/external_evals.md)
+records dataset revisions, SDK builds, label mappings, size-matched controls,
+and reproduction commands. Run `make evals` from the harness checkout after
+installing its evaluation dependencies; these runs download public datasets.
 
-| Question | Result |
-| --- | --- |
-| Keyword clause classifier accuracy (LEDGAR, 3,955 test provisions, 100 classes mapped to 31) | **39.6%** accuracy, **42.5%** macro-F1; majority class 21.6%; a supervised TF-IDF + logistic regression reaches 90.8% |
-| Is `classification_confidence` calibrated? | No. Directionally informative (Spearman 0.375) but not monotonic; expected calibration error 0.113. Use it to rank, not to threshold |
-| Do chunk boundaries keep gold answer spans intact (CUAD, 100 contracts, 2,458 spans)? | **83.7%** vs **72.1%** for `RecursiveCharacterTextSplitter` at the same mean chunk length. Raw containment at `max_chunk_size=512` is 98.1%, but most of that is chunk length |
-| Does the parser find structure on real SEC filings? | At `b99eb10`, only 14% of contracts yielded five or more top-level clauses under the `us` profile because bare `1. / 1.1` numbering was not recognised. Fixed in 0.9.0; re-measurement pending |
-| Does it crash on real filings? | No. Zero exceptions across 150 contracts |
+Those published measurements cover earlier SDK builds, including 0.9.0;
+they do not establish accuracy for this unreleased 0.9.1 patch. The harness
+pins an older SDK commit by default, so record and verify the installed SDK
+version and source revision when comparing a new build.
 
-The classifier number is the honest headline: the keyword scorer is useful as
-a coarse filter and clearly worse than a small supervised model. A hook for
-routing low-confidence chunks to your own classifier is described under
-[Additional API](#additional-api).
+The reported keyword classifier trails a supervised baseline, and its
+confidence scores are not calibrated probabilities. Treat it as a coarse
+filter and validate any routing threshold on your own data. A hook for your
+own classifier is described under [Additional API](#additional-api).
 
 ---
 
@@ -251,13 +252,12 @@ git rev-parse HEAD
 Then pin `git+https://github.com/emmcygn/lexichunk.git@SHA` in your dependency
 manager, replacing `SHA` with that commit.
 
-**On PyPI publication:** the release workflow
-(`.github/workflows/publish.yml`) is ready - it runs CI and the integration
-build, then publishes the *same verified artifact* to TestPyPI or PyPI via
-`workflow_dispatch`, or to PyPI on a `v*` tag. It requires the maintainer to
-configure PyPI/TestPyPI **trusted publishing** for this repository and to
-create the `pypi` and `testpypi` GitHub environments first. Until that is
-done, the git install above is the only supported route.
+**Release publishing:** `.github/workflows/publish.yml` runs CI and the
+integration build, then publishes the *same verified artifact* to TestPyPI
+or PyPI via `workflow_dispatch`, or to PyPI on a `v*` tag. PyPI trusted
+publishing is configured for this repository. Maintainers using another
+repository or publishing target must configure its matching trusted publisher
+and GitHub environment before running the workflow.
 
 ---
 
@@ -307,7 +307,7 @@ dataclass with these fields:
 | `defined_terms_used` | `list[str]` | Defined terms found in this chunk's text. |
 | `defined_terms_context` | `dict[str, str]` | Maps each used defined term to its contract-specific definition. Empty unless `include_definitions=True`. |
 | `classification_confidence` | `float` | Relative dominance of the winning clause type, saturation-scaled. Not a calibrated probability. |
-| `secondary_clause_type` | `ClauseType \| None` | The runner-up clause type, or `None` when fewer than two types scored. |
+| `secondary_clause_type` | `ClauseType \| None` | The keyword runner-up. After a hook override, the highest-scoring keyword type different from the hook's primary, or `None` if none exists. |
 | `cross_ref_total` | `int` | Number of cross-references detected in this chunk. |
 | `cross_ref_resolved` | `int` | How many of those resolved to a `target_chunk_index`. |
 | `context_header` | `str` | Prepend to `content` before embedding (Contextual Retrieval pattern). Empty unless `include_context_header=True`. |
@@ -655,6 +655,13 @@ for chunk in chunks[:3]:
     print(contract_text[chunk.raw_char_start : chunk.raw_char_end][:60])
 ```
 
+Raw spans cover the original characters contributing to each sanitised span.
+If a chunk splits a Unicode sequence that normalises to multiple characters,
+its raw span covers the whole sequence. Adjacent raw spans may then overlap,
+and sanitising a raw slice may return more text than that individual chunk.
+Use sanitised offsets for exact chunk boundaries and raw offsets for source
+highlighting; do not concatenate raw slices to reconstruct the document.
+
 
 ---
 
@@ -765,7 +772,9 @@ print(chunker.cross_ref_stats)
 
 ## Testing and quality
 
-The suite is 2151 tests at 96.9% statement coverage with every optional dependency installed. CI enforces 92% on the integrations job and 88% on the dependency-free core job, where the optional-dependency tests skip.
+CI enforces 92% statement coverage on the integrations job and 88% on the
+dependency-free core job, where optional-dependency tests skip. Test counts
+depend on the installed extras; each run reports its executed and skipped tests.
 
 - **Snapshot tests** (`tests/test_snapshots.py`) pin the full chunk output for
   seven fixtures - a UK service agreement, UK terms and conditions, a US MSA,

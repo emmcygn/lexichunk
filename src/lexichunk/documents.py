@@ -25,6 +25,7 @@ from typing import Callable, Optional
 
 from .exceptions import InputError
 from .models import DocumentSection, Section
+from .offsets import OffsetMap, sanitize_with_map
 from .parsers.structure import ParsedClause
 
 #: ``(identifier, title, level) -> DocumentSection`` — normally
@@ -67,7 +68,9 @@ class SourceSpanIndex:
     ``"identifier title"`` line this module emits, which has no counterpart
     in the caller's source — maps to the start of that section's source
     span, since that is the nearest position in the source that the header
-    actually describes.
+    actually describes.  For an empty-bodied section whose source span is
+    the original heading, a non-empty reconstructed span covers that whole
+    heading because its rewritten fragments have no exact source boundaries.
 
     Args:
         body_starts: Offset of each section's body in the reconstructed text.
@@ -76,6 +79,9 @@ class SourceSpanIndex:
             included) in the reconstructed text.
         source_starts: Each section's ``char_start`` in the caller's source.
         source_ends: Each section's ``char_end`` in the caller's source.
+        body_offset_maps: Optional per-section maps from sanitised body
+            offsets to the caller-supplied section text.  Omission preserves
+            the original identity-mapping constructor behaviour.
     """
 
     __slots__ = (
@@ -84,6 +90,7 @@ class SourceSpanIndex:
         "_block_starts",
         "_source_starts",
         "_source_ends",
+        "_body_offset_maps",
     )
 
     def __init__(
@@ -93,35 +100,65 @@ class SourceSpanIndex:
         block_starts: list[int],
         source_starts: list[int],
         source_ends: list[int],
+        body_offset_maps: list[OffsetMap] | None = None,
     ) -> None:
         self._body_starts = body_starts
         self._body_ends = body_ends
         self._block_starts = block_starts
         self._source_starts = source_starts
         self._source_ends = source_ends
+        self._body_offset_maps = (
+            body_offset_maps
+            if body_offset_maps is not None
+            else [
+                OffsetMap(None, body_end - body_start, body_end - body_start)
+                for body_start, body_end in zip(body_starts, body_ends)
+            ]
+        )
 
     def _section_at(self, offset: int) -> int:
         """Return the index of the section whose block contains *offset*."""
         index = bisect_right(self._block_starts, offset) - 1
         return max(0, min(index, len(self._block_starts) - 1))
 
-    def _project(self, offset: int, index: int) -> int:
-        """Project a reconstructed *offset* into section *index*'s source span."""
+    def _body_offset(self, offset: int, index: int) -> int:
+        """Return a reconstructed offset relative to a section's body."""
+        within = min(offset, self._body_ends[index]) - self._body_starts[index]
+        return max(0, min(within, self._body_offset_maps[index].sanitised_length))
+
+    def _project_start(self, offset: int, index: int) -> int:
+        """Project a reconstructed start into section *index*'s source span."""
         source_start = self._source_starts[index]
         source_end = self._source_ends[index]
         if offset <= self._body_starts[index]:
             return source_start
-        within = min(offset, self._body_ends[index]) - self._body_starts[index]
-        return min(source_start + within, source_end)
+        within = self._body_offset(offset, index)
+        return min(
+            source_start + self._body_offset_maps[index].to_raw(within),
+            source_end,
+        )
+
+    def _project_end(self, offset: int, index: int) -> int:
+        """Project a reconstructed end into section *index*'s source span."""
+        source_start = self._source_starts[index]
+        source_end = self._source_ends[index]
+        offset_map = self._body_offset_maps[index]
+        if offset_map.sanitised_length == 0:
+            return source_end
+        if offset <= self._body_starts[index]:
+            return source_start
+        within = self._body_offset(offset, index)
+        _, raw_end = offset_map.to_raw_span(0, within)
+        return min(source_start + raw_end, source_end)
 
     def __call__(self, start: int, end: int) -> tuple[int, int]:
         """Map a reconstructed half-open span onto the caller's source text."""
         first = self._section_at(start)
-        raw_start = self._project(start, first)
+        raw_start = self._project_start(start, first)
         if end <= start:
             return raw_start, raw_start
         last = self._section_at(max(end - 1, 0))
-        raw_end = self._project(end, last)
+        raw_end = self._project_end(end, last)
         return raw_start, max(raw_start, raw_end)
 
 
@@ -334,9 +371,12 @@ def _build_from_sections(
     sanitise: Sanitiser,
 ) -> tuple[str, list[ParsedClause], SourceSpanIndex | None]:
     """Reconstruct a document from :class:`~lexichunk.models.Section` records."""
-    validated = [
-        _sanitised_section(_validate_section(section, position), sanitise)
+    source_sections = [
+        _validate_section(section, position)
         for position, section in enumerate(sections)
+    ]
+    validated = [
+        _sanitised_section(section, sanitise) for section in source_sections
     ]
     identifiers = [
         _resolve_identifier(section, position)
@@ -420,13 +460,25 @@ def _build_from_sections(
         section.char_start is not None and section.char_end is not None
         for section in validated
     ):
-        index = SourceSpanIndex(
-            body_starts=body_starts,
-            body_ends=body_ends,
-            block_starts=block_starts,
-            source_starts=[int(s.char_start or 0) for s in validated],
-            source_ends=[int(s.char_end or 0) for s in validated],
-        )
+        sanitised_bodies_with_maps = [
+            sanitize_with_map(section.text) for section in source_sections
+        ]
+        if all(
+            body_with_map[0] == section.text
+            for body_with_map, section in zip(
+                sanitised_bodies_with_maps, validated
+            )
+        ):
+            index = SourceSpanIndex(
+                body_starts=body_starts,
+                body_ends=body_ends,
+                block_starts=block_starts,
+                source_starts=[int(section.char_start or 0) for section in validated],
+                source_ends=[int(section.char_end or 0) for section in validated],
+                body_offset_maps=[
+                    body_with_map[1] for body_with_map in sanitised_bodies_with_maps
+                ],
+            )
 
     return text, clauses, index
 
@@ -539,7 +591,8 @@ def build_document(
 
     Returns:
         ``(text, clauses, source_span_index)``.  *source_span_index* is
-        ``None`` unless every section carried source offsets.
+        ``None`` unless every section carried source offsets and *sanitise*
+        produced the same body text as the built-in mapped sanitiser.
 
     Raises:
         InputError: If *sections* is not a sequence, is empty, mixes the two

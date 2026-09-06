@@ -288,7 +288,10 @@ class LegalChunk:
     **Offset invariant**: the offsets are monotonic, in bounds, and index the
     sanitised text — not the raw text the caller passed in.  For offsets into
     the raw text, pass ``raw_offsets=True`` and read ``raw_char_start`` /
-    ``raw_char_end``.
+    ``raw_char_end``. Raw spans cover the original characters contributing
+    to the sanitised span. Splitting a multi-output Unicode normalisation
+    run can widen adjacent raw spans to cover the same original sequence;
+    raw spans may therefore overlap even when sanitised spans do not.
 
     **Mutation**: the mutable container fields (``cross_references``,
     ``defined_terms_used``, ``defined_terms_context``) belong to this chunk
