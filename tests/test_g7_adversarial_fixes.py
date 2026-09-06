@@ -625,3 +625,120 @@ class TestH4DashRangeFalsePositives:
     def test_bare_number_head_never_starts_a_dash_range(self) -> None:
         """'never expand across a missing head' — no label, no range."""
         assert "13" not in self._ids("The figure 12 - 30 was agreed.")
+
+
+class TestH5FromDictTypeValidation:
+    """H5/M4 — ``from_dict`` is the deserialisation entry point, so it is the
+    method most likely to receive shape-drifted data.  A ``str`` where a list
+    was expected was silently iterated: ``list("Services")`` produced
+    ``['S','e','r','v','i','c','e','s']`` on an otherwise valid-looking chunk.
+    """
+
+    @staticmethod
+    def _valid_dict() -> dict:
+        from lexichunk.models import (
+            ClauseType,
+            DocumentSection,
+            HierarchyNode,
+            LegalChunk,
+        )
+
+        return LegalChunk(
+            content="Body text.",
+            index=0,
+            hierarchy=HierarchyNode(level=0, identifier="1", title="Scope"),
+            hierarchy_path="1",
+            document_section=DocumentSection.OPERATIVE,
+            clause_type=ClauseType.UNKNOWN,
+            jurisdiction=Jurisdiction.UK,
+            char_start=0,
+            char_end=10,
+        ).to_dict()
+
+    def test_round_trip_still_works(self) -> None:
+        from lexichunk.models import LegalChunk
+
+        source = self._valid_dict()
+        assert LegalChunk.from_dict(source).to_dict() == source
+
+    @pytest.mark.parametrize(
+        ("field_name", "bad_value"),
+        [
+            ("defined_terms_used", "Services"),
+            ("defined_terms_used", {"a": "b"}),
+            ("defined_terms_used", 5),
+            ("defined_terms_context", "Services"),
+            ("defined_terms_context", ["Services"]),
+            ("cross_references", "clause 3"),
+            ("cross_references", 7),
+            ("hierarchy", "1"),
+        ],
+    )
+    def test_wrong_container_type_raises_parsing_error_naming_the_field(
+        self, field_name: str, bad_value: object
+    ) -> None:
+        from lexichunk.exceptions import ParsingError
+        from lexichunk.models import LegalChunk
+
+        payload = self._valid_dict()
+        payload[field_name] = bad_value
+        with pytest.raises(ParsingError) as excinfo:
+            LegalChunk.from_dict(payload)
+        assert field_name in str(excinfo.value)
+
+    def test_string_is_never_iterated_into_characters(self) -> None:
+        from lexichunk.exceptions import ParsingError
+        from lexichunk.models import LegalChunk
+
+        payload = self._valid_dict()
+        payload["defined_terms_used"] = "Services"
+        with pytest.raises(ParsingError):
+            LegalChunk.from_dict(payload)
+
+    @pytest.mark.parametrize("value", ["not a dict", 5, None, ["a"]])
+    def test_non_mapping_input_raises_parsing_error(self, value: object) -> None:
+        from lexichunk.exceptions import ParsingError
+        from lexichunk.models import LegalChunk
+
+        with pytest.raises(ParsingError):
+            LegalChunk.from_dict(value)  # type: ignore[arg-type]
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "content",
+            "index",
+            "hierarchy",
+            "hierarchy_path",
+            "document_section",
+            "clause_type",
+            "jurisdiction",
+        ],
+    )
+    def test_missing_required_key_raises_parsing_error(self, key: str) -> None:
+        from lexichunk.exceptions import ParsingError
+        from lexichunk.models import LegalChunk
+
+        payload = self._valid_dict()
+        del payload[key]
+        with pytest.raises(ParsingError) as excinfo:
+            LegalChunk.from_dict(payload)
+        assert key in str(excinfo.value)
+
+    def test_malformed_cross_reference_entry_raises_parsing_error(self) -> None:
+        from lexichunk.exceptions import ParsingError
+        from lexichunk.models import LegalChunk
+
+        payload = self._valid_dict()
+        payload["cross_references"] = [{"raw_text": "clause 3"}]
+        with pytest.raises(ParsingError):
+            LegalChunk.from_dict(payload)
+
+    def test_unknown_enum_value_raises_parsing_error(self) -> None:
+        from lexichunk.exceptions import ParsingError
+        from lexichunk.models import LegalChunk
+
+        payload = self._valid_dict()
+        payload["clause_type"] = "not_a_clause_type"
+        with pytest.raises(ParsingError):
+            LegalChunk.from_dict(payload)

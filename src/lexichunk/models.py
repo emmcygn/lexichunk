@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional, Protocol, runtime_checkable
@@ -338,8 +339,64 @@ class LegalChunk:
         An unrecognised ``jurisdiction`` string (i.e. not a built-in
         :class:`Jurisdiction` value) is kept as a plain string, matching the
         custom-jurisdiction registration mechanism.
+
+        This is the deserialisation entry point, so it is the method most
+        likely to be handed data whose shape drifted crossing a system
+        boundary (cache, database, message queue).  Every container field is
+        therefore type-checked before use and every failure raises
+        :class:`~lexichunk.exceptions.ParsingError` naming the offending
+        field — the same rigour the numeric and enum fields already get from
+        ``__post_init__``.
+
+        In particular a ``str`` where a list or dict is expected is rejected
+        rather than iterated: ``list("Services")`` silently produced
+        ``['S', 'e', 'r', 'v', 'i', 'c', 'e', 's']`` and a ``LegalChunk``
+        that looked entirely valid.
+
+        Args:
+            d: A mapping in the shape produced by :meth:`to_dict`.
+
+        Returns:
+            The reconstructed :class:`LegalChunk`.
+
+        Raises:
+            ParsingError: If *d* is not a mapping, a required key is missing,
+                or any field has a type this method cannot honour.
         """
-        hierarchy_d = d["hierarchy"]
+        if not isinstance(d, Mapping):
+            raise ParsingError(
+                f"LegalChunk.from_dict expects a mapping, got {type(d).__name__}."
+            )
+
+        def _require(key: str) -> Any:
+            if key not in d:
+                raise ParsingError(f"LegalChunk.from_dict: missing required key {key!r}")
+            return d[key]
+
+        def _mapping(value: Any, field_name: str) -> Mapping[str, Any]:
+            if not isinstance(value, Mapping):
+                raise ParsingError(
+                    f"LegalChunk.from_dict: {field_name!r} must be a mapping, "
+                    f"got {type(value).__name__}."
+                )
+            return value
+
+        def _sequence(value: Any, field_name: str) -> Sequence[Any]:
+            if isinstance(value, (str, bytes, bytearray)) or not isinstance(
+                value, Sequence
+            ):
+                raise ParsingError(
+                    f"LegalChunk.from_dict: {field_name!r} must be a list, "
+                    f"got {type(value).__name__}."
+                )
+            return value
+
+        hierarchy_d = _mapping(_require("hierarchy"), "hierarchy")
+        if "level" not in hierarchy_d or "identifier" not in hierarchy_d:
+            raise ParsingError(
+                "LegalChunk.from_dict: 'hierarchy' must contain 'level' and "
+                "'identifier'."
+            )
         hierarchy = HierarchyNode(
             level=hierarchy_d["level"],
             identifier=hierarchy_d["identifier"],
@@ -347,7 +404,34 @@ class LegalChunk:
             parent=hierarchy_d.get("parent"),
         )
 
-        jurisdiction_raw = d["jurisdiction"]
+        raw_references = _sequence(
+            d.get("cross_references", []), "cross_references"
+        )
+        cross_references: list[CrossReference] = []
+        for position, raw_reference in enumerate(raw_references):
+            reference = _mapping(raw_reference, f"cross_references[{position}]")
+            if "raw_text" not in reference or "target_identifier" not in reference:
+                raise ParsingError(
+                    f"LegalChunk.from_dict: cross_references[{position}] must "
+                    f"contain 'raw_text' and 'target_identifier'."
+                )
+            cross_references.append(
+                CrossReference(
+                    raw_text=reference["raw_text"],
+                    target_identifier=reference["target_identifier"],
+                    target_chunk_index=reference.get("target_chunk_index"),
+                    target_kind=reference.get("target_kind", "clause"),
+                )
+            )
+
+        terms_used = _sequence(
+            d.get("defined_terms_used", []), "defined_terms_used"
+        )
+        terms_context = _mapping(
+            d.get("defined_terms_context", {}), "defined_terms_context"
+        )
+
+        jurisdiction_raw = _require("jurisdiction")
         jurisdiction: Jurisdiction | str
         try:
             jurisdiction = Jurisdiction(jurisdiction_raw)
@@ -356,29 +440,28 @@ class LegalChunk:
 
         secondary = d.get("secondary_clause_type")
 
-        return cls(
-            content=d["content"],
-            index=d["index"],
-            hierarchy=hierarchy,
-            hierarchy_path=d["hierarchy_path"],
-            document_section=DocumentSection(d["document_section"]),
-            clause_type=ClauseType(d["clause_type"]),
-            jurisdiction=jurisdiction,
-            cross_references=[
-                CrossReference(
-                    raw_text=r["raw_text"],
-                    target_identifier=r["target_identifier"],
-                    target_chunk_index=r.get("target_chunk_index"),
-                    target_kind=r.get("target_kind", "clause"),
-                )
-                for r in d.get("cross_references", [])
-            ],
-            defined_terms_used=list(d.get("defined_terms_used", [])),
-            defined_terms_context=dict(d.get("defined_terms_context", {})),
-            classification_confidence=d.get("classification_confidence", 0.0),
-            secondary_clause_type=(
+        try:
+            document_section = DocumentSection(_require("document_section"))
+            clause_type = ClauseType(_require("clause_type"))
+            secondary_clause_type = (
                 ClauseType(secondary) if secondary is not None else None
-            ),
+            )
+        except ValueError as exc:
+            raise ParsingError(f"LegalChunk.from_dict: {exc}") from exc
+
+        return cls(
+            content=_require("content"),
+            index=_require("index"),
+            hierarchy=hierarchy,
+            hierarchy_path=_require("hierarchy_path"),
+            document_section=document_section,
+            clause_type=clause_type,
+            jurisdiction=jurisdiction,
+            cross_references=cross_references,
+            defined_terms_used=list(terms_used),
+            defined_terms_context=dict(terms_context),
+            classification_confidence=d.get("classification_confidence", 0.0),
+            secondary_clause_type=secondary_clause_type,
             cross_ref_total=d.get("cross_ref_total", 0),
             cross_ref_resolved=d.get("cross_ref_resolved", 0),
             context_header=d.get("context_header", ""),
