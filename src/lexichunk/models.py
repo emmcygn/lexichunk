@@ -111,11 +111,27 @@ class DocumentSection(str, Enum):
 
 @dataclass
 class CrossReference:
-    """A detected reference to another section/clause within the document."""
+    """A detected reference to another section/clause within the document.
+
+    Attributes:
+        raw_text: The matched reference text as it appears in the document
+            (e.g. ``"subject to Clause 3.2"``).
+        target_identifier: The identifier the reference points at
+            (e.g. ``"3.2"``), without the label word.
+        target_chunk_index: Index of the chunk this reference resolves to, or
+            ``None`` when the target could not be resolved *or* was ambiguous.
+        target_kind: Normalised, lower-case label word of the referenced unit —
+            one of ``clause``, ``schedule``, ``exhibit``, ``annex``,
+            ``article``, ``chapter``, ``recital``, ``section`` or
+            ``paragraph``.  Defaults to ``"clause"`` when the reference carries
+            only a number.  Resolution only matches candidates of a compatible
+            kind, so ``Annex I`` can never resolve to numbered paragraph ``1``.
+    """
 
     raw_text: str
     target_identifier: str
     target_chunk_index: Optional[int] = None
+    target_kind: str = "clause"
 
     def to_dict(self) -> dict[str, Any]:
         """Return a plain, ``json.dumps``-able dict representation."""
@@ -123,6 +139,7 @@ class CrossReference:
             "raw_text": self.raw_text,
             "target_identifier": self.target_identifier,
             "target_chunk_index": self.target_chunk_index,
+            "target_kind": self.target_kind,
         }
 
 
@@ -293,6 +310,7 @@ class LegalChunk:
                     raw_text=r["raw_text"],
                     target_identifier=r["target_identifier"],
                     target_chunk_index=r.get("target_chunk_index"),
+                    target_kind=r.get("target_kind", "clause"),
                 )
                 for r in d.get("cross_references", [])
             ],

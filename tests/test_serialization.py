@@ -202,6 +202,7 @@ def test_nested_to_dict_methods() -> None:
         "raw_text": "Clause 3.2",
         "target_identifier": "3.2",
         "target_chunk_index": 4,
+        "target_kind": "clause",
     }
 
     term = DefinedTerm(term="Supplier", definition="means the party.", source_clause="1.1")
