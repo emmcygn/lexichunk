@@ -2,7 +2,7 @@
 
 import logging
 
-from .chunker import LegalChunker
+from .chunker import ClassificationHook, LegalChunker
 from .enrichment.clause_type import ClassificationResult
 from .exceptions import (
     ConfigurationError,
@@ -38,6 +38,7 @@ from .models import (
 __version__ = "0.8.0b1"
 __all__ = [
     "LegalChunker",
+    "ClassificationHook",
     "LegalChunk",
     "HierarchyNode",
     "CrossReference",

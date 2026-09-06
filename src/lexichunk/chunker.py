@@ -20,6 +20,7 @@ import concurrent.futures.process
 import hashlib
 import logging
 import os
+import pickle
 import re
 import sys
 import threading
@@ -29,11 +30,11 @@ from bisect import bisect_left, bisect_right
 from collections import OrderedDict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Any, Iterator, Optional
+from typing import Any, Callable, Iterator, Optional
 
 logger = logging.getLogger(__name__)
 
-from .enrichment.clause_type import ClauseTypeClassifier
+from .enrichment.clause_type import ClassificationResult, ClauseTypeClassifier
 from .enrichment.context import ContextEnricher
 from .exceptions import ConfigurationError, InputError
 from .metrics import PipelineMetrics, StageMetric
@@ -53,6 +54,13 @@ from .parsers.references import ReferenceDetector, resolve_references
 from .parsers.structure import ParsedClause, StructureParser
 from .strategies.clause_aware import ClauseAwareChunker
 from .strategies.fallback import FallbackChunker
+
+#: Signature of the optional low-confidence classification hook.  It is
+#: handed the chunk and the keyword scorer's own
+#: :class:`~lexichunk.enrichment.clause_type.ClassificationResult`, and
+#: returns a replacement :class:`~lexichunk.models.ClauseType` or ``None``
+#: to keep the keyword verdict.
+ClassificationHook = Callable[[LegalChunk, ClassificationResult], Optional[ClauseType]]
 
 
 class LegalChunker:
@@ -91,6 +99,30 @@ class LegalChunker:
             ``except ValueError`` catches either).
         chars_per_token: Number of characters per token used for the
             approximate token count heuristic.  Defaults to 4.
+        classification_hook: Optional callable
+            ``(chunk, result) -> ClauseType | None`` invoked after Stage 4
+            for every chunk the keyword scorer was unsure about — this is
+            the seam for an LLM (or a bespoke model) that you only want to
+            pay for on the hard cases.  It receives the chunk and the
+            scorer's own
+            :class:`~lexichunk.enrichment.clause_type.ClassificationResult`,
+            including the per-clause-type ``scores`` mapping.  Return
+            ``None`` to keep the keyword verdict; return a
+            :class:`~lexichunk.models.ClauseType` to replace
+            ``clause_type`` and set ``classification_source`` to
+            ``"hook"``.  ``classification_confidence`` is left as the
+            keyword scorer computed it, so the number stays comparable
+            across a corpus.  Must be picklable to be used with
+            ``chunk_batch(workers>1)``; a lambda or closure raises
+            :class:`~lexichunk.exceptions.ConfigurationError` up front
+            rather than breaking the worker pool.
+        classification_hook_threshold: Confidence *strictly below* which a
+            chunk is offered to *classification_hook*.  Defaults to 0.5;
+            ``0.0`` never fires the hook, ``1.0`` offers every chunk.
+            Note that ``classification_confidence`` is a saturation-scaled
+            margin, not a calibrated probability — see
+            :class:`~lexichunk.enrichment.clause_type.ClassificationResult`
+            before picking a value.
 
     Example::
 
@@ -130,6 +162,8 @@ class LegalChunker:
         extra_clause_signals: dict[ClauseType, list[str]] | None = None,
         enable_definition_cache: bool = True,
         max_cache_size: int = 128,
+        classification_hook: ClassificationHook | None = None,
+        classification_hook_threshold: float = 0.5,
     ) -> None:
         # Normalise jurisdiction: Jurisdiction enum, then a stripped/lowered
         # str looked up first against the enum, then the registry.  A
@@ -188,6 +222,10 @@ class LegalChunker:
         self._extra_clause_signals = validated_signals
         self._enable_definition_cache = enable_definition_cache
         self._max_cache_size = max_cache_size
+        self._classification_hook = _validate_classification_hook(
+            classification_hook, classification_hook_threshold
+        )
+        self._classification_hook_threshold = classification_hook_threshold
         self._definition_cache: OrderedDict[str, dict[str, DefinedTerm]] = OrderedDict()
         self._cache_lock = threading.Lock()
         self._last_cross_ref_stats: dict[str, int | float] = {}
@@ -609,7 +647,9 @@ class LegalChunker:
         if collect_metrics:
             logger.debug("Stage 4: clause_type_classification — start")
             t0 = time.perf_counter()
-        self._clause_type_classifier.classify_all(chunks)
+        classifications = self._clause_type_classifier.classify_all_detailed(chunks)
+        if self._classification_hook is not None:
+            self._apply_classification_hook(chunks, classifications)
         if collect_metrics:
             classified = sum(1 for c in chunks if c.clause_type is not None)
             elapsed = (time.perf_counter() - t0) * 1000
@@ -774,6 +814,55 @@ class LegalChunker:
             )
 
         return chunks, metrics
+
+    def _apply_classification_hook(
+        self,
+        chunks: list[LegalChunk],
+        classifications: list[ClassificationResult],
+    ) -> None:
+        """Offer every low-confidence chunk to the ``classification_hook``.
+
+        Runs immediately after Stage 4, so the hook sees the keyword
+        scorer's verdict (and its per-type scores) but nothing downstream
+        has yet been derived from it — the context header generated in
+        Stage 5 reflects whatever the hook decided.
+
+        A chunk is offered when its ``classification_confidence`` is
+        **strictly below** ``classification_hook_threshold``.  Returning
+        ``None`` leaves the keyword result and its
+        ``classification_source`` of ``"keyword"`` untouched; returning a
+        :class:`~lexichunk.models.ClauseType` replaces ``clause_type`` and
+        stamps ``classification_source = "hook"``.  ``confidence`` is
+        deliberately *not* rewritten: it describes the keyword scorer's own
+        certainty, and overwriting it with a number the hook invented would
+        make the two incomparable across a corpus.
+
+        Args:
+            chunks: The chunks just classified, mutated in place.
+            classifications: The matching per-chunk results.
+
+        Raises:
+            ConfigurationError: If the hook returns something that is
+                neither ``None`` nor a :class:`ClauseType`.
+        """
+        hook = self._classification_hook
+        if hook is None:  # pragma: no cover - guarded by the caller
+            return
+        threshold = self._classification_hook_threshold
+        for chunk, result in zip(chunks, classifications):
+            if result.confidence >= threshold:
+                continue
+            outcome = hook(chunk, result)
+            if outcome is None:
+                continue
+            if not isinstance(outcome, ClauseType):
+                raise ConfigurationError(
+                    f"classification_hook must return a ClauseType or None, "
+                    f"got {type(outcome).__name__} ({outcome!r}) for chunk "
+                    f"{chunk.index}."
+                )
+            chunk.clause_type = outcome
+            chunk.classification_source = "hook"
 
     # ------------------------------------------------------------------
     # Additional public methods
@@ -1112,6 +1201,8 @@ class LegalChunker:
                     f"with workers > 1. Custom jurisdiction registrations are "
                     f"not inherited by child processes. Use workers=1 instead."
                 )
+            if self._classification_hook is not None:
+                _require_picklable_hook(self._classification_hook)
             result = self._chunk_batch_parallel(pairs, effective_workers, skip_indices)
         else:
             result = self._chunk_batch_serial(pairs, skip_indices)
@@ -1172,6 +1263,8 @@ class LegalChunker:
             extra_clause_signals=self._extra_clause_signals,
             enable_definition_cache=self._enable_definition_cache,
             max_cache_size=self._max_cache_size,
+            classification_hook=self._classification_hook,
+            classification_hook_threshold=self._classification_hook_threshold,
         )
 
         results: list[list[LegalChunk]] = [[] for _ in pairs]
@@ -1238,6 +1331,8 @@ class _ChunkerConfig:
     extra_clause_signals: dict[ClauseType, list[str]] | None
     enable_definition_cache: bool
     max_cache_size: int
+    classification_hook: ClassificationHook | None = None
+    classification_hook_threshold: float = 0.5
 
     def __post_init__(self) -> None:
         # Re-run the same validation LegalChunker.__init__ uses, so this
@@ -1254,6 +1349,9 @@ class _ChunkerConfig:
             enable_definition_cache=self.enable_definition_cache,
             extra_abbreviations=self.extra_abbreviations,
             extra_clause_signals=self.extra_clause_signals,
+        )
+        _validate_classification_hook(
+            self.classification_hook, self.classification_hook_threshold
         )
 
 
@@ -1278,6 +1376,8 @@ def _chunk_single(
         extra_clause_signals=config.extra_clause_signals,
         enable_definition_cache=config.enable_definition_cache,
         max_cache_size=config.max_cache_size,
+        classification_hook=config.classification_hook,
+        classification_hook_threshold=config.classification_hook_threshold,
     )
     return chunker.chunk(text, document_id=doc_id)
 
@@ -1408,6 +1508,72 @@ def _validate_config(
             validated_signals[key] = signals
 
     return validated_abbreviations, validated_signals
+
+
+def _validate_classification_hook(
+    hook: object, threshold: object
+) -> ClassificationHook | None:
+    """Validate the ``classification_hook`` pair and return the hook.
+
+    Args:
+        hook: ``None`` or a callable taking ``(chunk, result)``.
+        threshold: A ``float``/``int`` in ``[0.0, 1.0]``.
+
+    Returns:
+        The hook, unchanged.
+
+    Raises:
+        ConfigurationError: If *hook* is not callable, or *threshold* is not
+            a number in ``[0.0, 1.0]``.
+    """
+    if isinstance(threshold, bool) or not isinstance(threshold, (int, float)):
+        raise ConfigurationError(
+            f"classification_hook_threshold must be a float, got "
+            f"{type(threshold).__name__}"
+        )
+    if not 0.0 <= float(threshold) <= 1.0:
+        raise ConfigurationError(
+            f"classification_hook_threshold ({threshold}) must be in [0.0, 1.0]"
+        )
+    if hook is None:
+        return None
+    if not callable(hook):
+        raise ConfigurationError(
+            f"classification_hook must be callable or None, got "
+            f"{type(hook).__name__}"
+        )
+    return hook  # type: ignore[return-value]
+
+
+def _require_picklable_hook(hook: ClassificationHook) -> None:
+    """Fail fast when a hook cannot survive the trip to a worker process.
+
+    ``chunk_batch(workers>1)`` runs each document in a child process, so the
+    hook has to be pickled along with the rest of the configuration.  A
+    lambda, a local closure, or a bound method of an unpicklable object all
+    fail — and the default failure mode is a
+    :class:`~concurrent.futures.process.BrokenProcessPool` raised from deep
+    inside the pool, or worse, a per-document ``BatchError`` that reads like
+    the *documents* were bad.  Checking up front turns that into one clear
+    :class:`~lexichunk.exceptions.ConfigurationError` naming the actual fix.
+
+    Args:
+        hook: The configured classification hook.
+
+    Raises:
+        ConfigurationError: If the hook cannot be pickled.
+    """
+    try:
+        pickle.dumps(hook)
+    except Exception as exc:  # noqa: BLE001 - re-raised as ConfigurationError
+        name = getattr(hook, "__qualname__", repr(hook))
+        raise ConfigurationError(
+            f"classification_hook {name!r} cannot be pickled "
+            f"({type(exc).__name__}: {exc}), so it cannot be used with "
+            f"chunk_batch(workers>1) — each document is processed in a child "
+            f"process. Use a module-level function (or a picklable callable "
+            f"class) instead of a lambda or a closure, or pass workers=1."
+        ) from exc
 
 
 def _iteration_error(items: list[Any], exc: Exception) -> BatchError:
