@@ -554,7 +554,7 @@ print(chunker.cross_ref_stats)
 
 ## Testing and quality
 
-The suite is 1522 tests at 96% statement coverage, with a 92% gate in CI.
+The suite is 1611 tests at 96.5% statement coverage, with a 92% gate in CI.
 
 - **Snapshot tests** (`tests/test_snapshots.py`) pin the full chunk output for
   five fixtures — a UK service agreement, UK terms and conditions, a US MSA,
