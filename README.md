@@ -6,11 +6,10 @@
 ![License: MIT](https://img.shields.io/github/license/emmcygn/lexichunk)
 ![CI](https://img.shields.io/github/actions/workflow/status/emmcygn/lexichunk/ci.yml?label=tests)
 
-**Status: public beta, source-distributed.** lexichunk is **not published on
-PyPI**. Install it from this GitHub repository, pinned to the `v0.9.0` tag (or
-to a reviewed commit SHA) — see [Installation](#installation). `0.9.0` is the
-first tagged release; the public API is settled enough to build on, but it is
-not frozen. See [CHANGELOG.md](CHANGELOG.md) for what changed and why.
+**Status: public beta.** `0.9.0` is the first release on PyPI
+(`pip install lexichunk`). The public API is settled enough to build on, but it
+is not frozen; pin a version. See [CHANGELOG.md](CHANGELOG.md) for what changed
+and why.
 
 The core package has **zero required dependencies** — pure Python, stdlib and
 `re` only. The optional `llama-index` extra pulls a transitive NLTK version
@@ -218,19 +217,25 @@ routing low-confidence chunks to your own classifier is described under
 
 ## Installation
 
-lexichunk is **not on PyPI**. Install it from the source repository, pinned to
-a release tag:
+```bash
+pip install lexichunk
+```
+
+Optional framework integrations:
+
+```bash
+pip install "lexichunk[langchain]"
+pip install "lexichunk[llama-index]"
+pip install "lexichunk[docling]"
+pip install "lexichunk[all]"
+```
+
+Releases are published from a tagged commit through GitHub's trusted-publishing
+flow; the wheel on PyPI is the artifact that passed the integrations workflow.
+To install a specific release straight from the repository instead:
 
 ```bash
 pip install "lexichunk @ git+https://github.com/emmcygn/lexichunk.git@v0.9.0"
-```
-
-Optional framework integrations, same pinning:
-
-```bash
-pip install "lexichunk[langchain] @ git+https://github.com/emmcygn/lexichunk.git@v0.9.0"
-pip install "lexichunk[llama-index] @ git+https://github.com/emmcygn/lexichunk.git@v0.9.0"
-pip install "lexichunk[all] @ git+https://github.com/emmcygn/lexichunk.git@v0.9.0"
 ```
 
 To track a reviewed commit rather than a tag, clone, review, and record the
