@@ -68,10 +68,35 @@ _SHORT_UK_TEXT = (
     "This agreement is governed by the laws of England and Wales.\n"
 )
 
+# Unstructured prose — no clause headers at all, so the FallbackChunker runs.
+# This is the shape from CUAD issue 5, where consecutive chunks were one
+# character apart because each sentence was stripped before its offset was
+# recorded and the whitespace between them belonged to neither.
+_UNSTRUCTURED_TEXT = "DISTRIBUTION AGREEMENT\n\n" + (
+    " ".join(
+        ["The parties acknowledge and agree that the foregoing applies."] * 40
+    )
+) + "\n"
+
+# Unstructured text carrying a run with no whitespace to split on — an OCR'd
+# table, a base64 blob, a long identifier. CUAD issue 3: this had no splitter
+# below "one sentence" on the fallback path, so it was emitted oversized.
+_UNSTRUCTURED_UNBREAKABLE_TEXT = (
+    "Preliminary matters are described in the schedule below.\n\n"
+    + ("A" * 6000)
+    + "\n\nThe foregoing applies to all parties equally.\n"
+)
+
 _SYNTHETIC_CASES: dict[str, tuple[str, str, str]] = {
     "crlf_bom": ("uk", "contract", _CRLF_BOM_TEXT),
     "semicolon_5kb_clause": ("uk", "contract", _SEMICOLON_CLAUSE_TEXT),
     "short_uk_three_clauses": ("uk", "contract", _SHORT_UK_TEXT),
+    "unstructured_fallback": ("us", "contract", _UNSTRUCTURED_TEXT),
+    "unstructured_unbreakable_run": (
+        "us",
+        "contract",
+        _UNSTRUCTURED_UNBREAKABLE_TEXT,
+    ),
 }
 
 
@@ -156,6 +181,56 @@ def test_offset_ordering_and_no_overlap(
             f"[{case_id}] chunk {i} (char_end={a.char_end}) overlaps "
             f"chunk {i + 1} (char_start={b.char_start})"
         )
+
+
+# ---------------------------------------------------------------------------
+# 2b. On the fallback path the spans are not merely non-overlapping — they
+#     *tile*: consecutive chunks meet exactly.
+# ---------------------------------------------------------------------------
+#
+# The clause-aware path deliberately leaves gaps (a parent chunk stops at the
+# end of its own text, and the blank lines between clauses belong to no
+# chunk), so this is asserted only where the fallback runs. There, every chunk
+# is a slice of undifferentiated prose and a gap has no meaning: CUAD issue 5
+# found 21 of 150 contracts with at least one, always exactly one character
+# and always whitespace, because each sentence was stripped before its offset
+# was taken.
+
+
+@pytest.mark.parametrize(
+    "max_size,min_size", [(64, 0), (128, 32), (512, 64), (512, 0)]
+)
+def test_fallback_chunks_tile_the_text(max_size: int, min_size: int) -> None:
+    chunker = LegalChunker(
+        jurisdiction="us", max_chunk_size=max_size, min_chunk_size=min_size
+    )
+    chunks, metrics = chunker.chunk_with_metrics(_UNSTRUCTURED_TEXT)
+    assert metrics.fallback_used, "expected the fallback path for this input"
+    assert len(chunks) > 1, "need several chunks for tiling to mean anything"
+    for a, b in zip(chunks, chunks[1:]):
+        assert a.char_end == b.char_start, (
+            f"[{max_size}/{min_size}] gap of "
+            f"{b.char_start - a.char_end} char(s) between chunk {a.index} "
+            f"and {b.index}"
+        )
+
+
+def test_the_reported_gap_reproducer_has_no_gaps() -> None:
+    """Issue 5's own reproducer, verbatim."""
+    body = " ".join(
+        ["The parties acknowledge and agree that the foregoing applies."] * 40
+    )
+    text = "DISTRIBUTION AGREEMENT\n\n" + body + "\n"
+    spans = [
+        (c.char_start, c.char_end)
+        for c in LegalChunker(jurisdiction="us", max_chunk_size=64).chunk(text)
+    ]
+    gaps = [
+        (a_end, b_start)
+        for (_, a_end), (b_start, _) in zip(spans, spans[1:])
+        if b_start != a_end
+    ]
+    assert gaps == []
 
 
 # ---------------------------------------------------------------------------

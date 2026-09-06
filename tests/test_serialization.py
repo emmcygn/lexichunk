@@ -33,6 +33,9 @@ _ALL_CHUNK_FIELDS = {
     "char_end",
     "token_count",
     "original_header",
+    "classification_source",
+    "raw_char_start",
+    "raw_char_end",
 }
 
 

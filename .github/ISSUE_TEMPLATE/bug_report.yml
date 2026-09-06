@@ -1,0 +1,86 @@
+name: Bug report
+description: Something in lexichunk produced the wrong output, or crashed.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Chunking bugs are almost always about a specific piece of drafting.
+        The document snippet and the jurisdiction are what make a report
+        reproducible — without them a report usually cannot be acted on.
+
+        Please redact anything confidential first. A short synthetic snippet
+        that reproduces the same structure is ideal.
+
+  - type: textarea
+    id: snippet
+    attributes:
+      label: Document snippet and jurisdiction
+      description: >-
+        Paste the smallest piece of text that reproduces the problem, and say
+        which jurisdiction you passed (`uk`, `us`, `eu`, or a custom key) and
+        which `doc_type`.
+      placeholder: |
+        jurisdiction="uk", doc_type="contract"
+
+        1. Definitions
+
+        1.1 "Services" means the services described in Schedule 1.
+
+        2. Fees
+        ...
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Code that reproduces it
+      description: The smallest script that shows the problem.
+      placeholder: |
+        from lexichunk import LegalChunker
+
+        chunks = LegalChunker(jurisdiction="uk").chunk(text)
+        print([c.hierarchy_path for c in chunks])
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what you got
+      description: >-
+        Be specific about the field — `hierarchy_path`, `clause_type`,
+        `char_start`, `defined_terms_used`, a missing chunk, and so on.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: lexichunk version
+      description: "`python -c \"import lexichunk; print(lexichunk.__version__)\"`"
+      placeholder: "0.9.0"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Python version and OS
+      placeholder: "3.12 on Ubuntu 24.04"
+    validations:
+      required: true
+
+  - type: textarea
+    id: upstream
+    attributes:
+      label: How the text was produced
+      description: >-
+        lexichunk takes plain text. If the document came out of a converter
+        (Docling, Unstructured, pdftotext, a DOCX export), say which — layout
+        artefacts from the converter are a common cause.
+    validations:
+      required: false

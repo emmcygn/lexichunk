@@ -23,7 +23,9 @@ def roman_to_int(s: str) -> int:
         The integer value of the Roman numeral.
 
     Raises:
-        ValueError: If *s* is empty or contains non-Roman characters.
+        ParsingError: If *s* is empty or contains non-Roman characters.
+            :class:`~lexichunk.exceptions.ParsingError` subclasses
+            ``ValueError``, so ``except ValueError`` still catches it.
     """
     if not s:
         raise ParsingError("Empty string is not a valid Roman numeral")
@@ -51,9 +53,18 @@ class USPatterns:
     US contracts use multi-tier structure:
       ARTICLE I / Article I  — top-level (Roman numerals)
       Section 1.01           — section
+      1. / 1.1 / 1.1.1       — bare-decimal top-level, section, sub-section
       (a)                    — alpha sub-clause
       (i)                    — roman sub-clause
       Exhibit A / Schedule 1 — attachments
+
+    The bare-decimal tier matters more than the ``ARTICLE``/``Section``
+    tier in practice.  A CUAD evaluation over 150 real SEC exhibit filings
+    found ``jurisdiction="us"`` recovering five or more top-level clauses
+    in only 14% of contracts, against 31% for ``jurisdiction="uk"`` on the
+    *same* US filings, because the ``us`` profile required a literal
+    ``Section``/``ARTICLE`` marker and the ``uk`` profile did not.  Bare
+    ``1. Definitions.`` is the dominant US commercial drafting style.
     """
 
     article: re.Pattern = field(default_factory=lambda: re.compile(
@@ -63,6 +74,16 @@ class USPatterns:
     section: re.Pattern = field(default_factory=lambda: re.compile(
         r'^(?:SECTION|Section)\s+(\d+\.\d+(?:\([a-z]\))?)',
         re.MULTILINE
+    ))
+    # Bare-decimal numbering, identical in shape to the UK profile's.
+    subsection_3: re.Pattern = field(default_factory=lambda: re.compile(
+        r'^(\d+\.\d+\.\d+)\.?\s+', re.MULTILINE
+    ))
+    subsection_2: re.Pattern = field(default_factory=lambda: re.compile(
+        r'^(\d+\.\d+)\.?\s+', re.MULTILINE
+    ))
+    top_level: re.Pattern = field(default_factory=lambda: re.compile(
+        r'^(\d+)\.?\s+([A-Z][A-Za-z\s]{2,60})(?:\n|$)', re.MULTILINE
     ))
     alpha_sub: re.Pattern = field(default_factory=lambda: re.compile(
         r'^\(([a-z])\)\s+', re.MULTILINE
@@ -79,8 +100,23 @@ class USPatterns:
         re.MULTILINE | re.IGNORECASE
     ))
 
+    # The trailing ``(?-i:[A-Z])(?![A-Za-z])`` alternative is what makes
+    # "Exhibit A" a reference. US agreements name their attachments by
+    # letter -- "attached hereto as Exhibit A", "the form set out in
+    # Exhibit B" -- and ``detect_level`` already recognises ``EXHIBIT A``
+    # as a container heading, so without this a document contained an
+    # Exhibit A chunk that no reference could ever resolve to. Worse, it
+    # was inconsistent: ``Exhibit C`` happened to resolve, because C is a
+    # Roman numeral, while A, B and D did not.
+    #
+    # The scoped ``(?-i:...)`` turns IGNORECASE off for that one
+    # alternative so it matches a genuinely capitalised letter, and the
+    # lookahead requires the letter to stand alone -- "Schedule Terms" is
+    # not a reference to a schedule named "T".
     cross_ref: re.Pattern = field(default_factory=lambda: re.compile(
-        r'\b(?:Sections?|Articles?|Exhibits?|Schedules?|Clauses?)\s+(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*|[IVXLC]+)',
+        r'\b(?:Sections?|Articles?|Exhibits?|Schedules?|Clauses?)\s+'
+        r'(\d+(?:\.\d+)*(?:\([a-z]+\))*(?:\([ivxlc]+\))*|[IVXLC]+'
+        r'|(?-i:[A-Z])(?![A-Za-z]))',
         re.IGNORECASE
     ))
 
@@ -128,8 +164,11 @@ def detect_level(line: str) -> tuple[int, str] | None:
         (level, identifier) where level is:
           -2 = Exhibit
           -1 = Schedule / Appendix
-           0 = Article, or a bare "Section N" heading
-           1 = Section (dotted, e.g. "Section 1.01")
+           0 = Article, a bare "Section N" heading, a bare-decimal
+               top-level clause ("1." / "1) Definitions"), or a standalone
+               ALL-CAPS line (identifier = the line itself)
+           1 = Section (dotted, e.g. "Section 1.01" or bare "1.1")
+           2 = bare sub-subsection ("1.1.1")
            3 = alpha sub-clause "(a)"
            4 = roman sub-clause "(i)"
         Returns None if not a clause header.
@@ -167,6 +206,36 @@ def detect_level(line: str) -> tuple[int, str] | None:
     m = re.match(r'^(?:SECTION|Section)\s+(\d+)\.?(?:\s|$)', s)
     if m:
         return (0, f'Section {m.group(1)}')
+
+    # Bare-decimal numbering — "1.1.1", "1.1", "1. Definitions".  These are
+    # the same three patterns the UK profile uses, and they are what the
+    # dominant US commercial drafting style actually looks like; requiring
+    # a literal "Section"/"ARTICLE" marker is what made ``us`` the worse
+    # profile for US filings.  Most-specific first, so "1.1.1" is not read
+    # as "1.1" followed by junk.
+    #
+    # The trailing ``\S`` on the dotted forms is load-bearing: it demands
+    # whitespace *and* then a non-space character after the number, so the
+    # wrapped sentence fragment "4.5; (c) all outstanding fees ..." (where
+    # ";" immediately follows the number) is not read as clause 4.5.  The
+    # remaining wrapped-continuation cases (a line ending in the word
+    # "Section", with "7.2. Continued use ..." wrapped onto the line
+    # below it) are rejected by the
+    # heading-plausibility gate in ``parsers.structure``, which can see the
+    # preceding line and this function cannot.
+    m = re.match(r'^(\d+\.\d+\.\d+)\.?\s+\S', s)
+    if m:
+        return (2, m.group(1))
+
+    m = re.match(r'^(\d+\.\d+)\.?\s+\S', s)
+    if m:
+        return (1, m.group(1))
+
+    # Top-level: "1.  Definitions", '1. "Term" means ...' (straight or
+    # curly quote), "1) Definitions" or "1. 2024 Fee Schedule".
+    m = re.match(r'^(\d+)[.)]?\s+(?:[A-Z]\S|["“‘]|\d)', s)
+    if m:
+        return (0, m.group(1))
 
     m = re.match(r'^\(([a-z])\)\s+\S', s)
     if m:

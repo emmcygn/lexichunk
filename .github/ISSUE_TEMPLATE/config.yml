@@ -1,0 +1,7 @@
+# Blank issues stay available so a question that fits neither template still
+# has a home.
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/emmcygn/lexichunk/security/advisories/new
+    about: Report privately. Please do not open a public issue for a vulnerability.

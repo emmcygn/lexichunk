@@ -41,6 +41,52 @@ class PipelineMetrics:
         input_chars: Character count of the sanitised input text.
         fallback_used: ``True`` if the fallback (sentence-level) chunker
             was used instead of the clause-aware chunker.
+        clause_count: Number of ``ParsedClause`` objects Stage 1 produced,
+            including the synthetic preamble clause when the document has
+            leading text.  ``0`` when the structure parser was bypassed.
+        top_level_clause_count: Number of *root* structural units — parsed
+            clauses with no parent.  For a UK contract that is the preamble
+            plus each numbered top-level clause plus each Schedule; for a US
+            one, each ``ARTICLE``.  This is the denominator to compare
+            ``chunk_count`` against when judging whether chunking respected
+            the document's own outline.
+        chunks_spanning_multiple_top_level_clauses: Number of chunks whose
+            ``[char_start, char_end)`` span overlaps more than one root
+            structural unit.  **This is 0 by design**: the clause-aware
+            chunker never merges two container-level groups, so a chunk
+            cannot straddle two top-level clauses.  A non-zero value means
+            a merge crossed a boundary it should not have — an over-merge
+            that puts two unrelated clauses behind one embedding.
+        chunks_with_multiple_clauses: Number of chunks that gathered more
+            than one *distinct* clause identifier — a parent folded in with
+            its sub-clauses, or a run of merged siblings.  Informational,
+            not a defect: sub-clause grouping is how ``min_chunk_size`` is
+            honoured without crossing hierarchy.  The pieces of one
+            over-sized clause split across several chunks are **not**
+            counted, since they carry a single identifier between them.
+        chunks_below_min: Number of chunks whose ``token_count`` is below
+            ``min_chunk_size``.  Expected to be non-zero on documents with
+            short, structurally isolated clauses (``min_chunk_size`` is a
+            preference; hierarchy wins), so read it as a distribution
+            signal rather than an error count.
+        heading_candidates_rejected: Number of lines the jurisdiction's
+            ``detect_level`` proposed as headings that the structure
+            parser's plausibility gate then rejected — table-of-contents
+            entries, running headers, wrapped ALL-CAPS paragraphs, numbered
+            list items inside a fees clause.  A sudden jump against a
+            comparable document usually means the extraction layer changed,
+            not the contract.
+        chunks_unclassified: Number of chunks whose ``clause_type`` is
+            ``ClauseType.UNKNOWN`` — the classifier declining rather than
+            guessing, which is the right failure direction but leaves those
+            chunks with no clause metadata to filter or route on.  Some
+            unclassified chunks are normal (a signature block, a table of
+            fees).  ``chunks_unclassified == chunk_count`` is the signal
+            worth alerting on: it means the document carries *no* clause
+            metadata at all.  A CUAD evaluation saw this on 2 of 150
+            contracts, both short and unusually formatted.  Read it next to
+            ``fallback_used``, which says whether the structure parser found
+            anything to classify in the first place.
     """
 
     total_duration_ms: float
@@ -51,3 +97,10 @@ class PipelineMetrics:
     cross_ref_resolved: int
     input_chars: int
     fallback_used: bool
+    clause_count: int = 0
+    top_level_clause_count: int = 0
+    chunks_spanning_multiple_top_level_clauses: int = 0
+    chunks_with_multiple_clauses: int = 0
+    chunks_below_min: int = 0
+    heading_candidates_rejected: int = 0
+    chunks_unclassified: int = 0

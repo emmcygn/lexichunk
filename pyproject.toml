@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lexichunk"
-version = "0.8.0b1"
+version = "0.9.0"
 description = "Clause-aware legal document chunking SDK for RAG pipelines"
 readme = "README.md"
 license = "MIT"
@@ -32,6 +32,10 @@ dependencies = []
 [project.optional-dependencies]
 langchain = ["langchain-core>=0.2.0,<2"]
 llama-index = ["llama-index-core>=0.10.0,<0.15"]
+# Ingestion adapters. `docling-core` alone is enough to read a
+# DoclingDocument (including its JSON form); the full `docling` package is
+# only needed to produce one from a PDF, and lexichunk never imports it.
+docling = ["docling-core>=2.0"]
 examples = [
     "langchain-text-splitters",
     "langchain-community",
@@ -48,6 +52,7 @@ dev = [
 all = [
     "langchain-core>=0.2.0,<2",
     "llama-index-core>=0.10.0,<0.15",
+    "docling-core>=2.0",
 ]
 
 [project.urls]
@@ -88,6 +93,7 @@ disallow_untyped_defs = true
 module = [
     "langchain_core.*",
     "llama_index.*",
+    "docling_core.*",
 ]
 ignore_missing_imports = true
 
@@ -99,4 +105,7 @@ python_functions = ["test_*"]
 markers = [
     "benchmark: performance benchmarks (deselect with '-m \"not benchmark\"')",
 ]
-addopts = "--benchmark-disable"
+# --benchmark-disable keeps `pytest benchmarks/` executable in CI without
+# spending CI minutes on timing runs; --strict-markers turns a typo in a
+# @pytest.mark name into an error rather than a silently ignored marker.
+addopts = "--benchmark-disable --strict-markers"

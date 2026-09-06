@@ -372,12 +372,14 @@ def demo_side_by_side() -> None:
 
     print(
         "\n  NAIVE CHUNKER                     | LEXICHUNK\n"
-        "  ----------------------------------|-----------------------------------\n"
-        "  Fixed character/token window      | Splits at clause boundaries only\n"
+        "  ----------------------------------|------------------------------------\n"
+        "  Fixed character/token window      | Splits at clause boundaries first,\n"
+        "                                    |   then inside an oversized clause\n"
         "  No clause boundary awareness      | Hierarchy path on every chunk\n"
         "  No defined terms                  | Definitions attached to each chunk\n"
-        "  No cross-reference tracking       | Cross-references detected & resolved\n"
-        "  No clause type classification     | 24 clause types classified\n"
+        "  No cross-reference tracking       | In-document cross-refs resolved;\n"
+        "                                    |   statute refs detected, not resolved\n"
+        "  No clause type classification     | 31 clause types classified\n"
         "  No document-level metadata        | document_id on every chunk\n"
         "  No context for embedding          | context_header for Contextual Retrieval\n"
     )
