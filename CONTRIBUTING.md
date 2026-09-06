@@ -23,13 +23,43 @@ pip install -e ".[dev,all]"
 
 ## Running the gates
 
-Run these before opening a pull request — CI runs the same checks:
+Run these before opening a pull request — CI runs the same checks on Python
+3.10 through 3.13, plus Windows on 3.12:
 
 ```bash
 ruff check src/ tests/ examples/ benchmarks/
 mypy src/lexichunk/
-pytest --cov=lexichunk --cov-fail-under=90
+pytest --cov=lexichunk --cov-fail-under=92
+pytest benchmarks --benchmark-disable
 ```
+
+`ruff format` is **not** enforced — the tree is not currently formatted with
+it, and reformatting everything would bury real changes in noise. Match the
+style of the file you are editing.
+
+## Property-based tests
+
+`tests/test_properties.py` and `tests/test_invariants.py` use Hypothesis.
+`tests/conftest.py` registers two derandomised profiles, so the same commit
+generates the same examples everywhere:
+
+- `dev` (default locally) — 500 ms per-example deadline;
+- `ci` (used when `$CI` is set, or via `HYPOTHESIS_PROFILE=ci`) — 100 examples
+  and a 2 s deadline, for cold shared runners.
+
+To reproduce a CI failure locally, run `HYPOTHESIS_PROFILE=ci pytest ...`.
+
+## Documentation is tested
+
+`tests/test_readme_examples.py` executes every ```` ```python ```` block in
+`README.md`. If you change the API, update the README in the same PR or that
+test fails. A block that genuinely cannot run in CI needs an HTML comment
+above it containing `lexichunk-doctest: skip` **and a stated reason**.
+
+`tests/test_docstrings.py` requires a docstring on every name in
+`lexichunk.__all__` and every public member of `LegalChunker`, and pins the
+`LegalChunker` public surface — adding a public method means updating that
+list and `CHANGELOG.md` deliberately.
 
 ## Updating snapshots
 

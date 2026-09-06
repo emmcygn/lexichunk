@@ -2,26 +2,47 @@
 
 ## Supported Versions
 
-lexichunk has not yet had a stable PyPI release. Until 1.0.0, only the
-latest published version receives security fixes.
+`0.9.0` is the first PyPI release. Until 1.0.0, only the latest published
+version receives security fixes.
 
 | Version | Supported |
 | ------- | --------- |
-| 0.9.x (planned first PyPI release) | :white_check_mark: |
-| < 0.9.0 (pre-release / source-only) | :x: |
+| 0.9.x | :white_check_mark: |
+| < 0.9.0 (source-only pre-releases) | :x: |
 
 ## Reporting a Vulnerability
 
-Please do **not** open a public GitHub issue for security vulnerabilities.
+Please do **not** open a public GitHub issue for a security vulnerability.
 
-Preferred: use [GitHub's private vulnerability reporting](https://github.com/emmcygn/lexichunk/security/advisories/new)
-for this repository ("Security" tab → "Report a vulnerability").
+Use [GitHub's private vulnerability reporting](https://github.com/emmcygn/lexichunk/security/advisories/new)
+for this repository — the "Security" tab, then "Report a vulnerability". That
+channel is private to the maintainers and is the only one monitored for
+security reports.
 
-Alternatively, email **security@REPLACE_WITH_MAINTAINER_DOMAIN.example** with
-a description of the issue, steps to reproduce, and any relevant proof of
-concept. (Placeholder — replace with a maintained security contact address
-before publishing.)
+Include a description of the issue, steps to reproduce, and any proof of
+concept. We aim to acknowledge reports within 5 business days. Once a fix is
+available we will agree a disclosure timeline with the reporter before
+publishing an advisory.
 
-We aim to acknowledge reports within 5 business days. Once a fix is
-available, we will coordinate a disclosure timeline with the reporter before
-any public advisory is published.
+## Scope
+
+lexichunk parses untrusted document text with regular expressions and has no
+network, filesystem or subprocess behaviour beyond `chunk_batch(workers>1)`,
+which starts worker processes running this package's own code.
+
+In scope:
+
+- catastrophic regex backtracking (ReDoS) on adversarial input — see
+  `tests/test_redos_audit.py`, which drives every pattern in the package with
+  pathological strings;
+- unbounded memory or CPU growth on input under the 10,000,000-character
+  guard;
+- anything that lets document content escape the parser and affect the host
+  process.
+
+Out of scope:
+
+- a wrong or missing chunk, clause type, defined term or cross-reference —
+  that is a correctness bug, so please open a normal issue;
+- resource exhaustion from deliberately passing input larger than the
+  documented limit.

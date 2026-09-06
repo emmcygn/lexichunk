@@ -7,6 +7,16 @@ on:
     branches: [main, master]
   workflow_call:
 
+# Read-only by default; no job here needs to write to the repository.
+permissions:
+  contents: read
+
+# A new push to the same branch supersedes the run in flight. `github.ref` is
+# used rather than the PR number so a push to master cancels only itself.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
@@ -37,4 +47,9 @@ jobs:
         run: mypy src/lexichunk/
 
       - name: Run tests with coverage
-        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=90
+        env:
+          # Selects the derandomised Hypothesis profile registered in
+          # tests/conftest.py, so a property-based failure here reproduces
+          # locally with HYPOTHESIS_PROFILE=ci.
+          HYPOTHESIS_PROFILE: ci
+        run: pytest --tb=short -q --cov=lexichunk --cov-report=term-missing --cov-fail-under=92

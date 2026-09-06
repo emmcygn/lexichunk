@@ -1,5 +1,7 @@
-"""Shared pytest fixtures for lexichunk tests."""
+"""Shared pytest fixtures and the Hypothesis profiles for lexichunk tests."""
 
+import os
+from datetime import timedelta
 from pathlib import Path
 
 import pytest
@@ -7,6 +9,43 @@ import pytest
 from lexichunk.jurisdiction import registered_jurisdictions, unregister_jurisdiction
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+
+# ---------------------------------------------------------------------------
+# Hypothesis profiles
+#
+# Both profiles are derandomised, so a property-based failure reproduces
+# exactly: the same commit generates the same examples on a laptop and on a
+# CI runner, and a red build can be re-run locally without hunting for a seed.
+# The default 200ms per-example deadline is too tight for a cold, shared CI
+# runner (a first call pays for regex compilation), so the ``ci`` profile
+# raises it rather than letting the suite flake.
+#
+# Select explicitly with ``pytest -p hypothesis --hypothesis-profile=ci`` or
+# via ``HYPOTHESIS_PROFILE``; otherwise ``ci`` is used when ``$CI`` is set.
+# ---------------------------------------------------------------------------
+try:
+    from hypothesis import HealthCheck, settings
+except ImportError:  # pragma: no cover - hypothesis is a dev dependency
+    pass
+else:
+    settings.register_profile(
+        "dev",
+        derandomize=True,
+        deadline=timedelta(milliseconds=500),
+        print_blob=True,
+    )
+    settings.register_profile(
+        "ci",
+        derandomize=True,
+        deadline=timedelta(seconds=2),
+        max_examples=100,
+        print_blob=True,
+        suppress_health_check=[HealthCheck.too_slow],
+    )
+    settings.load_profile(
+        os.environ.get("HYPOTHESIS_PROFILE") or ("ci" if os.environ.get("CI") else "dev")
+    )
 
 
 @pytest.fixture(autouse=True)

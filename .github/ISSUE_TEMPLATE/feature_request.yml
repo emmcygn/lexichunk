@@ -1,0 +1,54 @@
+name: Feature request
+description: Suggest a capability lexichunk does not have.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening this, please check the "What it does not do" section of
+        the README. Some absences are deliberate — PDF and DOCX parsing, and
+        resolving statute references against an external source, are out of
+        scope by design.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: >-
+        What are you trying to do, and where does lexichunk get in the way?
+        Describe the situation rather than the API you have in mind.
+    validations:
+      required: true
+
+  - type: textarea
+    id: documents
+    attributes:
+      label: Documents and jurisdiction
+      description: >-
+        What kind of documents is this for, and under which jurisdiction? A
+        short redacted snippet helps a great deal if the request is about
+        parsing or classification.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like it to do
+      description: >-
+        A sketch of the API or the output you want. It does not have to be
+        final.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you are doing instead today
+      description: >-
+        Post-processing, a custom jurisdiction via `register_jurisdiction()`,
+        `extra_clause_signals`, a different library — knowing the workaround
+        tells us how much the gap costs.
+    validations:
+      required: false
