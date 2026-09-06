@@ -65,11 +65,22 @@ def register_jurisdiction(
             (each spawned worker starts from a pristine registry).
 
     Raises:
-        ConfigurationError: If *name* is empty, *patterns* does not conform
+        ConfigurationError: If *name* is not a ``str`` or is empty,
+            *patterns* does not conform
             to the protocol, *detect_level_fn* is not callable, or *name*
             is a built-in jurisdiction key and ``override`` is not ``True``.
     """
-    if not name or not name.strip():
+    # ``name`` must be checked for type *before* anything duck-typed is done
+    # with it.  ``bytes`` also has ``.strip()``/``.lower()``, so it used to
+    # sail through every check and land in the registry as a non-``str`` key —
+    # after which ``registered_jurisdictions()`` (``sorted(keys())``) raised
+    # ``TypeError`` on every subsequent call for the life of the process, with
+    # no way to enumerate or clear the offending key.
+    if not isinstance(name, str):
+        raise ConfigurationError(
+            f"Jurisdiction name must be a str, got {type(name).__name__}."
+        )
+    if not name.strip():
         raise ConfigurationError("Jurisdiction name must be a non-empty string")
     if not isinstance(patterns, JurisdictionPatterns):
         raise ConfigurationError(
@@ -101,9 +112,14 @@ def unregister_jurisdiction(name: str) -> None:
         name: The jurisdiction key to remove (case-insensitive, stripped).
 
     Raises:
-        ConfigurationError: If *name* is a built-in jurisdiction (``"uk"``,
-            ``"us"``, ``"eu"``) or is not currently registered.
+        ConfigurationError: If *name* is not a ``str``, is a built-in
+            jurisdiction (``"uk"``, ``"us"``, ``"eu"``) or is not currently
+            registered.
     """
+    if not isinstance(name, str):
+        raise ConfigurationError(
+            f"Jurisdiction name must be a str, got {type(name).__name__}."
+        )
     key = name.lower().strip()
     if key in _BUILTIN_JURISDICTIONS:
         raise ConfigurationError(

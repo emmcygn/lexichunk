@@ -120,3 +120,79 @@ class TestC3UnicodeLineSeparators:
         assert len(offsets) == len(lines)
         for offset, line in zip(offsets, lines):
             assert text[offset : offset + len(line)] == line
+
+
+class TestC4SurrogateCacheKey:
+    """C4 — the definition cache key used ``text.encode("utf-8")`` with no
+    ``errors=``, so an unpaired surrogate (routine output of
+    ``errors="surrogateescape"`` decoding) raised ``UnicodeEncodeError``.
+    """
+
+    DOC = '1. Definitions\n\n"Services" means the services described below.\udcff\n'
+
+    def test_chunk_with_cache_enabled_accepts_lone_surrogate(self) -> None:
+        from lexichunk import LegalChunker
+
+        chunker = LegalChunker(jurisdiction="uk", enable_definition_cache=True)
+        assert isinstance(chunker.chunk(self.DOC), list)
+
+    def test_unpaired_surrogate_is_preserved_in_output(self) -> None:
+        from lexichunk import LegalChunker
+
+        chunks = LegalChunker(jurisdiction="uk").chunk(self.DOC)
+        assert any("\udcff" in c.content for c in chunks)
+
+    def test_cache_hit_still_works_for_surrogate_text(self) -> None:
+        from lexichunk import LegalChunker
+
+        chunker = LegalChunker(jurisdiction="uk", enable_definition_cache=True)
+        first = chunker.chunk(self.DOC)
+        second = chunker.chunk(self.DOC)
+        assert [c.content for c in first] == [c.content for c in second]
+
+
+class TestC5RegistryNameType:
+    """C5 — ``register_jurisdiction`` duck-typed ``name``, so ``bytes`` was
+    accepted as a registry key and permanently broke
+    ``registered_jurisdictions()`` for the rest of the process.
+    """
+
+    @staticmethod
+    def _patterns():
+        import re
+
+        class _P:
+            cross_ref = definition = definition_curly = re.compile("x")
+            definitions_headers = boilerplate_headers = signature_markers = ()
+
+        return _P()
+
+    @pytest.mark.parametrize("bad_name", [b"uk", 1, None, ["uk"], 2.0])
+    def test_non_str_name_is_rejected_with_configuration_error(
+        self, bad_name: object
+    ) -> None:
+        from lexichunk.exceptions import ConfigurationError
+        from lexichunk.jurisdiction import register_jurisdiction
+
+        with pytest.raises(ConfigurationError):
+            register_jurisdiction(bad_name, self._patterns(), lambda s: None)  # type: ignore[arg-type]
+
+    @pytest.mark.parametrize("bad_name", [b"uk", 1, None, ["uk"]])
+    def test_unregister_rejects_non_str_name(self, bad_name: object) -> None:
+        from lexichunk.exceptions import ConfigurationError
+        from lexichunk.jurisdiction import unregister_jurisdiction
+
+        with pytest.raises(ConfigurationError):
+            unregister_jurisdiction(bad_name)  # type: ignore[arg-type]
+
+    def test_registry_stays_usable_after_a_rejected_call(self) -> None:
+        from lexichunk.exceptions import ConfigurationError
+        from lexichunk.jurisdiction import (
+            register_jurisdiction,
+            registered_jurisdictions,
+        )
+
+        before = registered_jurisdictions()
+        with pytest.raises(ConfigurationError):
+            register_jurisdiction(b"uk", self._patterns(), lambda s: None)  # type: ignore[arg-type]
+        assert registered_jurisdictions() == before

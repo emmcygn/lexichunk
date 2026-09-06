@@ -570,7 +570,17 @@ class LegalChunker:
         defined_terms: dict[str, DefinedTerm] | None = None
         if self._include_definitions:
             if self._enable_definition_cache:
-                cache_key = hashlib.sha256(text.encode("utf-8")).hexdigest()
+                # ``surrogatepass`` (not plain ``utf-8``) because a document
+                # decoded with ``errors="surrogateescape"`` — the standard way
+                # to read a mis-encoded legal-document export without losing
+                # bytes — carries unpaired surrogates that plain UTF-8 refuses
+                # to encode.  Every other stage of the pipeline accepts such a
+                # ``str`` happily, so the cache key must not be the one place
+                # that raises.  Unpaired surrogates are preserved verbatim in
+                # the chunk text; only the key derivation tolerates them.
+                cache_key = hashlib.sha256(
+                    text.encode("utf-8", errors="surrogatepass")
+                ).hexdigest()
                 with self._cache_lock:
                     hit = self._definition_cache.get(cache_key)
                     if hit is not None:
