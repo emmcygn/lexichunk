@@ -68,11 +68,11 @@ def test_the_default_still_prepends_ancestor_headers(
         )
 
 
-def test_offsets_are_identical_with_and_without_the_prefix() -> None:
-    """Turning the prefix off must not move any boundary.
+def test_roomy_budget_keeps_offsets_identical_with_and_without_the_prefix() -> None:
+    """The US MSA keeps its boundaries when both modes have a 2048-token budget.
 
-    It only changes what is prepended to the text at each boundary, so a
-    caller can flip the flag without re-deriving anything positional.
+    This fixture does not approach the cap in either mode, so changing what is
+    prepended does not require any positional boundary to move.
     """
     text = load_fixture("us_msa")
     common = dict(jurisdiction="us", doc_type="contract", max_chunk_size=2048)

@@ -255,7 +255,7 @@ class TestVersionBeta:
         # src/lexichunk/__init__.py __version__; the publish workflow's
         # version-check job asserts those two agree with the release tag.
         import lexichunk
-        assert lexichunk.__version__ == "0.9.0"
+        assert lexichunk.__version__ == "0.9.1"
 
     def test_jurisdiction_enum_has_eu(self) -> None:
         assert hasattr(Jurisdiction, "EU")

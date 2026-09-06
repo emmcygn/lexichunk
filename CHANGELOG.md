@@ -3,11 +3,31 @@
 All notable changes to lexichunk are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.9.1] — Unreleased
+
+### Fixed
+- Preserve clause headings after sentences ending in closing quotes or
+  parentheses, without treating wrapped sentence fragments as headings.
+- Keep numbered form-field lists from becoming top-level US clauses and
+  changing the parents of subsequent sections.
+- Correct source-span projection for sanitised structured input and
+  heading-only sections.
+- Map chunks split inside a normalised Unicode sequence to covering raw
+  source spans rather than empty spans.
+- Respect Markdown fence lengths and preserve distinct equal-valued table
+  cells during Docling ingestion.
+- Exclude disabled ancestor headers from the oversized-clause split budget.
+- Keep primary and secondary clause types distinct after a classifier hook.
+
+### Documentation
+- Record PyPI availability consistently and link external benchmark claims
+  to versioned evaluator results, not to measurements of this unreleased patch.
+- Clarify raw-source covering spans and header-dependent chunk boundaries.
+
 ## [0.9.0] — 2026-09-06
 
-First tagged release of the source-distributed public beta. lexichunk is not
-published on PyPI; install it from git, pinned to `v0.9.0` or to a reviewed
-commit SHA. Everything before this version was source-only too, so the
+First tagged and PyPI release of the public beta. Earlier versions were
+source-only, so the
 "Breaking" entries below describe changes against `0.8.0b1` as installed from
 git, not against a published package.
 
@@ -142,8 +162,8 @@ git, not against a published package.
   smoke-tests the wheel and sdist, `dependabot.yml`, `SECURITY.md`,
   `CONTRIBUTING.md`, `CODEOWNERS`, issue and pull-request templates, and a
   `--cov-fail-under=92` coverage gate.
-- Installation guidance for a package that is not on PyPI: pin the `v0.9.0`
-  tag or an exact reviewed commit SHA. Security reporting scope,
+- Installation guidance for pinned releases or reviewed source commits.
+  Security reporting scope,
   optional-dependency scope (including the NLTK advisory that reaches the
   `llama-index` extra transitively), an adoption guide
   (`docs/adoption-guide.md`) and a fully offline source-evidence retrieval
@@ -211,7 +231,7 @@ git, not against a published package.
   run-on sentence with no internal punctuation — plausible in OCR'd or
   poorly formatted text — used to be emitted whole, violating the
   `max_chunk_size` hard cap. A single indivisible word over the budget is
-  still emitted as-is.
+  split at character boundaries, as described below.
 - Cross-references to a sub-clause that was merged into a larger chunk
   (`clause 2.7`, `clause 3.4(b)`) now resolve: the clause-aware path hands
   the absorbed identifiers to the resolver instead of dropping them.

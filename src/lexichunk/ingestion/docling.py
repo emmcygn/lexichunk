@@ -139,14 +139,25 @@ def _table_text(item: Any) -> str:
     data = getattr(item, "data", None)
     grid = getattr(data, "grid", None) or []
     for row in grid:
-        cells = [(getattr(cell, "text", "") or "").strip() for cell in row]
-        # Collapse the duplicate text a spanning cell leaves in every column
-        # it covers, so "Fees | Fees | Fees" reads as "Fees".
-        collapsed: list[str] = []
-        for cell in cells:
-            if not collapsed or collapsed[-1] != cell:
-                collapsed.append(cell)
-        rendered = " | ".join(collapsed).strip(" |")
+        cells: list[str] = []
+        seen: set[tuple[object, ...]] = set()
+        for cell in row:
+            coordinates = (
+                getattr(cell, "start_row_offset_idx", None),
+                getattr(cell, "end_row_offset_idx", None),
+                getattr(cell, "start_col_offset_idx", None),
+                getattr(cell, "end_col_offset_idx", None),
+            )
+            key = (
+                ("coordinates", *coordinates)
+                if all(value is not None for value in coordinates)
+                else ("identity", id(cell))
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            cells.append((getattr(cell, "text", "") or "").strip())
+        rendered = " | ".join(cells).strip(" |")
         if rendered:
             lines.append(rendered)
     return "\n".join(lines)

@@ -200,7 +200,7 @@ class ClauseAwareChunker:
             if clause.level == -99 and not clause.content.strip():
                 continue
 
-            prefix = self._content_prefix(clause, clause_map)
+            prefix = self._group_prefix([clause], clause_map)
             tokens = _approx_tokens(prefix + clause.content, self._chars_per_token)
 
             if tokens > self._max_chunk_size:

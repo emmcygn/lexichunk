@@ -347,6 +347,18 @@ _BARE_NUMERIC_ID_RE = re.compile(r'\d+(?:\.\d+)*')
 # Punctuation that ends the preceding line's sentence, and so tells rule (f)
 # that the numbered line below it starts something new.
 _SENTENCE_END = ('.', '!', '?', ':', ';')
+_CLOSING_DELIMITERS = '\'"\u2019\u201d\u00bb\u203a)]}'
+_NUMBERED_LIST_PREFIX_RE = re.compile(r'^\s*\d+[.)]\s+\S')
+
+
+def _ends_sentence(line: str) -> bool:
+    """Return whether *line* ends in sentence punctuation and closing delimiters."""
+    return line.rstrip().rstrip(_CLOSING_DELIMITERS).endswith(_SENTENCE_END)
+
+
+def _introduces_list(line: str) -> bool:
+    """Return whether *line* ends with a colon before closing delimiters."""
+    return line.rstrip().rstrip(_CLOSING_DELIMITERS).endswith(':')
 
 
 def _is_title_shaped(remainder: str) -> bool:
@@ -948,6 +960,10 @@ class StructureParser:
         """
         header_map: dict[int, tuple[int, str]] = {}
         rejected = 0
+        active_headings: list[tuple[int, str]] = []
+        form_list_active = False
+        list_introduction_pending = False
+        previous_was_form_list_item = False
 
         # Last *alpha* sub-label accepted at a given indent (and overall),
         # used to disambiguate (i)/(v)/(x)/(l)/(c).  Cleared whenever a
@@ -956,11 +972,45 @@ class StructureParser:
         prev_alpha: Optional[str] = None
 
         for idx, line in enumerate(lines):
+            if not line.strip():
+                form_list_active = False
+                list_introduction_pending = False
+                previous_was_form_list_item = False
+                continue
+
+            inside_marked_us_section = self._inside_marked_us_section(active_headings)
+            has_numbered_list_prefix = _NUMBERED_LIST_PREFIX_RE.match(line) is not None
+            is_form_list_item = (
+                inside_marked_us_section
+                and has_numbered_list_prefix
+                and (form_list_active or list_introduction_pending)
+            )
             result = self._detect_level(line)
             if result is None:
+                previous_was_form_list_item = is_form_list_item
+                form_list_active = is_form_list_item
+                list_introduction_pending = (
+                    inside_marked_us_section
+                    and not is_form_list_item
+                    and _introduces_list(line)
+                )
                 continue
-            if not self._is_plausible_heading(lines, idx, result, header_map):
+            if not self._is_plausible_heading(
+                lines,
+                idx,
+                result,
+                header_map,
+                is_form_list_item=is_form_list_item,
+                follows_form_list=previous_was_form_list_item,
+            ):
                 rejected += 1
+                previous_was_form_list_item = is_form_list_item
+                form_list_active = is_form_list_item
+                list_introduction_pending = (
+                    inside_marked_us_section
+                    and not is_form_list_item
+                    and _introduces_list(line)
+                )
                 continue
 
             level, identifier = result
@@ -981,10 +1031,43 @@ class StructureParser:
                 prev_alpha_by_indent[indent] = identifier
                 prev_alpha = identifier
 
+            while active_headings and active_headings[-1][0] >= level:
+                active_headings.pop()
+            active_headings.append((level, identifier))
             header_map[idx] = (level, identifier)
+            form_list_active = False
+            list_introduction_pending = (
+                self._is_marked_us_section((level, identifier))
+                and _introduces_list(line)
+            )
+            previous_was_form_list_item = False
 
         self.last_rejected_headings = rejected
         return header_map
+
+    def _is_marked_us_section(self, result: tuple[int, str]) -> bool:
+        """Return whether *result* is an explicit dotted US Section heading."""
+        level, identifier = result
+        return (
+            self._jurisdiction in (Jurisdiction.US, Jurisdiction.US.value)
+            and level == 1
+            and identifier.startswith('Section ')
+        )
+
+    def _inside_marked_us_section(
+        self,
+        active_headings: list[tuple[int, str]] | None,
+    ) -> bool:
+        """Return whether the active hierarchy contains a dotted US Section."""
+        if active_headings is None or self._jurisdiction not in (
+            Jurisdiction.US,
+            Jurisdiction.US.value,
+        ):
+            return False
+        return any(
+            active_level == 1 and active_identifier.startswith('Section ')
+            for active_level, active_identifier in active_headings
+        )
 
     def _is_plausible_heading(
         self,
@@ -992,6 +1075,9 @@ class StructureParser:
         idx: int,
         result: tuple[int, str],
         accepted: dict[int, tuple[int, str]] | None = None,
+        *,
+        is_form_list_item: bool = False,
+        follows_form_list: bool = False,
     ) -> bool:
         """Return ``True`` when ``lines[idx]`` really looks like a heading.
 
@@ -1068,11 +1154,16 @@ class StructureParser:
         # evidence is the line above: blank, finished, or itself a heading.
         # Used by rules (b) and (f) below.
         previous = lines[idx - 1].rstrip() if idx > 0 else ''
+        follows_us_numbered_list = (
+            self._is_marked_us_section(result)
+            and follows_form_list
+        )
         opens_block = (
             idx == 0
             or not previous.strip()
-            or previous.endswith(_SENTENCE_END)
+            or _ends_sentence(previous)
             or (accepted is not None and (idx - 1) in accepted)
+            or follows_us_numbered_list
         )
 
         # (b) *Every* heading opens a block.  A line that merely continues the
@@ -1110,6 +1201,8 @@ class StructureParser:
 
         # (d) Numeric top-level clause.
         if level == 0 and identifier.isdigit():
+            if is_form_list_item:
+                return False
             if remainder:
                 upper = remainder.upper()
                 if upper in _ALLCAPS_DENYLIST or _PAGE_RE.match(upper):

@@ -36,7 +36,7 @@ __all__ = ["from_markdown"]
 _HEADING_RE = re.compile(r"^ {0,3}(#{1,6})\s+(.*?)\s*#*\s*$")
 
 # A fenced code block delimiter: ``` or ~~~ , three or more.
-_FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+_FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 
 
 def from_markdown(
@@ -75,6 +75,7 @@ def from_markdown(
     accumulator = SectionAccumulator(jurisdiction, separator="\n")
     in_fence = False
     fence_marker = ""
+    fence_length = 0
     offset = 0
 
     for line in text.splitlines(keepends=True):
@@ -84,15 +85,31 @@ def from_markdown(
 
         fence = _FENCE_RE.match(stripped)
         if fence is not None:
-            marker = fence.group(1)[0]
+            delimiter = fence.group(1)
+            marker = delimiter[0]
+            suffix = fence.group(2)
+            closing_suffix = suffix[:-1] if suffix.endswith("\r") else suffix
+            valid_closing_suffix = not closing_suffix.strip(" \t")
             if not in_fence:
-                in_fence, fence_marker = True, marker
-            elif marker == fence_marker:
-                in_fence, fence_marker = False, ""
-            accumulator.add_line(
-                stripped, char_start=line_start, char_end=line_start + len(stripped)
-            )
-            continue
+                if marker != "`" or "`" not in suffix:
+                    in_fence = True
+                    fence_marker = marker
+                    fence_length = len(delimiter)
+            elif (
+                marker == fence_marker
+                and len(delimiter) >= fence_length
+                and valid_closing_suffix
+            ):
+                in_fence = False
+                fence_marker = ""
+                fence_length = 0
+            if in_fence or valid_closing_suffix:
+                accumulator.add_line(
+                    stripped,
+                    char_start=line_start,
+                    char_end=line_start + len(stripped),
+                )
+                continue
 
         heading = None if in_fence else _HEADING_RE.match(stripped)
         if heading is not None:

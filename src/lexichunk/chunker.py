@@ -1110,7 +1110,20 @@ class LegalChunker:
                     f"got {type(outcome).__name__} ({outcome!r}) for chunk "
                     f"{chunk.index}."
                 )
+            ranked_keyword_types = sorted(
+                result.scores,
+                key=result.scores.__getitem__,
+                reverse=True,
+            )
             chunk.clause_type = outcome
+            chunk.secondary_clause_type = next(
+                (
+                    keyword_type
+                    for keyword_type in ranked_keyword_types
+                    if keyword_type is not outcome
+                ),
+                None,
+            )
             chunk.classification_source = "hook"
 
     # ------------------------------------------------------------------
