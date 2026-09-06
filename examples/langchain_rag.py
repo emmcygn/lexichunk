@@ -9,6 +9,8 @@ Demonstrates:
 
 Requirements:
     pip install lexichunk[langchain] faiss-cpu openai
+    # or: pip install lexichunk[examples]   # installs langchain-community and
+    #     langchain-openai (used for the optional FAISS + embeddings demo below)
 
 The OpenAI embeddings call requires OPENAI_API_KEY to be set.
 If you prefer a local embedding model, swap OpenAIEmbeddings for any
@@ -184,9 +186,10 @@ def main() -> None:
     print("-" * 70)
 
     try:
-        from langchain_community.vectorstores import FAISS  # type: ignore
-        from langchain_openai import OpenAIEmbeddings       # type: ignore
         import os
+
+        from langchain_community.vectorstores import FAISS  # type: ignore
+        from langchain_openai import OpenAIEmbeddings  # type: ignore
 
         if not os.getenv("OPENAI_API_KEY"):
             print("\n  Skipping FAISS indexing: OPENAI_API_KEY not set.")

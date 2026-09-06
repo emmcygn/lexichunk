@@ -1,0 +1,89 @@
+name: Integrations
+
+on:
+  workflow_call:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [master]
+
+jobs:
+  integrations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package with all extras
+        run: pip install -e ".[dev,all]"
+
+      - name: Assert optional integrations import
+        run: |
+          python -c "
+          from lexichunk.integrations.langchain import _LANGCHAIN_AVAILABLE
+          from lexichunk.integrations.llama_index import _LLAMA_INDEX_AVAILABLE
+          assert _LANGCHAIN_AVAILABLE, 'langchain-core did not import despite [all] extra'
+          assert _LLAMA_INDEX_AVAILABLE, 'llama-index-core did not import despite [all] extra'
+          print('Both optional integrations import correctly.')
+          "
+
+      - name: Run tests
+        run: pytest --tb=short -q
+
+      - name: Build sdist and wheel
+        run: |
+          pip install build twine
+          python -m build
+
+      - name: Check distributions with twine
+        run: twine check dist/*
+
+      - name: Assert sdist contains tests, fixtures and snapshots
+        run: |
+          python -c "
+          import glob
+          import tarfile
+
+          sdist_path = glob.glob('dist/*.tar.gz')[0]
+          with tarfile.open(sdist_path) as tar:
+              names = tar.getnames()
+
+          def has(sub):
+              return any(sub in n for n in names)
+
+          assert has('tests/conftest.py'), 'tests/conftest.py missing from sdist'
+          assert has('tests/fixtures/'), 'tests/fixtures/ missing from sdist'
+          # tests/snapshots/ is created once golden-file snapshot tests land;
+          # only assert on it if the source tree actually has it, so this
+          # workflow does not fail before that lands.
+          import os
+          if os.path.isdir('tests/snapshots'):
+              assert has('tests/snapshots/'), 'tests/snapshots/ missing from sdist'
+          print('sdist contents OK.')
+          "
+
+      - name: Smoke-test the built wheel in an isolated environment
+        run: |
+          wheel_path=$(ls "$GITHUB_WORKSPACE"/dist/*.whl)
+          mkdir -p "$RUNNER_TEMP/wheel-smoke-test"
+          cd "$RUNNER_TEMP/wheel-smoke-test"
+          python -m venv smoke-venv
+          if [ -f smoke-venv/Scripts/python.exe ]; then
+            SMOKE_PY=smoke-venv/Scripts/python.exe
+          else
+            SMOKE_PY=smoke-venv/bin/python
+          fi
+          "$SMOKE_PY" -m pip install --no-deps "$wheel_path"
+          "$SMOKE_PY" -c "
+          from lexichunk import LegalChunker
+          chunks = LegalChunker().chunk('1. Term\nThis Agreement starts today.')
+          assert chunks, 'expected at least one chunk from the smoke-test wheel install'
+          print(f'Wheel smoke test OK: {len(chunks)} chunk(s).')
+          "
+        shell: bash

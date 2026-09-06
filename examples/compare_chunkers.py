@@ -14,6 +14,8 @@ Failure modes shown:
 Requirements:
     pip install lexichunk
     pip install langchain-text-splitters    # optional, for naive splitter demo
+    # or: pip install lexichunk[examples]   # installs the optional deps used
+    #     by the examples/ directory (langchain-text-splitters, etc.)
 
 Run:
     python examples/compare_chunkers.py
@@ -204,7 +206,7 @@ def demo_failure_modes() -> None:
     # Show the two chunks a naive splitter would produce
     print("  Naive chunks:")
     print(f"    [Definitions chunk] {DEFINED_TERMS_TEXT[:160].replace(chr(10), ' ')!r}...")
-    print(f"    [Indemnification chunk] ...Losses arising out of any Material Adverse Effect...")
+    print("    [Indemnification chunk] ...Losses arising out of any Material Adverse Effect...")
     print(
         "\n  The LLM uses its pre-training sense of 'material adverse effect'\n"
         "  rather than the contract-specific definition — a silent hallucination."
@@ -239,7 +241,7 @@ def demo_failure_modes() -> None:
         "This Agreement shall be governed by and construed in accordance with "
         "the laws of England and Wales."
     )
-    print(f"  This governing-law text appears verbatim in thousands of UK contracts:")
+    print("  This governing-law text appears verbatim in thousands of UK contracts:")
     print(f"    {boilerplate!r}")
     print(
         "\n  A naive chunk carries no document identifier. At query time the\n"
@@ -291,7 +293,6 @@ def demo_side_by_side() -> None:
 
         # Check for missing defined terms
         print("\n  Defined terms analysis:")
-        has_mae_def = any("Material Adverse Effect\" means" in c for c in naive_chunks)
         has_mae_use = any(
             "Material Adverse Effect" in c and "means" not in c for c in naive_chunks
         )

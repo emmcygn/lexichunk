@@ -51,7 +51,7 @@ Scans the document line-by-line using jurisdiction-specific `detect_level()` fun
 
 **Class**: `lexichunk.strategies.clause_aware.ClauseAwareChunker` (primary) or `lexichunk.strategies.fallback.FallbackChunker` (when Stage 1 finds no clause structure — either returns `[]` or only a preamble clause)
 
-The clause-aware chunker respects clause boundaries. Clauses smaller than `min_chunk_size` are merged with neighbours; clauses exceeding `max_chunk_size` are split at sentence boundaries. Ancestor headers are prepended to maintain hierarchy context.
+The clause-aware chunker respects clause boundaries. Clauses smaller than `min_chunk_size` are merged with an adjacent sibling where the hierarchy allows; hierarchy is never crossed to satisfy `min_chunk_size` (a clause is never merged into a sibling's subtree, or across a parent boundary, purely to hit the minimum). `max_chunk_size` is enforced as a hard cap: an oversized clause is run through a cascading splitter that tries, in order, sentence boundaries, then semicolons, then enumerated sub-items (`(a)`, `(i)`, etc.), then newlines, and finally a word window — falling through to the next strategy only when the current one cannot produce pieces under the cap. A single warning is logged if an indivisible run (e.g. one unbroken word or number) still exceeds `max_chunk_size` after all strategies are exhausted. Ancestor headers are prepended to maintain hierarchy context.
 
 The fallback chunker uses sentence-level splitting with a legal-abbreviation-aware sentence boundary detector (handles "U.S.C.", "F.3d.", "Ltd.", etc.).
 
@@ -124,3 +124,34 @@ print(f"Total: {metrics.total_duration_ms:.1f}ms, {metrics.chunk_count} chunks")
 for stage in metrics.stage_metrics:
     print(f"  {stage.name}: {stage.duration_ms:.1f}ms ({stage.item_count} items)")
 ```
+
+## Logging and observability
+
+lexichunk's root logger (`logging.getLogger("lexichunk")`) has a `NullHandler`
+installed by default, so the library is silent unless the host application
+configures logging.
+
+- **DEBUG** — per-stage progress: stage start/done, item counts, timing. Safe
+  to enable in development; verbose in production.
+- **WARNING** — emitted only when behaviour deviates from what the caller
+  asked for, not for routine operation. Examples: `chunk_batch()` falling
+  back to serial execution because the process pool could not start, the
+  worker count being capped to the platform limit, and a jurisdiction
+  being re-registered over an existing key (overriding a previous
+  registration).
+
+No other levels are used internally; there is no INFO-level chatter to filter out.
+
+## Thread safety
+
+A single `LegalChunker` instance is safe to share across threads for
+`chunk()` and `chunk_iter()` — these methods do not mutate shared instance
+state that would race between concurrent calls beyond the definition cache,
+which is itself safe for concurrent reads/writes.
+
+The `cross_ref_resolution_rate` and `cross_ref_stats` properties reflect the
+**last completed call** on that instance — they are convenience accumulators,
+not per-call results, so reading them from one thread while another thread is
+mid-`chunk()` call is racy. When you need statistics tied to a specific call
+(e.g. from concurrent callers), use `chunk_with_metrics()` and read the
+returned `PipelineMetrics` object instead of the instance-level properties.

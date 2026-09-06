@@ -138,7 +138,7 @@ def main() -> None:
             refs = [r.raw_text for r in chunk.cross_references]
             print(f"  cross_references : {refs}")
         else:
-            print(f"  cross_references : (none detected)")
+            print("  cross_references : (none detected)")
 
         # Defined terms
         if chunk.defined_terms_used:
@@ -150,7 +150,7 @@ def main() -> None:
                     short += "..."
                 print(f"    '{term}' => {short!r}")
         else:
-            print(f"  defined_terms_used     : (none)")
+            print("  defined_terms_used     : (none)")
 
         # Context header (Contextual Retrieval)
         print(f"  context_header   : {chunk.context_header!r}")
