@@ -1058,19 +1058,38 @@ class StructureParser:
         # Text after the identifier; used by rules (d) and (e) below.
         remainder = _remainder_after_identifier(line, identifier)
 
-        # (b) Container levels must start at column 0, follow a blank line, or
-        #     follow a line that ended a sentence.  The third alternative was
-        #     added because a real "Schedule 2" heading is routinely typed
-        #     directly under the last line of the preceding clause with no
-        #     blank line between them; rejecting it collapses the entire
-        #     schedule into the clause above.
-        if level in (-1, -2):
-            starts_at_column_0 = not line[:1].isspace()
-            previous = lines[idx - 1].rstrip() if idx > 0 else ''
-            blank_before = idx > 0 and not previous.strip()
-            terminated_before = previous.endswith(('.', '!', '?', ':', ';'))
-            if not (starts_at_column_0 or blank_before or terminated_before):
-                return False
+        # A heading opens a block; a wrapped sentence continues one.  The
+        # evidence is the line above: blank, finished, or itself a heading.
+        # Used by rules (b) and (f) below.
+        previous = lines[idx - 1].rstrip() if idx > 0 else ''
+        opens_block = (
+            idx == 0
+            or not previous.strip()
+            or previous.endswith(_SENTENCE_END)
+            or (accepted is not None and (idx - 1) in accepted)
+        )
+
+        # (b) *Every* heading opens a block.  A line that merely continues the
+        #     sentence above it is a wrapped fragment, whatever it starts
+        #     with, and believing it is expensive: the rest of the document
+        #     is re-parented under a clause that does not exist there.
+        #
+        #     This rule used to apply only to containers, and to accept any
+        #     line starting at column 0 — which is no evidence at all in text
+        #     hard-wrapped out of a PDF, where *every* line starts at column
+        #     0.  The two gold fixtures are full of the cases that exposed
+        #     it: "... the payment terms set out in paragraph 2 of" wrapping
+        #     onto "Schedule 2."; "... its obligations under" wrapping onto
+        #     "Section 2.04."; "... invoiced in accordance with" wrapping
+        #     onto "Section 3.02."; an ALL-CAPS liability cap wrapping onto
+        #     "SECTION 8.01 OR SECTION 8.02, A BREACH OF ARTICLE V, ...".
+        #
+        #     The "previous line was itself a heading" alternative is what
+        #     keeps the layouts that have no blank line and no full stop: a
+        #     real "Schedule 2" typed under the heading above it, and "1.1"
+        #     stacked directly under "1. Definitions".
+        if not opens_block:
+            return False
 
         # (c) ALL-CAPS level-0 fallback.
         if _is_allcaps_fallback(stripped, level, identifier):
@@ -1126,27 +1145,6 @@ class StructureParser:
         #     (`"Article I, Section 3.01 through 3.04, ..."`).
         if remainder.startswith(','):
             return False
-
-        # (f) A bare-numeric heading must open a block.  Unlike "Section 4.5"
-        #     or "SCHEDULE 2", "4.5" carries no keyword vouching for it, so
-        #     the only evidence that it is a heading and not the tail of a
-        #     wrapped sentence is what sits above it.  Requiring a blank
-        #     line, a finished sentence, or another heading covers every
-        #     real layout: sub-clauses stacked under their parent heading
-        #     ("1. Definitions" / "1.1 In this Agreement ...") are kept by
-        #     the third alternative even when the parent has no full stop.
-        if (
-            accepted is not None
-            and idx > 0
-            and _BARE_NUMERIC_ID_RE.fullmatch(identifier)
-        ):
-            previous = lines[idx - 1].rstrip()
-            if (
-                previous.strip()
-                and not previous.endswith(_SENTENCE_END)
-                and (idx - 1) not in accepted
-            ):
-                return False
 
         return True
 

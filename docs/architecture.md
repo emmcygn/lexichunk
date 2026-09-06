@@ -165,7 +165,12 @@ print(
 )
 ```
 
-Reference values for the bundled fixtures at the default 512/64 sizes:
+Reference values for the bundled fixtures at the default 512/64 sizes.
+The last two are generated fixtures with hand-built gold annotations —
+see `tests/test_gold_fixtures.py`. `us_msa_signed_with_exhibits` rejects
+17 heading candidates because it is a signed agreement full of ALL-CAPS
+liability text and wrapped `Section N.NN` references; that number being
+high is the gate working, not failing.
 
 | Fixture | clauses | top-level | chunks | spanning | grouped | below min | rejected | unclassified |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -174,6 +179,8 @@ Reference values for the bundled fixtures at the default 512/64 sizes:
 | `us_msa` | 74 | 12 | 50 | 0 | 17 | 2 | 14 | 0 |
 | `us_terms_of_service` | 80 | 12 | 48 | 0 | 17 | 0 | 6 | 1 |
 | `eu_gdpr_excerpt` | 37 | 3 | 10 | 0 | 8 | 1 | 2 | 1 |
+| `uk_pdf_extracted_agreement` | 91 | 18 | 56 | 0 | 22 | 0 | 3 | 1 |
+| `us_msa_signed_with_exhibits` | 63 | 13 | 44 | 0 | 18 | 1 | 17 | 1 |
 
 ## Logging and observability
 

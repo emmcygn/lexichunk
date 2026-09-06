@@ -1,0 +1,1366 @@
+[
+  {
+    "char_end": 1738,
+    "char_start": 0,
+    "classification_confidence": 1.0,
+    "clause_type": "preamble",
+    "content_head": "'MASTER SERVICES AGREEMENT\\n\\nThis Master Services Agreement (this \"Agreement\") is '",
+    "content_sha256": "bd70469a1c0dedd1eafd15a4217a855bec873c2d210c1976635318acf887b6a1",
+    "context_header": "[Section: preamble] [Type: Preamble] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Agreement",
+      "Customer",
+      "Effective Date",
+      "Fees",
+      "Parties",
+      "Party",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "preamble",
+    "hierarchy_path": "preamble",
+    "index": 0,
+    "original_header": "",
+    "secondary_clause_type": null,
+    "token_count": 434
+  },
+  {
+    "char_end": 1807,
+    "char_start": 1738,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'ARTICLE I\\nDEFINITIONS AND INTERPRETATION\\n\\nSection 1.01 Definitions.\\n\\n'",
+    "content_sha256": "383f9d40a52b954bccb6825b6746a12a8b05a6c5342571f4c447eb82f19ed4c3",
+    "context_header": "[Section: Article I — Definitions and Interpretation > Section 1.01 — Definitions.] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE I",
+        "target_chunk_index": 1,
+        "target_identifier": "I"
+      },
+      {
+        "raw_text": "Section 1.01",
+        "target_chunk_index": 1,
+        "target_identifier": "1.01"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions and Interpretation > Section 1.01 — Definitions.",
+    "index": 1,
+    "original_header": "Section 1.01 Definitions.",
+    "secondary_clause_type": null,
+    "token_count": 17
+  },
+  {
+    "char_end": 3815,
+    "char_start": 1807,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'Article I Definitions and Interpretation\\nAs used in this Agreement, the followin'",
+    "content_sha256": "ba0dcc26e8a4963ec4c3db7048540d58938d8e25d1ec388d940edaafb7d9014b",
+    "context_header": "[Section: Article I — Definitions and Interpretation > Section 1.01 — Definitions.] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Affiliate",
+      "Agreement",
+      "Authorized User",
+      "Confidential Information",
+      "Customer",
+      "Deliverables",
+      "Disclosing Party",
+      "Documentation",
+      "Fees",
+      "Intellectual Property Rights",
+      "Order Form",
+      "Party",
+      "Provider",
+      "Receiving Party",
+      "Services"
+    ],
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions and Interpretation > Section 1.01 — Definitions.",
+    "index": 2,
+    "original_header": "Section 1.01 Definitions.",
+    "secondary_clause_type": null,
+    "token_count": 512
+  },
+  {
+    "char_end": 4545,
+    "char_start": 3815,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'Article I Definitions and Interpretation\\napplications, registrations, and renewa'",
+    "content_sha256": "ac0162e42260436d45308fe801f8ddd79208315afe30c50337683b4e0e31eab5",
+    "context_header": "[Section: Article I — Definitions and Interpretation > Section 1.01 — Definitions.] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Exhibit A",
+        "target_chunk_index": 38,
+        "target_identifier": "A"
+      },
+      {
+        "raw_text": "Exhibit B",
+        "target_chunk_index": 41,
+        "target_identifier": "B"
+      },
+      {
+        "raw_text": "Article IV",
+        "target_chunk_index": 14,
+        "target_identifier": "IV"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Deliverables",
+      "Effective Date",
+      "Fees",
+      "Order Form",
+      "Services",
+      "Term"
+    ],
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions and Interpretation > Section 1.01 — Definitions.",
+    "index": 3,
+    "original_header": "Section 1.01 Definitions.",
+    "secondary_clause_type": null,
+    "token_count": 192
+  },
+  {
+    "char_end": 4947,
+    "char_start": 4545,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'Article I Definitions and Interpretation\\nSection 1.02 Interpretation.\\n\\nIn this A'",
+    "content_sha256": "dea2176852267e937ade9e6e71f900c13815fe7f82da8c17978267be737097f5",
+    "context_header": "[Section: Article I — Definitions and Interpretation > Section 1.02 — Interpretation.] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.02",
+        "target_chunk_index": 4,
+        "target_identifier": "1.02"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement"
+    ],
+    "document_section": "definitions",
+    "hierarchy_path": "Article I — Definitions and Interpretation > Section 1.02 — Interpretation.",
+    "index": 4,
+    "original_header": "Section 1.02 Interpretation.",
+    "secondary_clause_type": null,
+    "token_count": 110
+  },
+  {
+    "char_end": 5327,
+    "char_start": 4947,
+    "classification_confidence": 0.923,
+    "clause_type": "services",
+    "content_head": "'ARTICLE II\\nSCOPE OF SERVICES\\n\\nSection 2.01 Provision of Services.\\n\\nProvider shal'",
+    "content_sha256": "0e2e2bf05ab4d039798d6d56b4584745c50c1b8a77d986ad18b0b7642d3a92ea",
+    "context_header": "[Section: Article II — Scope of Services > Section 2.01 — Provision of Services.] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE II",
+        "target_chunk_index": 5,
+        "target_identifier": "II"
+      },
+      {
+        "raw_text": "Section 2.01",
+        "target_chunk_index": 5,
+        "target_identifier": "2.01"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Customer",
+      "Order Form",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article II — Scope of Services > Section 2.01 — Provision of Services.",
+    "index": 5,
+    "original_header": "Section 2.01 Provision of Services.",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 95
+  },
+  {
+    "char_end": 5773,
+    "char_start": 5327,
+    "classification_confidence": 0.909,
+    "clause_type": "services",
+    "content_head": "'Article II Scope of Services\\nSection 2.02 Statements of Work and Order Forms.\\n\\nT'",
+    "content_sha256": "4775fb66ed7b1802bff73753b7dc58f9be77625457332927a9145038c572c1bf",
+    "context_header": "[Section: Article II — Scope of Services > Section 2.02 — Statements of Work and Order Forms.] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.02",
+        "target_chunk_index": 6,
+        "target_identifier": "2.02"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Order Form",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article II — Scope of Services > Section 2.02 — Statements of Work and Order Forms.",
+    "index": 6,
+    "original_header": "Section 2.02 Statements of Work and Order Forms.",
+    "secondary_clause_type": "entire_agreement",
+    "token_count": 118
+  },
+  {
+    "char_end": 6282,
+    "char_start": 5773,
+    "classification_confidence": 0.75,
+    "clause_type": "services",
+    "content_head": "'Article II Scope of Services\\nSection 2.03 Change Orders.\\n\\nEither party may propo'",
+    "content_sha256": "b079c6215566eb1d4a51e54a0d7fd9b6f306d90d133609623368882cbc1898f3",
+    "context_header": "[Section: Article II — Scope of Services > Section 2.03 — Change Orders.] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.03",
+        "target_chunk_index": 7,
+        "target_identifier": "2.03"
+      },
+      {
+        "raw_text": "Section 2.04",
+        "target_chunk_index": 7,
+        "target_identifier": "2.04"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Provider",
+      "Services",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article II — Scope of Services > Section 2.03 — Change Orders.",
+    "index": 7,
+    "original_header": "Section 2.03 Change Orders.",
+    "secondary_clause_type": "payment",
+    "token_count": 134
+  },
+  {
+    "char_end": 6809,
+    "char_start": 6282,
+    "classification_confidence": 1.0,
+    "clause_type": "services",
+    "content_head": "'Article II Scope of Services\\nSection 2.04 Customer Responsibilities.\\n(a) Access '",
+    "content_sha256": "31a292ebc44a0b5ebcbd3c80914cdf6db849bc4508a9c97c7b5421bed58c098d",
+    "context_header": "[Section: Article II — Scope of Services > Section 2.04 — Customer Responsibilities. > (a) — Access and Cooperation.] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article II — Scope of Services > Section 2.04 — Customer Responsibilities. > (a) — Access and Cooperation.",
+    "index": 8,
+    "original_header": "(a) Access and Cooperation.",
+    "secondary_clause_type": null,
+    "token_count": 149
+  },
+  {
+    "char_end": 7158,
+    "char_start": 6809,
+    "classification_confidence": 1.0,
+    "clause_type": "services",
+    "content_head": "'Article II Scope of Services\\nSection 2.04 Customer Responsibilities.\\n(c) Accurac'",
+    "content_sha256": "2ac5fdc471937c6b340477bc5f5a56992fc9702afb52af6dbc43f086d4c995fe",
+    "context_header": "[Section: Article II — Scope of Services > Section 2.04 — Customer Responsibilities. > (c) — Accuracy of Information.] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.04",
+        "target_chunk_index": 7,
+        "target_identifier": "2.04"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article II — Scope of Services > Section 2.04 — Customer Responsibilities. > (c) — Accuracy of Information.",
+    "index": 9,
+    "original_header": "(c) Accuracy of Information.",
+    "secondary_clause_type": null,
+    "token_count": 104
+  },
+  {
+    "char_end": 7470,
+    "char_start": 7158,
+    "classification_confidence": 0.889,
+    "clause_type": "payment",
+    "content_head": "'ARTICLE III\\nFEES AND PAYMENT\\n\\nSection 3.01 Fees.\\n\\nCustomer shall pay Provider th'",
+    "content_sha256": "c7d7687f5fdc7c74606c10b6f2121826a53b1b32569d33a629639c0ee2d390a9",
+    "context_header": "[Section: Article III — Fees and Payment > Section 3.01 — Fees.] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE III",
+        "target_chunk_index": 10,
+        "target_identifier": "III"
+      },
+      {
+        "raw_text": "Section 3.01",
+        "target_chunk_index": 10,
+        "target_identifier": "3.01"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Fees",
+      "Order Form",
+      "Provider"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article III — Fees and Payment > Section 3.01 — Fees.",
+    "index": 10,
+    "original_header": "Section 3.01 Fees.",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 78
+  },
+  {
+    "char_end": 7949,
+    "char_start": 7470,
+    "classification_confidence": 0.875,
+    "clause_type": "payment",
+    "content_head": "'Article III Fees and Payment\\nSection 3.02 Invoicing and Payment.\\n\\nProvider shall'",
+    "content_sha256": "55f1303d0165495844adb6d77fc071617bf4300bfb34df85694ba82fb06672b0",
+    "context_header": "[Section: Article III — Fees and Payment > Section 3.02 — Invoicing and Payment.] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3.02",
+        "target_chunk_index": 11,
+        "target_identifier": "3.02"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Fees",
+      "Order Form",
+      "Payment Due Date",
+      "Provider"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article III — Fees and Payment > Section 3.02 — Invoicing and Payment.",
+    "index": 11,
+    "original_header": "Section 3.02 Invoicing and Payment.",
+    "secondary_clause_type": "assignment",
+    "token_count": 127
+  },
+  {
+    "char_end": 8379,
+    "char_start": 7949,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'Article III Fees and Payment\\nSection 3.03 Late Payments.\\n\\nAny amount not paid by'",
+    "content_sha256": "eca80946b23367b74702da2785d1e879bd1ed70c8f1b8060209e0396d780c364",
+    "context_header": "[Section: Article III — Fees and Payment > Section 3.03 — Late Payments.] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3.03",
+        "target_chunk_index": 12,
+        "target_identifier": "3.03"
+      },
+      {
+        "raw_text": "Section 3.01",
+        "target_chunk_index": 10,
+        "target_identifier": "3.01"
+      }
+    ],
+    "defined_terms_used": [
+      "Fees",
+      "Payment Due Date",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article III — Fees and Payment > Section 3.03 — Late Payments.",
+    "index": 12,
+    "original_header": "Section 3.03 Late Payments.",
+    "secondary_clause_type": null,
+    "token_count": 114
+  },
+  {
+    "char_end": 8793,
+    "char_start": 8379,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'Article III Fees and Payment\\nSection 3.04 Taxes.\\n\\nThe Fees do not include sales,'",
+    "content_sha256": "ff0c2cb4c01413bf0cf63043be565d024e1684e5b70d0af39fe6e51a369578e4",
+    "context_header": "[Section: Article III — Fees and Payment > Section 3.04 — Taxes.] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3.04",
+        "target_chunk_index": 13,
+        "target_identifier": "3.04"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Fees",
+      "Provider",
+      "Taxes"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article III — Fees and Payment > Section 3.04 — Taxes.",
+    "index": 13,
+    "original_header": "Section 3.04 Taxes.",
+    "secondary_clause_type": null,
+    "token_count": 110
+  },
+  {
+    "char_end": 9218,
+    "char_start": 8793,
+    "classification_confidence": 0.714,
+    "clause_type": "termination",
+    "content_head": "'ARTICLE IV\\nTERM AND TERMINATION\\n\\nSection 4.01 Term.\\n\\nThis Agreement commences on'",
+    "content_sha256": "e7ea7f50409aa16d20b58703032eddd525b260f12e2b71811d1eaa6e499b76cc",
+    "context_header": "[Section: Article IV — Term and Termination > Section 4.01 — Term.] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE IV",
+        "target_chunk_index": 14,
+        "target_identifier": "IV"
+      },
+      {
+        "raw_text": "Section 4.01",
+        "target_chunk_index": 14,
+        "target_identifier": "4.01"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Effective Date",
+      "Order Form",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article IV — Term and Termination > Section 4.01 — Term.",
+    "index": 14,
+    "original_header": "Section 4.01 Term.",
+    "secondary_clause_type": "notices",
+    "token_count": 106
+  },
+  {
+    "char_end": 9799,
+    "char_start": 9218,
+    "classification_confidence": 0.5,
+    "clause_type": "termination",
+    "content_head": "'Article IV Term and Termination\\nSection 4.02 Termination for Convenience.\\n\\nEithe'",
+    "content_sha256": "57176e96ba8504c7803e358c5e37ca850795573bcb068fcdbbc22e48a86cb957",
+    "context_header": "[Section: Article IV — Term and Termination > Section 4.02 — Termination for Convenience.] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.02",
+        "target_chunk_index": 15,
+        "target_identifier": "4.02"
+      },
+      {
+        "raw_text": "Section 4.03",
+        "target_chunk_index": 15,
+        "target_identifier": "4.03"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Order Form",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article IV — Term and Termination > Section 4.02 — Termination for Convenience.",
+    "index": 15,
+    "original_header": "Section 4.02 Termination for Convenience.",
+    "secondary_clause_type": "notices",
+    "token_count": 153
+  },
+  {
+    "char_end": 10400,
+    "char_start": 9799,
+    "classification_confidence": 0.5,
+    "clause_type": "termination",
+    "content_head": "'Article IV Term and Termination\\nSection 4.03 Termination for Cause.\\n(a) Uncured '",
+    "content_sha256": "fd17c4f391d429fcd07dec888163a944c587e1780ebe9eed6173b146472a9aa9",
+    "context_header": "[Section: Article IV — Term and Termination > Section 4.03 — Termination for Cause. > (a) — Uncured Material Breach.] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Agreement",
+      "Order Form",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article IV — Term and Termination > Section 4.03 — Termination for Cause. > (a) — Uncured Material Breach.",
+    "index": 16,
+    "original_header": "(a) Uncured Material Breach.",
+    "secondary_clause_type": "assignment",
+    "token_count": 167
+  },
+  {
+    "char_end": 10874,
+    "char_start": 10400,
+    "classification_confidence": 0.636,
+    "clause_type": "termination",
+    "content_head": "'Article IV Term and Termination\\nSection 4.04 Effect of Termination.\\n\\nUpon termin'",
+    "content_sha256": "c22fa4a287f6f851a872f2c2f8d139fe80e535d7f41a4d6ec92991c294f04b38",
+    "context_header": "[Section: Article IV — Term and Termination > Section 4.04 — Effect of Termination.] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.04",
+        "target_chunk_index": 17,
+        "target_identifier": "4.04"
+      },
+      {
+        "raw_text": "Article V",
+        "target_chunk_index": 18,
+        "target_identifier": "V"
+      },
+      {
+        "raw_text": "Article\nVI",
+        "target_chunk_index": 21,
+        "target_identifier": "VI"
+      },
+      {
+        "raw_text": "Article I",
+        "target_chunk_index": 1,
+        "target_identifier": "I"
+      },
+      {
+        "raw_text": "Article III",
+        "target_chunk_index": 10,
+        "target_identifier": "III"
+      },
+      {
+        "raw_text": "Article VII",
+        "target_chunk_index": 25,
+        "target_identifier": "VII"
+      },
+      {
+        "raw_text": "Article VIII",
+        "target_chunk_index": 28,
+        "target_identifier": "VIII"
+      },
+      {
+        "raw_text": "Article IX",
+        "target_chunk_index": 33,
+        "target_identifier": "IX"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Confidential Information",
+      "Customer",
+      "Fees",
+      "Services",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article IV — Term and Termination > Section 4.04 — Effect of Termination.",
+    "index": 17,
+    "original_header": "Section 4.04 Effect of Termination.",
+    "secondary_clause_type": "payment",
+    "token_count": 126
+  },
+  {
+    "char_end": 11300,
+    "char_start": 10874,
+    "classification_confidence": 0.714,
+    "clause_type": "confidentiality",
+    "content_head": "'ARTICLE V\\nCONFIDENTIALITY\\n\\nSection 5.01 Confidentiality Obligations.\\n\\nEach party'",
+    "content_sha256": "1e2fc9c8565f8f7ed61c1fe1358160f447bb74e43ce639a32baa7e6aa1c62ec8",
+    "context_header": "[Section: Article V — Confidentiality > Section 5.01 — Confidentiality Obligations.] [Type: Confidentiality] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE V",
+        "target_chunk_index": 18,
+        "target_identifier": "V"
+      },
+      {
+        "raw_text": "Section 5.01",
+        "target_chunk_index": 18,
+        "target_identifier": "5.01"
+      },
+      {
+        "raw_text": "Section 5.02",
+        "target_chunk_index": 19,
+        "target_identifier": "5.02"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Confidential Information"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article V — Confidentiality > Section 5.01 — Confidentiality Obligations.",
+    "index": 18,
+    "original_header": "Section 5.01 Confidentiality Obligations.",
+    "secondary_clause_type": "covenants",
+    "token_count": 106
+  },
+  {
+    "char_end": 11769,
+    "char_start": 11300,
+    "classification_confidence": 0.556,
+    "clause_type": "confidentiality",
+    "content_head": "'Article V Confidentiality\\nSection 5.02 Permitted Disclosures.\\n\\nA party may discl'",
+    "content_sha256": "4f5184fd2f13a4d8be798689ee37e6c22a1d3f59588831cc688cb6eb0cce4cf3",
+    "context_header": "[Section: Article V — Confidentiality > Section 5.02 — Permitted Disclosures.] [Type: Confidentiality] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.02",
+        "target_chunk_index": 19,
+        "target_identifier": "5.02"
+      },
+      {
+        "raw_text": "Article V",
+        "target_chunk_index": 18,
+        "target_identifier": "V"
+      }
+    ],
+    "defined_terms_used": [
+      "Confidential Information"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article V — Confidentiality > Section 5.02 — Permitted Disclosures.",
+    "index": 19,
+    "original_header": "Section 5.02 Permitted Disclosures.",
+    "secondary_clause_type": "governing_law",
+    "token_count": 123
+  },
+  {
+    "char_end": 12107,
+    "char_start": 11769,
+    "classification_confidence": 0.7,
+    "clause_type": "confidentiality",
+    "content_head": "'Article V Confidentiality\\nSection 5.03 Survival.\\n\\nThe obligations in this Articl'",
+    "content_sha256": "cbdb45ba331e210f65b500393598668999874e441a520d14906d17f26f7dfb93",
+    "context_header": "[Section: Article V — Confidentiality > Section 5.03 — Survival.] [Type: Confidentiality] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.03",
+        "target_chunk_index": 20,
+        "target_identifier": "5.03"
+      },
+      {
+        "raw_text": "Article V",
+        "target_chunk_index": 18,
+        "target_identifier": "V"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Confidential Information"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article V — Confidentiality > Section 5.03 — Survival.",
+    "index": 20,
+    "original_header": "Section 5.03 Survival.",
+    "secondary_clause_type": "governing_law",
+    "token_count": 91
+  },
+  {
+    "char_end": 12558,
+    "char_start": 12107,
+    "classification_confidence": 1.0,
+    "clause_type": "intellectual_property",
+    "content_head": "'ARTICLE VI\\nINTELLECTUAL PROPERTY\\n\\nSection 6.01 Provider Ownership.\\n\\nAs between t'",
+    "content_sha256": "88693c859af40e3ccc4ffe7b128951119a0d6483fd3ffdcda486de440e379c8b",
+    "context_header": "[Section: Article VI — Intellectual Property > Section 6.01 — Provider Ownership.] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE VI",
+        "target_chunk_index": 21,
+        "target_identifier": "VI"
+      },
+      {
+        "raw_text": "Section 6.01",
+        "target_chunk_index": 21,
+        "target_identifier": "6.01"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Customer",
+      "Documentation",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VI — Intellectual Property > Section 6.01 — Provider Ownership.",
+    "index": 21,
+    "original_header": "Section 6.01 Provider Ownership.",
+    "secondary_clause_type": null,
+    "token_count": 112
+  },
+  {
+    "char_end": 12903,
+    "char_start": 12558,
+    "classification_confidence": 0.6,
+    "clause_type": "intellectual_property",
+    "content_head": "'Article VI Intellectual Property\\nSection 6.02 License Grant.\\n\\nSubject to Custome'",
+    "content_sha256": "d97d3d3529f4a06004056ac0e4270aad2ea5c4f3e2539d6b05955bb558128bdc",
+    "context_header": "[Section: Article VI — Intellectual Property > Section 6.02 — License Grant.] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 6.02",
+        "target_chunk_index": 22,
+        "target_identifier": "6.02"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Customer",
+      "Documentation",
+      "Fees",
+      "Order Form",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VI — Intellectual Property > Section 6.02 — License Grant.",
+    "index": 22,
+    "original_header": "Section 6.02 License Grant.",
+    "secondary_clause_type": "payment",
+    "token_count": 94
+  },
+  {
+    "char_end": 13353,
+    "char_start": 12903,
+    "classification_confidence": 0.545,
+    "clause_type": "intellectual_property",
+    "content_head": "'Article VI Intellectual Property\\nSection 6.03 Customer Data.\\n\\nAs between the par'",
+    "content_sha256": "fd2809433d522e29a32c00f5b082b724d2493cfce2be0d98b0034f131440a049",
+    "context_header": "[Section: Article VI — Intellectual Property > Section 6.03 — Customer Data.] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 6.03",
+        "target_chunk_index": 23,
+        "target_identifier": "6.03"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Customer Data",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VI — Intellectual Property > Section 6.03 — Customer Data.",
+    "index": 23,
+    "original_header": "Section 6.03 Customer Data.",
+    "secondary_clause_type": "services",
+    "token_count": 120
+  },
+  {
+    "char_end": 13765,
+    "char_start": 13353,
+    "classification_confidence": 0.5,
+    "clause_type": "intellectual_property",
+    "content_head": "'Article VI Intellectual Property\\nSection 6.04 Deliverables.\\n\\nUnless an Order For'",
+    "content_sha256": "32889f5b6886708a5db8960fef11db7e8a280043145d03f5fa6aa069550dffdd",
+    "context_header": "[Section: Article VI — Intellectual Property > Section 6.04 — Deliverables.] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 6.04",
+        "target_chunk_index": 24,
+        "target_identifier": "6.04"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Deliverables",
+      "Fees",
+      "Order Form",
+      "Provider"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VI — Intellectual Property > Section 6.04 — Deliverables.",
+    "index": 24,
+    "original_header": "Section 6.04 Deliverables.",
+    "secondary_clause_type": "payment",
+    "token_count": 111
+  },
+  {
+    "char_end": 14094,
+    "char_start": 13765,
+    "classification_confidence": 0.667,
+    "clause_type": "representations",
+    "content_head": "'ARTICLE VII\\nREPRESENTATIONS AND WARRANTIES\\n\\nSection 7.01 Mutual Representations.'",
+    "content_sha256": "f3cc040228746ee5672c2f1ced286e76ab7a491e58c6edd78a316b8c43c346c2",
+    "context_header": "[Section: Article VII — Representations and Warranties > Section 7.01 — Mutual Representations.] [Type: Representations] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE VII",
+        "target_chunk_index": 25,
+        "target_identifier": "VII"
+      },
+      {
+        "raw_text": "Section 7.01",
+        "target_chunk_index": 25,
+        "target_identifier": "7.01"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VII — Representations and Warranties > Section 7.01 — Mutual Representations.",
+    "index": 25,
+    "original_header": "Section 7.01 Mutual Representations.",
+    "secondary_clause_type": "warranties",
+    "token_count": 82
+  },
+  {
+    "char_end": 14512,
+    "char_start": 14094,
+    "classification_confidence": 0.455,
+    "clause_type": "warranties",
+    "content_head": "'Article VII Representations and Warranties\\nSection 7.02 Provider Warranty.\\n\\nProv'",
+    "content_sha256": "5e1bebbf30e72d44739a7c5f434d4cc15f439b529b871b438e28b4124f3799e5",
+    "context_header": "[Section: Article VII — Representations and Warranties > Section 7.02 — Provider Warranty.] [Type: Warranties] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.02",
+        "target_chunk_index": 26,
+        "target_identifier": "7.02"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Documentation",
+      "Fees",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VII — Representations and Warranties > Section 7.02 — Provider Warranty.",
+    "index": 26,
+    "original_header": "Section 7.02 Provider Warranty.",
+    "secondary_clause_type": "representations",
+    "token_count": 115
+  },
+  {
+    "char_end": 14904,
+    "char_start": 14512,
+    "classification_confidence": 0.545,
+    "clause_type": "warranties",
+    "content_head": "'Article VII Representations and Warranties\\nSection 7.03 Disclaimer.\\n\\nEXCEPT AS E'",
+    "content_sha256": "4d273f47bb2d1bcb4cbcbea558167ce515b01f98ab0e75b8669334bb84006128",
+    "context_header": "[Section: Article VII — Representations and Warranties > Section 7.03 — Disclaimer.] [Type: Warranties] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.03",
+        "target_chunk_index": 27,
+        "target_identifier": "7.03"
+      },
+      {
+        "raw_text": "SECTION 7.02",
+        "target_chunk_index": 26,
+        "target_identifier": "7.02"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Article VII — Representations and Warranties > Section 7.03 — Disclaimer.",
+    "index": 27,
+    "original_header": "Section 7.03 Disclaimer.",
+    "secondary_clause_type": "representations",
+    "token_count": 108
+  },
+  {
+    "char_end": 15436,
+    "char_start": 14904,
+    "classification_confidence": 0.412,
+    "clause_type": "indemnification",
+    "content_head": "'ARTICLE VIII\\nINDEMNIFICATION AND LIMITATION OF LIABILITY\\n\\nSection 8.01 Indemnifi'",
+    "content_sha256": "10563813feb73c994ee8f1726fea6bf5ae4183b4dcddba7adc5410f370e601ea",
+    "context_header": "[Section: Article VIII — Indemnification and Limitation of Liability > Section 8.01 — Indemnification by Provider.] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE VIII",
+        "target_chunk_index": 28,
+        "target_identifier": "VIII"
+      },
+      {
+        "raw_text": "Section 8.01",
+        "target_chunk_index": 28,
+        "target_identifier": "8.01"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement",
+      "Customer",
+      "Customer Indemnitees",
+      "Intellectual Property Rights",
+      "Losses",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VIII — Indemnification and Limitation of Liability > Section 8.01 — Indemnification by Provider.",
+    "index": 28,
+    "original_header": "Section 8.01 Indemnification by Provider.",
+    "secondary_clause_type": "limitation_of_liability",
+    "token_count": 133
+  },
+  {
+    "char_end": 16031,
+    "char_start": 15436,
+    "classification_confidence": 0.474,
+    "clause_type": "indemnification",
+    "content_head": "'Article VIII Indemnification and Limitation of Liability\\nSection 8.02 Indemnific'",
+    "content_sha256": "4c29db8e313c1fede54fb4082cd037b810abfc478dc2ba1e4afb78887595afac",
+    "context_header": "[Section: Article VIII — Indemnification and Limitation of Liability > Section 8.02 — Indemnification by Customer.] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 8.02",
+        "target_chunk_index": 29,
+        "target_identifier": "8.02"
+      },
+      {
+        "raw_text": "Article V",
+        "target_chunk_index": 18,
+        "target_identifier": "V"
+      },
+      {
+        "raw_text": "Section 8.03",
+        "target_chunk_index": 29,
+        "target_identifier": "8.03"
+      },
+      {
+        "raw_text": "Section 8.01",
+        "target_chunk_index": 28,
+        "target_identifier": "8.01"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Customer Data",
+      "Indemnified Party",
+      "Losses",
+      "Party",
+      "Provider",
+      "Provider Indemnitees",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VIII — Indemnification and Limitation of Liability > Section 8.02 — Indemnification by Customer.",
+    "index": 29,
+    "original_header": "Section 8.02 Indemnification by Customer.",
+    "secondary_clause_type": "limitation_of_liability",
+    "token_count": 163
+  },
+  {
+    "char_end": 16364,
+    "char_start": 16031,
+    "classification_confidence": 0.562,
+    "clause_type": "indemnification",
+    "content_head": "'Article VIII Indemnification and Limitation of Liability\\nSection 8.03 Indemnific'",
+    "content_sha256": "ca2bc4644ae392524fa815bd46ac1b8918675059058ae44aa85b496437b306f0",
+    "context_header": "[Section: Article VIII — Indemnification and Limitation of Liability > Section 8.03 — Indemnification Procedure. > (a) — Notification.] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 8.03",
+        "target_chunk_index": 29,
+        "target_identifier": "8.03"
+      }
+    ],
+    "defined_terms_used": [
+      "Indemnified Party",
+      "Indemnifying Party",
+      "Party"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VIII — Indemnification and Limitation of Liability > Section 8.03 — Indemnification Procedure. > (a) — Notification.",
+    "index": 30,
+    "original_header": "(a) Notification.",
+    "secondary_clause_type": "limitation_of_liability",
+    "token_count": 107
+  },
+  {
+    "char_end": 16922,
+    "char_start": 16364,
+    "classification_confidence": 0.6,
+    "clause_type": "indemnification",
+    "content_head": "'Article VIII Indemnification and Limitation of Liability\\nSection 8.03 Indemnific'",
+    "content_sha256": "d6112791cc74701cafaea39bd4d04cd188e80ec4e27df294ee4b06921f1df78a",
+    "context_header": "[Section: Article VIII — Indemnification and Limitation of Liability > Section 8.03 — Indemnification Procedure. > (b) — Control of Defense.] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Indemnified Party",
+      "Indemnifying Party",
+      "Party"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article VIII — Indemnification and Limitation of Liability > Section 8.03 — Indemnification Procedure. > (b) — Control of Defense.",
+    "index": 31,
+    "original_header": "(b) Control of Defense.",
+    "secondary_clause_type": "limitation_of_liability",
+    "token_count": 163
+  },
+  {
+    "char_end": 17378,
+    "char_start": 16922,
+    "classification_confidence": 0.529,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'Article VIII Indemnification and Limitation of Liability\\nSection 8.04 Limitation'",
+    "content_sha256": "2059e273cb5e6cee23730fe32af10b28a19dce2cb46512848a91e45153f676c1",
+    "context_header": "[Section: Article VIII — Indemnification and Limitation of Liability > Section 8.04 — Limitation of Liability.] [Type: Limitation Of Liability] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 8.04",
+        "target_chunk_index": 32,
+        "target_identifier": "8.04"
+      },
+      {
+        "raw_text": "SECTION 8.01",
+        "target_chunk_index": 28,
+        "target_identifier": "8.01"
+      },
+      {
+        "raw_text": "SECTION 8.02",
+        "target_chunk_index": 29,
+        "target_identifier": "8.02"
+      },
+      {
+        "raw_text": "ARTICLE V",
+        "target_chunk_index": 18,
+        "target_identifier": "V"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Article VIII — Indemnification and Limitation of Liability > Section 8.04 — Limitation of Liability.",
+    "index": 32,
+    "original_header": "Section 8.04 Limitation of Liability.",
+    "secondary_clause_type": "indemnification",
+    "token_count": 128
+  },
+  {
+    "char_end": 17832,
+    "char_start": 17378,
+    "classification_confidence": 1.0,
+    "clause_type": "governing_law",
+    "content_head": "'ARTICLE IX\\nGENERAL PROVISIONS\\n\\nSection 9.01 Governing Law; Venue.\\n\\nThis Agreemen'",
+    "content_sha256": "a962bde63772c4d08f9dc1b4d2f1992c0d16becd7a7a516234f9e5ee47fe8ab8",
+    "context_header": "[Section: Article IX — General Provisions > Section 9.01 — Governing Law; Venue.] [Type: Governing Law] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "ARTICLE IX",
+        "target_chunk_index": 33,
+        "target_identifier": "IX"
+      },
+      {
+        "raw_text": "Section 9.01",
+        "target_chunk_index": 33,
+        "target_identifier": "9.01"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article IX — General Provisions > Section 9.01 — Governing Law; Venue.",
+    "index": 33,
+    "original_header": "Section 9.01 Governing Law; Venue.",
+    "secondary_clause_type": null,
+    "token_count": 113
+  },
+  {
+    "char_end": 18562,
+    "char_start": 17832,
+    "classification_confidence": 1.0,
+    "clause_type": "notices",
+    "content_head": "'Article IX General Provisions\\nSection 9.02 Notices.\\n\\nAll notices under this Agre'",
+    "content_sha256": "d96587f5c0c7666bcb1ad173cb16889986eba6a29a90f97928bc8555e0073f5f",
+    "context_header": "[Section: Article IX — General Provisions > Section 9.02 — Notices.] [Type: Notices] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 9.02",
+        "target_chunk_index": 34,
+        "target_identifier": "9.02"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article IX — General Provisions > Section 9.02 — Notices.",
+    "index": 34,
+    "original_header": "Section 9.02 Notices.",
+    "secondary_clause_type": null,
+    "token_count": 190
+  },
+  {
+    "char_end": 18975,
+    "char_start": 18562,
+    "classification_confidence": 0.81,
+    "clause_type": "assignment",
+    "content_head": "'Article IX General Provisions\\nSection 9.03 Assignment.\\n\\nNeither party may assign'",
+    "content_sha256": "c882b07e7ff4fc902c407ec0291dd987fec15da3098052c8b1419cd8b38140b4",
+    "context_header": "[Section: Article IX — General Provisions > Section 9.03 — Assignment.] [Type: Assignment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 9.03",
+        "target_chunk_index": 35,
+        "target_identifier": "9.03"
+      }
+    ],
+    "defined_terms_used": [
+      "Affiliate",
+      "Agreement"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article IX — General Provisions > Section 9.03 — Assignment.",
+    "index": 35,
+    "original_header": "Section 9.03 Assignment.",
+    "secondary_clause_type": "covenants",
+    "token_count": 110
+  },
+  {
+    "char_end": 19440,
+    "char_start": 18975,
+    "classification_confidence": 0.514,
+    "clause_type": "entire_agreement",
+    "content_head": "'Article IX General Provisions\\nSection 9.04 Entire Agreement; Amendment.\\n\\nThis Ag'",
+    "content_sha256": "9d7dc051ea26180c444063a2745be0ef169be41d49427371b46f01a9ba18e6f5",
+    "context_header": "[Section: Article IX — General Provisions > Section 9.04 — Entire Agreement; Amendment.] [Type: Entire Agreement] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 9.04",
+        "target_chunk_index": 36,
+        "target_identifier": "9.04"
+      },
+      {
+        "raw_text": "Exhibits i",
+        "target_chunk_index": null,
+        "target_identifier": "i"
+      }
+    ],
+    "defined_terms_used": [
+      "Agreement"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Article IX — General Provisions > Section 9.04 — Entire Agreement; Amendment.",
+    "index": 36,
+    "original_header": "Section 9.04 Entire Agreement; Amendment.",
+    "secondary_clause_type": "amendment",
+    "token_count": 123
+  },
+  {
+    "char_end": 19719,
+    "char_start": 19440,
+    "classification_confidence": 0.0,
+    "clause_type": "unknown",
+    "content_head": "'IN WITNESS WHEREOF\\n\\nIN WITNESS WHEREOF, the parties have caused this Agreement t'",
+    "content_sha256": "52d4da6464f07a4b919194d089f792d19cfd2a6a343d66a77ce2abc5ed19043b",
+    "context_header": "[Section: IN WITNESS WHEREOF] [Type: Unknown] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Agreement",
+      "Effective Date"
+    ],
+    "document_section": "signatures",
+    "hierarchy_path": "IN WITNESS WHEREOF",
+    "index": 37,
+    "original_header": "IN WITNESS WHEREOF",
+    "secondary_clause_type": null,
+    "token_count": 69
+  },
+  {
+    "char_end": 20289,
+    "char_start": 19719,
+    "classification_confidence": 1.0,
+    "clause_type": "services",
+    "content_head": "'EXHIBIT A\\nSTATEMENT OF WORK NO. 1\\n\\n1. Description of Services\\n\\nProvider shall im'",
+    "content_sha256": "a74154a072bcd8fa0c4ac34a595faad962f1a78aed2a7fca1fa92292744b4d42",
+    "context_header": "[Section: EXHIBIT A — Statement of Work No. 1 > 1 — Description of Services] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "EXHIBIT A",
+        "target_chunk_index": 38,
+        "target_identifier": "A"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Platform",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "EXHIBIT A — Statement of Work No. 1 > 1 — Description of Services",
+    "index": 38,
+    "original_header": "1 Description of Services",
+    "secondary_clause_type": null,
+    "token_count": 142
+  },
+  {
+    "char_end": 20767,
+    "char_start": 20289,
+    "classification_confidence": 1.0,
+    "clause_type": "services",
+    "content_head": "'EXHIBIT A Statement of Work No. 1\\n2. Deliverables and Milestones\\n\\nThe following '",
+    "content_sha256": "b1b3cb3b90c835d3a17e55a62419eaa845f61a58117ee280864f2f87d792502c",
+    "context_header": "[Section: EXHIBIT A — Statement of Work No. 1 > 2 — Deliverables and Milestones] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Exhibit A",
+        "target_chunk_index": 38,
+        "target_identifier": "A"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Deliverables",
+      "Effective Date",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "EXHIBIT A — Statement of Work No. 1 > 2 — Deliverables and Milestones",
+    "index": 39,
+    "original_header": "2 Deliverables and Milestones",
+    "secondary_clause_type": null,
+    "token_count": 128
+  },
+  {
+    "char_end": 21167,
+    "char_start": 20767,
+    "classification_confidence": 0.571,
+    "clause_type": "payment",
+    "content_head": "'EXHIBIT A Statement of Work No. 1\\n3. Fees\\n\\nThe total fixed fee for the Services '",
+    "content_sha256": "3d6e8f4c4c070cb29be0a5c1d4391f3b12ee98dff2bab296333813e9fbf21ab4",
+    "context_header": "[Section: EXHIBIT A — Statement of Work No. 1 > 3 — Fees] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Exhibit A",
+        "target_chunk_index": 38,
+        "target_identifier": "A"
+      },
+      {
+        "raw_text": "Exhibit B",
+        "target_chunk_index": 41,
+        "target_identifier": "B"
+      },
+      {
+        "raw_text": "Section 3.02",
+        "target_chunk_index": 11,
+        "target_identifier": "3.02"
+      }
+    ],
+    "defined_terms_used": [
+      "Fees",
+      "Services"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "EXHIBIT A — Statement of Work No. 1 > 3 — Fees",
+    "index": 40,
+    "original_header": "3 Fees",
+    "secondary_clause_type": "services",
+    "token_count": 108
+  },
+  {
+    "char_end": 21662,
+    "char_start": 21167,
+    "classification_confidence": 0.625,
+    "clause_type": "services",
+    "content_head": "'EXHIBIT B\\nSUBSCRIPTION SERVICES AND SERVICE LEVELS\\n\\n1. Subscription Services\\n\\nCo'",
+    "content_sha256": "b913b5a4692b619b1fb1bf0d45de451053cee2a67f9ea0a04ea6f1b116ee038a",
+    "context_header": "[Section: EXHIBIT B — Subscription Services and Service Levels > 1 — Subscription Services] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "EXHIBIT B",
+        "target_chunk_index": 41,
+        "target_identifier": "B"
+      },
+      {
+        "raw_text": "Exhibit A",
+        "target_chunk_index": 38,
+        "target_identifier": "A"
+      },
+      {
+        "raw_text": "Section 3.02",
+        "target_chunk_index": 11,
+        "target_identifier": "3.02"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Platform",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "EXHIBIT B — Subscription Services and Service Levels > 1 — Subscription Services",
+    "index": 41,
+    "original_header": "1 Subscription Services",
+    "secondary_clause_type": "payment",
+    "token_count": 123
+  },
+  {
+    "char_end": 22131,
+    "char_start": 21662,
+    "classification_confidence": 0.833,
+    "clause_type": "services",
+    "content_head": "'EXHIBIT B Subscription Services and Service Levels\\n2. Service Levels\\n\\nProvider s'",
+    "content_sha256": "dffee4e03caf4712e1791024c336be24073dbcfc0e2aff1c4eaec15d8d707111",
+    "context_header": "[Section: EXHIBIT B — Subscription Services and Service Levels > 2 — Service Levels] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Platform",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "EXHIBIT B — Subscription Services and Service Levels > 2 — Service Levels",
+    "index": 42,
+    "original_header": "2 Service Levels",
+    "secondary_clause_type": "payment",
+    "token_count": 130
+  },
+  {
+    "char_end": 22437,
+    "char_start": 22131,
+    "classification_confidence": 0.4,
+    "clause_type": "services",
+    "content_head": "'EXHIBIT B Subscription Services and Service Levels\\n3. Renewal and Termination\\n\\nT'",
+    "content_sha256": "8d5732861e22fee5a224253f0dab6d50c9e437f99b5c2d70c9c79458672e30f6",
+    "context_header": "[Section: EXHIBIT B — Subscription Services and Service Levels > 3 — Renewal and Termination] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Exhibit B",
+        "target_chunk_index": 41,
+        "target_identifier": "B"
+      },
+      {
+        "raw_text": "Section 4.01",
+        "target_chunk_index": 14,
+        "target_identifier": "4.01"
+      },
+      {
+        "raw_text": "Section 4.03",
+        "target_chunk_index": 15,
+        "target_identifier": "4.03"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Services"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "EXHIBIT B — Subscription Services and Service Levels > 3 — Renewal and Termination",
+    "index": 43,
+    "original_header": "3 Renewal and Termination",
+    "secondary_clause_type": "termination",
+    "token_count": 89
+  }
+]

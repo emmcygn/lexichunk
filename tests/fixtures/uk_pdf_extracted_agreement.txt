@@ -1,0 +1,664 @@
+SERVICES AGREEMENT
+
+This Agreement is made on 1 March 2024 between Atlas Managed Services Limited,
+a company incorporated in England and Wales with company number 08123456 and
+whose registered office is at 25 Old Broad Street, London EC2N 1HN (the
+"Supplier"), and Meridian Retail Group PLC, a company incorporated in England
+and Wales with company number 05678910 and whose registered office is at 100
+Victoria Street, London SW1E 5JL (the "Customer").
+
+The Supplier has agreed to provide, and the Customer has agreed to receive,
+the Services on the terms of this Agreement. IT IS AGREED as follows:
+
+1. Definitions and Interpretation
+
+1.1 Definitions
+
+In this Agreement, the following terms have the meanings set out below.
+
+"Business Day" means a day other than a Saturday, Sunday or public holiday in
+England and Wales, on which clearing banks are open for general business in
+London;
+
+"Charges" means the charges payable by the Customer to the Supplier for the
+Services, as set out in Schedule 2;
+
+"Commencement Date" means 1 April 2024;
+
+"Confidential Information" means any information disclosed by one party to the
+other, whether orally, in writing or in any other form, that is designated as
+confidential or that a reasonable person would understand to be confidential
+given its nature and the circumstances of disclosure;
+
+"Deliverables" means any reports, documentation, code or other materials
+created or supplied by the Supplier for the Customer in the course of
+providing the Services;
+
+"Force Majeure Event" means any event beyond the reasonable control of the
+affected party, including fire, flood, industrial action, failure of a utility
+service or an act of government, which prevents or delays that party from
+performing its obligations under this Agreement;
+
+"Intellectual Property Rights" means patents, rights to inventions, copyright,
+trade marks, design rights, database rights and all other intellectual
+property rights, whether registered or unregistered, together with
+applications for any of the foregoing;
+
+Page 1 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+
+"Personal Data" means personal data, as that term is defined in the Data
+Protection Legislation, that is processed by the Supplier on behalf of the
+Customer in connection with the Services;
+
+"Services" means the managed hosting, support and professional services
+described in Schedule 1;
+
+"Term" means the period beginning on the Commencement Date and continuing
+until this Agreement is terminated in accordance with clause 11.
+
+1.2 Interpretation
+
+In this Agreement, unless the context otherwise requires, a reference to a
+person includes an individual, company, partnership or unincorporated body,
+and a reference to a statute includes that statute as amended, re-enacted or
+replaced from time to time.
+
+(a) references to clauses and Schedules are references to clauses of, and
+Schedules to, this Agreement;
+
+(b) the headings in this Agreement are for convenience only and do not affect
+its interpretation;
+
+(c) the singular includes the plural and vice versa, and words importing one
+gender include every gender; and
+
+(d) any words following the terms including, in particular or any similar
+expression are illustrative and do not limit the generality of the words
+preceding them; and
+
+(e) if there is a conflict between the terms of the main body of this
+Agreement and any Schedule, the terms of the main body of this Agreement shall
+prevail unless the Schedule expressly states otherwise.
+
+2. Commencement and Term
+
+2.1 Commencement
+
+This Agreement shall commence on the Commencement Date and shall continue,
+subject to earlier termination in accordance with clause 11, for the initial
+period set out in Schedule 2. The Supplier shall have no obligation to provide
+the Services before the Commencement Date, and any services provided before
+that date shall be provided on a goodwill basis only, without charge and
+without liability.
+
+Page 2 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+
+2.2 Term and Renewal
+
+The Term shall continue for an initial period of thirty-six months from the
+Commencement Date and shall automatically renew for successive periods of
+twelve months, unless either party gives the other not less than ninety days'
+written notice of non-renewal before the expiry of the then-current period.
+Nothing in this clause 2.2 obliges either party to agree to any variation of
+the Charges as a condition of renewal, and the parties shall negotiate any
+proposed variation in good faith.
+
+2.3 Extension of Term
+
+The parties may agree in writing to extend the Term on such further terms as
+they may agree, and any such extension shall be recorded in a written
+amendment signed by an authorised representative of each party. During any
+extension of the Term, all other terms of this Agreement shall continue to
+apply in full force and effect, save to the extent the parties expressly agree
+otherwise in writing.
+
+3. Supplier Obligations
+
+3.1 General Obligations
+
+The Supplier shall provide the Services with reasonable skill and care and in
+accordance with good industry practice applicable to the provision of services
+of a similar nature. The Supplier shall ensure that the Services are performed
+by appropriately qualified and experienced personnel. The Supplier shall
+comply with all applicable laws and regulations in the performance of the
+Services and shall maintain such professional indemnity and public liability
+insurance as is reasonable having regard to the nature and scale of the
+Services.
+
+3.2 Standard of Performance
+
+The Supplier shall use reasonable endeavours to meet any performance targets
+set out in Schedule 1, and shall notify the Customer promptly of any
+circumstance that is likely to have a material adverse effect on the
+Supplier's ability to perform the Services, having regard to the Customer's
+cooperation obligations under clause 4.1.
+
+3.3 Personnel and Subcontracting
+
+The Supplier may subcontract the performance of any part of the Services,
+provided that the Supplier remains liable for the acts and omissions of its
+
+Page 3 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+subcontractors as if they were its own acts and omissions.
+
+3.4 Audit Rights
+
+The Customer may, on giving the Supplier not less than fourteen days' written
+notice, audit the Supplier's compliance with its obligations under this
+Agreement, including by inspecting relevant records and processes at the
+Supplier's premises during normal business hours. The Supplier shall provide
+reasonable cooperation with any such audit, and neither party shall be
+entitled to conduct more than one audit under this clause 3.4 in any twelve
+month period, save where the Customer reasonably suspects a material breach of
+this Agreement.
+
+If an audit under this clause 3.4 identifies a material failure by the
+Supplier to comply with its obligations under this Agreement, the Supplier
+shall, at its own cost, remedy the failure within a reasonable time and shall
+reimburse the Customer's reasonable costs of the audit.
+
+3.5 Business Continuity and Disaster Recovery
+
+The Supplier shall maintain and test not less than annually a business
+continuity and disaster recovery plan designed to restore the Services within
+forty-eight hours of an unplanned outage, and shall provide the Customer with
+a written summary of the results of each test within thirty days of its
+completion. If the Supplier invokes its business continuity plan, it shall
+notify the Customer without delay and shall keep the Customer informed of
+progress towards restoration of the Services.
+
+4. Customer Obligations
+
+4.1 Cooperation and Access
+
+The Customer shall provide the Supplier with such information, access and
+cooperation as the Supplier reasonably requires to perform the Services,
+including timely access to the Customer's premises, systems and personnel
+where relevant.
+
+4.2 Customer Systems
+
+The Customer shall be responsible for procuring and maintaining the network
+connectivity, hardware and software environment necessary to receive the
+Services, except to the extent expressly agreed otherwise in Schedule 1.
+
+4.3 Delay by the Customer
+
+
+Page 4 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+If the Supplier's performance of its obligations is prevented or delayed by
+any act or omission of the Customer, the Supplier shall not be liable for the
+resulting delay, and the relevant milestone or delivery date shall be extended
+by a reasonable period.
+
+4.4 Changes to Customer Requirements
+
+If the Customer requests a change to its requirements that materially
+increases the scope or cost of the Services, the Supplier shall notify the
+Customer of the resulting impact on the Charges and any applicable timescales
+before implementing the change. Neither party shall be obliged to proceed with
+a change requested under this clause 4.4 unless it is agreed in writing by
+both parties in accordance with the change control procedure described in
+Schedule 1.
+
+5. Charges and Payment
+
+5.1 Charges
+
+The Customer shall pay the Charges to the Supplier in accordance with Schedule
+2. The Charges are exclusive of value added tax, which shall be payable in
+addition at the applicable rate.
+
+5.2 Invoicing and Payment Terms
+
+The Supplier shall invoice the Customer monthly in arrears, and the Customer
+shall pay each undisputed invoice within thirty days of the date of a valid
+invoice, in accordance with the payment terms set out in paragraph 2 of
+Schedule 2.
+
+5.3 Late Payment
+
+If the Customer fails to pay any undisputed amount by the due date, the
+Supplier may charge interest on the overdue amount at the rate of four per
+cent per annum above the Bank of England base rate, accruing daily from the
+due date until payment is made in full.
+
+5.4 VAT
+
+All amounts stated in this Agreement are exclusive of VAT, and the Customer
+shall pay any VAT properly chargeable in connection with the Charges at the
+rate and in the manner prescribed by applicable law.
+
+6. Confidentiality
+
+
+Page 5 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+6.1 Confidentiality Obligations
+
+Each party shall keep confidential all Confidential Information disclosed to
+it by the other party and shall not use such Confidential Information except
+for the purpose of performing its obligations under this Agreement.
+
+6.2 Permitted Disclosures
+
+A party may disclose Confidential Information to its employees, officers,
+professional advisers and subcontractors who need to know the information for
+the purposes set out in clause 6.1, provided that it procures that such
+persons comply with confidentiality obligations equivalent to those in this
+clause 6.
+
+6.3 Duration of Obligations
+
+The obligations in this clause 6 shall survive termination or expiry of this
+Agreement for a period of five years, except in respect of Confidential
+Information that constitutes a trade secret, for which the obligations shall
+continue indefinitely.
+
+6.4 Compelled Disclosure
+
+If a party is required by law, regulation or a court or regulator of competent
+jurisdiction to disclose any Confidential Information of the other party, it
+shall, to the extent permitted by law, notify the other party promptly and
+cooperate with that party's reasonable requests in seeking to limit the scope
+of the disclosure or to obtain confidential treatment for the information
+disclosed.
+
+6.5 Publicity
+
+Neither party shall use the other party's name, logo or trade marks in any
+press release, marketing material or public announcement relating to this
+Agreement without the prior written consent of the other party, save as
+required by law or by any regulatory authority.
+
+7. Data Protection
+
+7.1 Data Processing
+
+To the extent that the Supplier processes Personal Data on behalf of the
+Customer in connection with the Services, the Supplier shall process that
+Personal Data only in accordance with the Customer's documented instructions
+and the requirements of the Data Protection Legislation.
+
+Page 6 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+
+7.2 Security Measures
+
+The Supplier shall implement appropriate technical and organisational measures
+to protect Personal Data against unauthorised or unlawful processing and
+against accidental loss, destruction or damage, having regard to the state of
+the art and the cost of implementation.
+
+7.3 Sub-Processors
+
+The Supplier shall not engage any sub-processor to process Personal Data
+without the prior written authorisation of the Customer, and shall impose on
+any authorised sub-processor obligations no less protective than those set out
+in clause 7.2.
+
+(a) Notice of Engagement
+
+The Supplier shall give the Customer not less than thirty days' prior written
+notice before engaging any new sub-processor to process Personal Data, and the
+Customer may object to the proposed sub-processor on reasonable grounds
+relating to the protection of Personal Data within fourteen days of receiving
+that notice.
+
+(b) Sub-Processor Liability
+
+The Supplier remains fully liable to the Customer for the acts and omissions
+of any sub-processor engaged under this clause 7.3 as if they were the
+Supplier's own acts and omissions, and shall ensure that its written agreement
+with each sub-processor imposes obligations relating to Personal Data no less
+protective than those set out in clause 7.2.
+
+7.4 International Transfers
+
+The Supplier shall not transfer Personal Data outside the United Kingdom
+without the prior written consent of the Customer, and any such transfer shall
+be subject to appropriate safeguards recognised under the Data Protection
+Legislation, including standard contractual clauses or an adequacy decision
+covering the destination country. The Supplier shall notify the Customer
+promptly of any failure by a sub-processor to comply with the obligations
+imposed on it, as set out in clause
+7.3(b).
+
+8. Intellectual Property
+
+8.1 Ownership
+
+Page 7 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+
+Except as expressly provided in this clause 8, all Intellectual Property
+Rights in the Deliverables and in any materials, tools or methodologies used
+by the Supplier in providing the Services shall vest in, and remain the
+property of, the Supplier.
+
+8.2 Licence
+
+The Supplier grants to the Customer a non-exclusive, non-transferable licence
+to use the Deliverables for the Customer's internal business purposes for the
+duration of the Term.
+
+8.3 Third Party Rights
+
+The Supplier warrants that the Deliverables, when used in accordance with this
+Agreement, will not infringe the Intellectual Property Rights of any third
+party, save to the extent that any infringement arises from materials supplied
+by the Customer.
+
+9. Indemnities
+
+9.1 Supplier Indemnity
+
+The Supplier shall indemnify the Customer against all losses, liabilities and
+reasonable costs incurred by the Customer arising from any third party claim
+that the Deliverables infringe that third party's Intellectual Property
+Rights, save to the extent excluded under clause 10.
+
+9.2 Customer Indemnity
+
+The Customer shall indemnify the Supplier against all losses, liabilities and
+reasonable costs incurred by the Supplier arising from the Customer's breach
+of clause 6.1 or from materials supplied by the Customer for incorporation
+into the Deliverables.
+
+9.3 Conduct of Claims
+
+The indemnities in clause 9.1 and clause 9.2 are subject to the conduct of
+claims procedure set out in this clause 9, including the right to seek
+indemnifi-
+cation for losses as described further in clause 9.3(b) below.
+
+(a) Notification
+
+The party seeking indemnifi-
+
+Page 8 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+cation shall notify the indemnifying party promptly
+in writing on becoming aware of a claim.
+
+(b) Control of Defence
+
+The indemnifying party may assume control of the defence and settlement of the
+claim, provided that it acts reasonably and keeps the indemnified party
+informed of material developments.
+
+(c) Cooperation
+
+The indemnified party shall provide reasonable cooperation and assistance to
+the indemnifying party, at the indemnifying party's expense, in the defence or
+settlement of the claim.
+
+9.4 Exclusions from Indemnities
+
+Neither party shall be liable to indemnify the other under clause 9.1 or
+clause 9.2 to the extent that the claim arises from the indemnified party's
+own negligence or breach of this Agreement, and the indemnities in this clause
+9 are subject to the limitations and exclusions set out in clause 10.
+
+Any liability arising under an indemnity in clause 9.1 or clause 9.2 shall
+count towards, and not be in addition to, the financial cap in clause 10.2.
+
+10. Limitation of Liability
+
+10.1 Exclusions
+
+Subject to clause 10.3, neither party shall be liable to the other for any
+indirect or consequential loss, or for any loss of profits, revenue, business
+opportunity or goodwill, arising out of or in connection with this Agreement.
+
+10.2 Financial Cap
+
+Subject to clause 10.3, the total aggregate liability of each party arising
+out of or in connection with this Agreement, whether in contract, tort or
+otherwise, shall not exceed an amount equal to the total Charges paid or
+payable in the twelve months preceding the event giving rise to the claim.
+
+10.3 Unlimited Liability
+
+Nothing in this Agreement shall exclude or limit either party's liability for
+death or personal injury caused by negligence, for fraud or fraudulent
+misrepresentation, or for any other liability that cannot lawfully be excluded
+
+Page 9 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+or limited.
+
+11. Termination
+
+11.1 Termination for Convenience
+
+Either party may terminate this Agreement for convenience by giving the other
+not less than ninety days' written notice, such notice not to expire earlier
+than the first anniversary of the Commencement Date.
+
+11.2 Termination for Cause
+
+Either party may terminate this Agreement with immediate effect by written
+notice to the other if the other party commits a material breach of this
+Agreement that is not remedied within thirty days of being notified in writing
+to do so, or becomes insolvent.
+
+11.3 Consequences of Termination
+
+On termination or expiry of this Agreement for any reason, the Customer shall
+pay all Charges accrued but unpaid as at the date of termination, and each
+party shall return or destroy the other party's Confidential Information in
+accordance with clause 6.
+
+11.4 Force Majeure
+
+Neither party shall be liable for any failure or delay in performing its
+obligations under this Agreement to the extent that the failure or delay is
+caused by a Force Majeure Event, provided that the affected party notifies the
+other party promptly and uses reasonable endeavours to mitigate the effect of
+the Force Majeure Event.
+
+11.5 Transitional Assistance
+
+On termination or expiry of this Agreement, the Supplier shall, for a period
+of up to ninety days at the Customer's request, provide reasonable assistance
+to transfer the Services to the Customer or a replacement supplier, and the
+Customer shall pay the Supplier's reasonable charges for such assistance at
+the Supplier's then-current standard rates.
+
+12. Governing Law and Jurisdiction
+
+12.1 Governing Law
+
+This Agreement, and any dispute or claim arising out of or in connection with
+
+Page 10 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+it, its subject matter or its formation, shall be governed by and construed in
+accordance with the law of England and Wales.
+
+12.2 Jurisdiction
+
+The parties irrevocably agree that the courts of England and Wales shall have
+exclusive jurisdiction to settle any dispute or claim arising out of or in
+connection with this Agreement, its subject matter or its formation.
+
+13. Anti-Bribery and Compliance
+
+13.1 Anti-Bribery
+
+Each party shall comply with all applicable anti-bribery and anti-corruption
+laws, including the Bribery Act 2010, and shall not offer, give, request or
+accept any bribe or other improper advantage in connection with this
+Agreement. The Supplier shall maintain adequate procedures designed to prevent
+bribery by persons associated with it, and shall promptly notify the Customer
+in writing if it becomes aware of any breach or suspected breach of this
+clause 13.1.
+
+13.2 Sanctions and Export Control
+
+Neither party shall be required to perform any obligation under this Agreement
+that would result in a breach of applicable trade sanctions or export control
+laws. Each party warrants that it is not, and shall notify the other party
+promptly if it becomes, a person designated under any applicable sanctions
+regime, and either party may suspend performance of the Services to the extent
+necessary to comply with its obligations under this clause 13.2.
+
+13.3 Compliance Training
+
+The Supplier shall ensure that its personnel who perform the Services receive
+appropriate training on the requirements of this clause 13 at intervals of not
+more than twelve months, and shall maintain records of that training available
+for inspection under clause 3.4.
+
+14. Insurance
+
+14.1 Insurance Obligations
+
+The Supplier shall maintain, at its own expense, professional indemnity
+insurance of not less than £2,000,000 in the aggregate, public liability
+insurance of not less than £5,000,000 in respect of any one occurrence, and
+cyber liability insurance of not less than £1,000,000 in the aggregate, in
+
+Page 11 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+each case with a reputable insurer, for the duration of the Term and for a
+period of twenty-four months following its expiry or termination.
+
+14.2 Evidence of Insurance
+
+The Supplier shall, within ten Business Days of a written request from the
+Customer, provide evidence satisfactory to the Customer that the insurance
+required by clause 14.1 is in force, and shall notify the Customer promptly if
+any such insurance is cancelled, materially reduced or not renewed.
+
+14.3 Subrogation Waiver
+
+The Supplier shall use reasonable endeavours to procure that its insurers
+waive any right of subrogation against the Customer, except where the loss
+arises from the Customer's own wilful default or gross negligence.
+
+15. Dispute Resolution and Escalation
+
+15.1 Escalation Procedure
+
+If a dispute arises out of or in connection with this Agreement that is not
+resolved by the parties' respective account managers within ten Business Days,
+either party may refer the dispute in writing to a director of each party, who
+shall use reasonable endeavours to resolve the dispute within a further
+fifteen Business Days before either party commences formal proceedings, save
+that either party may seek urgent injunctive relief at any time without
+following this procedure.
+
+15.2 Mediation
+
+If a dispute referred under clause 15.1 remains unresolved after the
+escalation period has expired, the parties shall attempt in good faith to
+settle the dispute by mediation in accordance with the Centre for Effective
+Dispute Resolution Model Mediation Procedure before either party commences
+court proceedings, save that this clause 15.2 shall not prevent either party
+from applying to the courts referred to in clause 12.2 for interim relief.
+
+15.3 Continued Performance
+
+Each party shall continue to perform its obligations under this Agreement
+during the resolution of any dispute under clause 15.1 or clause 15.2, unless
+the parties agree otherwise in writing or the dispute is incapable of
+resolution without such performance ceasing.
+
+Schedule 1 — Services Description
+
+Page 12 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+
+1. Scope of Services
+
+The Services comprise the managed hosting, monitoring, support and
+professional services described in this Schedule 1, together with such
+additional services as the parties may agree in writing from time to time, all
+as further described in clause 1.1.
+
+2. Service Levels
+
+The Supplier shall use reasonable endeavours to achieve the service levels set
+out below, including a target monthly uptime of 99.5% for the hosted
+environment, measured using the Supplier's standard monitoring tools.
+
+3. Change Control
+
+Either party may request a change to the Services by written notice, and no
+change shall take effect unless agreed in writing by both parties and, where
+the change affects the Charges, reflected in an updated version of Schedule 2.
+
+4. Reporting
+
+The Supplier shall provide the Customer with a monthly service report setting
+out performance against the service levels described in this Schedule 1,
+including any incidents of downtime and the corrective action taken, no later
+than ten Business Days after the end of the month to which the report relates.
+
+5. Service Credits
+
+If the Supplier fails to achieve the monthly uptime target described above in
+two consecutive months, the Supplier shall credit the Customer an amount equal
+to five per cent of the Charges payable for the second such month, such credit
+to be applied against the Customer's next invoice.
+
+Schedule 2 — Charges and Payment Schedule
+
+1. Charges
+
+The annual Charges for the Services are £36,000, payable in accordance with
+clause 5.2, and shall be reviewed annually in accordance with paragraph 3 of
+this Schedule 2.
+
+2. Payment Terms
+
+Invoices shall be issued monthly in arrears and are payable within thirty days
+
+Page 13 of 42
+CONFIDENTIAL — Project Atlas Services Agreement
+
+of the invoice date, as further described in clause 5.2, time being of the
+essence in respect of payment.
+
+3. Annual Review
+
+The Charges shall be reviewed on each anniversary of the Commencement Date and
+may be increased by the Supplier by no more than the percentage increase in
+the Consumer Prices Index over the preceding twelve months.
+
+4. Expenses
+
+The Charges do not include travel, accommodation or other out-of-pocket
+expenses reasonably incurred by the Supplier in providing the Services, which
+shall be reimbursed by the Customer within thirty days of receipt of a valid
+invoice supported by appropriate receipts, provided that any single item of
+expenditure exceeding £250 shall require the Customer's prior written
+approval.
+
+5. Disputed Invoices
+
+If the Customer disputes any part of an invoice in good faith, it shall notify
+the Supplier in writing of the disputed amount and the reasons for the dispute
+within fifteen Business Days of receipt of the invoice, and shall pay the
+undisputed balance by the due date. The parties shall use reasonable
+endeavours to resolve the dispute promptly, failing which either party may
+refer it in accordance with the procedure described in this Agreement.
+
