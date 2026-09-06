@@ -5,7 +5,9 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from .._patterns import NOT_AFTER_WORD, TERM_UPPER
 from ..exceptions import ParsingError
+from ..models import DocumentSection
 
 _ROMAN = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
 
@@ -73,7 +75,7 @@ class USPatterns:
         re.MULTILINE
     ))
     schedule: re.Pattern = field(default_factory=lambda: re.compile(
-        r'^(Schedule\s+[\d.]+(?:\s*[-\u2013]\s*[A-Za-z\s]+)?)',
+        r'^((?:Schedule\s+\d+(?:\.\d+)*|Appendix\s+[\dA-Z][\w-]*)(?:\s*[-\u2013]\s*[A-Za-z\s]+)?)',
         re.MULTILINE | re.IGNORECASE
     ))
 
@@ -83,11 +85,13 @@ class USPatterns:
     ))
 
     definition: re.Pattern = field(default_factory=lambda: re.compile(
-        r'"([A-Z][A-Za-z\s\-]{1,60})"\s+(?:means|shall mean|has the meaning|is defined as|refers to)',
+        NOT_AFTER_WORD + rf'"({TERM_UPPER})"\s+'
+        r'(?:means|shall mean|has the meaning|is defined as|refers to)',
         re.MULTILINE
     ))
     definition_curly: re.Pattern = field(default_factory=lambda: re.compile(
-        r'\u201c([A-Z][A-Za-z\s\-]{1,60})\u201d\s+(?:means|shall mean|has the meaning)',
+        NOT_AFTER_WORD + rf'\u201c({TERM_UPPER})\u201d\s+'
+        r'(?:means|shall mean|has the meaning)',
         re.MULTILINE
     ))
 
@@ -107,18 +111,34 @@ class USPatterns:
 US_PATTERNS = USPatterns()
 
 
+#: Optional per-jurisdiction mapping from hierarchy level to
+#: :class:`~lexichunk.models.DocumentSection`.  Read by
+#: :class:`~lexichunk.parsers.structure.StructureParser`; any level absent
+#: from this mapping defaults to ``OPERATIVE``.
+SECTION_ROLES: dict[int, DocumentSection] = {
+    -1: DocumentSection.SCHEDULES,  # Schedule / Appendix
+    -2: DocumentSection.SCHEDULES,  # Exhibit
+}
+
+
 def detect_level(line: str) -> tuple[int, str] | None:
     """Detect the hierarchy level and identifier of a line for US documents.
 
     Returns:
         (level, identifier) where level is:
           -2 = Exhibit
-          -1 = Schedule
-           0 = Article
-           1 = Section
+          -1 = Schedule / Appendix
+           0 = Article, or a bare "Section N" heading
+           1 = Section (dotted, e.g. "Section 1.01")
            3 = alpha sub-clause "(a)"
            4 = roman sub-clause "(i)"
         Returns None if not a clause header.
+
+    Note:
+        Detection is deliberately permissive: ``StructureParser`` applies
+        a heading-plausibility gate to every match, so page furniture and
+        wrapped ALL-CAPS disclaimers are filtered out there rather than
+        here.
     """
     s = line.lstrip()
 
@@ -126,7 +146,11 @@ def detect_level(line: str) -> tuple[int, str] | None:
     if m:
         return (-2, m.group(1))
 
-    m = re.match(r'^(Schedule\s+[\d.]+)', s, re.IGNORECASE)
+    m = re.match(
+        r'^(Schedule\s+\d+(?:\.\d+)*|Appendix\s+[\dA-Z][\w-]*)',
+        s,
+        re.IGNORECASE,
+    )
     if m:
         return (-1, m.group(1))
 
@@ -137,6 +161,12 @@ def detect_level(line: str) -> tuple[int, str] | None:
     m = re.match(r'^(?:SECTION|Section)\s+(\d+\.\d+(?:\([a-z]\))?)', s)
     if m:
         return (1, f'Section {m.group(1)}')
+
+    # Bare "Section 1." / "SECTION 1" headings (no dotted sub-number) are
+    # the top-level unit in documents that do not use ARTICLE headings.
+    m = re.match(r'^(?:SECTION|Section)\s+(\d+)\.?(?:\s|$)', s)
+    if m:
+        return (0, f'Section {m.group(1)}')
 
     m = re.match(r'^\(([a-z])\)\s+\S', s)
     if m:

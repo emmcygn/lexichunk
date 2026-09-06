@@ -279,17 +279,23 @@ class TestGDPRFixture:
         assert len(chunks) >= 6  # at least preamble + 6 articles
 
     def test_gdpr_fixture_hierarchy_has_chapters(self) -> None:
+        # A Chapter heading carries no text of its own, so it is folded into
+        # the first Article beneath it and shows up in ``hierarchy_path``
+        # rather than as a chunk identified "Chapter I".
         chunker = LegalChunker(jurisdiction="eu", min_chunk_size=0)
         chunks = chunker.chunk(_GDPR_FIXTURE)
-        identifiers = [c.hierarchy.identifier for c in chunks]
-        assert any("Chapter" in i for i in identifiers)
+        assert any(c.hierarchy_path.startswith("Chapter ") for c in chunks)
 
     def test_gdpr_fixture_hierarchy_has_articles(self) -> None:
         chunker = LegalChunker(jurisdiction="eu", min_chunk_size=0)
         chunks = chunker.chunk(_GDPR_FIXTURE)
-        identifiers = [c.hierarchy.identifier for c in chunks]
-        article_ids = [i for i in identifiers if "Article" in i]
-        assert len(article_ids) >= 4
+        articles = {
+            part.split(" — ")[0]
+            for c in chunks
+            for part in c.hierarchy_path.split(" > ")
+            if part.startswith("Article ")
+        }
+        assert len(articles) >= 4, articles
 
     def test_gdpr_fixture_definitions_extracted(self) -> None:
         chunker = LegalChunker(jurisdiction="eu")

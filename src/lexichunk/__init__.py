@@ -1,5 +1,7 @@
 """lexichunk — Legal document chunking SDK for RAG pipelines."""
 
+import logging
+
 from .chunker import LegalChunker
 from .enrichment.clause_type import ClassificationResult
 from .exceptions import (
@@ -8,8 +10,17 @@ from .exceptions import (
     LexichunkError,
     ParsingError,
 )
-from .jurisdiction import register_jurisdiction
+from .jurisdiction import (
+    register_jurisdiction,
+    registered_jurisdictions,
+    unregister_jurisdiction,
+)
 from .metrics import PipelineMetrics, StageMetric
+
+# Library hygiene: don't emit "no handlers found" warnings for consumers who
+# haven't configured logging. See docs/architecture.md "Logging and
+# observability" for the DEBUG/WARNING policy this package follows.
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 from .models import (
     BatchError,
     BatchResult,
@@ -40,6 +51,8 @@ __all__ = [
     "PipelineMetrics",
     "StageMetric",
     "register_jurisdiction",
+    "unregister_jurisdiction",
+    "registered_jurisdictions",
     "LexichunkError",
     "ConfigurationError",
     "ParsingError",

@@ -247,7 +247,7 @@ def test_invalid_jurisdiction_raises_error():
 def test_jurisdiction_enum_accepted():
     """Passing a Jurisdiction enum value directly must be accepted."""
     chunker = LegalChunker(jurisdiction=Jurisdiction.UK)
-    assert chunker._jurisdiction == Jurisdiction.UK
+    assert chunker.jurisdiction == Jurisdiction.UK
 
 
 def test_empty_text_returns_empty(uk_chunker):
@@ -370,6 +370,37 @@ def test_fallback_splits_at_real_sentences():
         )
 
 
+def test_fallback_splits_oversized_sentence_at_word_boundaries():
+    text = "alpha bravo charlie delta echo foxtrot golf hotel india juliet"
+    chunker = FallbackChunker(
+        jurisdiction=Jurisdiction.UK,
+        max_chunk_size=5,
+        min_chunk_size=0,
+    )
+
+    chunks = chunker.chunk(text)
+
+    assert len(chunks) > 1
+    assert all(chunk.token_count <= 5 for chunk in chunks)
+    assert all(chunk.content == text[chunk.char_start : chunk.char_end] for chunk in chunks)
+    assert " ".join(chunk.content for chunk in chunks) == text
+
+
+def test_fallback_preserves_indivisible_word_over_budget():
+    text = "x" * 25
+    chunker = FallbackChunker(
+        jurisdiction=Jurisdiction.UK,
+        max_chunk_size=5,
+        min_chunk_size=0,
+    )
+
+    chunks = chunker.chunk(text)
+
+    assert len(chunks) == 1
+    assert chunks[0].content == text
+    assert chunks[0].token_count > 5
+
+
 # ---------------------------------------------------------------------------
 # Additional public-method tests
 # ---------------------------------------------------------------------------
@@ -433,7 +464,7 @@ def test_invalid_jurisdiction_string_raises_value_error():
 def test_jurisdiction_enum_us_accepted():
     """Passing a Jurisdiction enum value directly works."""
     chunker = LegalChunker(jurisdiction=Jurisdiction.US)
-    assert chunker._jurisdiction == Jurisdiction.US
+    assert chunker.jurisdiction == Jurisdiction.US
 
 
 def test_max_lt_min_chunk_size_raises_error():
@@ -730,18 +761,23 @@ def test_original_header_field_populated():
 def test_per_chunk_identifier_in_content(uk_chunker, uk_service_agreement):
     """Every chunk's hierarchy identifier must appear in its content.
 
-    Synthetic __part identifiers from sentence-splitting are excluded since
-    the part suffix is a chunker artifact, not a document-level identifier.
+    An over-sized clause is split across several chunks that all keep the
+    clause's own identifier, and only the piece where the clause *starts*
+    carries the header line that spells it out — so a continuation piece is
+    satisfied by the earlier chunk that witnessed the identifier.
     """
     chunks = uk_chunker.chunk(uk_service_agreement)
+    seen_text: list[str] = []
     for chunk in chunks:
         ident = chunk.hierarchy.identifier
-        if ident == "preamble" or "__part" in ident:
-            continue
-        assert ident in chunk.content, (
-            f"Chunk {chunk.index} identifier {ident!r} not found in content: "
-            f"{chunk.content[:200]!r}"
-        )
+        if ident != "preamble":
+            assert ident in chunk.content or any(
+                ident in earlier for earlier in seen_text
+            ), (
+                f"Chunk {chunk.index} identifier {ident!r} not found in "
+                f"content: {chunk.content[:200]!r}"
+            )
+        seen_text.append(chunk.content)
 
 
 def test_ancestor_header_ordering():

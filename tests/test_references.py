@@ -329,6 +329,22 @@ def test_resolve_article_roman_numeral():
     assert resolved[0][0].target_chunk_index == 1
 
 
+def test_manual_reference_infers_strict_container_kind():
+    for label in ("Schedule", "Exhibit", "Annex", "Chapter", "Recital"):
+        detector = _uk_detector()
+        reference = CrossReference(raw_text=f"{label} 1", target_identifier="1")
+        resolved = detector.resolve([([reference], "2"), ([], "1"), ([], "1.1")])
+        assert resolved[0][0].target_chunk_index is None
+        assert resolved[0][0].target_kind == label.lower()
+
+
+def test_manual_article_reference_keeps_bare_identifier_compatibility():
+    detector = _us_detector()
+    reference = CrossReference(raw_text="Article VII", target_identifier="VII")
+    resolved = detector.resolve([([reference], "1"), ([], "7")])
+    assert resolved[0][0].target_chunk_index == 1
+
+
 # ---------------------------------------------------------------------------
 # Conjunctive reference tests (S4)
 # ---------------------------------------------------------------------------
