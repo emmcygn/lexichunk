@@ -23,7 +23,9 @@ def roman_to_int(s: str) -> int:
         The integer value of the Roman numeral.
 
     Raises:
-        ValueError: If *s* is empty or contains non-Roman characters.
+        ParsingError: If *s* is empty or contains non-Roman characters.
+            :class:`~lexichunk.exceptions.ParsingError` subclasses
+            ``ValueError``, so ``except ValueError`` still catches it.
     """
     if not s:
         raise ParsingError("Empty string is not a valid Roman numeral")
@@ -128,7 +130,8 @@ def detect_level(line: str) -> tuple[int, str] | None:
         (level, identifier) where level is:
           -2 = Exhibit
           -1 = Schedule / Appendix
-           0 = Article, or a bare "Section N" heading
+           0 = Article, a bare "Section N" heading, or a standalone
+               ALL-CAPS line (identifier = the line itself)
            1 = Section (dotted, e.g. "Section 1.01")
            3 = alpha sub-clause "(a)"
            4 = roman sub-clause "(i)"

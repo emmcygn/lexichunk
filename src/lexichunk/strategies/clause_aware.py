@@ -114,7 +114,9 @@ class ClauseAwareChunker:
             — otherwise ``"clause 1.1"`` is ambiguous across its own pieces.
 
     Args:
-        jurisdiction: UK or US.
+        jurisdiction: ``"uk"``, ``"us"`` or ``"eu"`` (or a
+            :class:`~lexichunk.models.Jurisdiction` enum value), or the key of a
+            custom registered jurisdiction.
         max_chunk_size: Maximum chunk size in approximate tokens (default 512).
             Enforced as a hard cap: an over-sized clause is split with a
             cascading splitter and a final :meth:`_enforce_max` pass re-splits

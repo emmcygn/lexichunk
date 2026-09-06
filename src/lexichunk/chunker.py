@@ -1,16 +1,23 @@
 """LegalChunker — primary public interface for lexichunk.
 
-Orchestrates the full pipeline:
+Orchestrates the full pipeline.  The numbering below matches the stage
+numbering in ``_run_pipeline`` and the ``StageMetric.name`` values reported
+by :meth:`LegalChunker.chunk_with_metrics`:
 
 1. :class:`~lexichunk.parsers.structure.StructureParser` — detect clause boundaries
 2. :class:`~lexichunk.strategies.clause_aware.ClauseAwareChunker` — split into chunks
    (or :class:`~lexichunk.strategies.fallback.FallbackChunker` when no structure found)
-3. :class:`~lexichunk.parsers.definitions.DefinitionsExtractor` — extract defined terms
-4. :class:`~lexichunk.parsers.references.ReferenceDetector` — detect cross-references
-5. :class:`~lexichunk.enrichment.clause_type.ClauseTypeClassifier` — classify clause types
-6. :class:`~lexichunk.enrichment.context.ContextEnricher` — generate context headers
-7. Second-pass cross-reference resolution
-8. Attach relevant defined terms to each chunk
+3. :class:`~lexichunk.parsers.references.ReferenceDetector` — detect cross-references
+   (first pass, targets not yet resolved)
+4. :class:`~lexichunk.enrichment.clause_type.ClauseTypeClassifier` — classify clause types
+5. :class:`~lexichunk.enrichment.context.ContextEnricher` — generate context headers
+6. :class:`~lexichunk.parsers.definitions.DefinitionsExtractor` — extract defined
+   terms and attach the relevant ones to each chunk
+7. Second-pass cross-reference resolution — fill in ``target_chunk_index``
+
+A final bookkeeping step aggregates the cross-reference statistics exposed by
+:attr:`LegalChunker.cross_ref_resolution_rate` and
+:attr:`LegalChunker.cross_ref_stats`.
 """
 
 from __future__ import annotations
@@ -54,14 +61,17 @@ from .strategies.fallback import FallbackChunker
 
 
 class LegalChunker:
-    """Intelligent chunker for legal documents optimised for RAG pipelines.
+    """Clause-aware chunker for legal documents in RAG pipelines.
 
     Detects clause boundaries, preserves hierarchy, extracts defined terms,
     resolves cross-references, classifies clause types, and generates
     Contextual Retrieval headers — all in a single ``chunk()`` call.
 
     Args:
-        jurisdiction: ``"uk"`` or ``"us"`` (or a :class:`Jurisdiction` enum value).
+        jurisdiction: ``"uk"``, ``"us"`` or ``"eu"`` (or a
+            :class:`Jurisdiction` enum value), or the key of a custom
+            jurisdiction registered via
+            :func:`~lexichunk.jurisdiction.register_jurisdiction`.
         doc_type: Document type hint — ``"contract"`` or ``"terms_conditions"``.
             Affects document-section detection: with ``"terms_conditions"``,
             the signature-block heuristic is relaxed (recitals/signature
@@ -89,6 +99,22 @@ class LegalChunker:
             ``except ValueError`` catches either).
         chars_per_token: Number of characters per token used for the
             approximate token count heuristic.  Defaults to 4.
+        extra_abbreviations: Additional abbreviations (``"e.g."``,
+            ``"Ltd."``) that must not be treated as sentence boundaries.
+            Passed to whichever chunking strategy runs — clause-aware or
+            fallback — and merged with the built-in list, which is never
+            mutated.  Defaults to ``None``.
+        extra_clause_signals: Additional keyword signals per
+            :class:`~lexichunk.models.ClauseType`, merged with the built-in
+            signal table for classification.  The built-in table is never
+            mutated.  Defaults to ``None``.  See ``docs/extending.md`` for
+            the merge rules.
+        enable_definition_cache: When ``True``, extracted defined terms are
+            cached per instance, keyed by a SHA-256 digest of the sanitised
+            text, so re-chunking the same document skips extraction.
+            Defaults to ``True``.
+        max_cache_size: Maximum number of documents held in that cache.
+            Eviction is least-recently-used.  Defaults to 128.
 
     Example::
 

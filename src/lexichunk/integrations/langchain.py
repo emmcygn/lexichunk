@@ -61,8 +61,9 @@ class LegalTextSplitter(_BaseTransformer):  # type: ignore[misc,valid-type]
     dependency on the separate ``langchain-text-splitters`` distribution.
 
     Args:
-        jurisdiction: Legal jurisdiction — ``"uk"`` or ``"us"`` (or a
-            :class:`~lexichunk.models.Jurisdiction` enum value).
+        jurisdiction: Legal jurisdiction — ``"uk"``, ``"us"`` or ``"eu"``
+            (or a :class:`~lexichunk.models.Jurisdiction` enum value), or the
+            key of a custom registered jurisdiction.
         doc_type: Document type hint — ``"contract"`` or
             ``"terms_conditions"``.  Affects document-section detection: with
             ``"terms_conditions"`` the signature-block heuristic is relaxed
