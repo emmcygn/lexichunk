@@ -909,3 +909,93 @@ class TestH8DefinitionBodyBoundaries:
         )
         assert "hosting services" in terms["Services"].definition
         assert "support services" in terms["Services"].definition
+
+
+class TestH9ScheduleScopedRedefinition:
+    """H9 — a term redefined for one schedule was not rescoped: chunks inside
+    that schedule carried the main-body meaning, feeding the wrong legal
+    meaning into ``defined_terms_context`` and the embedded ``context_header``.
+    """
+
+    MAIN_BODY = "the consultancy services described in Schedule 1."
+    SCHEDULE_LOCAL = "the managed hosting services provided by the Supplier."
+
+    @staticmethod
+    def _document() -> str:
+        filler = " ".join("filler" for _ in range(60))
+        return (
+            "AGREEMENT\n\n1. Definitions\n\n"
+            f'"Services" means the consultancy services described in Schedule 1. {filler}\n\n'
+            "2. Supply\n\n"
+            f"The Supplier shall provide the Services under this Agreement. {filler}\n\n"
+            "Schedule 2\n\n"
+            'For the purposes of this Schedule 2 only, "Services" means the '
+            "managed hosting services provided by the Supplier.\n\n"
+            "1. Hosting\n\n"
+            f"The Supplier shall provide the Services to the standards here. {filler}\n\n"
+            "2. Support\n\n"
+            f"The Supplier shall support the Services in business hours. {filler}\n"
+        )
+
+    def _chunks(self):
+        from lexichunk import LegalChunker
+
+        return LegalChunker(jurisdiction="uk", max_chunk_size=120).chunk(
+            self._document()
+        )
+
+    def test_chunks_inside_the_schedule_use_the_schedule_definition(self) -> None:
+        from lexichunk.models import DocumentSection
+
+        inside = [
+            c
+            for c in self._chunks()
+            if c.document_section is DocumentSection.SCHEDULES
+            and "Services" in c.defined_terms_context
+        ]
+        assert inside
+        for chunk in inside:
+            assert chunk.defined_terms_context["Services"] == self.SCHEDULE_LOCAL
+
+    def test_main_body_chunks_keep_the_main_body_definition(self) -> None:
+        from lexichunk.models import DocumentSection
+
+        outside = [
+            c
+            for c in self._chunks()
+            if c.document_section is not DocumentSection.SCHEDULES
+            and "Services" in c.defined_terms_context
+        ]
+        assert outside
+        for chunk in outside:
+            assert chunk.defined_terms_context["Services"].startswith(self.MAIN_BODY)
+
+    def test_nested_clauses_inside_the_schedule_inherit_the_local_meaning(
+        self,
+    ) -> None:
+        nested = [
+            c
+            for c in self._chunks()
+            if c.hierarchy_path.startswith("Schedule 2 > ")
+            and "Services" in c.defined_terms_context
+        ]
+        assert nested
+        for chunk in nested:
+            assert chunk.defined_terms_context["Services"] == self.SCHEDULE_LOCAL
+
+    def test_a_document_without_schedules_is_unaffected(self) -> None:
+        from lexichunk import LegalChunker
+
+        document = (
+            "AGREEMENT\n\n1. Definitions\n\n"
+            '"Services" means the consultancy services described below.\n\n'
+            "2. Supply\n\nThe Supplier shall provide the Services promptly.\n"
+        )
+        chunks = LegalChunker(jurisdiction="uk").chunk(document)
+        contexts = [
+            c.defined_terms_context["Services"]
+            for c in chunks
+            if "Services" in c.defined_terms_context
+        ]
+        assert contexts
+        assert len(set(contexts)) == 1

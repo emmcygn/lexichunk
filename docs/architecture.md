@@ -88,6 +88,8 @@ Generates a Contextual Retrieval header for each chunk summarising its position 
 
 Extracts defined terms from definition sections (quoted or formatted terms with "means", "refers to", etc.) and "hereinafter" inline definitions. Results are cached by SHA-256 content hash. Each chunk is then scanned for term usage, populating `defined_terms_used` and `defined_terms_context`.
 
+**Scoping of redefined terms.** A term may be defined more than once — the main body defines it, and a schedule then redefines it for its own purposes (`For the purposes of this Schedule 2 only, "Services" means the managed hosting services...`). The definition attached to a chunk is the one from the **nearest enclosing container**: if the schedule the chunk sits in defines the term itself, that schedule-local definition wins; otherwise the main-body definition is used. Definitions inside a container never leak outward, so a chunk in the main body is unaffected by a schedule's redefinition. The per-container pass runs only when the document actually has schedule containers and at least one defined term.
+
 ### Stage 7: Cross-Reference Resolution (Second Pass)
 
 **Function**: `lexichunk.parsers.references.resolve_references()`

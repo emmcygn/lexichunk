@@ -41,6 +41,7 @@ from .models import (
     BatchResult,
     ClauseType,
     DefinedTerm,
+    DocumentSection,
     HierarchyNode,
     Jurisdiction,
     LegalChunk,
@@ -606,7 +607,12 @@ class LegalChunker:
                     logger.debug("Definition cache hit (key=%s…)", cache_key[:12])
             else:
                 defined_terms = self._definitions_extractor.extract(text)
-            _attach_defined_terms(chunks, defined_terms)
+            container_terms = _extract_container_scoped_terms(
+                self._definitions_extractor, text, chunks, defined_terms
+            )
+            _attach_defined_terms(
+                chunks, defined_terms, container_terms=container_terms
+            )
         dt_count = len(defined_terms) if defined_terms else 0
         if collect_metrics:
             elapsed = (time.perf_counter() - t0) * 1000
@@ -1245,9 +1251,78 @@ def _validate_config(
     return validated_abbreviations, validated_signals
 
 
+def _container_key(chunk: LegalChunk) -> str:
+    """Return the top-level container a chunk sits under.
+
+    Args:
+        chunk: The chunk whose enclosing container is wanted.
+
+    Returns:
+        The first segment of ``hierarchy_path`` (e.g. ``"Schedule 2"``), or
+        the empty string when the chunk has no path.
+    """
+    return chunk.hierarchy_path.split(" > ")[0].strip()
+
+
+def _extract_container_scoped_terms(
+    extractor: DefinitionsExtractor,
+    text: str,
+    chunks: list[LegalChunk],
+    defined_terms: dict[str, DefinedTerm],
+) -> dict[str, dict[str, DefinedTerm]]:
+    """Re-extract definitions separately inside each Schedule-like container.
+
+    A term defined in the main body and then explicitly redefined for one
+    schedule — ``For the purposes of this Schedule 2 only, "Services" means
+    the managed hosting services ...`` — is routine drafting, and the
+    schedule-local meaning is the one that governs text inside that schedule.
+    A single flat term dictionary cannot express that, so every chunk inside
+    Schedule 2 was handed the main-body definition: the wrong legal meaning,
+    fed straight into ``defined_terms_context`` and the ``context_header``
+    that a RAG pipeline embeds.
+
+    Args:
+        extractor: The extractor to reuse for the per-container passes.
+        text: The full sanitised document text.
+        chunks: The chunks produced for *text*.
+        defined_terms: The document-wide term dictionary.
+
+    Returns:
+        A mapping from container identifier (the first segment of
+        ``hierarchy_path``) to that container's own term dictionary.  Empty
+        when the document has no schedule containers or no defined terms —
+        in which case no extra extraction work is done at all.
+    """
+    if not defined_terms:
+        return {}
+
+    spans: dict[str, list[int]] = {}
+    for chunk in chunks:
+        if chunk.document_section is not DocumentSection.SCHEDULES:
+            continue
+        key = _container_key(chunk)
+        if not key:
+            continue
+        span = spans.get(key)
+        if span is None:
+            spans[key] = [chunk.char_start, chunk.char_end]
+        else:
+            span[0] = min(span[0], chunk.char_start)
+            span[1] = max(span[1], chunk.char_end)
+
+    container_terms: dict[str, dict[str, DefinedTerm]] = {}
+    for key, (start, end) in spans.items():
+        local = extractor.extract_from_section(text[start:end], key)
+        if local:
+            container_terms[key] = local
+    return container_terms
+
+
 def _attach_defined_terms(
     chunks: list[LegalChunk],
     defined_terms: dict[str, DefinedTerm],
+    *,
+    container_terms: Optional[dict[str, dict[str, DefinedTerm]]] = None,
 ) -> None:
     """Attach relevant defined terms to each chunk in-place.
 
@@ -1277,12 +1352,26 @@ def _attach_defined_terms(
     - Appends the term to ``chunk.defined_terms_used``.
     - Adds it to ``chunk.defined_terms_context`` (term → definition text).
 
+    **Scoping rule.** When a term is defined more than once, the definition
+    attached to a chunk is the one from the nearest enclosing container — the
+    schedule the chunk sits in, if that schedule defines the term itself —
+    and otherwise the main-body one.  This is what makes
+    ``For the purposes of this Schedule 2 only, "Services" means ...``
+    govern the chunks inside Schedule 2 while leaving the rest of the
+    agreement on the main-body meaning.
+
     Args:
         chunks: List of LegalChunk objects to enrich (mutated in-place).
         defined_terms: Dict of all defined terms in the document.
+        container_terms: Optional mapping from container identifier to that
+            container's own term dictionary, as built by
+            :func:`_extract_container_scoped_terms`.  A term present there
+            overrides the document-wide definition for chunks inside that
+            container.
     """
     if not defined_terms:
         return
+    container_terms = container_terms or {}
 
     # Longest-first is cosmetic here (candidate-position detection does not
     # depend on ordering, since the bucket check re-verifies every term
@@ -1306,6 +1395,7 @@ def _attach_defined_terms(
 
     for chunk in chunks:
         content = chunk.content
+        local_terms = container_terms.get(_container_key(chunk), {})
         seen: set[str] = set()
         for match in candidate_pattern.finditer(content):
             pos = match.start()
@@ -1315,7 +1405,8 @@ def _attach_defined_terms(
                 if not term_pattern.match(content, pos):
                     continue
                 seen.add(term)
-                dt = defined_terms.get(term)
+                # Nearest enclosing container wins over the main body.
+                dt = local_terms.get(term) or defined_terms.get(term)
                 if dt is None:
                     continue
                 chunk.defined_terms_used.append(term)
