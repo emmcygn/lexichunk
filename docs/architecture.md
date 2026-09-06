@@ -133,6 +133,46 @@ for stage in metrics.stage_metrics:
     print(f"  {stage.name}: {stage.duration_ms:.1f}ms ({stage.item_count} items)")
 ```
 
+### Structure-quality metrics
+
+Timings tell you the pipeline ran. These fields tell you whether it
+*understood this contract* — the question that actually matters when you point
+lexichunk at a new corpus and cannot eyeball 4,000 documents.
+
+| Field | Meaning | How to read it |
+| --- | --- | --- |
+| `clause_count` | `ParsedClause` objects from Stage 1, including the synthetic preamble. | Near-zero on a document you expect to be structured means the extraction layer, not the contract, changed. |
+| `top_level_clause_count` | Root structural units — parsed clauses with no parent (preamble, each top-level clause, each Schedule/Article). | The document's own outline size. Compare `chunk_count` against it. |
+| `chunks_spanning_multiple_top_level_clauses` | Chunks whose `[char_start, char_end)` overlaps more than one root unit. | **0 by design.** The clause-aware chunker never merges two container-level groups, so anything else is an over-merge putting two unrelated clauses behind one embedding. Assert on it in CI. |
+| `chunks_with_multiple_clauses` | Chunks that gathered more than one *distinct* clause identifier. | Informational. Sub-clause grouping is how `min_chunk_size` is honoured without crossing hierarchy. The pieces of one over-sized clause are not counted — they share an identifier. |
+| `chunks_below_min` | Chunks under `min_chunk_size` tokens. | Expected to be non-zero: `min_chunk_size` is a preference, hierarchy is a fact. A short, structurally isolated clause is emitted short rather than folded into a neighbour. |
+| `heading_candidates_rejected` | Lines `detect_level` proposed as headings that the plausibility gate then vetoed. | Table-of-contents entries, running headers, wrapped ALL-CAPS paragraphs, fee-schedule list items. A jump against a comparable document points at the extraction layer. |
+| `fallback_used` | The sentence-level `FallbackChunker` ran because Stage 1 found no structure. | On a numbered contract this means detection failed outright. |
+
+```python
+chunks, metrics = chunker.chunk_with_metrics(text)
+
+assert metrics.chunks_spanning_multiple_top_level_clauses == 0
+print(
+    f"{metrics.clause_count} clauses "
+    f"({metrics.top_level_clause_count} top-level) -> "
+    f"{metrics.chunk_count} chunks; "
+    f"{metrics.chunks_with_multiple_clauses} grouped, "
+    f"{metrics.chunks_below_min} short, "
+    f"{metrics.heading_candidates_rejected} heading candidates rejected"
+)
+```
+
+Reference values for the bundled fixtures at the default 512/64 sizes:
+
+| Fixture | clauses | top-level | chunks | spanning | grouped | below min | rejected |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `uk_service_agreement` | 113 | 11 | 51 | 0 | 32 | 4 | 1 |
+| `uk_terms_conditions` | 71 | 11 | 32 | 0 | 21 | 2 | 1 |
+| `us_msa` | 71 | 12 | 48 | 0 | 16 | 1 | 14 |
+| `us_terms_of_service` | 80 | 12 | 48 | 0 | 17 | 0 | 5 |
+| `eu_gdpr_excerpt` | 37 | 3 | 10 | 0 | 8 | 1 | 2 |
+
 ## Logging and observability
 
 lexichunk's root logger (`logging.getLogger("lexichunk")`) has a `NullHandler`

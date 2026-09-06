@@ -25,6 +25,7 @@ import sys
 import threading
 import time
 import unicodedata
+from bisect import bisect_left, bisect_right
 from collections import OrderedDict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -49,7 +50,7 @@ from .models import (
 from .offsets import OffsetMap, sanitize_with_map
 from .parsers.definitions import DefinitionsExtractor
 from .parsers.references import ReferenceDetector, resolve_references
-from .parsers.structure import StructureParser
+from .parsers.structure import ParsedClause, StructureParser
 from .strategies.clause_aware import ClauseAwareChunker
 from .strategies.fallback import FallbackChunker
 
@@ -475,6 +476,7 @@ class LegalChunker:
             logger.debug("Stage 1: structure_parsing — start")
             t0 = time.perf_counter()
         clauses = self._structure_parser.parse(text)
+        heading_candidates_rejected = self._structure_parser.last_rejected_headings
         if collect_metrics:
             elapsed = (time.perf_counter() - t0) * 1000
             logger.debug(
@@ -557,6 +559,11 @@ class LegalChunker:
                     cross_ref_resolved=0,
                     input_chars=input_chars,
                     fallback_used=fallback_used,
+                    clause_count=len(clauses),
+                    top_level_clause_count=sum(
+                        1 for c in clauses if c.parent_uid is None
+                    ),
+                    heading_candidates_rejected=heading_candidates_rejected,
                 )
             return [], None
 
@@ -740,6 +747,7 @@ class LegalChunker:
 
         metrics: PipelineMetrics | None = None
         if collect_metrics:
+            root_units = [c for c in clauses if c.parent_uid is None]
             metrics = PipelineMetrics(
                 total_duration_ms=(time.perf_counter() - pipeline_start) * 1000,
                 stage_metrics=tuple(stage_metrics),
@@ -749,6 +757,20 @@ class LegalChunker:
                 cross_ref_resolved=resolved_count,
                 input_chars=input_chars,
                 fallback_used=fallback_used,
+                clause_count=len(clauses),
+                top_level_clause_count=len(root_units),
+                chunks_spanning_multiple_top_level_clauses=(
+                    _count_boundary_crossing_chunks(chunks, root_units)
+                ),
+                chunks_with_multiple_clauses=sum(
+                    1
+                    for identifiers in (merged_identifiers or {}).values()
+                    if len(identifiers) > 1
+                ),
+                chunks_below_min=sum(
+                    1 for c in chunks if c.token_count < self._min_chunk_size
+                ),
+                heading_candidates_rejected=heading_candidates_rejected,
             )
 
         return chunks, metrics
@@ -1405,6 +1427,41 @@ def _iteration_error(items: list[Any], exc: Exception) -> BatchError:
         error=f"Input iterable raised after {len(items)} item(s): {exc}",
         error_type=type(exc).__qualname__,
     )
+
+
+def _count_boundary_crossing_chunks(
+    chunks: list[LegalChunk], root_units: list[ParsedClause]
+) -> int:
+    """Count chunks whose span straddles two root structural units.
+
+    A *root unit* is a parsed clause with no parent — the synthetic
+    preamble, each top-level clause, each Schedule.  Their
+    ``[char_start, char_end)`` spans tile the document without overlap
+    (a clause only closes when a same-or-more-senior header arrives), so a
+    chunk overlapping two of them has merged across a boundary the
+    hierarchy says is real.
+
+    Args:
+        chunks: The emitted chunks, in document order.
+        root_units: The parsed clauses with ``parent_uid is None``, in
+            document order.
+
+    Returns:
+        The number of offending chunks — expected to be ``0``.
+    """
+    if len(root_units) < 2:
+        return 0
+    starts = [unit.char_start for unit in root_units]
+    crossing = 0
+    for chunk in chunks:
+        if chunk.char_end <= chunk.char_start:
+            continue
+        # Number of unit boundaries strictly inside the chunk's own span.
+        first = bisect_right(starts, chunk.char_start)
+        last = bisect_left(starts, chunk.char_end)
+        if last > first:
+            crossing += 1
+    return crossing
 
 
 def _container_key(chunk: LegalChunk) -> str:
