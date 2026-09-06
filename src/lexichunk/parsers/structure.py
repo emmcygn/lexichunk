@@ -339,6 +339,15 @@ _UK_POSTCODE_RE = re.compile(
     r'\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b', re.IGNORECASE
 )
 
+# A wholly numeric identifier — "1", "1.1", "1.1.1".  These are the shapes
+# that carry no keyword ("Section", "ARTICLE", "Schedule") to vouch for
+# them, so they are the ones a wrapped sentence can imitate; see rule (f).
+_BARE_NUMERIC_ID_RE = re.compile(r'\d+(?:\.\d+)*')
+
+# Punctuation that ends the preceding line's sentence, and so tells rule (f)
+# that the numbered line below it starts something new.
+_SENTENCE_END = ('.', '!', '?', ':', ';')
+
 
 def _is_title_shaped(remainder: str) -> bool:
     """Return ``True`` when *remainder* reads as a heading title, not prose.
@@ -944,7 +953,7 @@ class StructureParser:
             result = self._detect_level(line)
             if result is None:
                 continue
-            if not self._is_plausible_heading(lines, idx, result):
+            if not self._is_plausible_heading(lines, idx, result, header_map):
                 rejected += 1
                 continue
 
@@ -976,6 +985,7 @@ class StructureParser:
         lines: list[str],
         idx: int,
         result: tuple[int, str],
+        accepted: dict[int, tuple[int, str]] | None = None,
     ) -> bool:
         """Return ``True`` when ``lines[idx]`` really looks like a heading.
 
@@ -1013,11 +1023,24 @@ class StructureParser:
           title-cased, unpunctuated — out of those two rules.  A remainder
           opening with a quote is exempt from the length test: that is the
           numbered-definition layout ``1. "Term" means …``.
+        * **Bare-numeric headings** (``1``, ``1.1``, ``1.1.1`` — no
+          ``Section``/``ARTICLE``/``Schedule`` keyword to vouch for them)
+          must *open* a block: the previous line has to be blank, end a
+          sentence, or itself be an accepted heading.  A numbered line that
+          merely continues the previous one is a wrapped sentence, not a
+          clause — ``"… terminate before the effective date in accordance
+          with Section"`` wrapping onto ``"7.2. Continued use of the
+          Platform …"`` is the canonical case, and it costs a real clause
+          body if believed.
 
         Args:
             lines: The document's lines.
             idx: Index of the candidate line.
             result: The ``(level, identifier)`` proposed by ``detect_level``.
+            accepted: Headings accepted so far, keyed by line index.  Only
+                indices below *idx* are populated, which is all rule (f)
+                needs.  ``None`` disables that rule, so a direct call for a
+                single line behaves as it did before the rule existed.
 
         Returns:
             ``True`` to accept the heading, ``False`` to reject it.
@@ -1103,6 +1126,27 @@ class StructureParser:
         #     (`"Article I, Section 3.01 through 3.04, ..."`).
         if remainder.startswith(','):
             return False
+
+        # (f) A bare-numeric heading must open a block.  Unlike "Section 4.5"
+        #     or "SCHEDULE 2", "4.5" carries no keyword vouching for it, so
+        #     the only evidence that it is a heading and not the tail of a
+        #     wrapped sentence is what sits above it.  Requiring a blank
+        #     line, a finished sentence, or another heading covers every
+        #     real layout: sub-clauses stacked under their parent heading
+        #     ("1. Definitions" / "1.1 In this Agreement ...") are kept by
+        #     the third alternative even when the parent has no full stop.
+        if (
+            accepted is not None
+            and idx > 0
+            and _BARE_NUMERIC_ID_RE.fullmatch(identifier)
+        ):
+            previous = lines[idx - 1].rstrip()
+            if (
+                previous.strip()
+                and not previous.endswith(_SENTENCE_END)
+                and (idx - 1) not in accepted
+            ):
+                return False
 
         return True
 

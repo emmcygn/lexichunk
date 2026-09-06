@@ -1064,11 +1064,11 @@
   {
     "char_end": 18452,
     "char_start": 17869,
-    "classification_confidence": 0.393,
-    "clause_type": "notices",
+    "classification_confidence": 0.455,
+    "clause_type": "termination",
     "content_head": "'Article VIII Term and Termination\\nSection 8.03  Termination for Cause. Either Pa'",
     "content_sha256": "8a7564e60caa3bf169b746a16aebba51a88580bb29a8f436416728298e0402c5",
-    "context_header": "[Section: Article VIII — Term and Termination > Section 8.03 — Termination for Cause. Either Party may terminate this Agreement or any] [Type: Notices] [Jurisdiction: US]",
+    "context_header": "[Section: Article VIII — Term and Termination > Section 8.03 — Termination for Cause. Either Party may terminate this Agreement or any] [Type: Termination] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Section 8.03",
@@ -1086,7 +1086,7 @@
     "hierarchy_path": "Article VIII — Term and Termination > Section 8.03 — Termination for Cause. Either Party may terminate this Agreement or any",
     "index": 36,
     "original_header": "Section 8.03 Termination for Cause. Either Party may terminate this Agreement or any",
-    "secondary_clause_type": "termination",
+    "secondary_clause_type": "notices",
     "token_count": 154
   },
   {
@@ -1399,13 +1399,13 @@
     "token_count": 203
   },
   {
-    "char_end": 24169,
+    "char_end": 23690,
     "char_start": 23486,
-    "classification_confidence": 0.562,
+    "classification_confidence": 1.0,
     "clause_type": "services",
     "content_head": "'EXHIBIT A — STATEMENT OF WORK NO. 1\\n\\n1.   Description of Services\\n\\n     Provider'",
-    "content_sha256": "416ddbf1ad225631d34872d945290a19c8ce9be0de1cabc4bcc7f2b74042009b",
-    "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1] [Type: Services] [Jurisdiction: US]",
+    "content_sha256": "3ccf4f9cae635981c50c794f0039875900bfd28ad8376793b00039644606f462",
+    "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1 > 1 — Description of Services] [Type: Services] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "EXHIBIT A",
@@ -1414,7 +1414,6 @@
       }
     ],
     "defined_terms_used": [
-      "Customer",
       "Effective Date",
       "Provider",
       "SOW",
@@ -1422,20 +1421,62 @@
       "Services"
     ],
     "document_section": "schedules",
-    "hierarchy_path": "EXHIBIT A — STATEMENT OF WORK NO. 1",
+    "hierarchy_path": "EXHIBIT A — STATEMENT OF WORK NO. 1 > 1 — Description of Services",
     "index": 46,
-    "original_header": "EXHIBIT A STATEMENT OF WORK NO. 1",
+    "original_header": "1 Description of Services",
+    "secondary_clause_type": null,
+    "token_count": 51
+  },
+  {
+    "char_end": 24334,
+    "char_start": 23690,
+    "classification_confidence": 0.857,
+    "clause_type": "services",
+    "content_head": "'EXHIBIT A STATEMENT OF WORK NO. 1\\n1 Description of Services\\n     (a)  Cloud Infr'",
+    "content_sha256": "102e5c69fb6aff64f693607314cdf92393e7857448fc48c31e94193c15d2a5ac",
+    "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1 > 1 — Description of Services > (a) — Cloud Infrastructure Migration: Migration of Customer's existing on-premises] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Provider",
+      "Services"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "EXHIBIT A — STATEMENT OF WORK NO. 1 > 1 — Description of Services > (a) — Cloud Infrastructure Migration: Migration of Customer's existing on-premises",
+    "index": 47,
+    "original_header": "(a) Cloud Infrastructure Migration: Migration of Customer's existing on-premises",
     "secondary_clause_type": "payment",
-    "token_count": 170
+    "token_count": 176
+  },
+  {
+    "char_end": 24768,
+    "char_start": 24334,
+    "classification_confidence": 1.0,
+    "clause_type": "services",
+    "content_head": "'EXHIBIT A STATEMENT OF WORK NO. 1\\n2.   Deliverables and milestones\\n\\n     Milesto'",
+    "content_sha256": "c60d72bbf865902dd1daf362f97e98619b9f1c085f1526bcabb8d0d98dd35145",
+    "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1 > 2 — Deliverables and milestones] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Effective Date",
+      "SOW",
+      "SOW Effective Date"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "EXHIBIT A — STATEMENT OF WORK NO. 1 > 2 — Deliverables and milestones",
+    "index": 48,
+    "original_header": "2 Deliverables and milestones",
+    "secondary_clause_type": null,
+    "token_count": 117
   },
   {
     "char_end": 25346,
-    "char_start": 24169,
-    "classification_confidence": 0.571,
-    "clause_type": "services",
-    "content_head": "'EXHIBIT A STATEMENT OF WORK NO. 1\\n     (c)  Training and Enablement: Delivery of'",
-    "content_sha256": "deb5864b44698ac5ef1b17aa8c219e4f023e666705f2353144a8ae190d9b64bc",
-    "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1 > (c) — Training and Enablement: Delivery of up to twenty (20) hours of end-user] [Type: Services] [Jurisdiction: US]",
+    "char_start": 24768,
+    "classification_confidence": 0.375,
+    "clause_type": "payment",
+    "content_head": "'EXHIBIT A STATEMENT OF WORK NO. 1\\n3.   Fees (Exhibit A)\\n\\n     The total fixed fe'",
+    "content_sha256": "8e80a297aff3f7f58a171ebddaa7a603f9f65e8dff27f8fb0bb405b0e9b01aec",
+    "context_header": "[Section: EXHIBIT A — STATEMENT OF WORK NO. 1 > 3 — Fees (Exhibit A)] [Type: Payment] [Jurisdiction: US]",
     "cross_references": [
       {
         "raw_text": "Exhibit A",
@@ -1450,18 +1491,14 @@
     ],
     "defined_terms_used": [
       "Agreement",
-      "Customer",
-      "Effective Date",
       "Fees",
-      "SOW",
-      "SOW Effective Date",
       "Services"
     ],
     "document_section": "schedules",
-    "hierarchy_path": "EXHIBIT A — STATEMENT OF WORK NO. 1 > (c) — Training and Enablement: Delivery of up to twenty (20) hours of end-user",
-    "index": 47,
-    "original_header": "(c) Training and Enablement: Delivery of up to twenty (20) hours of end-user",
-    "secondary_clause_type": "payment",
-    "token_count": 302
+    "hierarchy_path": "EXHIBIT A — STATEMENT OF WORK NO. 1 > 3 — Fees (Exhibit A)",
+    "index": 49,
+    "original_header": "3 Fees (Exhibit A)",
+    "secondary_clause_type": "services",
+    "token_count": 153
   }
 ]
