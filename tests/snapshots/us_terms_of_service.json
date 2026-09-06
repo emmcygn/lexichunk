@@ -1,0 +1,1471 @@
+[
+  {
+    "char_end": 762,
+    "char_start": 0,
+    "classification_confidence": 1.0,
+    "clause_type": "preamble",
+    "content_head": "'TERMS OF SERVICE\\n\\nStrata Software Platform\\n\\nLast Updated: January 10, 2024\\nEffec'",
+    "content_sha256": "efd4fe321d179088bf87f5de0a09f4abcb5867e512d0d8ee2d138fb9456a6cb6",
+    "context_header": "[Section: preamble] [Type: Preamble] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Platform",
+      "TERMS"
+    ],
+    "document_section": "preamble",
+    "hierarchy_path": "preamble",
+    "index": 0,
+    "original_header": "",
+    "secondary_clause_type": null,
+    "token_count": 190
+  },
+  {
+    "char_end": 1622,
+    "char_start": 762,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'Section 1.   Definitions\\n\\nSection 1.1  \"Account\" means a Customer-specific accou'",
+    "content_sha256": "b7a575a9a4f2e1128160330105477fcb3a4381df2ef960a469f3d1df2e9371cd",
+    "context_header": "[Section: Section 1 — Definitions] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1",
+        "target_chunk_index": 1,
+        "target_identifier": "1"
+      },
+      {
+        "raw_text": "Section 1.1",
+        "target_chunk_index": 1,
+        "target_identifier": "1.1"
+      },
+      {
+        "raw_text": "Section 2.3",
+        "target_chunk_index": 6,
+        "target_identifier": "2.3"
+      },
+      {
+        "raw_text": "Section 1.2",
+        "target_chunk_index": 1,
+        "target_identifier": "1.2"
+      },
+      {
+        "raw_text": "Section 1.3",
+        "target_chunk_index": 1,
+        "target_identifier": "1.3"
+      },
+      {
+        "raw_text": "Section 1.4",
+        "target_chunk_index": 1,
+        "target_identifier": "1.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Account",
+      "Authorized Users",
+      "Customer Content",
+      "Documentation",
+      "Order Form",
+      "Personal Information",
+      "Platform"
+    ],
+    "document_section": "definitions",
+    "hierarchy_path": "Section 1 — Definitions",
+    "index": 1,
+    "original_header": "Section 1 Definitions",
+    "secondary_clause_type": null,
+    "token_count": 215
+  },
+  {
+    "char_end": 2181,
+    "char_start": 1622,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'Section 1 Definitions\\nSection 1.5  \"Intellectual Property Rights\" means all pate'",
+    "content_sha256": "66a187c7ccb01c1ef9ba5ab1e7e4107c027d14965dba70894a36fa874ba09afd",
+    "context_header": "[Section: Section 1 — Definitions > Section 1.5 — \"Intellectual Property Rights\" means all patents, patent applications,] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.5",
+        "target_chunk_index": 2,
+        "target_identifier": "1.5"
+      },
+      {
+        "raw_text": "Section 1.6",
+        "target_chunk_index": 2,
+        "target_identifier": "1.6"
+      }
+    ],
+    "defined_terms_used": [
+      "Intellectual Property Rights",
+      "Order Form"
+    ],
+    "document_section": "definitions",
+    "hierarchy_path": "Section 1 — Definitions > Section 1.5 — \"Intellectual Property Rights\" means all patents, patent applications,",
+    "index": 2,
+    "original_header": "Section 1.5 \"Intellectual Property Rights\" means all patents, patent applications,",
+    "secondary_clause_type": null,
+    "token_count": 145
+  },
+  {
+    "char_end": 3533,
+    "char_start": 2181,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'Section 1 Definitions\\nSection 1.7  \"Personal Information\" means any information '",
+    "content_sha256": "53c2171242a9feb713882e03cb89cd3e5c428ae3910cd3612b649485a28394a7",
+    "context_header": "[Section: Section 1 — Definitions > Section 1.7 — \"Personal Information\" means any information that identifies or could] [Type: Definitions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 1.7",
+        "target_chunk_index": 3,
+        "target_identifier": "1.7"
+      },
+      {
+        "raw_text": "Section 1.8",
+        "target_chunk_index": 3,
+        "target_identifier": "1.8"
+      },
+      {
+        "raw_text": "Section 1.9",
+        "target_chunk_index": 3,
+        "target_identifier": "1.9"
+      },
+      {
+        "raw_text": "Section 2.5",
+        "target_chunk_index": 9,
+        "target_identifier": "2.5"
+      },
+      {
+        "raw_text": "Section 1.10",
+        "target_chunk_index": 3,
+        "target_identifier": "1.10"
+      },
+      {
+        "raw_text": "Section 1.11",
+        "target_chunk_index": 3,
+        "target_identifier": "1.11"
+      },
+      {
+        "raw_text": "Section 7.1",
+        "target_chunk_index": 27,
+        "target_identifier": "7.1"
+      },
+      {
+        "raw_text": "Section 1.12",
+        "target_chunk_index": 3,
+        "target_identifier": "1.12"
+      }
+    ],
+    "defined_terms_used": [
+      "Account",
+      "Order Form",
+      "Personal Information",
+      "Platform",
+      "Professional Services",
+      "Subscription Fees",
+      "Subscription Term",
+      "Third-Party Services"
+    ],
+    "document_section": "definitions",
+    "hierarchy_path": "Section 1 — Definitions > Section 1.7 — \"Personal Information\" means any information that identifies or could",
+    "index": 3,
+    "original_header": "Section 1.7 \"Personal Information\" means any information that identifies or could",
+    "secondary_clause_type": null,
+    "token_count": 343
+  },
+  {
+    "char_end": 4108,
+    "char_start": 3533,
+    "classification_confidence": 0.321,
+    "clause_type": "payment",
+    "content_head": "'Section 2.   License Grant and Access\\n\\nSection 2.1  License Grant. Subject to Cu'",
+    "content_sha256": "4ac0803bfd7288dd4492153530d9890138c2460adba58e3d9a4e8d3843264a99",
+    "context_header": "[Section: Section 2 — License Grant and Access] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2",
+        "target_chunk_index": 4,
+        "target_identifier": "2"
+      },
+      {
+        "raw_text": "Section 2.1",
+        "target_chunk_index": 4,
+        "target_identifier": "2.1"
+      },
+      {
+        "raw_text": "Section 2.2",
+        "target_chunk_index": 4,
+        "target_identifier": "2.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Documentation",
+      "Order Form",
+      "Platform",
+      "Subscription Fees",
+      "Subscription Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 2 — License Grant and Access",
+    "index": 4,
+    "original_header": "Section 2 License Grant and Access",
+    "secondary_clause_type": "covenants",
+    "token_count": 143
+  },
+  {
+    "char_end": 5254,
+    "char_start": 4108,
+    "classification_confidence": 0.467,
+    "clause_type": "user_restrictions",
+    "content_head": "'Section 2 License Grant and Access\\nSection 2.2 Restrictions. Customer shall not,'",
+    "content_sha256": "6201d368ef43c2e0195b680153d90fefd7e4c1cf5e46ae69cdf5ff166a4d6cb3",
+    "context_header": "[Section: Section 2 — License Grant and Access > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User > (a) — copy, modify, adapt, translate, or create derivative works of the Platform or] [Type: User Restrictions] [Jurisdiction: US]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Documentation",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 2 — License Grant and Access > Section 2.2 — Restrictions. Customer shall not, and shall not permit any Authorized User > (a) — copy, modify, adapt, translate, or create derivative works of the Platform or",
+    "index": 5,
+    "original_header": "(a) copy, modify, adapt, translate, or create derivative works of the Platform or",
+    "secondary_clause_type": "governing_law",
+    "token_count": 317
+  },
+  {
+    "char_end": 5594,
+    "char_start": 5254,
+    "classification_confidence": 0.909,
+    "clause_type": "account_security",
+    "content_head": "'Section 2 License Grant and Access\\nSection 2.3  Account Security. Customer is re'",
+    "content_sha256": "aeb7afa0550f4774f22c16c59bb747cff7b8922a47e120f93c3e179cff547266",
+    "context_header": "[Section: Section 2 — License Grant and Access > Section 2.3 — Account Security. Customer is responsible for maintaining the security of] [Type: Account Security] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.3",
+        "target_chunk_index": 6,
+        "target_identifier": "2.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Account"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 2 — License Grant and Access > Section 2.3 — Account Security. Customer is responsible for maintaining the security of",
+    "index": 6,
+    "original_header": "Section 2.3 Account Security. Customer is responsible for maintaining the security of",
+    "secondary_clause_type": "intellectual_property",
+    "token_count": 93
+  },
+  {
+    "char_end": 5919,
+    "char_start": 5594,
+    "classification_confidence": 0.7,
+    "clause_type": "account_security",
+    "content_head": "'Section 2 License Grant and Access\\nSection 2.3 Account Security. Customer is res'",
+    "content_sha256": "666f22464113bd906fbbaef2fac3df2bcf7e1ce567281f68ba7f5bb3d28ef60a",
+    "context_header": "[Section: Section 2 — License Grant and Access > Section 2.3 — Account Security. Customer is responsible for maintaining the security of > (c) — notify Strata promptly at security@strataplatform.io upon discovering any] [Type: Account Security] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.3",
+        "target_chunk_index": 6,
+        "target_identifier": "2.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Account"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 2 — License Grant and Access > Section 2.3 — Account Security. Customer is responsible for maintaining the security of > (c) — notify Strata promptly at security@strataplatform.io upon discovering any",
+    "index": 7,
+    "original_header": "(c) notify Strata promptly at security@strataplatform.io upon discovering any",
+    "secondary_clause_type": "covenants",
+    "token_count": 111
+  },
+  {
+    "char_end": 6202,
+    "char_start": 5919,
+    "classification_confidence": 0.625,
+    "clause_type": "acceptable_use",
+    "content_head": "\"Section 2 License Grant and Access\\nSection 2.4  Acceptable Use Policy. Customer'\"",
+    "content_sha256": "bef7bf7b477a39f5142b5a601cd2ab369d1fc12f7341ad61df9a5b045b48aa94",
+    "context_header": "[Section: Section 2 — License Grant and Access > Section 2.4 — Acceptable Use Policy. Customer's use of the Platform is also subject to] [Type: Acceptable Use] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.4",
+        "target_chunk_index": 8,
+        "target_identifier": "2.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 2 — License Grant and Access > Section 2.4 — Acceptable Use Policy. Customer's use of the Platform is also subject to",
+    "index": 8,
+    "original_header": "Section 2.4 Acceptable Use Policy. Customer's use of the Platform is also subject to",
+    "secondary_clause_type": "notices",
+    "token_count": 79
+  },
+  {
+    "char_end": 6543,
+    "char_start": 6202,
+    "classification_confidence": 0.857,
+    "clause_type": "services",
+    "content_head": "'Section 2 License Grant and Access\\nSection 2.5  Professional Services. The parti'",
+    "content_sha256": "dbbd18d7cb6f17129865fefa4e856364ed4e28fa3adc23201085c9216de53634",
+    "context_header": "[Section: Section 2 — License Grant and Access > Section 2.5 — Professional Services. The parties may agree to Professional Services under] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.5",
+        "target_chunk_index": 9,
+        "target_identifier": "2.5"
+      }
+    ],
+    "defined_terms_used": [
+      "Professional Services",
+      "SOW"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 2 — License Grant and Access > Section 2.5 — Professional Services. The parties may agree to Professional Services under",
+    "index": 9,
+    "original_header": "Section 2.5 Professional Services. The parties may agree to Professional Services under",
+    "secondary_clause_type": "intellectual_property",
+    "token_count": 94
+  },
+  {
+    "char_end": 6945,
+    "char_start": 6543,
+    "classification_confidence": 0.562,
+    "clause_type": "services",
+    "content_head": "'Section 2 License Grant and Access\\nSection 2.6  Third-Party Services. The Platfo'",
+    "content_sha256": "1a7ba6cb4850e2913f1b897428a361bbe459abd467b7969cf710e7b2a67eedcf",
+    "context_header": "[Section: Section 2 — License Grant and Access > Section 2.6 — Third-Party Services. The Platform may allow Customer to integrate or] [Type: Services] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 2.6",
+        "target_chunk_index": 10,
+        "target_identifier": "2.6"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform",
+      "Third-Party Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 2 — License Grant and Access > Section 2.6 — Third-Party Services. The Platform may allow Customer to integrate or",
+    "index": 10,
+    "original_header": "Section 2.6 Third-Party Services. The Platform may allow Customer to integrate or",
+    "secondary_clause_type": "intellectual_property",
+    "token_count": 109
+  },
+  {
+    "char_end": 7440,
+    "char_start": 6945,
+    "classification_confidence": 0.188,
+    "clause_type": "data_protection",
+    "content_head": "'Section 3.   Restrictions on Use\\n\\nSection 3.1  Prohibited Content. Customer shal'",
+    "content_sha256": "e32be8b5a43fa11212064d9ffe9203a1001ead98219ff5ea2769443694774907",
+    "context_header": "[Section: Section 3 — Restrictions on Use > Section 3.1 — Prohibited Content. Customer shall not upload, store, process, or transmit] [Type: Data Protection] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3",
+        "target_chunk_index": 11,
+        "target_identifier": "3"
+      },
+      {
+        "raw_text": "Section 3.1",
+        "target_chunk_index": 11,
+        "target_identifier": "3.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Intellectual Property Rights",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 3 — Restrictions on Use > Section 3.1 — Prohibited Content. Customer shall not upload, store, process, or transmit",
+    "index": 11,
+    "original_header": "Section 3.1 Prohibited Content. Customer shall not upload, store, process, or transmit",
+    "secondary_clause_type": "user_restrictions",
+    "token_count": 123
+  },
+  {
+    "char_end": 7775,
+    "char_start": 7440,
+    "classification_confidence": 0.562,
+    "clause_type": "user_restrictions",
+    "content_head": "\"Section 3 Restrictions on Use\\nSection 3.2  Usage Limits. Customer's use of the P\"",
+    "content_sha256": "0cb7d987d10809954ce20cfe3a4af38bd1b84038bd5268d8206eaff7ef52e7cd",
+    "context_header": "[Section: Section 3 — Restrictions on Use > Section 3.2 — Usage Limits. Customer's use of the Platform is subject to the usage limits] [Type: User Restrictions] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3.2",
+        "target_chunk_index": 12,
+        "target_identifier": "3.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 3 — Restrictions on Use > Section 3.2 — Usage Limits. Customer's use of the Platform is subject to the usage limits",
+    "index": 12,
+    "original_header": "Section 3.2 Usage Limits. Customer's use of the Platform is subject to the usage limits",
+    "secondary_clause_type": "payment",
+    "token_count": 91
+  },
+  {
+    "char_end": 8313,
+    "char_start": 7775,
+    "classification_confidence": 0.5,
+    "clause_type": "representations",
+    "content_head": "'Section 3 Restrictions on Use\\nSection 3.3  Export Compliance. Customer agrees to'",
+    "content_sha256": "bf045f6c5a8289d3a4b88ca946b13696c1038b5d2da91c91d1c83d6659bb5637",
+    "context_header": "[Section: Section 3 — Restrictions on Use > Section 3.3 — Export Compliance. Customer agrees to comply fully with all applicable] [Type: Representations] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 3.3",
+        "target_chunk_index": 13,
+        "target_identifier": "3.3"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 3 — Restrictions on Use > Section 3.3 — Export Compliance. Customer agrees to comply fully with all applicable",
+    "index": 13,
+    "original_header": "Section 3.3 Export Compliance. Customer agrees to comply fully with all applicable",
+    "secondary_clause_type": "user_restrictions",
+    "token_count": 142
+  },
+  {
+    "char_end": 8680,
+    "char_start": 8313,
+    "classification_confidence": 0.45,
+    "clause_type": "data_protection",
+    "content_head": "\"Section 4.   Privacy and Data\\n\\nSection 4.1  Privacy Policy. Strata's collection \"",
+    "content_sha256": "cae77e16f3cc98ca86b6bb0931d60a50bd7b50c57ee30f7d9d95435be0b71ec7",
+    "context_header": "[Section: Section 4 — Privacy and Data > Section 4.1 — Privacy Policy. Strata's collection and use of Personal Information is] [Type: Data Protection] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4",
+        "target_chunk_index": 14,
+        "target_identifier": "4"
+      },
+      {
+        "raw_text": "Section 4.1",
+        "target_chunk_index": 14,
+        "target_identifier": "4.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Personal Information",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 4 — Privacy and Data > Section 4.1 — Privacy Policy. Strata's collection and use of Personal Information is",
+    "index": 14,
+    "original_header": "Section 4.1 Privacy Policy. Strata's collection and use of Personal Information is",
+    "secondary_clause_type": "governing_law",
+    "token_count": 91
+  },
+  {
+    "char_end": 9074,
+    "char_start": 8680,
+    "classification_confidence": 0.125,
+    "clause_type": "data_protection",
+    "content_head": "'Section 4 Privacy and Data\\nSection 4.2  Customer Content Ownership. As between t'",
+    "content_sha256": "eb6fa7c33b723478e9ff262b4e78dacebf7988f0ef29da5b994832e2b2f7a619",
+    "context_header": "[Section: Section 4 — Privacy and Data > Section 4.2 — Customer Content Ownership. As between the parties, Customer retains all] [Type: Data Protection] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.2",
+        "target_chunk_index": 15,
+        "target_identifier": "4.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 4 — Privacy and Data > Section 4.2 — Customer Content Ownership. As between the parties, Customer retains all",
+    "index": 15,
+    "original_header": "Section 4.2 Customer Content Ownership. As between the parties, Customer retains all",
+    "secondary_clause_type": "intellectual_property",
+    "token_count": 105
+  },
+  {
+    "char_end": 9529,
+    "char_start": 9074,
+    "classification_confidence": 0.75,
+    "clause_type": "data_protection",
+    "content_head": "'Section 4 Privacy and Data\\nSection 4.3  Data Processing. To the extent Strata pr'",
+    "content_sha256": "b566a8f030325867302499fe9cc3063bf44ed002f686cf5a9cdbd19b0b2ae19e",
+    "context_header": "[Section: Section 4 — Privacy and Data > Section 4.3 — Data Processing. To the extent Strata processes Personal Information] [Type: Data Protection] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.3",
+        "target_chunk_index": 16,
+        "target_identifier": "4.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "DPA",
+      "Personal Information"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 4 — Privacy and Data > Section 4.3 — Data Processing. To the extent Strata processes Personal Information",
+    "index": 16,
+    "original_header": "Section 4.3 Data Processing. To the extent Strata processes Personal Information",
+    "secondary_clause_type": null,
+    "token_count": 120
+  },
+  {
+    "char_end": 9976,
+    "char_start": 9529,
+    "classification_confidence": 0.167,
+    "clause_type": "covenants",
+    "content_head": "'Section 4 Privacy and Data\\nSection 4.4  Data Security. Strata implements industr'",
+    "content_sha256": "9152887590d2c4f3081a6520204414d0a34ab21091749148f9e160bab1b43670",
+    "context_header": "[Section: Section 4 — Privacy and Data > Section 4.4 — Data Security. Strata implements industry-standard technical and] [Type: Covenants] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.4",
+        "target_chunk_index": 17,
+        "target_identifier": "4.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 4 — Privacy and Data > Section 4.4 — Data Security. Strata implements industry-standard technical and",
+    "index": 17,
+    "original_header": "Section 4.4 Data Security. Strata implements industry-standard technical and",
+    "secondary_clause_type": "account_security",
+    "token_count": 118
+  },
+  {
+    "char_end": 10375,
+    "char_start": 9976,
+    "classification_confidence": 0.714,
+    "clause_type": "termination",
+    "content_head": "'Section 4 Privacy and Data\\nSection 4.5  Data Retention and Deletion. Upon expira'",
+    "content_sha256": "283bf2702e82e36d5cd904f62292c0e03318ce8f319affff7c1f7a4bde8e3423",
+    "context_header": "[Section: Section 4 — Privacy and Data > Section 4.5 — Data Retention and Deletion. Upon expiration or termination of the] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 4.5",
+        "target_chunk_index": 18,
+        "target_identifier": "4.5"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Subscription Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 4 — Privacy and Data > Section 4.5 — Data Retention and Deletion. Upon expiration or termination of the",
+    "index": 18,
+    "original_header": "Section 4.5 Data Retention and Deletion. Upon expiration or termination of the",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 106
+  },
+  {
+    "char_end": 10888,
+    "char_start": 10375,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'Section 5.   Payment Terms\\n\\nSection 5.1  Subscription Fees. Customer shall pay t'",
+    "content_sha256": "bc5c5de18ea44c77488849e96eab8312f230aa4c06c201c782721e37185ea7fb",
+    "context_header": "[Section: Section 5 — Payment Terms] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5",
+        "target_chunk_index": 19,
+        "target_identifier": "5"
+      },
+      {
+        "raw_text": "Section 5.1",
+        "target_chunk_index": 19,
+        "target_identifier": "5.1"
+      },
+      {
+        "raw_text": "Section 5.2",
+        "target_chunk_index": 19,
+        "target_identifier": "5.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Subscription Fees"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 5 — Payment Terms",
+    "index": 19,
+    "original_header": "Section 5 Payment Terms",
+    "secondary_clause_type": null,
+    "token_count": 128
+  },
+  {
+    "char_end": 11277,
+    "char_start": 10888,
+    "classification_confidence": 0.556,
+    "clause_type": "payment",
+    "content_head": "'Section 5 Payment Terms\\nSection 5.3  Late Payments. If any payment is not receiv'",
+    "content_sha256": "e5a062ee400d30ba6966f47aaf1ad0d42b259fdf20cc8e764972ee6acf800365",
+    "context_header": "[Section: Section 5 — Payment Terms > Section 5.3 — Late Payments. If any payment is not received when due, Strata may: (a)] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.3",
+        "target_chunk_index": 20,
+        "target_identifier": "5.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 5 — Payment Terms > Section 5.3 — Late Payments. If any payment is not received when due, Strata may: (a)",
+    "index": 20,
+    "original_header": "Section 5.3 Late Payments. If any payment is not received when due, Strata may: (a)",
+    "secondary_clause_type": "governing_law",
+    "token_count": 103
+  },
+  {
+    "char_end": 11552,
+    "char_start": 11277,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'Section 5 Payment Terms\\nSection 5.4  Taxes. The Subscription Fees do not include'",
+    "content_sha256": "68032aa30ba2a517c9c1d6306c365205b4aaba0db524b9fb8d5e40ed84509fda",
+    "context_header": "[Section: Section 5 — Payment Terms > Section 5.4 — Taxes. The Subscription Fees do not include any applicable sales, use,] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.4",
+        "target_chunk_index": 21,
+        "target_identifier": "5.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Subscription Fees"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 5 — Payment Terms > Section 5.4 — Taxes. The Subscription Fees do not include any applicable sales, use,",
+    "index": 21,
+    "original_header": "Section 5.4 Taxes. The Subscription Fees do not include any applicable sales, use,",
+    "secondary_clause_type": null,
+    "token_count": 74
+  },
+  {
+    "char_end": 11971,
+    "char_start": 11552,
+    "classification_confidence": 0.75,
+    "clause_type": "payment",
+    "content_head": "'Section 5 Payment Terms\\nSection 5.5  Fee Increases. Strata may increase Subscrip'",
+    "content_sha256": "c8d5bd95a4b9720801cd7263aa2a371541949700702c88ac0bb023fd6f94a947",
+    "context_header": "[Section: Section 5 — Payment Terms > Section 5.5 — Fee Increases. Strata may increase Subscription Fees upon renewal of any] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.5",
+        "target_chunk_index": 22,
+        "target_identifier": "5.5"
+      },
+      {
+        "raw_text": "Section 7.2",
+        "target_chunk_index": 28,
+        "target_identifier": "7.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Platform",
+      "Subscription Fees"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 5 — Payment Terms > Section 5.5 — Fee Increases. Strata may increase Subscription Fees upon renewal of any",
+    "index": 22,
+    "original_header": "Section 5.5 Fee Increases. Strata may increase Subscription Fees upon renewal of any",
+    "secondary_clause_type": "notices",
+    "token_count": 110
+  },
+  {
+    "char_end": 12274,
+    "char_start": 11971,
+    "classification_confidence": 0.6,
+    "clause_type": "payment",
+    "content_head": "'Section 5 Payment Terms\\nSection 5.6  No Refunds. Except as expressly provided in'",
+    "content_sha256": "533e7ccdcf725c590899429d22db59be122f0d5c031c922676f7560d6167758a",
+    "context_header": "[Section: Section 5 — Payment Terms > Section 5.6 — No Refunds. Except as expressly provided in these Terms or required by] [Type: Payment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 5.6",
+        "target_chunk_index": 23,
+        "target_identifier": "5.6"
+      },
+      {
+        "raw_text": "Section 7.4",
+        "target_chunk_index": 30,
+        "target_identifier": "7.4"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 5 — Payment Terms > Section 5.6 — No Refunds. Except as expressly provided in these Terms or required by",
+    "index": 23,
+    "original_header": "Section 5.6 No Refunds. Except as expressly provided in these Terms or required by",
+    "secondary_clause_type": "governing_law",
+    "token_count": 81
+  },
+  {
+    "char_end": 12686,
+    "char_start": 12274,
+    "classification_confidence": 0.556,
+    "clause_type": "intellectual_property",
+    "content_head": "'Section 6.   Intellectual Property\\n\\nSection 6.1  Strata Ownership. Strata and it'",
+    "content_sha256": "14a76841b94c4f7ab43b46df0e1d9399f0f035bb0c95b3e309ed46675f557009",
+    "context_header": "[Section: Section 6 — Intellectual Property > Section 6.1 — Strata Ownership. Strata and its licensors own all right, title, and] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 6",
+        "target_chunk_index": 24,
+        "target_identifier": "6"
+      },
+      {
+        "raw_text": "Section 6.1",
+        "target_chunk_index": 24,
+        "target_identifier": "6.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Documentation",
+      "Intellectual Property Rights",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 6 — Intellectual Property > Section 6.1 — Strata Ownership. Strata and its licensors own all right, title, and",
+    "index": 24,
+    "original_header": "Section 6.1 Strata Ownership. Strata and its licensors own all right, title, and",
+    "secondary_clause_type": "user_restrictions",
+    "token_count": 103
+  },
+  {
+    "char_end": 13124,
+    "char_start": 12686,
+    "classification_confidence": 0.75,
+    "clause_type": "intellectual_property",
+    "content_head": "'Section 6 Intellectual Property\\nSection 6.2  Feedback. If Customer or any Author'",
+    "content_sha256": "154df22a4254b3e8880067e6711ed0e3ec32a81523144cc5a7580872a7fbd8da",
+    "context_header": "[Section: Section 6 — Intellectual Property > Section 6.2 — Feedback. If Customer or any Authorized User provides Strata with any] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 6.2",
+        "target_chunk_index": 25,
+        "target_identifier": "6.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Feedback",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 6 — Intellectual Property > Section 6.2 — Feedback. If Customer or any Authorized User provides Strata with any",
+    "index": 25,
+    "original_header": "Section 6.2 Feedback. If Customer or any Authorized User provides Strata with any",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 117
+  },
+  {
+    "char_end": 13489,
+    "char_start": 13124,
+    "classification_confidence": 0.714,
+    "clause_type": "intellectual_property",
+    "content_head": "'Section 6 Intellectual Property\\nSection 6.3  Usage Data. Strata may collect and '",
+    "content_sha256": "4ac29a5b32bc3ea58f6be4b6bd044794c6d319af3076d33097ddaeb9a1c6f307",
+    "context_header": "[Section: Section 6 — Intellectual Property > Section 6.3 — Usage Data. Strata may collect and use aggregated, anonymized data] [Type: Intellectual Property] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 6.3",
+        "target_chunk_index": 26,
+        "target_identifier": "6.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Platform",
+      "Usage Data"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 6 — Intellectual Property > Section 6.3 — Usage Data. Strata may collect and use aggregated, anonymized data",
+    "index": 26,
+    "original_header": "Section 6.3 Usage Data. Strata may collect and use aggregated, anonymized data",
+    "secondary_clause_type": "governing_law",
+    "token_count": 99
+  },
+  {
+    "char_end": 13953,
+    "char_start": 13489,
+    "classification_confidence": 0.714,
+    "clause_type": "termination",
+    "content_head": "'Section 7.   Term and Termination\\n\\nSection 7.1  Term. These Terms commence on th'",
+    "content_sha256": "5a23747c5cffb56821bae0bee42c3f4699dd0fda974594a5b0dd0e62f86c5403",
+    "context_header": "[Section: Section 7 — Term and Termination > Section 7.1 — Term. These Terms commence on the Effective Date and continue until all] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7",
+        "target_chunk_index": 27,
+        "target_identifier": "7"
+      },
+      {
+        "raw_text": "Section 7.1",
+        "target_chunk_index": 27,
+        "target_identifier": "7.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Subscription Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 7 — Term and Termination > Section 7.1 — Term. These Terms commence on the Effective Date and continue until all",
+    "index": 27,
+    "original_header": "Section 7.1 Term. These Terms commence on the Effective Date and continue until all",
+    "secondary_clause_type": "notices",
+    "token_count": 116
+  },
+  {
+    "char_end": 14292,
+    "char_start": 13953,
+    "classification_confidence": 0.385,
+    "clause_type": "termination",
+    "content_head": "'Section 7 Term and Termination\\nSection 7.2  Termination for Convenience. Either '",
+    "content_sha256": "18fa26822f04d33ccc9737e9c71160579aeea19a5385411d3841ae13aece40a2",
+    "context_header": "[Section: Section 7 — Term and Termination > Section 7.2 — Termination for Convenience. Either party may terminate these Terms or] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.2",
+        "target_chunk_index": 28,
+        "target_identifier": "7.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form",
+      "Subscription Fees",
+      "Subscription Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 7 — Term and Termination > Section 7.2 — Termination for Convenience. Either party may terminate these Terms or",
+    "index": 28,
+    "original_header": "Section 7.2 Termination for Convenience. Either party may terminate these Terms or",
+    "secondary_clause_type": "notices",
+    "token_count": 92
+  },
+  {
+    "char_end": 14881,
+    "char_start": 14292,
+    "classification_confidence": 0.556,
+    "clause_type": "termination",
+    "content_head": "'Section 7 Term and Termination\\nSection 7.3  Termination for Cause. Either party '",
+    "content_sha256": "d2b3900fd138904e55d744118785c2691a42167bc02f2f2ed724aad9e872324a",
+    "context_header": "[Section: Section 7 — Term and Termination > Section 7.3 — Termination for Cause. Either party may terminate these Terms or any] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.3",
+        "target_chunk_index": 29,
+        "target_identifier": "7.3"
+      },
+      {
+        "raw_text": "Section 2.2",
+        "target_chunk_index": 4,
+        "target_identifier": "2.2"
+      },
+      {
+        "raw_text": "Section 3.1",
+        "target_chunk_index": 11,
+        "target_identifier": "3.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Order Form"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 7 — Term and Termination > Section 7.3 — Termination for Cause. Either party may terminate these Terms or any",
+    "index": 29,
+    "original_header": "Section 7.3 Termination for Cause. Either party may terminate these Terms or any",
+    "secondary_clause_type": "assignment",
+    "token_count": 155
+  },
+  {
+    "char_end": 15219,
+    "char_start": 14881,
+    "classification_confidence": 0.714,
+    "clause_type": "termination",
+    "content_head": "'Section 7 Term and Termination\\nSection 7.4  Refunds on Termination for Cause by '",
+    "content_sha256": "0fecdb5087ccdbaa86bb44347d0ef7364db7a99655e2ed6223a15b7879bea859",
+    "context_header": "[Section: Section 7 — Term and Termination > Section 7.4 — Refunds on Termination for Cause by Customer. If Customer terminates these] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.4",
+        "target_chunk_index": 30,
+        "target_identifier": "7.4"
+      },
+      {
+        "raw_text": "Section 7.3",
+        "target_chunk_index": 29,
+        "target_identifier": "7.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Subscription Fees",
+      "Subscription Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 7 — Term and Termination > Section 7.4 — Refunds on Termination for Cause by Customer. If Customer terminates these",
+    "index": 30,
+    "original_header": "Section 7.4 Refunds on Termination for Cause by Customer. If Customer terminates these",
+    "secondary_clause_type": "payment",
+    "token_count": 92
+  },
+  {
+    "char_end": 15879,
+    "char_start": 15219,
+    "classification_confidence": 0.6,
+    "clause_type": "termination",
+    "content_head": "'Section 7 Term and Termination\\nSection 7.5  Effect of Termination. Upon expirati'",
+    "content_sha256": "2619632298f6a584cdd90a889e8f1ee9b360d420c7f1d3a1fef09d0b19161764",
+    "context_header": "[Section: Section 7 — Term and Termination > Section 7.5 — Effect of Termination. Upon expiration or termination of these Terms for] [Type: Termination] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 7.5",
+        "target_chunk_index": 31,
+        "target_identifier": "7.5"
+      },
+      {
+        "raw_text": "Section\n4.5",
+        "target_chunk_index": 18,
+        "target_identifier": "4.5"
+      },
+      {
+        "raw_text": "Section 7.3",
+        "target_chunk_index": 29,
+        "target_identifier": "7.3"
+      },
+      {
+        "raw_text": "Section 1",
+        "target_chunk_index": 1,
+        "target_identifier": "1"
+      },
+      {
+        "raw_text": "Section 3",
+        "target_chunk_index": 11,
+        "target_identifier": "3"
+      },
+      {
+        "raw_text": "Section 5",
+        "target_chunk_index": 19,
+        "target_identifier": "5"
+      },
+      {
+        "raw_text": "Section 6",
+        "target_chunk_index": 24,
+        "target_identifier": "6"
+      },
+      {
+        "raw_text": "Section 8",
+        "target_chunk_index": 32,
+        "target_identifier": "8"
+      },
+      {
+        "raw_text": "Section 9",
+        "target_chunk_index": 34,
+        "target_identifier": "9"
+      },
+      {
+        "raw_text": "Section 10",
+        "target_chunk_index": 37,
+        "target_identifier": "10"
+      },
+      {
+        "raw_text": "Section 11",
+        "target_chunk_index": 40,
+        "target_identifier": "11"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer Content",
+      "Subscription Fees",
+      "Subscription Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 7 — Term and Termination > Section 7.5 — Effect of Termination. Upon expiration or termination of these Terms for",
+    "index": 31,
+    "original_header": "Section 7.5 Effect of Termination. Upon expiration or termination of these Terms for",
+    "secondary_clause_type": "payment",
+    "token_count": 172
+  },
+  {
+    "char_end": 16400,
+    "char_start": 15879,
+    "classification_confidence": 0.667,
+    "clause_type": "warranties",
+    "content_head": "'Section 8.   Disclaimer of Warranties\\n\\nSection 8.1  AS IS. THE PLATFORM AND ALL '",
+    "content_sha256": "07e0ab25fbccf44ebe22b4d19f116377893ff04695da19d2fb24adfdfa83d9c9",
+    "context_header": "[Section: Section 8 — Disclaimer of Warranties > Section 8.1 — AS IS. THE PLATFORM AND ALL RELATED SERVICES ARE PROVIDED \"AS IS\" AND \"AS] [Type: Warranties] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 8",
+        "target_chunk_index": 32,
+        "target_identifier": "8"
+      },
+      {
+        "raw_text": "Section 8.1",
+        "target_chunk_index": 32,
+        "target_identifier": "8.1"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 8 — Disclaimer of Warranties > Section 8.1 — AS IS. THE PLATFORM AND ALL RELATED SERVICES ARE PROVIDED \"AS IS\" AND \"AS",
+    "index": 32,
+    "original_header": "Section 8.1 AS IS. THE PLATFORM AND ALL RELATED SERVICES ARE PROVIDED \"AS IS\" AND \"AS",
+    "secondary_clause_type": "services",
+    "token_count": 130
+  },
+  {
+    "char_end": 17016,
+    "char_start": 16400,
+    "classification_confidence": 1.0,
+    "clause_type": "warranties",
+    "content_head": "'Section 8 Disclaimer of Warranties\\nSection 8.2  No Guarantee of Availability. ST'",
+    "content_sha256": "d5e68b737e4f5082f75d07fd4c899f8aa28562e65a3cffdc342df67cefbaed2e",
+    "context_header": "[Section: Section 8 — Disclaimer of Warranties > Section 8.2 — No Guarantee of Availability. STRATA DOES NOT WARRANT THAT THE PLATFORM] [Type: Warranties] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 8.2",
+        "target_chunk_index": 33,
+        "target_identifier": "8.2"
+      },
+      {
+        "raw_text": "Section 8.3",
+        "target_chunk_index": 33,
+        "target_identifier": "8.3"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 8 — Disclaimer of Warranties > Section 8.2 — No Guarantee of Availability. STRATA DOES NOT WARRANT THAT THE PLATFORM",
+    "index": 33,
+    "original_header": "Section 8.2 No Guarantee of Availability. STRATA DOES NOT WARRANT THAT THE PLATFORM",
+    "secondary_clause_type": null,
+    "token_count": 162
+  },
+  {
+    "char_end": 17704,
+    "char_start": 17016,
+    "classification_confidence": 1.0,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'Section 9.   Limitation of Liability\\n\\nSection 9.1  Exclusion of Consequential Da'",
+    "content_sha256": "789293741b491b5832832463fef24e6f067e1b0353fe89375274d4ae15bad6b1",
+    "context_header": "[Section: Section 9 — Limitation of Liability > Section 9.1 — Exclusion of Consequential Damages. IN NO EVENT SHALL STRATA OR ITS] [Type: Limitation Of Liability] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 9",
+        "target_chunk_index": 34,
+        "target_identifier": "9"
+      },
+      {
+        "raw_text": "Section 9.1",
+        "target_chunk_index": 34,
+        "target_identifier": "9.1"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 9 — Limitation of Liability > Section 9.1 — Exclusion of Consequential Damages. IN NO EVENT SHALL STRATA OR ITS",
+    "index": 34,
+    "original_header": "Section 9.1 Exclusion of Consequential Damages. IN NO EVENT SHALL STRATA OR ITS",
+    "secondary_clause_type": null,
+    "token_count": 172
+  },
+  {
+    "char_end": 18342,
+    "char_start": 17704,
+    "classification_confidence": 0.857,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'Section 9 Limitation of Liability\\nSection 9.2  Cap on Liability. IN NO EVENT SHA'",
+    "content_sha256": "ecacb14cd8c6e56690fd9003f098ebdd5c87d78b1738a873d9295d8b6c0f2649",
+    "context_header": "[Section: Section 9 — Limitation of Liability > Section 9.2 — Cap on Liability. IN NO EVENT SHALL STRATA'S TOTAL CUMULATIVE LIABILITY] [Type: Limitation Of Liability] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 9.2",
+        "target_chunk_index": 35,
+        "target_identifier": "9.2"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 9 — Limitation of Liability > Section 9.2 — Cap on Liability. IN NO EVENT SHALL STRATA'S TOTAL CUMULATIVE LIABILITY",
+    "index": 35,
+    "original_header": "Section 9.2 Cap on Liability. IN NO EVENT SHALL STRATA'S TOTAL CUMULATIVE LIABILITY",
+    "secondary_clause_type": "payment",
+    "token_count": 168
+  },
+  {
+    "char_end": 19016,
+    "char_start": 18342,
+    "classification_confidence": 0.387,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'Section 9 Limitation of Liability\\nSection 9.3  Exceptions. The limitations in Se'",
+    "content_sha256": "dc29347c40f4da3fade50b43967fa36b672c5b88c6e0d81dde335877ab64de85",
+    "context_header": "[Section: Section 9 — Limitation of Liability > Section 9.3 — Exceptions. The limitations in Section 9.1 and Section 9.2 shall not] [Type: Limitation Of Liability] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 9.3",
+        "target_chunk_index": 36,
+        "target_identifier": "9.3"
+      },
+      {
+        "raw_text": "Section 9.1",
+        "target_chunk_index": 34,
+        "target_identifier": "9.1"
+      },
+      {
+        "raw_text": "Section 9.2",
+        "target_chunk_index": 35,
+        "target_identifier": "9.2"
+      },
+      {
+        "raw_text": "Section 5",
+        "target_chunk_index": 19,
+        "target_identifier": "5"
+      },
+      {
+        "raw_text": "Section 10",
+        "target_chunk_index": 37,
+        "target_identifier": "10"
+      },
+      {
+        "raw_text": "Section 9.4",
+        "target_chunk_index": 36,
+        "target_identifier": "9.4"
+      },
+      {
+        "raw_text": "SECTION 9",
+        "target_chunk_index": 34,
+        "target_identifier": "9"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 9 — Limitation of Liability > Section 9.3 — Exceptions. The limitations in Section 9.1 and Section 9.2 shall not",
+    "index": 36,
+    "original_header": "Section 9.3 Exceptions. The limitations in Section 9.1 and Section 9.2 shall not",
+    "secondary_clause_type": "governing_law",
+    "token_count": 177
+  },
+  {
+    "char_end": 20305,
+    "char_start": 19016,
+    "classification_confidence": 0.323,
+    "clause_type": "indemnification",
+    "content_head": "'Section 10.  Indemnification\\n\\nSection 10.1 Indemnification by Strata. Strata sha'",
+    "content_sha256": "9a7ceccfad28012baaba474b2d8336fc0aa7aff2079835e218dbd179f8b6d782",
+    "context_header": "[Section: Section 10 — Indemnification > Section 10.1 — Indemnification by Strata. Strata shall defend, indemnify, and hold] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 10",
+        "target_chunk_index": 37,
+        "target_identifier": "10"
+      },
+      {
+        "raw_text": "Section 10.1",
+        "target_chunk_index": 37,
+        "target_identifier": "10.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Claims",
+      "Customer Content",
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 10 — Indemnification > Section 10.1 — Indemnification by Strata. Strata shall defend, indemnify, and hold",
+    "index": 37,
+    "original_header": "Section 10.1 Indemnification by Strata. Strata shall defend, indemnify, and hold",
+    "secondary_clause_type": "intellectual_property",
+    "token_count": 322
+  },
+  {
+    "char_end": 20810,
+    "char_start": 20305,
+    "classification_confidence": 0.588,
+    "clause_type": "indemnification",
+    "content_head": "'Section 10 Indemnification\\nSection 10.2 Indemnification by Customer. Customer sh'",
+    "content_sha256": "cefa3791e9c348d3c88a96dd3ad4f95e5fe11beb095ebdc4a0cc2f9fc516b103",
+    "context_header": "[Section: Section 10 — Indemnification > Section 10.2 — Indemnification by Customer. Customer shall defend, indemnify, and hold] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 10.2",
+        "target_chunk_index": 38,
+        "target_identifier": "10.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Claims",
+      "Customer Content",
+      "Strata Indemnitees"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 10 — Indemnification > Section 10.2 — Indemnification by Customer. Customer shall defend, indemnify, and hold",
+    "index": 38,
+    "original_header": "Section 10.2 Indemnification by Customer. Customer shall defend, indemnify, and hold",
+    "secondary_clause_type": "governing_law",
+    "token_count": 133
+  },
+  {
+    "char_end": 21361,
+    "char_start": 20810,
+    "classification_confidence": 1.0,
+    "clause_type": "indemnification",
+    "content_head": "'Section 10 Indemnification\\nSection 10.3 Indemnification Procedure. The Indemnifi'",
+    "content_sha256": "0fc33707604ed49f105a3e5c8b1a39d7f4cf3164a149a3780b616c9ad151f39e",
+    "context_header": "[Section: Section 10 — Indemnification > Section 10.3 — Indemnification Procedure. The Indemnified Party shall: (a) promptly notify] [Type: Indemnification] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 10.3",
+        "target_chunk_index": 39,
+        "target_identifier": "10.3"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 10 — Indemnification > Section 10.3 — Indemnification Procedure. The Indemnified Party shall: (a) promptly notify",
+    "index": 39,
+    "original_header": "Section 10.3 Indemnification Procedure. The Indemnified Party shall: (a) promptly notify",
+    "secondary_clause_type": null,
+    "token_count": 144
+  },
+  {
+    "char_end": 21853,
+    "char_start": 21361,
+    "classification_confidence": 1.0,
+    "clause_type": "governing_law",
+    "content_head": "'Section 11.  General Provisions\\n\\nSection 11.1 Governing Law. These Terms shall b'",
+    "content_sha256": "44b0faa66bbe1db07754328806543276c05e2152d21fb3afa2d3a54bbe2e0bae",
+    "context_header": "[Section: Section 11 — General Provisions > Section 11.1 — Governing Law. These Terms shall be governed by and construed in accordance] [Type: Governing Law] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11",
+        "target_chunk_index": 40,
+        "target_identifier": "11"
+      },
+      {
+        "raw_text": "Section 11.1",
+        "target_chunk_index": 40,
+        "target_identifier": "11.1"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 11 — General Provisions > Section 11.1 — Governing Law. These Terms shall be governed by and construed in accordance",
+    "index": 40,
+    "original_header": "Section 11.1 Governing Law. These Terms shall be governed by and construed in accordance",
+    "secondary_clause_type": null,
+    "token_count": 123
+  },
+  {
+    "char_end": 22435,
+    "char_start": 21853,
+    "classification_confidence": 0.619,
+    "clause_type": "entire_agreement",
+    "content_head": "'Section 11 General Provisions\\nSection 11.2 Entire Agreement. These Terms, togeth'",
+    "content_sha256": "936e34dba00c0d88297d83056141ee1e297578ec8642f930201eb079816de026",
+    "context_header": "[Section: Section 11 — General Provisions > Section 11.2 — Entire Agreement. These Terms, together with all Order Forms, the Privacy] [Type: Entire Agreement] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.2",
+        "target_chunk_index": 41,
+        "target_identifier": "11.2"
+      }
+    ],
+    "defined_terms_used": [
+      "DPA",
+      "Order Form",
+      "SOW"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 11 — General Provisions > Section 11.2 — Entire Agreement. These Terms, together with all Order Forms, the Privacy",
+    "index": 41,
+    "original_header": "Section 11.2 Entire Agreement. These Terms, together with all Order Forms, the Privacy",
+    "secondary_clause_type": "acceptable_use",
+    "token_count": 153
+  },
+  {
+    "char_end": 22916,
+    "char_start": 22435,
+    "classification_confidence": 0.446,
+    "clause_type": "amendment",
+    "content_head": "'Section 11 General Provisions\\nSection 11.3 Modifications. Strata may modify thes'",
+    "content_sha256": "5d6796fb89ffa09aa59f9e6b7e28cd2b15184a373c3fd003faa27267bb5fb79d",
+    "context_header": "[Section: Section 11 — General Provisions > Section 11.3 — Modifications. Strata may modify these Terms from time to time by posting] [Type: Amendment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.3",
+        "target_chunk_index": 42,
+        "target_identifier": "11.3"
+      },
+      {
+        "raw_text": "Section\n7.2",
+        "target_chunk_index": 28,
+        "target_identifier": "7.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Platform"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 11 — General Provisions > Section 11.3 — Modifications. Strata may modify these Terms from time to time by posting",
+    "index": 42,
+    "original_header": "Section 11.3 Modifications. Strata may modify these Terms from time to time by posting",
+    "secondary_clause_type": "termination",
+    "token_count": 127
+  },
+  {
+    "char_end": 23979,
+    "char_start": 22916,
+    "classification_confidence": 0.514,
+    "clause_type": "assignment",
+    "content_head": "'Section 11 General Provisions\\nSection 11.4 Assignment. Customer may not assign, '",
+    "content_sha256": "1202738f0bf9edb0a7ecb3f9b6000a9a326758d5e91ebf29d534c72f4aac2006",
+    "context_header": "[Section: Section 11 — General Provisions > Section 11.4 — Assignment. Customer may not assign, transfer, or delegate these Terms or] [Type: Assignment] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.4",
+        "target_chunk_index": 43,
+        "target_identifier": "11.4"
+      },
+      {
+        "raw_text": "Section 11.5",
+        "target_chunk_index": 43,
+        "target_identifier": "11.5"
+      },
+      {
+        "raw_text": "Section 11.6",
+        "target_chunk_index": 43,
+        "target_identifier": "11.6"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 11 — General Provisions > Section 11.4 — Assignment. Customer may not assign, transfer, or delegate these Terms or",
+    "index": 43,
+    "original_header": "Section 11.4 Assignment. Customer may not assign, transfer, or delegate these Terms or",
+    "secondary_clause_type": "severability",
+    "token_count": 273
+  },
+  {
+    "char_end": 24489,
+    "char_start": 23979,
+    "classification_confidence": 1.0,
+    "clause_type": "notices",
+    "content_head": "'Section 11 General Provisions\\nSection 11.7 Notices. Notices to Strata shall be s'",
+    "content_sha256": "0cace11a6aa3f199f643acf9f56cb084de25e7670e9f764c03519305f4aa290a",
+    "context_header": "[Section: Section 11 — General Provisions > Section 11.7 — Notices. Notices to Strata shall be sent to Strata Technologies, Inc.,] [Type: Notices] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.7",
+        "target_chunk_index": 44,
+        "target_identifier": "11.7"
+      }
+    ],
+    "defined_terms_used": [
+      "Account",
+      "Order Form"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 11 — General Provisions > Section 11.7 — Notices. Notices to Strata shall be sent to Strata Technologies, Inc.,",
+    "index": 44,
+    "original_header": "Section 11.7 Notices. Notices to Strata shall be sent to Strata Technologies, Inc.,",
+    "secondary_clause_type": null,
+    "token_count": 135
+  },
+  {
+    "char_end": 25002,
+    "char_start": 24489,
+    "classification_confidence": 0.588,
+    "clause_type": "force_majeure",
+    "content_head": "'Section 11 General Provisions\\nSection 11.8 Force Majeure. Neither party shall be'",
+    "content_sha256": "cfaf476f5d27a93a1dd7ea38fff10c57da5adeeefb8070b5afa01f83cd2bf3e7",
+    "context_header": "[Section: Section 11 — General Provisions > Section 11.8 — Force Majeure. Neither party shall be in default or liable for any delay] [Type: Force Majeure] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.8",
+        "target_chunk_index": 45,
+        "target_identifier": "11.8"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 11 — General Provisions > Section 11.8 — Force Majeure. Neither party shall be in default or liable for any delay",
+    "index": 45,
+    "original_header": "Section 11.8 Force Majeure. Neither party shall be in default or liable for any delay",
+    "secondary_clause_type": "notices",
+    "token_count": 135
+  },
+  {
+    "char_end": 25307,
+    "char_start": 25002,
+    "classification_confidence": 0.0,
+    "clause_type": "unknown",
+    "content_head": "'Section 11 General Provisions\\nSection 11.9 Relationship of the Parties. The part'",
+    "content_sha256": "a9adea0d38135b732566cb22160af2f57a10b975c2aff61bf1ae410c0154c0c1",
+    "context_header": "[Section: Section 11 — General Provisions > Section 11.9 — Relationship of the Parties. The parties are independent contractors.] [Type: Unknown] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.9",
+        "target_chunk_index": 46,
+        "target_identifier": "11.9"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "Section 11 — General Provisions > Section 11.9 — Relationship of the Parties. The parties are independent contractors.",
+    "index": 46,
+    "original_header": "Section 11.9 Relationship of the Parties. The parties are independent contractors.",
+    "secondary_clause_type": null,
+    "token_count": 83
+  },
+  {
+    "char_end": 25743,
+    "char_start": 25307,
+    "classification_confidence": 0.625,
+    "clause_type": "boilerplate",
+    "content_head": "'Section 11 General Provisions\\nSection 11.10 Counterparts; Electronic Signatures.'",
+    "content_sha256": "f7aedfe0e1894c25aad1a1f65b1100a813bb6adeeadb3328fc94b1a241971499",
+    "context_header": "[Section: Section 11 — General Provisions > Section 11.10 — Counterparts; Electronic Signatures. These Terms may be accepted and] [Type: Boilerplate] [Jurisdiction: US]",
+    "cross_references": [
+      {
+        "raw_text": "Section 11.10",
+        "target_chunk_index": 47,
+        "target_identifier": "11.10"
+      }
+    ],
+    "defined_terms_used": [
+      "TERMS"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "Section 11 — General Provisions > Section 11.10 — Counterparts; Electronic Signatures. These Terms may be accepted and",
+    "index": 47,
+    "original_header": "Section 11.10 Counterparts; Electronic Signatures. These Terms may be accepted and",
+    "secondary_clause_type": null,
+    "token_count": 116
+  }
+]

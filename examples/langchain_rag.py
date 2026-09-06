@@ -8,7 +8,10 @@ Demonstrates:
     embedding so every chunk carries its document-level context
 
 Requirements:
-    pip install lexichunk[langchain] faiss-cpu openai
+    python -m pip install -e ".[langchain]"
+    python -m pip install faiss-cpu openai
+    # or: python -m pip install -e ".[examples]"
+    #     langchain-openai (used for the optional FAISS + embeddings demo below)
 
 The OpenAI embeddings call requires OPENAI_API_KEY to be set.
 If you prefer a local embedding model, swap OpenAIEmbeddings for any
@@ -102,7 +105,7 @@ def main() -> None:
         from lexichunk.integrations.langchain import LegalTextSplitter
     except ImportError as exc:
         print(f"\nERROR: {exc}")
-        print("Install the LangChain extra with: pip install lexichunk[langchain]")
+        print('Install the LangChain extra with: python -m pip install -e ".[langchain]"')
         return
 
     # ------------------------------------------------------------------
@@ -184,9 +187,10 @@ def main() -> None:
     print("-" * 70)
 
     try:
-        from langchain_community.vectorstores import FAISS  # type: ignore
-        from langchain_openai import OpenAIEmbeddings       # type: ignore
         import os
+
+        from langchain_community.vectorstores import FAISS  # type: ignore
+        from langchain_openai import OpenAIEmbeddings  # type: ignore
 
         if not os.getenv("OPENAI_API_KEY"):
             print("\n  Skipping FAISS indexing: OPENAI_API_KEY not set.")

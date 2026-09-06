@@ -19,8 +19,22 @@ class ClassificationResult:
     Attributes:
         clause_type: The primary (best-scoring) clause type.
         confidence: Confidence score between 0.0 and 1.0.
-            Computed as best_score / sum(all_scores).  1.0 when only one
-            clause type matched; 0.0 for UNKNOWN.
+
+            **This is a margin, saturation-scaled by absolute signal
+            strength — it is not a calibrated probability.** It is computed
+            as ``(best_score / total_score) * min(1.0, best_score /
+            SATURATION)``, where ``SATURATION = 4.0``. The first factor is
+            the winning type's *relative dominance* among everything that
+            scored; the second factor discounts weak matches so that a
+            single one-word keyword hit with no competing signal — which
+            would otherwise report a misleadingly perfect ``1.0`` — instead
+            reports well below 1.0 (e.g. ``~0.25`` for a one-word signal).
+            ``1.0`` requires both an undisputed winner *and* at least
+            ``SATURATION`` points of absolute evidence (roughly two
+            two-word signals, or one from a structural override). ``0.0``
+            for :attr:`~lexichunk.models.ClauseType.UNKNOWN` (no signals
+            matched at all). Do not threshold on this value as if it were a
+            model-calibrated probability.
         secondary_clause_type: The second-best clause type, or ``None``
             when fewer than two types matched.
         scores: Per-clause-type scores after all scoring stages (keyword
@@ -235,6 +249,41 @@ CLAUSE_SIGNALS: dict[ClauseType, list[str]] = {
         "password",
         "account credentials",
     ],
+    ClauseType.SERVICES: [
+        "statement of work",
+        "statements of work",
+        "scope of services",
+        "provide the services",
+        "perform the services",
+        "provision of services",
+        "service levels",
+        "deliverables",
+    ],
+    ClauseType.INSURANCE: [
+        "insurance",
+        "insurer",
+        "insured",
+        "policy of insurance",
+        "professional indemnity insurance",
+        "public liability",
+        "employers' liability",
+    ],
+    ClauseType.AUDIT: [
+        "audit",
+        "auditor",
+        "right to audit",
+        "inspect the records",
+        "books and records",
+        "audit rights",
+    ],
+    ClauseType.NON_SOLICITATION: [
+        "solicit",
+        "non-solicitation",
+        "non-solicit",
+        "induce any employee",
+        "entice away",
+        "poach",
+    ],
     ClauseType.UNKNOWN: [],
 }
 
@@ -250,6 +299,13 @@ _SECTION_TO_CLAUSE_TYPE: dict[DocumentSection, ClauseType] = {
 
 # Bonus points awarded when the hierarchy path contains a clause-type hint.
 _PATH_BONUS: float = 3.0
+
+# Absolute score at which the confidence saturation factor reaches 1.0 —
+# roughly two specific two-word signals' worth of evidence.  Below this, a
+# winning type's confidence is discounted even if it has no competitor, so a
+# single incidental one-word keyword hit does not report a misleading 1.0.
+# See ClassificationResult.confidence and classify_detailed() docstrings.
+SATURATION: float = 4.0
 
 
 # ---------------------------------------------------------------------------
@@ -375,8 +431,11 @@ def _classify_detailed(
     )
 
     best = sorted_types[0]
+    best_score = scores[best]
     total = sum(scores.values())
-    confidence = scores[best] / total if total > 0 else 0.0
+    margin = best_score / total if total > 0 else 0.0
+    saturation_factor = min(1.0, best_score / SATURATION)
+    confidence = margin * saturation_factor
 
     secondary = sorted_types[1] if len(sorted_types) >= 2 else None
 
@@ -532,6 +591,16 @@ class ClauseTypeClassifier:
 
         Returns:
             A :class:`ClassificationResult` with confidence and secondary type.
+
+        Note:
+            ``result.confidence`` is a saturation-scaled margin, **not** a
+            calibrated probability — see :class:`ClassificationResult`. A
+            chunk whose only signal is one incidental one-word keyword match
+            (e.g. the word "fee" appearing once, with no other clause type
+            scoring) reports confidence well below ``1.0``, not a perfect
+            ``1.0``, because the absolute evidence is weak even though there
+            is no competing clause type. Do not threshold on this value as
+            if it were model-calibrated.
         """
         return _classify_detailed(
             content, hierarchy_path, document_section,

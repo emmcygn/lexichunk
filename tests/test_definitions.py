@@ -1,6 +1,9 @@
 """Tests for DefinitionsExtractor."""
 
 
+from lexichunk.jurisdiction import register_jurisdiction, unregister_jurisdiction
+from lexichunk.jurisdiction.uk import UK_PATTERNS
+from lexichunk.jurisdiction.uk import detect_level as uk_detect_level
 from lexichunk.models import DefinedTerm, Jurisdiction
 from lexichunk.parsers.definitions import DefinitionsExtractor
 
@@ -366,3 +369,61 @@ def test_hereinafter_lowercase_term_rejected():
     extractor = _make_extractor()
     result = extractor.extract(text)
     assert "the company" not in result
+
+
+def test_custom_jurisdiction_definition_uses_registered_uk_boundaries():
+    register_jurisdiction("test_custom_uk_definitions", UK_PATTERNS, uk_detect_level)
+    try:
+        text = (
+            "1. Definitions\n\n"
+            '"Term" means first body.\n\n'
+            "1. Other\n\n"
+            "Other body."
+        )
+        definition = DefinitionsExtractor("test_custom_uk_definitions").extract(text)["Term"]
+        assert definition.definition == "first body."
+    finally:
+        unregister_jurisdiction("test_custom_uk_definitions")
+
+
+def test_custom_jurisdiction_definition_uses_registered_custom_boundary():
+    def detect_custom_header(line: str) -> tuple[int, str] | None:
+        if line.lstrip().startswith("CUSTOM "):
+            return 0, "CUSTOM"
+        return None
+
+    register_jurisdiction(
+        "test_custom_definition_syntax",
+        UK_PATTERNS,
+        detect_custom_header,
+    )
+    try:
+        text = (
+            "1. Definitions\n\n"
+            '"Term" means first body.\n\n'
+            "continuation paragraph.\n\n"
+            "CUSTOM Other\n\n"
+            "Other body."
+        )
+        definition = DefinitionsExtractor("test_custom_definition_syntax").extract(text)["Term"]
+        assert definition.definition == "first body. continuation paragraph."
+    finally:
+        unregister_jurisdiction("test_custom_definition_syntax")
+
+
+def test_wrapped_reference_prose_does_not_end_definition():
+    text = (
+        "1. Definitions\n\n"
+        '"Confidential Information" means information disclosed under\n'
+        "Clause 2 excluding information in the public domain.\n\n"
+        "2. Use\n"
+        "Protect Confidential Information."
+    )
+
+    definition = DefinitionsExtractor(Jurisdiction.UK).extract(text)[
+        "Confidential Information"
+    ]
+
+    assert definition.definition == (
+        "information disclosed under Clause 2 excluding information in the public domain."
+    )

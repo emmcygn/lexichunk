@@ -5,13 +5,20 @@ from __future__ import annotations
 import bisect
 import logging
 import re
-from typing import Union
 
-from ..jurisdiction import get_patterns
+from .._patterns import (
+    CLOSE_QUOTE,
+    NOT_AFTER_WORD,
+    OPEN_QUOTE,
+    TERM_ANY,
+    TERM_ANY_SHORT,
+    TERM_CHARS,
+    TERM_LOWER,
+    TERM_UPPER,
+)
+from ..jurisdiction import get_detect_level, get_patterns
 
 logger = logging.getLogger(__name__)
-from ..jurisdiction.uk import UKPatterns
-from ..jurisdiction.us import USPatterns
 from ..models import DefinedTerm, Jurisdiction, JurisdictionPatterns
 
 # Terms that should be filtered out even if capitalised.
@@ -23,24 +30,85 @@ _SKIP_TERMS: frozenset[str] = frozenset({
     "It", "We", "You", "They", "Our", "Your", "Its",
 })
 
+# Case-folded view of ``_SKIP_TERMS``, consulted only for lowercase-initial
+# terms so that the behaviour of capitalised terms is unchanged.
+_SKIP_TERMS_LOWER: frozenset[str] = frozenset(t.lower() for t in _SKIP_TERMS)
+
 # Regex matching a blank line (zero or more spaces, then newline).
 _BLANK_LINE: re.Pattern[str] = re.compile(r"^\s*$", re.MULTILINE)
+
+# A standalone ALL-CAPS line starting a new operative section.  A definition
+# body must stop before one even when no blank line separates them: the last
+# definition of a section otherwise ran straight into the heading below it
+# ("Charlie" -> "the third letter. GOVERNING LAW This Agreement is governed
+# by ...").
+_ALLCAPS_LINE_AHEAD: re.Pattern[str] = re.compile(
+    r"\n[ \t]*(?=[A-Z][A-Z \t&/-]{2,}[ \t]*(?:\n|$))"
+)
+
+# A clause-entry marker ("1.2", "(a)", "(iv)", "Section 1.2", "Article II")
+# left dangling at the end of a captured definition body.  When definitions
+# are separated by a single newline rather than a blank line, the next entry's
+# own marker sits between the end of this definition and the quote that opens
+# the next term, so it is captured as part of this definition's text
+# ("the first thing. 1.2").
+#
+# The leading ``\n`` is load-bearing: it is what distinguishes that dangling
+# marker from a number that legitimately ends the sentence, as in
+# ``"Gamma" shall have the meaning set forth in Section 3.`` — so this is
+# applied to the raw slice, before newlines are collapsed to spaces.
+_TRAILING_CLAUSE_LABEL: re.Pattern[str] = re.compile(
+    r"\n[ \t]*(?:"
+    r"\d+(?:\.\d+)*\.?"
+    r"|\([a-z]\)"
+    r"|\([ivxlc]+\)"
+    r"|(?:Section|Article|Clause|Paragraph|Chapter)\s+"
+    r"(?:\d+(?:\.\d+)*\.?|[IVXLC]+\.?)"
+    r")[ \t]*\Z",
+    re.IGNORECASE,
+)
+
+# How far back a "hereinafter" definition looks for its body.
+_HEREINAFTER_LOOKBACK: int = 500
+
+# Runs of whitespace inside a captured term name.
+_TERM_WHITESPACE: re.Pattern[str] = re.compile(r"\s+")
+
+
+def _normalise_term(term: str) -> str:
+    """Collapse internal whitespace in a captured defined-term name.
+
+    The term character classes include ``\\s``, so a quoted term that wraps
+    across a line is captured with a literal newline inside it
+    (``"Indemnifying\\nParty"``) — a dictionary key no lookup for the rendered
+    term can ever match (D16).
+
+    Args:
+        term: The raw captured term name.
+
+    Returns:
+        The term with internal whitespace runs collapsed to single spaces and
+        leading/trailing whitespace removed.
+    """
+    return _TERM_WHITESPACE.sub(" ", term).strip()
 
 # Single-quote definition patterns (straight and curly).
 # ~30-40% of UK contracts use single quotes for defined terms.
 _DEFINITION_SINGLE: re.Pattern[str] = re.compile(
-    r"'([A-Z][A-Za-z\s\-]{1,60})'\s+(?:means|shall mean|has the meaning|is defined as|refers to)",
+    NOT_AFTER_WORD + rf"'({TERM_UPPER})'\s+"
+    r"(?:means|shall mean|has the meaning|is defined as|refers to)",
     re.MULTILINE,
 )
 _DEFINITION_SINGLE_CURLY: re.Pattern[str] = re.compile(
-    r"\u2018([A-Z][A-Za-z\s\-]{1,60})\u2019\s+(?:means|shall mean|has the meaning|is defined as|refers to)",
+    NOT_AFTER_WORD + rf"\u2018({TERM_UPPER})\u2019\s+"
+    r"(?:means|shall mean|has the meaning|is defined as|refers to)",
     re.MULTILINE,
 )
 
 # "shall have the meaning" form (straight + curly quotes).
 # e.g. "Term" shall have the meaning set forth in Section 1.1
 _DEFINITION_SHALL_HAVE_MEANING: re.Pattern[str] = re.compile(
-    r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]\s+shall have the meaning',
+    NOT_AFTER_WORD + rf'["\u201c]({TERM_UPPER})["\u201d]\s+shall have the meaning',
     re.MULTILINE,
 )
 
@@ -49,24 +117,24 @@ _DEFINITION_SHALL_HAVE_MEANING: re.Pattern[str] = re.compile(
 # e.g. (the "Effective Date")
 # First, find parenthetical groups that contain at least one quoted term.
 _INLINE_PAREN_GROUP: re.Pattern[str] = re.compile(
-    r'\([^)]*?["\u201c][A-Z][A-Za-z\s\-]{1,60}["\u201d][^)]*?\)',
+    rf'\([^)]*?["\u201c]{TERM_UPPER}["\u201d][^)]*?\)',
     re.MULTILINE,
 )
 # Then, extract individual quoted terms within a parenthetical group.
 _INLINE_PAREN_TERM: re.Pattern[str] = re.compile(
-    r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]',
+    NOT_AFTER_WORD + rf'["\u201c]({TERM_UPPER})["\u201d]',
 )
 
 # Lowercase-article definitions (straight and single quotes).
 # e.g. "the Company" means..., 'the Supplier' means...
 # Captures the full term including the article ("the Company", not "Company").
 _DEFINITION_ARTICLE: re.Pattern[str] = re.compile(
-    r'["\u201c](the\s+[A-Z][A-Za-z\s\-]{1,60})["\u201d]\s+'
+    NOT_AFTER_WORD + rf'["\u201c](the\s+{TERM_UPPER})["\u201d]\s+'
     r'(?:means|shall mean|has the meaning|is defined as|refers to)',
     re.MULTILINE,
 )
 _DEFINITION_ARTICLE_SINGLE: re.Pattern[str] = re.compile(
-    r"['\u2018](the\s+[A-Z][A-Za-z\s\-]{1,60})['\u2019]\s+"
+    NOT_AFTER_WORD + rf"['\u2018](the\s+{TERM_UPPER})['\u2019]\s+"
     r"(?:means|shall mean|has the meaning|is defined as|refers to)",
     re.MULTILINE,
 )
@@ -78,31 +146,49 @@ _DEFINITION_ARTICLE_SINGLE: re.Pattern[str] = re.compile(
 # allows an optional lowercase article before the uppercase term.
 _DEFINITION_HEREINAFTER: re.Pattern[str] = re.compile(
     r'(?i:hereinafter\s+(?:referred\s+to\s+as|called|known\s+as))\s+'
-    r'["\u201c]((?:the\s+)?[A-Z][A-Za-z\s\-]{1,60})["\u201d]',
+    + NOT_AFTER_WORD
+    + rf'["\u201c]((?:the\s+)?{TERM_UPPER})["\u201d]',
     re.MULTILINE,
+)
+
+# Lowercase-initial quoted definitions (straight, curly and single quotes).
+# e.g. "business day" means any day other than a Saturday or Sunday.
+# Most contracts capitalise defined terms, but not all; without this pattern
+# the term is invisible rather than merely mis-cased (D27).
+_DEFINITION_LOWERCASE: re.Pattern[str] = re.compile(
+    NOT_AFTER_WORD + rf"{OPEN_QUOTE}({TERM_LOWER}){CLOSE_QUOTE}\s+"
+    r"(?:means|shall mean|has the meaning|is defined as|refers to)",
+    re.MULTILINE,
+)
+
+# Parenthesised-plural defined terms, e.g. "Affiliate(s)" means ...
+# The canonical term is the singular stem; the plural form is registered as an
+# alias so downstream whole-word matching finds both (D27).
+_DEFINITION_PAREN_PLURAL: re.Pattern[str] = re.compile(
+    NOT_AFTER_WORD + rf"{OPEN_QUOTE}({TERM_ANY_SHORT})\((s|es)\)"
+    rf"{CLOSE_QUOTE}\s+"
+    r"(?:means|shall mean|has the meaning|is defined as|refers to)",
+    re.MULTILINE,
+)
+
+# The "individually as a 'X' and collectively as the 'Y'" idiom, which defines
+# two terms (singular and plural) with one shared definition and - unlike
+# ``_INLINE_PAREN_GROUP`` - carries no enclosing parentheses (D27).
+# e.g. Each of Provider and Customer may be referred to individually as a
+#      "Party" and collectively as the "Parties."
+_DEFINITION_INDIVIDUALLY_COLLECTIVELY: re.Pattern[str] = re.compile(
+    r"individually\s+as\s+(?:an?|the)\s+"
+    + NOT_AFTER_WORD + rf"{OPEN_QUOTE}({TERM_ANY})[.,]?{CLOSE_QUOTE}"
+    r"[^\"'“”‘’]{0,80}?"
+    r"collectively\s+as\s+(?:an?|the)\s+"
+    + NOT_AFTER_WORD + rf"{OPEN_QUOTE}({TERM_ANY})[.,]?{CLOSE_QUOTE}",
+    re.IGNORECASE | re.MULTILINE,
 )
 
 # Parenthetical back-reference definitions.
 # e.g. the Borrower (as defined in Section 1.1)
 _PARENTHETICAL_BACKREF: re.Pattern[str] = re.compile(
-    r'the\s+([A-Z][A-Za-z\s\-]{1,60}?)\s*\(\s*as\s+defined\s+in\b',
-    re.MULTILINE,
-)
-
-# Numbered / lettered clause-header patterns used to detect the start of a new
-# clause when scanning a definition body.
-_UK_CLAUSE_HEADER: re.Pattern[str] = re.compile(
-    r"^(?:\d+\.\d+(?:\.\d+)?\.?\s|\d+\.\s+[A-Z]|\([a-z]\)\s|\([ivxlc]+\)\s)",
-    re.MULTILINE,
-)
-_US_CLAUSE_HEADER: re.Pattern[str] = re.compile(
-    r"^(?:(?:ARTICLE|Article)\s+[IVXLC]+|(?:SECTION|Section)\s+\d+\.\d+|"
-    r"\([a-z]\)\s|\([ivxlc]+\)\s)",
-    re.MULTILINE,
-)
-_EU_CLAUSE_HEADER: re.Pattern[str] = re.compile(
-    r"^(?:(?:CHAPTER|Chapter)\s+[IVXLC]+|(?:ARTICLE|Article)\s+\d+|"
-    r"(?:SECTION|Section)\s+\d+|\d+\.\s+\S|\([a-z]\)\s|\([ivxlc]+\)\s)",
+    rf'the\s+([A-Z][{TERM_CHARS}]{{1,60}}?)\s*\(\s*as\s+defined\s+in\b',
     re.MULTILINE,
 )
 
@@ -133,7 +219,7 @@ class DefinitionsExtractor:
     Attributes:
         _jurisdiction: The jurisdiction whose pattern set will be used.
         _patterns: Compiled pattern dataclass for the jurisdiction.
-        _clause_header_re: Regex identifying clause headers for this jurisdiction.
+        _detect_level: Registered clause-header detector for this jurisdiction.
     """
 
     def __init__(self, jurisdiction: Jurisdiction | str) -> None:
@@ -144,13 +230,8 @@ class DefinitionsExtractor:
                 jurisdiction string registered via :func:`register_jurisdiction`.
         """
         self._jurisdiction: Jurisdiction | str = jurisdiction
-        self._patterns: Union[UKPatterns, USPatterns, JurisdictionPatterns] = get_patterns(jurisdiction)
-        if jurisdiction == Jurisdiction.UK:
-            self._clause_header_re: re.Pattern[str] = _UK_CLAUSE_HEADER
-        elif jurisdiction == Jurisdiction.EU:
-            self._clause_header_re = _EU_CLAUSE_HEADER
-        else:
-            self._clause_header_re = _US_CLAUSE_HEADER
+        self._patterns: JurisdictionPatterns = get_patterns(jurisdiction)
+        self._detect_level = get_detect_level(jurisdiction)
 
     # ------------------------------------------------------------------
     # Public API
@@ -270,55 +351,16 @@ class DefinitionsExtractor:
         Returns:
             Character offset of the section end (or end-of-text).
         """
-        # We look for lines that look like sibling or ancestor clause headers.
-        # "Higher or same level" means level <= found_level.
-        if self._jurisdiction == Jurisdiction.UK:
-            next_header_re = re.compile(
-                r"^(?:"
-                r"(\d+\.\d+\.\d+)\.?\s+\S"   # level 2
-                r"|(\d+\.\d+)\.?\s+\S"        # level 1
-                r"|(\d+)\.?\s+[A-Z]\S"        # level 0
-                r"|Schedule\s+\d+"            # level -1
-                r")",
-                re.MULTILINE,
-            )
-            level_map = {0: 2, 1: 1, 2: 0, 3: -1}  # group-index → level
-        elif self._jurisdiction == Jurisdiction.EU:
-            next_header_re = re.compile(
-                r"^(?:"
-                r"((?:CHAPTER|Chapter)\s+[IVXLC]+)"    # level -1
-                r"|((?:ARTICLE|Article)\s+\d+)"         # level 0
-                r"|((?:SECTION|Section)\s+\d+)"         # level 1
-                r"|((?:ANNEX|Annex)\s+[IVXLC]+)"        # level -2
-                r"|(\d+)\.\s"                           # level 2 (numbered paragraph)
-                r")",
-                re.MULTILINE,
-            )
-            level_map = {0: -1, 1: 0, 2: 1, 3: -2, 4: 2}  # group-index → level
-        else:
-            next_header_re = re.compile(
-                r"^(?:"
-                r"((?:ARTICLE|Article)\s+[IVXLC]+)"    # level 0
-                r"|((?:SECTION|Section)\s+\d+\.\d+)"   # level 1
-                r"|(Schedule\s+[\d.]+)"                 # level -1
-                r"|(Exhibit\s+[A-Z][\w\-]*)"            # level -2
-                r")",
-                re.MULTILINE,
-            )
-            level_map = {0: 0, 1: 1, 2: -1, 3: -2}  # group-index → level
-
-        remaining = text[after:]
-        for m in next_header_re.finditer(remaining):
-            # Determine the level of this candidate header.
-            for grp_idx, lvl in level_map.items():
-                if m.group(grp_idx + 1) is not None:
-                    candidate_level = lvl
-                    break
-            else:
-                continue
-
-            if candidate_level <= found_level:
-                return after + m.start()
+        offset = after
+        for line in text[after:].splitlines(keepends=True):
+            detected = self._detect_level(line.rstrip("\r\n"))
+            if (
+                detected is not None
+                and detected[0] <= found_level
+                and self._is_boundary_heading(line, detected)
+            ):
+                return offset
+            offset += len(line)
 
         return len(text)
 
@@ -331,29 +373,21 @@ class DefinitionsExtractor:
         Returns:
             Integer level (lower = higher in hierarchy).
         """
-        l = line.strip()
-        if self._jurisdiction == Jurisdiction.UK:
-            if re.match(r"^\d+\.\d+\.\d+", l):
-                return 2
-            if re.match(r"^\d+\.\d+", l):
-                return 1
-            if re.match(r"^\d+", l):
-                return 0
-            return 0
-        elif self._jurisdiction == Jurisdiction.EU:
-            if re.match(r"^(?:CHAPTER|Chapter)", l):
-                return -1
-            if re.match(r"^(?:ARTICLE|Article)", l):
-                return 0
-            if re.match(r"^(?:SECTION|Section)", l):
-                return 1
-            return 0
-        else:
-            if re.match(r"^(?:ARTICLE|Article)", l):
-                return 0
-            if re.match(r"^(?:SECTION|Section)", l):
-                return 1
-            return 0
+        detected = self._detect_level(line)
+        return detected[0] if detected is not None else 0
+
+    @staticmethod
+    def _is_boundary_heading(line: str, detected: tuple[int, str]) -> bool:
+        identifier = detected[1]
+        if not re.match(
+            r"^(?:clause|section|article|chapter|schedule|appendix|exhibit|annexe?|recital)\b",
+            identifier,
+            re.IGNORECASE,
+        ):
+            return True
+        stripped = line.lstrip()
+        remainder = stripped[len(identifier) :].lstrip(" .:\t-\u2013\u2014")
+        return not remainder or not remainder[0].islower()
 
     def _extract_definitions_from_text(
         self, text: str, source_clause: str
@@ -377,18 +411,19 @@ class DefinitionsExtractor:
         # positions so we can process them in document order.
         raw_matches: list[tuple[int, int, str]] = []  # (start, end, term)
 
-        for pattern in (
-            self._patterns.definition,
-            self._patterns.definition_curly,
-            _DEFINITION_SINGLE,
-            _DEFINITION_SINGLE_CURLY,
-            _DEFINITION_SHALL_HAVE_MEANING,
-            _DEFINITION_ARTICLE,
-            _DEFINITION_ARTICLE_SINGLE,
-        ):  # type: ignore[attr-defined]
+        for pattern in self._definition_patterns():
             for m in pattern.finditer(text):
-                term = m.group(1).strip()
+                term = _normalise_term(m.group(1))
                 raw_matches.append((m.start(), m.end(), term))
+
+        # Parenthesised plurals: '"Affiliate(s)" means …'.  The canonical term
+        # is the singular stem; the plural form is registered as an alias so a
+        # whole-word search for either form finds the definition.
+        plural_aliases: dict[str, str] = {}  # alias term → canonical term
+        for m in _DEFINITION_PAREN_PLURAL.finditer(text):
+            stem = _normalise_term(m.group(1))
+            raw_matches.append((m.start(), m.end(), stem))
+            plural_aliases[stem + m.group(2)] = stem
 
         # Sort by position.
         raw_matches.sort(key=lambda t: t[0])
@@ -420,6 +455,37 @@ class DefinitionsExtractor:
                     source_clause=clause,
                 )
 
+        # Register plural aliases for parenthesised-plural definitions so that
+        # both "Affiliate" and "Affiliates" find the same definition.
+        for alias, canonical in plural_aliases.items():
+            canonical_dt = results.get(canonical)
+            if canonical_dt is not None and alias not in results:
+                results[alias] = DefinedTerm(
+                    term=alias,
+                    definition=canonical_dt.definition,
+                    source_clause=canonical_dt.source_clause,
+                )
+
+        # --- "individually as a 'X' and collectively as the 'Y'" ---
+        # Defines two terms sharing one definition, without parentheses.
+        for m in _DEFINITION_INDIVIDUALLY_COLLECTIVELY.finditer(text):
+            clause = (
+                self._nearest_clause_label(clause_labels, m.start())
+                or source_clause
+                or "preamble"
+            )
+            definition = re.sub(r"\s+", " ", m.group(0).strip())
+            for group_index in (1, 2):
+                term = _normalise_term(m.group(group_index))
+                if not self._is_valid_term(term):
+                    continue
+                if term not in results:
+                    results[term] = DefinedTerm(
+                        term=term,
+                        definition=definition,
+                        source_clause=clause,
+                    )
+
         # --- Inline parenthetical definitions ---
         # These don't have a "means" body; the context is the surrounding
         # sentence.  Extract all quoted terms inside parentheses.
@@ -427,7 +493,7 @@ class DefinitionsExtractor:
             paren_text = group_m.group(0)
             clause = self._nearest_clause_label(clause_labels, group_m.start()) or source_clause or "preamble"
             for term_m in _INLINE_PAREN_TERM.finditer(paren_text):
-                term = term_m.group(1).strip()
+                term = _normalise_term(term_m.group(1))
                 if not self._is_valid_term(term):
                     continue
                 if term not in results:
@@ -440,7 +506,7 @@ class DefinitionsExtractor:
         # --- Parenthetical back-reference definitions ---
         # e.g. "the Borrower (as defined in Section 1.1)"
         for m in _PARENTHETICAL_BACKREF.finditer(text):
-            term = m.group(1).strip()
+            term = _normalise_term(m.group(1))
             if not self._is_valid_term(term):
                 continue
             if term not in results:
@@ -455,20 +521,12 @@ class DefinitionsExtractor:
         # e.g. 'XYZ Corp hereinafter referred to as "the Company"'
         # The definition body is the text *before* "hereinafter", not after.
         for m in _DEFINITION_HEREINAFTER.finditer(text):
-            term = m.group(1).strip()
+            term = _normalise_term(m.group(1))
             if not self._is_valid_term(term):
                 continue
             if term not in results:
                 clause = self._nearest_clause_label(clause_labels, m.start()) or source_clause or "preamble"
-                # Extract up to ~500 chars preceding context to the last
-                # sentence boundary.
-                preceding = text[max(0, m.start() - 500):m.start()]
-                # Find the last sentence boundary in the preceding text.
-                last_dot = preceding.rfind(".")
-                if last_dot >= 0:
-                    body = preceding[last_dot + 1:].strip()
-                else:
-                    body = preceding.strip()
+                body = self._hereinafter_body(text, m.start())
                 if not body:
                     body = m.group(0).strip()
                 results[term] = DefinedTerm(
@@ -479,12 +537,70 @@ class DefinitionsExtractor:
 
         return results
 
+    def _definition_patterns(self) -> tuple[re.Pattern[str], ...]:
+        """Return every pattern that can *start* a definition, in scan order.
+
+        Both :meth:`_extract_definitions_from_text` and
+        :meth:`_extract_definition_body` consult this single list — the body
+        extractor must stop at *any* pattern the extractor recognises, or a
+        definition body runs straight through the next definition (D15).
+
+        Returns:
+            Tuple of compiled patterns whose group 1 is the defined term.
+        """
+        return (
+            self._patterns.definition,  # type: ignore[attr-defined]
+            self._patterns.definition_curly,  # type: ignore[attr-defined]
+            _DEFINITION_SINGLE,
+            _DEFINITION_SINGLE_CURLY,
+            _DEFINITION_SHALL_HAVE_MEANING,
+            _DEFINITION_ARTICLE,
+            _DEFINITION_ARTICLE_SINGLE,
+            _DEFINITION_LOWERCASE,
+        )
+
+    def _hereinafter_body(self, text: str, match_start: int) -> str:
+        """Return the definition body preceding a "hereinafter" match.
+
+        The body is the preceding text back to the nearest sentence-ish
+        boundary (``.``, ``;`` or a newline) within a 500-character window.
+        When the window contains no boundary at all *and* was truncated
+        mid-word, the leading partial word is dropped so the body never begins
+        in the middle of a word (D26).
+
+        Args:
+            text: Full text being scanned.
+            match_start: Offset of the "hereinafter" match.
+
+        Returns:
+            The whitespace-normalised definition body (possibly empty).
+        """
+        window_start = max(0, match_start - _HEREINAFTER_LOOKBACK)
+        preceding = text[window_start:match_start]
+
+        boundary = max(
+            preceding.rfind("."), preceding.rfind(";"), preceding.rfind("\n")
+        )
+        if boundary >= 0:
+            body = preceding[boundary + 1:]
+        elif window_start > 0:
+            # The window was truncated; skip to the next word boundary rather
+            # than starting mid-word.
+            ws = re.search(r"\s", preceding)
+            body = preceding[ws.end():] if ws is not None else ""
+        else:
+            body = preceding
+
+        return re.sub(r"\s+", " ", body.strip())
+
     def _extract_definition_body(self, text: str, match_end: int) -> str:
         """Extract the full definition body starting at match_end.
 
         A definition body ends when:
 
-        - A new definition starts (next ``"Term"`` means pattern).
+        - A new definition starts — *any* of the patterns the extractor uses,
+          including the "shall have the meaning", lowercase-article,
+          parenthesised-plural, lowercase-initial and hereinafter forms.
         - A blank line followed by a clause header.
         - Two consecutive blank lines.
 
@@ -503,8 +619,12 @@ class DefinitionsExtractor:
         # Find the earliest termination point from any stop condition.
         stop = len(remaining)
 
-        # 1. Next definition match.
-        for pat in (self._patterns.definition, self._patterns.definition_curly, _DEFINITION_SINGLE, _DEFINITION_SINGLE_CURLY):  # type: ignore[attr-defined]
+        # 1. Next definition match — every start pattern the extractor uses.
+        for pat in (
+            *self._definition_patterns(),
+            _DEFINITION_PAREN_PLURAL,
+            _DEFINITION_HEREINAFTER,
+        ):
             m = pat.search(remaining)
             if m:
                 stop = min(stop, m.start())
@@ -515,17 +635,36 @@ class DefinitionsExtractor:
             stop = min(stop, double_blank.start())
 
         # 3. Blank line immediately followed by a clause-header line.
-        blank_then_header = re.search(
-            r"\n[ \t]*\n[ \t]*(?="
-            + self._clause_header_re.pattern
-            + r")",
-            remaining,
-            re.MULTILINE,
-        )
-        if blank_then_header:
-            stop = min(stop, blank_then_header.start())
+        line_offset = 0
+        blank_start: int | None = None
+        for line in remaining.splitlines(keepends=True):
+            if line.strip():
+                detected = self._detect_level(line.rstrip("\r\n"))
+                if (
+                    blank_start is not None
+                    and detected is not None
+                    and self._is_boundary_heading(line, detected)
+                ):
+                    stop = min(stop, blank_start)
+                    break
+                blank_start = None
+            elif blank_start is None:
+                blank_start = line_offset
+            line_offset += len(line)
 
-        body = remaining[:stop].strip()
+        # 4. A standalone ALL-CAPS line — an operative heading typed directly
+        #    under the last definition of a section, with no blank line.
+        allcaps_ahead = _ALLCAPS_LINE_AHEAD.search(remaining)
+        if allcaps_ahead:
+            stop = min(stop, allcaps_ahead.start())
+
+        # 5. Drop a dangling next-entry marker.  Stop condition 1 ends the
+        #    body at the quote that opens the *next* term, so when entries are
+        #    separated by a single newline instead of a blank line that
+        #    entry's own number ("1.2", "(b)") sits inside this body.  Done on
+        #    the raw slice, because the newline before the marker is what
+        #    tells it apart from a sentence-final number.
+        body = _TRAILING_CLAUSE_LABEL.sub("", remaining[:stop].rstrip()).strip()
         # Collapse internal runs of whitespace / newlines to a single space
         # so the definition is returned as a clean single-line string.
         body = re.sub(r"\s+", " ", body)
@@ -543,6 +682,9 @@ class DefinitionsExtractor:
         - Fewer than 2 characters.
         - Pure numeric string.
         - Member of the ``_SKIP_TERMS`` stop-list ("The", "A", etc.).
+        - A lowercase-initial term whose case-folded form is in the stop-list
+          (only lowercase-initial terms are checked case-insensitively, so the
+          treatment of capitalised terms is unchanged).
 
         Args:
             term: Candidate term extracted from the document.
@@ -555,6 +697,8 @@ class DefinitionsExtractor:
         if term.isdigit():
             return False
         if term in _SKIP_TERMS:
+            return False
+        if term[0].islower() and term.lower() in _SKIP_TERMS_LOWER:
             return False
         return True
 

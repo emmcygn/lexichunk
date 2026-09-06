@@ -10,6 +10,7 @@ token limit.
 
 from __future__ import annotations
 
+import logging
 import re
 from typing import Optional
 
@@ -21,6 +22,45 @@ from ..models import (
 )
 from ..parsers.structure import ParsedClause
 from ..utils import approx_tokens as _approx_tokens
+from .fallback import (
+    DEFAULT_ABBREVIATIONS,
+    _compile_abbreviations,
+    sentence_boundary_positions,
+)
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Cascading splitter — boundary patterns, applied in order of preference.
+#
+# Level 0 is sentence-boundary detection (abbreviation-aware, shared with
+# FallbackChunker) and is handled separately because it needs the compiled
+# abbreviation pattern.  Levels 1..4 are these plain regexes.  Each match's
+# ``end()`` is the offset at which the *next* piece begins.
+# ---------------------------------------------------------------------------
+
+_SEMICOLON_BOUNDARY = re.compile(r'(?<=;)\s+')
+# "(a) ", "(iv) ", "(A) ", "1.1 " — the start of an enumerated sub-item.
+_ENUMERATOR_BOUNDARY = re.compile(r'\s+(?=\([A-Za-z]+\)|\d+\.\d)')
+_NEWLINE_BOUNDARY = re.compile(r'\n')
+_WHITESPACE_BOUNDARY = re.compile(r'\s+')
+
+_CASCADE_PATTERNS: tuple[re.Pattern[str], ...] = (
+    _SEMICOLON_BOUNDARY,
+    _ENUMERATOR_BOUNDARY,
+    _NEWLINE_BOUNDARY,
+    _WHITESPACE_BOUNDARY,
+)
+
+# Index of the last cascade level (0 = sentences, then _CASCADE_PATTERNS).
+_LAST_CASCADE_LEVEL = len(_CASCADE_PATTERNS)
+
+# Longest a clause's opening line may be, in words, for that line to read as a
+# bare heading rather than as body text that starts on the header line.
+# "SCHEDULE 1 — SERVICES DESCRIPTION" is five words; a real clause opening
+# ("5.3  If any payment is not received by the due date, ...") is far longer.
+_MAX_HEADING_LINE_WORDS = 10
+
 
 # ---------------------------------------------------------------------------
 # Main chunker
@@ -35,14 +75,58 @@ class ClauseAwareChunker:
     Respects clause boundaries — never splits mid-clause unless the clause
     exceeds ``max_chunk_size``.
 
+    **Offsets are the single source of truth.**  A chunk's body is the exact
+    slice ``original_text[char_start:char_end]``; ``content`` is that body with
+    the ancestor header lines (if any) prepended, so
+    ``chunk.content.endswith(original_text[chunk.char_start:chunk.char_end])``
+    always holds.  ``char_end`` is the end of the clause's *own* text, so a
+    parent chunk's span never overlaps its descendants'.
+
+    **Hierarchy-aware merging.**  ``min_chunk_size`` is a preference, hierarchy
+    is a fact: a group below ``min_chunk_size`` is merged only with (a) an
+    adjacent sibling sharing the same ``parent_uid`` *and* ``document_section``
+    or (b) its own immediately-preceding parent group.  Two container-level
+    groups (``level <= 0`` — top-level clauses, Schedules, the preamble) are
+    never merged into one another, so an under-sized top-level clause is
+    emitted as a short chunk rather than being folded into an unrelated
+    neighbour.  A merged group's metadata (``hierarchy``, ``hierarchy_path``,
+    ``document_section``, ``original_header``) comes from the structurally
+    dominant clause — the parent in case (b), the first sibling in case (a).
+
+    Attributes:
+        last_merged_identifiers: Populated by every :meth:`chunk` call (and
+            reset at its start).  Maps the index of each emitted chunk that
+            covers **more than one** clause to the list of *all* clause
+            identifiers whose text that chunk contains, in document order,
+            starting with the dominant clause's own identifier.  Chunks
+            covering a single clause are absent from the mapping — their only
+            identifier is already ``chunk.hierarchy.identifier``.  Identifiers
+            are de-duplicated: the pieces of one over-sized clause all carry
+            that clause's identifier.  This is how
+            a child folded into its parent (e.g. ``4.1`` merged into ``4``)
+            stays discoverable for cross-reference resolution, which needs to
+            map ``"clause 4.1"`` onto the chunk that actually contains it.
+        last_continuation_indices: Populated by every :meth:`chunk` call (and
+            reset at its start).  The indices of emitted chunks that *continue*
+            an over-sized clause which starts in an earlier chunk.  Every piece
+            of a split clause carries that clause's own identifier, so a
+            resolver must register only the first piece as a lookup candidate
+            — otherwise ``"clause 1.1"`` is ambiguous across its own pieces.
+
     Args:
         jurisdiction: UK or US.
         max_chunk_size: Maximum chunk size in approximate tokens (default 512).
-        min_chunk_size: Minimum chunk size; smaller clauses are merged with
-            the next sibling (default 64).
+            Enforced as a hard cap: an over-sized clause is split with a
+            cascading splitter and a final :meth:`_enforce_max` pass re-splits
+            anything still over the limit after merging.
+        min_chunk_size: Minimum chunk size; smaller clauses are merged with an
+            adjacent sibling where the hierarchy allows (default 64).
         document_id: Optional document identifier attached to every chunk.
         chars_per_token: Number of characters per token for the approximation
             heuristic.  Defaults to 4.
+        extra_abbreviations: Additional abbreviations (without the trailing
+            dot) whose full stop must not be treated as a sentence boundary by
+            the cascading splitter.
     """
 
     def __init__(
@@ -52,12 +136,21 @@ class ClauseAwareChunker:
         min_chunk_size: int = 64,
         document_id: Optional[str] = None,
         chars_per_token: int = 4,
+        extra_abbreviations: list[str] | None = None,
     ) -> None:
         self._jurisdiction = jurisdiction
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
         self._document_id = document_id
         self._chars_per_token = chars_per_token
+        self._abbrev_pattern = _compile_abbreviations(
+            DEFAULT_ABBREVIATIONS, extra_abbreviations
+        )
+        self.last_merged_identifiers: dict[int, list[str]] = {}
+        self.last_continuation_indices: set[int] = set()
+        # uids of heading-only clauses folded forward by
+        # ``_absorb_heading_only`` during the current ``chunk`` call.
+        self._absorbed_heading_uids: set[str] = set()
 
     # ------------------------------------------------------------------
     # Public API
@@ -73,12 +166,17 @@ class ClauseAwareChunker:
         Algorithm:
 
         1. For each :class:`~lexichunk.parsers.structure.ParsedClause`, compute
-           its approximate token size.
-        2. If ``size < min_chunk_size`` → mark for merging with the next sibling.
-        3. If ``size > max_chunk_size`` → split at sub-clause boundaries.
-        4. Otherwise → emit as a single :class:`~lexichunk.models.LegalChunk`.
-        5. Assign sequential ``index`` values.
-        6. Build ``hierarchy_path`` for each chunk.
+           the approximate token size of its final ``content`` (own text plus
+           the ancestor headers that will be prepended).
+        2. If that exceeds ``max_chunk_size`` → split with the cascading
+           splitter (:meth:`_split_text_cascading`).
+        3. Merge groups below ``min_chunk_size`` where — and only where — the
+           hierarchy allows (:meth:`_merge_small_clauses`).
+        4. Re-split anything still over ``max_chunk_size``
+           (:meth:`_enforce_max`), then fold heading-only groups into the
+           child they announce (:meth:`_absorb_heading_only`).
+        5. Emit one :class:`~lexichunk.models.LegalChunk` per group, with
+           sequential ``index`` values and a ``hierarchy_path``.
 
         Preamble clauses (``level == -99``) that contain only whitespace are
         skipped.  Non-empty preambles are included as their own chunk.
@@ -87,14 +185,23 @@ class ClauseAwareChunker:
             clauses: Flat list from
                 :meth:`~lexichunk.parsers.structure.StructureParser.parse`,
                 in document order.
-            original_text: The original document text (used for char offsets).
+            original_text: The original (sanitised) document text.  Chunk
+                bodies are sliced from it directly.
 
         Returns:
             List of :class:`~lexichunk.models.LegalChunk` objects in document
             order.
         """
-        # Build a fast identifier → ParsedClause lookup for hierarchy walking.
-        clause_map: dict[str, ParsedClause] = {c.identifier: c for c in clauses}
+        # Build a uid → ParsedClause lookup for hierarchy walking.  Keying on
+        # `identifier` would be ambiguous: identifiers repeat across a document
+        # (a Schedule restarting at "1", repeated "(a)" sub-clauses), and a
+        # last-write-wins dict would then splice one section's headers into
+        # another section's chunk.  `uid` is unique by construction.
+        clause_map: dict[str, ParsedClause] = {c.uid: c for c in clauses}
+
+        self.last_merged_identifiers = {}
+        self.last_continuation_indices = set()
+        self._absorbed_heading_uids = set()
 
         # ------------------------------------------------------------------
         # Step 1: Filter and expand clauses into groups.
@@ -110,11 +217,14 @@ class ClauseAwareChunker:
             if clause.level == -99 and not clause.content.strip():
                 continue
 
-            tokens = _approx_tokens(clause.content, self._chars_per_token)
+            prefix = self._content_prefix(clause, clause_map)
+            tokens = _approx_tokens(prefix + clause.content, self._chars_per_token)
 
             if tokens > self._max_chunk_size:
                 # Split into smaller pieces.
-                sub_clauses = self._split_oversized_clause(clause, clauses)
+                sub_clauses = self._split_oversized_clause(
+                    clause, prefix_chars=len(prefix)
+                )
                 # Each sub-clause becomes its own initial group.
                 for sub in sub_clauses:
                     groups.append([sub])
@@ -127,15 +237,163 @@ class ClauseAwareChunker:
         groups = self._merge_small_clauses(groups)
 
         # ------------------------------------------------------------------
+        # Step 2b: Hard cap — nothing leaves this method over max_chunk_size
+        # unless it is genuinely indivisible (which is logged).
+        # ------------------------------------------------------------------
+        groups = self._enforce_max(groups, clause_map)
+
+        # ------------------------------------------------------------------
+        # Step 2c: Fold heading-only groups into the child they announce.
+        # Runs last because `_enforce_max` can undo a merge and leave a
+        # heading stranded on its own; the fold checks the cap itself, so it
+        # cannot re-create an over-sized group.
+        # ------------------------------------------------------------------
+        groups = self._absorb_heading_only(groups, clause_map)
+
+        # ------------------------------------------------------------------
         # Step 3: Convert each group into a LegalChunk.
         # ------------------------------------------------------------------
         legal_chunks: list[LegalChunk] = []
 
+        # Origin uids already covered by an emitted chunk, used to tell the
+        # first piece of a split clause from its continuations.
+        seen_origins: set[str] = set()
+
         for idx, group in enumerate(groups):
-            chunk = self._group_to_chunk(group, idx, clause_map)
+            dominant = self._labelling(group)
+            if (
+                '#' in dominant.uid
+                and self._origin_uid(dominant) in seen_origins
+            ):
+                self.last_continuation_indices.add(idx)
+            seen_origins.update(self._origin_uid(c) for c in group)
+
+            if len(group) > 1:
+                identifiers = [dominant.identifier]
+                # Split parts of one clause share an identifier, so de-duplicate
+                # while preserving document order.
+                for clause in group:
+                    if clause.identifier not in identifiers:
+                        identifiers.append(clause.identifier)
+                self.last_merged_identifiers[idx] = identifiers
+            chunk = self._group_to_chunk(group, idx, clause_map, original_text)
             legal_chunks.append(chunk)
 
         return legal_chunks
+
+    # ------------------------------------------------------------------
+    # Structural helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _own_end(clause: ParsedClause) -> int:
+        """Return the end offset of *clause*'s **own** text.
+
+        ``ParsedClause.char_end`` marks where the clause *closes* — i.e. past
+        the end of every descendant, because a clause only closes when a
+        same-or-more-senior header arrives.  ``content`` however holds only the
+        contiguous run of lines the clause owns directly, starting at
+        ``char_start``.  The own-text span is therefore
+        ``[char_start, char_start + len(content))``, and those spans tile the
+        document without overlap.
+        """
+        return clause.char_start + len(clause.content)
+
+    @staticmethod
+    def _dominant(group: list[ParsedClause]) -> ParsedClause:
+        """Return the structurally dominant clause of *group*.
+
+        The most senior clause (lowest ``level``); ties are broken by document
+        order.  For a child merged into its parent this is the parent; for a
+        run of merged siblings it is the first sibling.
+        """
+        best = group[0]
+        for clause in group[1:]:
+            if clause.level < best.level:
+                best = clause
+        return best
+
+    @staticmethod
+    def _origin_uid(clause: ParsedClause) -> str:
+        """Return the uid of the clause *clause* originated from.
+
+        Synthetic pieces produced by :meth:`_split_oversized_clause` carry a
+        ``"<parent uid>#p<n>"`` uid; every other clause returns its own uid.
+        """
+        return clause.uid.split('#', 1)[0]
+
+    @staticmethod
+    def _is_container(clause: ParsedClause) -> bool:
+        """Whether *clause* sits at a container level (top-level or above).
+
+        Levels ``0`` (top-level clause / Article), ``-1``/``-2``
+        (Schedule / Exhibit / Chapter) and ``-99`` (preamble) each own a
+        self-contained part of the document; two of them are never merged into
+        a single chunk because no single-valued ``hierarchy_path``,
+        ``clause_type`` or ``document_section`` could honestly describe the
+        result.
+        """
+        return clause.level <= 0
+
+    @staticmethod
+    def _is_heading_only(clause: ParsedClause) -> bool:
+        """Whether *clause* contributes nothing but its own heading.
+
+        True for a container that only announces what follows — ``ARTICLE I``
+        over ``DEFINITIONS``, ``SCHEDULE 1 — SERVICES DESCRIPTION``,
+        ``1.  Overview of Services`` — and false for a clause whose text
+        starts on the header line, however short.  The opening line must read
+        as a heading (at most :data:`_MAX_HEADING_LINE_WORDS` words) and the
+        only non-blank line allowed after it is the title the heading adopted
+        from the line below it.
+        """
+        if clause.level == -99:
+            return False
+        lines = clause.content.splitlines()
+        if not lines:
+            return False
+        first = lines[0].strip()
+        if not first or len(first.split()) > _MAX_HEADING_LINE_WORDS:
+            return False
+        rest = [line.strip() for line in lines[1:] if line.strip()]
+        if not rest:
+            return True
+        title = (clause.title or "").strip().casefold()
+        return len(rest) == 1 and bool(title) and rest[0].casefold() == title
+
+    def _labelling(self, group: list[ParsedClause]) -> ParsedClause:
+        """Return the clause whose metadata describes *group*.
+
+        Normally the structurally dominant clause (:meth:`_dominant`).  But a
+        chunk that opens with a heading-only container followed by its single
+        substantive child is *about* that child: ``Article I`` carrying nothing
+        but ``Section 1.01`` should read ``Article I — Definitions >
+        Section 1.01 …``, not a bare ``Article I``.  The heading is still in
+        the chunk's text and in ``last_merged_identifiers``, so references to
+        it keep resolving here.
+
+        The rule applies only while each skipped heading is the direct parent
+        of the next clause, and then only when exactly one clause is left or
+        the headings were folded in by :meth:`_absorb_heading_only`.  A chunk
+        that merely gathered a parent with *several* of its children (``3``
+        with ``3.1``–``3.4``) is honestly described by that parent, not by the
+        first child, so it keeps the ordinary dominant clause.
+        """
+        start = 0
+        while (
+            start + 1 < len(group)
+            and self._is_heading_only(group[start])
+            and group[start].uid == group[start + 1].parent_uid
+        ):
+            start += 1
+        if start == 0:
+            return self._dominant(group)
+        if (
+            len(group) - start == 1
+            or group[0].uid in self._absorbed_heading_uids
+        ):
+            return self._dominant(group[start:])
+        return self._dominant(group)
 
     # ------------------------------------------------------------------
     # Hierarchy path
@@ -148,8 +406,10 @@ class ClauseAwareChunker:
     ) -> str:
         """Build a human-readable hierarchy path string.
 
-        Walks up the ``parent_identifier`` chain using *clause_map* to collect
-        ancestor nodes, reverses them, then joins with ``" > "``.
+        Walks up the ``parent_uid`` chain using *clause_map* to collect
+        ancestor nodes, reverses them, then joins with ``" > "``.  ``uid`` is
+        used rather than ``parent_identifier`` because identifiers are not
+        unique across a document.
 
         If a node has a title it is formatted as ``"identifier — title"``
         (e.g. ``"Article VII — Indemnification"``); otherwise just the
@@ -157,7 +417,7 @@ class ClauseAwareChunker:
 
         Args:
             clause: The clause to build the path for.
-            clause_map: Dict mapping ``identifier`` → :class:`ParsedClause`.
+            clause_map: Dict mapping ``uid`` → :class:`ParsedClause`.
 
         Returns:
             Hierarchy path string, e.g.
@@ -165,21 +425,190 @@ class ClauseAwareChunker:
         """
         parts: list[str] = []
         current: Optional[ParsedClause] = clause
+        seen: set[str] = set()
 
         while current is not None:
             if current.title:
-                label = f"{current.identifier} \u2014 {current.title}"
+                label = f"{current.identifier} — {current.title}"
             else:
                 label = current.identifier
             parts.append(label)
 
-            parent_id = current.parent_identifier
-            if parent_id is None:
+            parent_uid = current.parent_uid
+            if parent_uid is None or parent_uid in seen:
                 break
-            current = clause_map.get(parent_id)
+            seen.add(parent_uid)
+            current = clause_map.get(parent_uid)
 
         parts.reverse()
         return " > ".join(parts)
+
+    def _collect_ancestor_headers(
+        self,
+        clause: ParsedClause,
+        clause_map: dict[str, ParsedClause],
+        exclude_uids: frozenset[str] = frozenset(),
+    ) -> list[str]:
+        """Collect ancestor header lines in root→leaf order (excluding *clause* itself).
+
+        Walks up the ``parent_uid`` chain, collects each ancestor's header as
+        ``"identifier title"`` (or just identifier if no title), then reverses
+        to produce root-first ordering.
+
+        Preamble clauses (``level == -99``) return an empty list.
+
+        Args:
+            clause: The clause whose ancestors to collect.
+            clause_map: Dict mapping ``uid`` → :class:`ParsedClause`.
+            exclude_uids: Ancestors already present verbatim in the chunk's
+                own body (a heading-only container absorbed into the chunk),
+                which must not be prepended a second time.
+
+        Returns:
+            List of header strings in root→leaf order.
+        """
+        if clause.level == -99:
+            return []
+
+        ancestors: list[str] = []
+        parent_uid = clause.parent_uid
+        seen: set[str] = set()
+
+        while parent_uid is not None and parent_uid not in seen:
+            seen.add(parent_uid)
+            parent = clause_map.get(parent_uid)
+            if parent is None:
+                break
+            if parent.uid in exclude_uids:
+                parent_uid = parent.parent_uid
+                continue
+            if parent.title:
+                ancestors.append(f"{parent.identifier} {parent.title}".strip())
+            else:
+                ancestors.append(parent.identifier.strip())
+            parent_uid = parent.parent_uid
+
+        ancestors.reverse()
+        return ancestors
+
+    def _content_prefix(
+        self,
+        clause: ParsedClause,
+        clause_map: dict[str, ParsedClause],
+        exclude_uids: frozenset[str] = frozenset(),
+    ) -> str:
+        """Return the exact string prepended to a chunk body for *clause*.
+
+        Either ``""`` or the ancestor header lines joined by newlines with a
+        trailing newline, so that ``prefix + body`` is the chunk's ``content``.
+        Ancestors listed in *exclude_uids* are already in the body and are
+        skipped.
+        """
+        headers = self._collect_ancestor_headers(
+            clause, clause_map, exclude_uids
+        )
+        if not headers:
+            return ""
+        return '\n'.join(headers) + '\n'
+
+    # ------------------------------------------------------------------
+    # Cascading splitter
+    # ------------------------------------------------------------------
+
+    def _split_text_cascading(
+        self,
+        text: str,
+        *,
+        prefix_chars: int = 0,
+        identifier: str = "",
+    ) -> list[tuple[int, int]]:
+        """Split *text* into spans that each fit within ``max_chunk_size``.
+
+        Boundary types are tried in order of decreasing semantic quality, and
+        each level is applied **only** to the pieces that are still over the
+        limit after the previous level:
+
+        0. sentence boundaries (abbreviation-aware — the same detector
+           :class:`~lexichunk.strategies.fallback.FallbackChunker` uses, so
+           ``extra_abbreviations`` applies here too);
+        1. semicolon boundaries (``"…; "``) — the common shape of a long
+           legal proviso that contains no ``.``/``!``/``?`` at all;
+        2. enumerator boundaries — ``(a)``, ``(iv)``, ``1.1``;
+        3. newlines;
+        4. a hard word window.
+
+        Args:
+            text: The text to split.
+            prefix_chars: Number of characters that will be prepended to every
+                resulting piece (the ancestor-header prefix).  Counted against
+                the budget so the *final* ``token_count`` respects the cap.
+            identifier: Clause identifier, used only in the warning logged when
+                a piece is genuinely indivisible.
+
+        Returns:
+            A list of ``(start, end)`` offsets into *text*, contiguous and in
+            order, that exactly tile ``[0, len(text))``.
+        """
+        if not text:
+            return [(0, 0)]
+
+        sentence_cuts = sentence_boundary_positions(text, self._abbrev_pattern)
+        warned = False
+
+        def tokens(start: int, end: int) -> int:
+            return max(1, (prefix_chars + end - start) // self._chars_per_token)
+
+        def cuts_for(level: int, start: int, end: int) -> list[int]:
+            if level == 0:
+                return [p for p in sentence_cuts if start < p < end]
+            pattern = _CASCADE_PATTERNS[level - 1]
+            return [
+                m.end()
+                for m in pattern.finditer(text, start, end)
+                if start < m.end() < end
+            ]
+
+        def finalise(start: int, end: int, level: int) -> list[tuple[int, int]]:
+            if tokens(start, end) <= self._max_chunk_size:
+                return [(start, end)]
+            return split(start, end, level + 1)
+
+        def split(start: int, end: int, level: int) -> list[tuple[int, int]]:
+            nonlocal warned
+            if tokens(start, end) <= self._max_chunk_size:
+                return [(start, end)]
+            if level > _LAST_CASCADE_LEVEL:
+                if not warned:
+                    warned = True
+                    logger.warning(
+                        "Indivisible text run of %d chars in clause %r exceeds "
+                        "max_chunk_size (%d tokens); emitting it oversized",
+                        end - start,
+                        identifier or "<unknown>",
+                        self._max_chunk_size,
+                    )
+                return [(start, end)]
+
+            positions = cuts_for(level, start, end)
+            if not positions:
+                return split(start, end, level + 1)
+
+            pieces: list[tuple[int, int]] = []
+            current_start = start
+            current_end = start
+            for boundary in [*positions, end]:
+                if (
+                    current_end > current_start
+                    and tokens(current_start, boundary) > self._max_chunk_size
+                ):
+                    pieces.extend(finalise(current_start, current_end, level))
+                    current_start = current_end
+                current_end = boundary
+            if current_end > current_start:
+                pieces.extend(finalise(current_start, current_end, level))
+            return pieces
+
+        return split(0, len(text), 0)
 
     # ------------------------------------------------------------------
     # Oversized clause splitting
@@ -188,150 +617,283 @@ class ClauseAwareChunker:
     def _split_oversized_clause(
         self,
         clause: ParsedClause,
-        all_clauses: list[ParsedClause],
+        prefix_chars: int = 0,
     ) -> list[ParsedClause]:
-        """Split an oversized clause into smaller pieces.
+        """Split an oversized clause's **own** text into smaller pieces.
 
-        Strategy (in order):
+        Child clauses are not consulted: they are already separate
+        :class:`~lexichunk.parsers.structure.ParsedClause` objects in the flat
+        list and their text is not part of ``clause.content``.  Only this
+        clause's own content is divided, using :meth:`_split_text_cascading`
+        (sentences → semicolons → enumerators → newlines → hard word window).
 
-        1. Find child clauses in *all_clauses* whose ``parent_identifier``
-           equals ``clause.identifier``.  If children exist, return them as
-           the split pieces — they are already separate
-           :class:`~lexichunk.parsers.structure.ParsedClause` objects in the
-           flat list.
-        2. If no children (leaf clause), fall back to sentence-boundary
-           splitting.  Sentences are accumulated until ``max_chunk_size`` is
-           reached, then a synthetic
-           :class:`~lexichunk.parsers.structure.ParsedClause` is emitted for
-           each group.
+        Each returned piece is a synthetic
+        :class:`~lexichunk.parsers.structure.ParsedClause` whose ``content`` is
+        an exact slice of ``clause.content`` and whose offsets are absolute, so
+        the pieces tile the original clause's span with no gap and no overlap.
+        Pieces inherit the clause's ``level``, ``title``, ``identifier``,
+        ``parent_identifier``, ``parent_uid`` and ``document_section`` — a
+        split is a packaging decision, not a change to the document's own
+        numbering, so every piece still reads ``1.1`` in ``hierarchy``,
+        ``hierarchy_path`` and ``original_header``.  Uniqueness comes from
+        ``uid`` alone, which is suffixed ``"#p<n>"``.
 
         Args:
             clause: The oversized :class:`~lexichunk.parsers.structure.ParsedClause`.
-            all_clauses: Full flat list (used to look up children).
+            prefix_chars: Length of the ancestor-header prefix that will be
+                prepended to each piece's ``content``, counted against the
+                token budget.
 
         Returns:
-            List of :class:`~lexichunk.parsers.structure.ParsedClause` objects
-            (sub-clauses or sentence-split synthetics).
+            List of synthetic :class:`~lexichunk.parsers.structure.ParsedClause`
+            objects, or ``[clause]`` when no split point exists.
         """
-        # Note: child clauses are already in the flat list and will be
-        # processed by the main loop.  We only need to split this clause's
-        # *own* content (which excludes children's content).
-
-        # Sentence-boundary splitting.
-        sentences = re.split(r'(?<=[.!?])\s+', clause.content)
+        spans = self._split_text_cascading(
+            clause.content,
+            prefix_chars=prefix_chars,
+            identifier=clause.identifier,
+        )
+        if len(spans) <= 1:
+            return [clause]
 
         result: list[ParsedClause] = []
-        current_sentences: list[str] = []
-        current_tokens = 0
-        part_index = 0
-
-        # Compute each sentence's start offset within the original document by
-        # scanning through the clause content.  This avoids the broken arithmetic
-        # that previously produced negative char_start values.
-        content = clause.content
-        sentence_offsets: list[int] = []  # document-absolute offset per sentence
-        scan_pos = 0
-        for sentence in sentences:
-            loc = content.find(sentence, scan_pos)
-            if loc < 0:
-                loc = scan_pos  # fallback: use current scan position
-            sentence_offsets.append(clause.char_start + loc)
-            scan_pos = loc + len(sentence)
-
-        def _flush(
-            sentences_buf: list[str], start: int, end: int, part_idx: int,
-        ) -> ParsedClause:
-            text = ' '.join(sentences_buf)
-            return ParsedClause(
-                identifier=f"{clause.identifier}.__part{part_idx}",
-                title=clause.title,
-                content=text,
-                level=clause.level,
-                parent_identifier=clause.parent_identifier,
-                document_section=clause.document_section,
-                char_start=start,
-                char_end=end,
-                children=[],
-            )
-
-        group_start = clause.char_start
-
-        for i, sentence in enumerate(sentences):
-            sentence_tokens = _approx_tokens(sentence, self._chars_per_token)
-
-            if current_sentences and (current_tokens + sentence_tokens > self._max_chunk_size):
-                # Flush: char_end is the start of the current sentence.
-                group_end = sentence_offsets[i]
-                result.append(_flush(current_sentences, group_start, group_end, part_index))
-                part_index += 1
-                current_sentences = []
-                current_tokens = 0
-                group_start = sentence_offsets[i]
-
-            current_sentences.append(sentence)
-            current_tokens += sentence_tokens
-
-        # Flush any remaining sentences.
-        if current_sentences:
+        for part_index, (start, end) in enumerate(spans):
             result.append(
-                _flush(current_sentences, group_start, clause.char_end, part_index)
+                ParsedClause(
+                    identifier=clause.identifier,
+                    title=clause.title,
+                    content=clause.content[start:end],
+                    level=clause.level,
+                    parent_identifier=clause.parent_identifier,
+                    document_section=clause.document_section,
+                    char_start=clause.char_start + start,
+                    char_end=clause.char_start + end,
+                    children=[],
+                    uid=f"{clause.uid}#p{part_index}",
+                    parent_uid=clause.parent_uid,
+                )
             )
-
-        # If splitting yielded nothing useful, return the clause as-is.
-        return result if result else [clause]
+        return result
 
     # ------------------------------------------------------------------
     # Small-clause merging
     # ------------------------------------------------------------------
 
+    def _group_tokens(self, group: list[ParsedClause]) -> int:
+        """Approximate token count of a group's own text (no header prefix)."""
+        return _approx_tokens(
+            ''.join(c.content for c in group), self._chars_per_token
+        )
+
+    def _groups_can_merge(
+        self,
+        left: list[ParsedClause],
+        right: list[ParsedClause],
+    ) -> bool:
+        """Whether the adjacent groups *left* and *right* may become one chunk.
+
+        Permitted, and only these:
+
+        * two pieces of the *same* oversized clause;
+        * **(b)** ``right`` starts with a direct child of ``left``'s dominant
+          clause (a section heading plus its first sub-clause);
+        * **(a)** ``right`` starts with a sibling of ``left``'s dominant clause
+          — same ``parent_uid`` and same ``document_section`` — that is not
+          more senior than it, and they are not both container-level.
+
+        Everything else is refused: there is no correct single-valued
+        ``hierarchy_path`` / ``clause_type`` / ``document_section`` for a chunk
+        spanning, say, Confidentiality and Termination, so a short chunk is the
+        honest outcome.
+        """
+        left_dominant = self._dominant(left)
+        right_first = right[0]
+
+        # Two pieces of one oversized clause — always safe to recombine.
+        if '#' in right_first.uid and self._origin_uid(
+            left[-1]
+        ) == self._origin_uid(right_first):
+            return True
+
+        # (b) A child folded into its own immediately-preceding parent group.
+        if (
+            right_first.parent_uid is not None
+            and right_first.parent_uid == left_dominant.uid
+        ):
+            return True
+
+        # (a) Successive siblings under the same parent and section.
+        if (
+            right_first.parent_uid == left_dominant.parent_uid
+            and right_first.document_section == left_dominant.document_section
+            and right_first.level >= left_dominant.level
+            and not (
+                self._is_container(left_dominant)
+                and self._is_container(right_first)
+            )
+        ):
+            return True
+
+        return False
+
     def _merge_small_clauses(
         self,
         groups: list[list[ParsedClause]],
     ) -> list[list[ParsedClause]]:
-        """Merge groups that fall below ``min_chunk_size`` with their neighbours.
+        """Merge under-sized groups with a neighbour *where the hierarchy allows*.
 
-        Groups are lists of :class:`~lexichunk.parsers.structure.ParsedClause`
-        that will be combined into one chunk.  A small group is merged
-        *forward* into the next group when possible; if it is the last group
-        it is merged *backward* into the previous group.
+        A group is a candidate for merging when it, or the group immediately
+        before it, is below ``min_chunk_size``.  The merge happens only if
+        :meth:`_groups_can_merge` permits it **and** the combined group still
+        fits within ``max_chunk_size`` — fixing an under-run never creates an
+        over-run.  Refused merges leave a short chunk in place, which is
+        correct: ``min_chunk_size`` is a preference, hierarchy is a fact.
 
         Args:
             groups: List of clause groups (each group → one chunk).
 
         Returns:
-            Merged list of groups; each group will contain one or more
-            :class:`~lexichunk.parsers.structure.ParsedClause` objects.
+            Merged list of groups; each group contains one or more
+            :class:`~lexichunk.parsers.structure.ParsedClause` objects, in
+            document order, with the dominant clause first.
         """
         if not groups:
             return groups
 
-        def _group_tokens(group: list[ParsedClause]) -> int:
-            return _approx_tokens('\n'.join(c.content for c in group), self._chars_per_token)
-
         merged: list[list[ParsedClause]] = []
 
-        i = 0
-        while i < len(groups):
-            group = groups[i]
-            tokens = _group_tokens(group)
-
-            if tokens < self._min_chunk_size:
-                if i + 1 < len(groups):
-                    # Merge forward: combine with the next group.
-                    groups[i + 1] = group + groups[i + 1]
-                    i += 1
-                    continue
-                elif merged:
-                    # Last group: merge backward into the previous one.
-                    merged[-1].extend(group)
-                    i += 1
-                    continue
-                # Only one group total and it's small — keep it as-is.
-
+        for group in groups:
+            if merged:
+                previous = merged[-1]
+                if (
+                    self._group_tokens(previous) < self._min_chunk_size
+                    or self._group_tokens(group) < self._min_chunk_size
+                ) and self._groups_can_merge(previous, group):
+                    combined = previous + group
+                    if self._group_tokens(combined) <= self._max_chunk_size:
+                        merged[-1] = combined
+                        continue
             merged.append(group)
-            i += 1
 
         return merged
+
+    # ------------------------------------------------------------------
+    # Heading-only absorption
+    # ------------------------------------------------------------------
+
+    def _group_prefix(
+        self,
+        group: list[ParsedClause],
+        clause_map: dict[str, ParsedClause],
+    ) -> str:
+        """Return the ancestor-header prefix *group* will be emitted with."""
+        return self._content_prefix(
+            self._labelling(group),
+            clause_map,
+            frozenset(c.uid for c in group),
+        )
+
+    def _group_fits(
+        self,
+        group: list[ParsedClause],
+        clause_map: dict[str, ParsedClause],
+    ) -> bool:
+        """Whether *group*'s final ``content`` stays within ``max_chunk_size``."""
+        chars = len(self._group_prefix(group, clause_map)) + sum(
+            len(c.content) for c in group
+        )
+        return max(1, chars // self._chars_per_token) <= self._max_chunk_size
+
+    def _absorb_heading_only(
+        self,
+        groups: list[list[ParsedClause]],
+        clause_map: dict[str, ParsedClause],
+    ) -> list[list[ParsedClause]]:
+        """Fold a heading-only group into the child group that follows it.
+
+        A chunk whose whole body is heading lines — ``Article I``,
+        ``Chapter I``, ``SCHEDULE 1 — SERVICES DESCRIPTION`` — retrieves
+        nothing: it has no proposition to match a query against, and it
+        displaces the clause it announces.  Such a group is merged into the
+        group that starts with its first child, whatever their levels, as long
+        as the result still fits ``max_chunk_size``.  When it does not (the
+        child is itself a near-maximum split piece) the heading is left alone,
+        because breaking the size contract is worse than a thin chunk.
+
+        The heading's own identifier survives in ``last_merged_identifiers``,
+        so ``"Schedule 1"`` and ``"Article I"`` still resolve to the merged
+        chunk, and the chunk's ``char_start`` is the heading's — the text is
+        contiguous, nothing is dropped or duplicated.
+
+        Args:
+            groups: Clause groups in document order.
+            clause_map: Dict mapping ``uid`` → :class:`ParsedClause`.
+
+        Returns:
+            The groups with heading-only ones folded forward.
+        """
+        result: list[list[ParsedClause]] = []
+        for group in groups:
+            if (
+                result
+                and all(self._is_heading_only(c) for c in result[-1])
+                and group[0].parent_uid == result[-1][-1].uid
+                and self._group_fits(result[-1] + group, clause_map)
+            ):
+                self._absorbed_heading_uids.update(
+                    c.uid for c in result[-1]
+                )
+                result[-1] = result[-1] + group
+                continue
+            result.append(group)
+        return result
+
+    # ------------------------------------------------------------------
+    # Hard maximum enforcement
+    # ------------------------------------------------------------------
+
+    def _enforce_max(
+        self,
+        groups: list[list[ParsedClause]],
+        clause_map: dict[str, ParsedClause],
+    ) -> list[list[ParsedClause]]:
+        """Re-split any group whose final ``content`` would exceed the cap.
+
+        Runs after merging, so it also accounts for the ancestor-header prefix
+        that :meth:`_group_to_chunk` prepends.  This is the safety net that
+        makes ``max_chunk_size`` a contract rather than a hint.
+        """
+        result: list[list[ParsedClause]] = []
+        for group in groups:
+            result.extend(self._enforce_max_group(group, clause_map))
+        return result
+
+    def _enforce_max_group(
+        self,
+        group: list[ParsedClause],
+        clause_map: dict[str, ParsedClause],
+    ) -> list[list[ParsedClause]]:
+        """Return *group*, or the pieces it must be broken into to fit the cap."""
+        prefix_chars = len(self._group_prefix(group, clause_map))
+        body_chars = sum(len(c.content) for c in group)
+
+        if max(1, (prefix_chars + body_chars) // self._chars_per_token) <= (
+            self._max_chunk_size
+        ):
+            return [group]
+
+        if len(group) > 1:
+            # Undo the merge and re-check each clause on its own terms (each
+            # gets its own, generally shorter, ancestor prefix).
+            result: list[list[ParsedClause]] = []
+            for clause in group:
+                result.extend(self._enforce_max_group([clause], clause_map))
+            return result
+
+        parts = self._split_oversized_clause(group[0], prefix_chars=prefix_chars)
+        if len(parts) <= 1:
+            return [group]
+        return [[part] for part in parts]
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -342,61 +904,72 @@ class ClauseAwareChunker:
         group: list[ParsedClause],
         index: int,
         clause_map: dict[str, ParsedClause],
+        original_text: str,
     ) -> LegalChunk:
         """Convert a group of clauses into a single :class:`~lexichunk.models.LegalChunk`.
 
-        For a group spanning multiple merged clauses, their ``content`` strings
-        are concatenated with a newline separator.  ``char_start`` is taken
-        from the first clause and ``char_end`` from the last clause.
-        ``document_section`` is taken from the first clause (merged clauses are
-        expected to be siblings sharing the same section).
+        The chunk body is the **exact slice** of *original_text* from the first
+        clause's ``char_start`` to the last clause's own-text end (see
+        :meth:`_own_end`) — never a reconstruction — so no separator the source
+        does not contain is ever introduced and the span never reaches into a
+        descendant's text.  ``content`` is that body with the ancestor headers
+        prepended; ``original_header`` remains this chunk's *own* header line.
+
+        Metadata (``hierarchy``, ``hierarchy_path``, ``document_section``,
+        ``original_header``) is taken from the structurally dominant clause,
+        not blindly from ``group[0]``.
 
         Args:
             group: Non-empty list of :class:`~lexichunk.parsers.structure.ParsedClause`
-                objects to combine.
+                objects to combine, in document order.
             index: Sequential chunk index (0-based).
-            clause_map: Dict mapping ``identifier`` →
+            clause_map: Dict mapping ``uid`` →
                 :class:`~lexichunk.parsers.structure.ParsedClause`, used for
                 hierarchy path construction.
+            original_text: The document text the clause offsets refer to.
 
         Returns:
             A fully populated :class:`~lexichunk.models.LegalChunk`.
         """
         first = group[0]
         last = group[-1]
+        dominant = self._labelling(group)
 
-        raw_content = '\n'.join(c.content for c in group)
+        char_start = first.char_start
+        char_end = self._own_end(last)
+
+        if 0 <= char_start <= char_end <= len(original_text):
+            raw_content = original_text[char_start:char_end]
+        else:  # pragma: no cover — offsets out of sync with the text
+            raw_content = ''.join(c.content for c in group)
 
         hierarchy = HierarchyNode(
-            level=first.level,
-            identifier=first.identifier,
-            title=first.title,
-            parent=first.parent_identifier,
+            level=dominant.level,
+            identifier=dominant.identifier,
+            title=dominant.title,
+            parent=dominant.parent_identifier,
         )
 
-        hierarchy_path = self._build_hierarchy_path(first, clause_map)
+        hierarchy_path = self._build_hierarchy_path(dominant, clause_map)
 
         # Build original_header for this chunk's own clause.
-        if first.level == -99:
+        if dominant.level == -99:
             original_header = ""
-        elif first.title:
-            original_header = f"{first.identifier} {first.title}".strip()
+        elif dominant.title:
+            original_header = f"{dominant.identifier} {dominant.title}".strip()
         else:
-            original_header = first.identifier.strip()
+            original_header = dominant.identifier.strip()
 
-        # Collect ancestor headers (root→leaf order) and prepend to content.
-        ancestor_headers = self._collect_ancestor_headers(first, clause_map)
-        if ancestor_headers:
-            content = '\n'.join(ancestor_headers) + '\n' + raw_content
-        else:
-            content = raw_content
+        # Prepend ancestor headers (root→leaf order) for retrieval context,
+        # skipping any that the chunk's own body already spells out.
+        content = self._group_prefix(group, clause_map) + raw_content
 
         return LegalChunk(
             content=content,
             index=index,
             hierarchy=hierarchy,
             hierarchy_path=hierarchy_path,
-            document_section=first.document_section,
+            document_section=dominant.document_section,
             clause_type=ClauseType.UNKNOWN,
             jurisdiction=self._jurisdiction,
             cross_references=[],
@@ -404,51 +977,11 @@ class ClauseAwareChunker:
             defined_terms_context={},
             context_header="",
             document_id=self._document_id,
-            char_start=first.char_start,
-            char_end=last.char_end,
+            char_start=char_start,
+            char_end=char_end,
             token_count=_approx_tokens(content, self._chars_per_token),
             original_header=original_header,
         )
-
-
-    def _collect_ancestor_headers(
-        self,
-        clause: ParsedClause,
-        clause_map: dict[str, ParsedClause],
-    ) -> list[str]:
-        """Collect ancestor header lines in root→leaf order (excluding *clause* itself).
-
-        Walks up the ``parent_identifier`` chain, collects each ancestor's
-        header as ``"identifier title"`` (or just identifier if no title),
-        then reverses to produce root-first ordering.
-
-        Preamble clauses (``level == -99``) return an empty list.
-
-        Args:
-            clause: The clause whose ancestors to collect.
-            clause_map: Dict mapping ``identifier`` → :class:`ParsedClause`.
-
-        Returns:
-            List of header strings in root→leaf order.
-        """
-        if clause.level == -99:
-            return []
-
-        ancestors: list[str] = []
-        parent_id = clause.parent_identifier
-
-        while parent_id is not None:
-            parent = clause_map.get(parent_id)
-            if parent is None:
-                break
-            if parent.title:
-                ancestors.append(f"{parent.identifier} {parent.title}".strip())
-            else:
-                ancestors.append(parent.identifier.strip())
-            parent_id = parent.parent_identifier
-
-        ancestors.reverse()
-        return ancestors
 
 
 __all__ = ["ClauseAwareChunker"]

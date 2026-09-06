@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import re
+from collections import Counter
+
 import pytest
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
@@ -35,6 +38,16 @@ def _build_document(clauses: list[str]) -> str:
 _document = st.lists(_clause_text, min_size=1, max_size=10).map(_build_document)
 
 
+def _normalised_token_counts(text: str) -> Counter[str]:
+    return Counter(re.findall(r"[a-z0-9]+", text.casefold()))
+
+
+def _preserves_token_multiplicity(source: str, contents: list[str]) -> bool:
+    expected = _normalised_token_counts(source)
+    actual = _normalised_token_counts("\n".join(contents))
+    return all(actual[token] >= count for token, count in expected.items())
+
+
 # ---------------------------------------------------------------------------
 # Property: no data loss — every character in the input appears in some chunk
 # ---------------------------------------------------------------------------
@@ -46,14 +59,26 @@ class TestNoDataLoss:
         chunker = LegalChunker(jurisdiction="uk")
         chunks = chunker.chunk(doc)
         if not chunks:
-            # Empty/whitespace-only input — skip
             assume(False)
-        combined = " ".join(c.content for c in chunks)
-        # Every non-whitespace word in the original should appear in chunks.
-        for word in doc.split():
-            word_clean = word.strip()
-            if word_clean:
-                assert word_clean in combined or word_clean in doc
+        assert _preserves_token_multiplicity(doc, [chunk.content for chunk in chunks])
+
+    def test_dropped_chunk_is_detected(self) -> None:
+        doc = "\n\n".join(
+            f"{index}. uniquemarker{index} alpha bravo charlie delta"
+            for index in range(1, 7)
+        )
+        chunker = LegalChunker(
+            jurisdiction="uk",
+            max_chunk_size=10,
+            min_chunk_size=0,
+        )
+        chunks = chunker.chunk(doc)
+        assert len(chunks) > 1
+        assert _preserves_token_multiplicity(doc, [chunk.content for chunk in chunks])
+        assert not _preserves_token_multiplicity(
+            doc,
+            [chunk.content for chunk in chunks[:-1]],
+        )
 
 
 # ---------------------------------------------------------------------------
