@@ -261,11 +261,34 @@ class Section:
 class LegalChunk:
     """A single chunk of legal text with full metadata.
 
-    **Offset invariant**: ``char_start`` and ``char_end`` mark the span of this
-    clause's own text in the *original* (sanitised) document.  The ``content``
-    field may additionally prepend ancestor header lines for retrieval context,
-    so ``content`` is typically a superset of
-    ``original_text[char_start:char_end]``.
+    **``content`` is not the span, by default.** ``char_start``/``char_end``
+    mark this clause's own text in the *sanitised* document, and ``content``
+    is that slice **with the ancestor headings prepended** — so a retrieved
+    ``(b)`` still says which clause it belongs to.  ``content`` is therefore
+    normally a superset of ``sanitized_text[char_start:char_end]``, not equal
+    to it.  Measured on 60 real CUAD contracts, 51% of chunks (1,244 of
+    2,422) carried such a prefix.
+
+    This trips up anything that trusts both fields at once: highlighting a
+    retrieved passage in the source, mapping an answer span back to a page,
+    or de-duplicating against the original.  Two ways out, depending on what
+    you need:
+
+    * ``LegalChunker(include_ancestor_headers=False)`` — then ``content ==
+      sanitized_text[char_start:char_end]`` exactly, and ``original_header``
+      is empty.
+    * keep the default and slice the source yourself when you need the
+      literal span; the offsets are always correct and always index the
+      sanitised text.
+
+    Note that ``include_context_header`` does **not** control this.  That
+    flag governs the separate ``context_header`` field (``[Section: ...]
+    [Type: ...]``), which is never part of ``content``.
+
+    **Offset invariant**: the offsets are monotonic, in bounds, and index the
+    sanitised text — not the raw text the caller passed in.  For offsets into
+    the raw text, pass ``raw_offsets=True`` and read ``raw_char_start`` /
+    ``raw_char_end``.
 
     **Mutation warning**: Mutable container fields (``cross_references``,
     ``defined_terms_used``, ``defined_terms_context``) are populated by the

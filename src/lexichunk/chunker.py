@@ -90,7 +90,18 @@ class LegalChunker:
             definitions to each chunk via ``defined_terms_context``.
             Defaults to ``True``.
         include_context_header: When ``True``, populate ``context_header`` on
-            every chunk.  Defaults to ``True``.
+            every chunk.  Defaults to ``True``.  This is a *separate* field
+            and does not affect ``content``; see ``include_ancestor_headers``
+            for that.
+        include_ancestor_headers: Controls what ``chunk.content`` contains.
+            When ``True`` (the default), ``content`` is the chunk's span with
+            its ancestor headings prepended, so a retrieved sub-clause still
+            says which clause it came from — and ``content`` is therefore
+            **not** ``sanitized_text[char_start:char_end]``.  When ``False``,
+            ``content`` is exactly that slice and ``original_header`` is
+            empty, which is what you want when the offsets drive highlighting
+            or answer-span mapping in the source document.  Either way the
+            offsets themselves are correct; only ``content`` differs.
         document_id: Optional document identifier embedded in every chunk and
             in the context header.  Must be ``None`` or a ``str``; invalid
             values raise :class:`~lexichunk.exceptions.ConfigurationError`
@@ -158,6 +169,7 @@ class LegalChunker:
         min_chunk_size: int = 64,
         include_definitions: bool = True,
         include_context_header: bool = True,
+        include_ancestor_headers: bool = True,
         document_id: Optional[str] = None,
         chars_per_token: int = 4,
         extra_abbreviations: list[str] | None = None,
@@ -206,6 +218,7 @@ class LegalChunker:
             max_cache_size=max_cache_size,
             include_definitions=include_definitions,
             include_context_header=include_context_header,
+            include_ancestor_headers=include_ancestor_headers,
             enable_definition_cache=enable_definition_cache,
             extra_abbreviations=extra_abbreviations,
             extra_clause_signals=extra_clause_signals,
@@ -215,6 +228,7 @@ class LegalChunker:
         self._chars_per_token = chars_per_token
         self._include_definitions = include_definitions
         self._include_context_header = include_context_header
+        self._include_ancestor_headers = include_ancestor_headers
         if document_id is not None and not isinstance(document_id, str):
             raise ConfigurationError(
                 f"document_id must be a string or None, got {type(document_id).__name__}"
@@ -761,6 +775,7 @@ class LegalChunker:
                 document_id=doc_id,
                 chars_per_token=self._chars_per_token,
                 extra_abbreviations=self._extra_abbreviations,
+                include_ancestor_headers=self._include_ancestor_headers,
             )
             chunks = chunker.chunk(clauses, text)
             merged_identifiers = chunker.last_merged_identifiers
@@ -1462,6 +1477,7 @@ class LegalChunker:
             min_chunk_size=self._min_chunk_size,
             include_definitions=self._include_definitions,
             include_context_header=self._include_context_header,
+            include_ancestor_headers=self._include_ancestor_headers,
             document_id=self._document_id,
             chars_per_token=self._chars_per_token,
             extra_abbreviations=self._extra_abbreviations,
@@ -1530,6 +1546,7 @@ class _ChunkerConfig:
     min_chunk_size: int
     include_definitions: bool
     include_context_header: bool
+    include_ancestor_headers: bool
     document_id: str | None
     chars_per_token: int
     extra_abbreviations: list[str] | None
@@ -1551,6 +1568,7 @@ class _ChunkerConfig:
             max_cache_size=self.max_cache_size,
             include_definitions=self.include_definitions,
             include_context_header=self.include_context_header,
+            include_ancestor_headers=self.include_ancestor_headers,
             enable_definition_cache=self.enable_definition_cache,
             extra_abbreviations=self.extra_abbreviations,
             extra_clause_signals=self.extra_clause_signals,
@@ -1575,6 +1593,7 @@ def _chunk_single(
         min_chunk_size=config.min_chunk_size,
         include_definitions=config.include_definitions,
         include_context_header=config.include_context_header,
+        include_ancestor_headers=config.include_ancestor_headers,
         document_id=config.document_id,
         chars_per_token=config.chars_per_token,
         extra_abbreviations=config.extra_abbreviations,
@@ -1600,6 +1619,7 @@ def _validate_config(
     max_cache_size: object,
     include_definitions: object,
     include_context_header: object,
+    include_ancestor_headers: object,
     enable_definition_cache: object,
     extra_abbreviations: object,
     extra_clause_signals: object,
@@ -1621,6 +1641,7 @@ def _validate_config(
             longer silently clamped to 1 when out of range).
         include_definitions: Must be a ``bool``.
         include_context_header: Must be a ``bool``.
+        include_ancestor_headers: Must be a ``bool``.
         enable_definition_cache: Must be a ``bool``.
         extra_abbreviations: ``None`` or a ``list``/``tuple`` of non-empty
             ``str``.
@@ -1660,6 +1681,7 @@ def _validate_config(
     for name, value in (
         ("include_definitions", include_definitions),
         ("include_context_header", include_context_header),
+        ("include_ancestor_headers", include_ancestor_headers),
         ("enable_definition_cache", enable_definition_cache),
     ):
         if not isinstance(value, bool):

@@ -203,3 +203,45 @@ not per-call results, so reading them from one thread while another thread is
 mid-`chunk()` call is racy. When you need statistics tied to a specific call
 (e.g. from concurrent callers), use `chunk_with_metrics()` and read the
 returned `PipelineMetrics` object instead of the instance-level properties.
+
+## `content` and the offsets: what a chunk actually holds
+
+`char_start` and `char_end` mark a clause's own text in the **sanitised**
+document. `content` is that slice **with the ancestor headings prepended**:
+
+```
+char_start ────────────────────────────────► char_end
+              │ Section 4.2 Payment terms. Customer shall pay ...
+              ▼
+content = "ARTICLE IV — Fees\nSection 4.2\n" + sanitized[char_start:char_end]
+          └──────── prepended, outside the span ────────┘
+```
+
+So by default `content != sanitized_text[char_start:char_end]`. This is
+deliberate — a retrieved `(b)` that does not say which clause it belongs to
+is much harder to use — but it is a trap for anything that trusts both
+fields at once. Measured on 60 real CUAD contracts, 51% of chunks (1,244 of
+2,422) carried such a prefix, on 43% of contracts.
+
+Two exits:
+
+| You want | Use |
+|---|---|
+| `content` to be exactly the span | `LegalChunker(include_ancestor_headers=False)` |
+| the heading context, and the literal span occasionally | keep the default, slice the source yourself |
+
+With `include_ancestor_headers=False`, `content ==
+sanitized_text[char_start:char_end]` exactly and `original_header` is empty.
+Chunk **boundaries do not move** when you flip the flag — only what is
+prepended at each boundary changes — so nothing positional needs re-deriving.
+The prefix also stops counting against `max_chunk_size`, which is why the
+flag is honoured in the size accounting and not merely at the point the
+strings are joined.
+
+`include_context_header` does **not** control any of this. That flag governs
+the separate `context_header` field (`[Section: ...] [Type: ...]
+[Jurisdiction: ...]`), which is never part of `content`.
+
+Finally, the offsets index the *sanitised* text, not the raw text passed in.
+For offsets into the raw input, pass `raw_offsets=True` and read
+`raw_char_start` / `raw_char_end`.

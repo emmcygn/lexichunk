@@ -127,6 +127,10 @@ class ClauseAwareChunker:
         extra_abbreviations: Additional abbreviations (without the trailing
             dot) whose full stop must not be treated as a sentence boundary by
             the cascading splitter.
+        include_ancestor_headers: When ``True`` (the default), each chunk's
+            ``content`` is its span with the ancestor headings prepended, and
+            the prefix counts against ``max_chunk_size``.  When ``False``,
+            ``content`` is exactly ``original_text[char_start:char_end]``.
     """
 
     def __init__(
@@ -137,12 +141,14 @@ class ClauseAwareChunker:
         document_id: Optional[str] = None,
         chars_per_token: int = 4,
         extra_abbreviations: list[str] | None = None,
+        include_ancestor_headers: bool = True,
     ) -> None:
         self._jurisdiction = jurisdiction
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
         self._document_id = document_id
         self._chars_per_token = chars_per_token
+        self._include_ancestor_headers = include_ancestor_headers
         self._abbrev_pattern = _compile_abbreviations(
             DEFAULT_ABBREVIATIONS, extra_abbreviations
         )
@@ -786,7 +792,16 @@ class ClauseAwareChunker:
         group: list[ParsedClause],
         clause_map: dict[str, ParsedClause],
     ) -> str:
-        """Return the ancestor-header prefix *group* will be emitted with."""
+        """Return the ancestor-header prefix *group* will be emitted with.
+
+        Gating the prefix *here* rather than at the point it is concatenated
+        is deliberate: the same call feeds the size accounting in
+        :meth:`_group_fits` and :meth:`_split_group`, so with the prefix
+        disabled the budget must stop reserving room for it too. Otherwise
+        chunks would come out smaller than requested for no visible reason.
+        """
+        if not self._include_ancestor_headers:
+            return ""
         return self._content_prefix(
             self._labelling(group),
             clause_map,
@@ -952,8 +967,10 @@ class ClauseAwareChunker:
 
         hierarchy_path = self._build_hierarchy_path(dominant, clause_map)
 
-        # Build original_header for this chunk's own clause.
-        if dominant.level == -99:
+        # Build original_header for this chunk's own clause.  With ancestor
+        # headers disabled the caller has asked for content to be nothing but
+        # the span, so no reconstructed header text is reported at all.
+        if dominant.level == -99 or not self._include_ancestor_headers:
             original_header = ""
         elif dominant.title:
             original_header = f"{dominant.identifier} {dominant.title}".strip()
