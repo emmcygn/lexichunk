@@ -742,3 +742,111 @@ class TestH5FromDictTypeValidation:
         payload["clause_type"] = "not_a_clause_type"
         with pytest.raises(ParsingError):
             LegalChunk.from_dict(payload)
+
+
+class TestH6PossessiveDefinedTerms:
+    """H6 — the opening-quote class was unconstrained, so the apostrophe
+    inside ``Client's`` opened a quote of its own and the extractor produced
+    the bogus term ``"s Data"`` with the real definition attached to it.
+    """
+
+    @staticmethod
+    def _terms(document: str) -> dict:
+        return DefinitionsExtractor(Jurisdiction.UK).extract(document)
+
+    @staticmethod
+    def _document(body: str) -> str:
+        return f"1. DEFINITIONS\n\n{body}\n\n2. Other\n\nBody text here.\n"
+
+    @pytest.mark.parametrize(
+        "term",
+        [
+            "Client's Data",
+            "Seller's Knowledge",
+            "Purchaser's Group",
+            "Guarantor's Obligations",
+        ],
+    )
+    def test_possessive_term_is_captured_whole(self, term: str) -> None:
+        terms = self._terms(
+            self._document(f'1.1 "{term}" means the thing that it means.')
+        )
+        assert term in terms
+
+    def test_no_bogus_fragment_term_is_produced(self) -> None:
+        terms = self._terms(
+            self._document('1.1 "Client\'s Data" means the data supplied by the client.')
+        )
+        assert "s Data" not in terms
+        assert len(terms) == 1
+
+    def test_single_quoted_term_still_works(self) -> None:
+        terms = self._terms(
+            self._document("1.1 'Supplier' means the party providing the services.")
+        )
+        assert "Supplier" in terms
+
+    def test_curly_quoted_term_still_works(self) -> None:
+        terms = self._terms(
+            self._document('1.1 \u201cSupplier\u201d means the party providing services.')
+        )
+        assert "Supplier" in terms
+
+
+class TestH7DefinedTermCharacterClass:
+    r"""H7 — every term-capture group used ``[A-Za-z\s\-]``, so terms with
+    digits, ``&`` or ``+`` were dropped entirely and silently.  A document
+    defining exactly three well-formed terms returned zero.
+    """
+
+    @staticmethod
+    def _document(*definitions: str) -> str:
+        body = "\n\n".join(
+            f'1.{i + 1} "{term}" means the thing that it means.'
+            for i, term in enumerate(definitions)
+        )
+        return f"1. DEFINITIONS\n\n{body}\n\n2. Other\n\nBody text here.\n"
+
+    @pytest.mark.parametrize(
+        "term",
+        [
+            "R&D",
+            "R&D Services",
+            "C++ Code",
+            "Level 1 Support",
+            "Schedule 2 Services",
+            "Tier1",
+            "Section 409A Plan",
+        ],
+    )
+    def test_term_with_digits_or_symbols_is_extracted(self, term: str) -> None:
+        terms = DefinitionsExtractor(Jurisdiction.UK).extract(self._document(term))
+        assert term in terms
+
+    def test_the_reported_three_term_document_yields_three_terms(self) -> None:
+        document = self._document("R&D", "Level 1 Support", "C++ Code")
+        terms = DefinitionsExtractor(Jurisdiction.UK).extract(document)
+        assert set(terms) == {"R&D", "Level 1 Support", "C++ Code"}
+
+    def test_parenthesised_plural_still_registers_both_forms(self) -> None:
+        """Parentheses stay out of the term class so this pattern still wins."""
+        document = self._document("PLACEHOLDER").replace(
+            '"PLACEHOLDER"', '"Affiliate(s)"'
+        )
+        terms = DefinitionsExtractor(Jurisdiction.UK).extract(document)
+        assert "Affiliate" in terms
+        assert "Affiliates" in terms
+
+    @pytest.mark.parametrize("jurisdiction", list(Jurisdiction))
+    def test_every_jurisdiction_accepts_digits_in_a_term(
+        self, jurisdiction: Jurisdiction
+    ) -> None:
+        from lexichunk.jurisdiction import get_patterns
+
+        patterns = get_patterns(jurisdiction)
+        probe = '"Level 1 Support" means first line support.'
+        probe_single = "'Level 1 Support' means first line support."
+        assert (
+            patterns.definition.search(probe) is not None
+            or patterns.definition.search(probe_single) is not None
+        )

@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass, field
 
 from ..exceptions import ParsingError
+from .._patterns import NOT_AFTER_WORD, TERM_UPPER
 from ..models import DocumentSection
 
 _ROMAN = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
@@ -84,11 +85,13 @@ class USPatterns:
     ))
 
     definition: re.Pattern = field(default_factory=lambda: re.compile(
-        r'"([A-Z][A-Za-z\s\-]{1,60})"\s+(?:means|shall mean|has the meaning|is defined as|refers to)',
+        NOT_AFTER_WORD + rf'"({TERM_UPPER})"\s+'
+        r'(?:means|shall mean|has the meaning|is defined as|refers to)',
         re.MULTILINE
     ))
     definition_curly: re.Pattern = field(default_factory=lambda: re.compile(
-        r'\u201c([A-Z][A-Za-z\s\-]{1,60})\u201d\s+(?:means|shall mean|has the meaning)',
+        NOT_AFTER_WORD + rf'\u201c({TERM_UPPER})\u201d\s+'
+        r'(?:means|shall mean|has the meaning)',
         re.MULTILINE
     ))
 

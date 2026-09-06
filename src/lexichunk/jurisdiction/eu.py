@@ -18,6 +18,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from .._patterns import NOT_AFTER_WORD, TERM_UPPER
 from ..models import DocumentSection
 
 
@@ -69,12 +70,12 @@ class EUPatterns:
     ))
 
     definition: re.Pattern[str] = field(default_factory=lambda: re.compile(
-        r"['\u2018]([A-Z][A-Za-z\s\-]{1,60})['\u2019]\s+"
+        NOT_AFTER_WORD + rf"['\u2018]({TERM_UPPER})['\u2019]\s+"
         r"(?:means|shall mean|has the meaning|is defined as|refers to)",
         re.MULTILINE,
     ))
     definition_curly: re.Pattern[str] = field(default_factory=lambda: re.compile(
-        r'\u201c([A-Z][A-Za-z\s\-]{1,60})\u201d\s+'
+        NOT_AFTER_WORD + rf'\u201c({TERM_UPPER})\u201d\s+'
         r'(?:means|shall mean|has the meaning|is defined as|refers to)',
         re.MULTILINE,
     ))

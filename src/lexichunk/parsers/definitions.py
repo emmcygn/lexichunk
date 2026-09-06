@@ -7,6 +7,16 @@ import logging
 import re
 from typing import Union
 
+from .._patterns import (
+    CLOSE_QUOTE,
+    TERM_CHARS,
+    NOT_AFTER_WORD,
+    OPEN_QUOTE,
+    TERM_ANY,
+    TERM_ANY_SHORT,
+    TERM_LOWER,
+    TERM_UPPER,
+)
 from ..jurisdiction import get_patterns
 
 logger = logging.getLogger(__name__)
@@ -57,18 +67,20 @@ def _normalise_term(term: str) -> str:
 # Single-quote definition patterns (straight and curly).
 # ~30-40% of UK contracts use single quotes for defined terms.
 _DEFINITION_SINGLE: re.Pattern[str] = re.compile(
-    r"'([A-Z][A-Za-z\s\-]{1,60})'\s+(?:means|shall mean|has the meaning|is defined as|refers to)",
+    NOT_AFTER_WORD + rf"'({TERM_UPPER})'\s+"
+    r"(?:means|shall mean|has the meaning|is defined as|refers to)",
     re.MULTILINE,
 )
 _DEFINITION_SINGLE_CURLY: re.Pattern[str] = re.compile(
-    r"\u2018([A-Z][A-Za-z\s\-]{1,60})\u2019\s+(?:means|shall mean|has the meaning|is defined as|refers to)",
+    NOT_AFTER_WORD + rf"\u2018({TERM_UPPER})\u2019\s+"
+    r"(?:means|shall mean|has the meaning|is defined as|refers to)",
     re.MULTILINE,
 )
 
 # "shall have the meaning" form (straight + curly quotes).
 # e.g. "Term" shall have the meaning set forth in Section 1.1
 _DEFINITION_SHALL_HAVE_MEANING: re.Pattern[str] = re.compile(
-    r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]\s+shall have the meaning',
+    NOT_AFTER_WORD + rf'["\u201c]({TERM_UPPER})["\u201d]\s+shall have the meaning',
     re.MULTILINE,
 )
 
@@ -77,24 +89,24 @@ _DEFINITION_SHALL_HAVE_MEANING: re.Pattern[str] = re.compile(
 # e.g. (the "Effective Date")
 # First, find parenthetical groups that contain at least one quoted term.
 _INLINE_PAREN_GROUP: re.Pattern[str] = re.compile(
-    r'\([^)]*?["\u201c][A-Z][A-Za-z\s\-]{1,60}["\u201d][^)]*?\)',
+    rf'\([^)]*?["\u201c]{TERM_UPPER}["\u201d][^)]*?\)',
     re.MULTILINE,
 )
 # Then, extract individual quoted terms within a parenthetical group.
 _INLINE_PAREN_TERM: re.Pattern[str] = re.compile(
-    r'["\u201c]([A-Z][A-Za-z\s\-]{1,60})["\u201d]',
+    NOT_AFTER_WORD + rf'["\u201c]({TERM_UPPER})["\u201d]',
 )
 
 # Lowercase-article definitions (straight and single quotes).
 # e.g. "the Company" means..., 'the Supplier' means...
 # Captures the full term including the article ("the Company", not "Company").
 _DEFINITION_ARTICLE: re.Pattern[str] = re.compile(
-    r'["\u201c](the\s+[A-Z][A-Za-z\s\-]{1,60})["\u201d]\s+'
+    NOT_AFTER_WORD + rf'["\u201c](the\s+{TERM_UPPER})["\u201d]\s+'
     r'(?:means|shall mean|has the meaning|is defined as|refers to)',
     re.MULTILINE,
 )
 _DEFINITION_ARTICLE_SINGLE: re.Pattern[str] = re.compile(
-    r"['\u2018](the\s+[A-Z][A-Za-z\s\-]{1,60})['\u2019]\s+"
+    NOT_AFTER_WORD + rf"['\u2018](the\s+{TERM_UPPER})['\u2019]\s+"
     r"(?:means|shall mean|has the meaning|is defined as|refers to)",
     re.MULTILINE,
 )
@@ -106,7 +118,8 @@ _DEFINITION_ARTICLE_SINGLE: re.Pattern[str] = re.compile(
 # allows an optional lowercase article before the uppercase term.
 _DEFINITION_HEREINAFTER: re.Pattern[str] = re.compile(
     r'(?i:hereinafter\s+(?:referred\s+to\s+as|called|known\s+as))\s+'
-    r'["\u201c]((?:the\s+)?[A-Z][A-Za-z\s\-]{1,60})["\u201d]',
+    + NOT_AFTER_WORD
+    + rf'["\u201c]((?:the\s+)?{TERM_UPPER})["\u201d]',
     re.MULTILINE,
 )
 
@@ -115,7 +128,7 @@ _DEFINITION_HEREINAFTER: re.Pattern[str] = re.compile(
 # Most contracts capitalise defined terms, but not all; without this pattern
 # the term is invisible rather than merely mis-cased (D27).
 _DEFINITION_LOWERCASE: re.Pattern[str] = re.compile(
-    r"[\"'“‘]([a-z][A-Za-z\s\-]{1,60})[\"'”’]\s+"
+    NOT_AFTER_WORD + rf"{OPEN_QUOTE}({TERM_LOWER}){CLOSE_QUOTE}\s+"
     r"(?:means|shall mean|has the meaning|is defined as|refers to)",
     re.MULTILINE,
 )
@@ -124,8 +137,8 @@ _DEFINITION_LOWERCASE: re.Pattern[str] = re.compile(
 # The canonical term is the singular stem; the plural form is registered as an
 # alias so downstream whole-word matching finds both (D27).
 _DEFINITION_PAREN_PLURAL: re.Pattern[str] = re.compile(
-    r"[\"'“‘]([A-Za-z][A-Za-z\s\-]{0,60})\((s|es)\)"
-    r"[\"'”’]\s+"
+    NOT_AFTER_WORD + rf"{OPEN_QUOTE}({TERM_ANY_SHORT})\((s|es)\)"
+    rf"{CLOSE_QUOTE}\s+"
     r"(?:means|shall mean|has the meaning|is defined as|refers to)",
     re.MULTILINE,
 )
@@ -137,17 +150,17 @@ _DEFINITION_PAREN_PLURAL: re.Pattern[str] = re.compile(
 #      "Party" and collectively as the "Parties."
 _DEFINITION_INDIVIDUALLY_COLLECTIVELY: re.Pattern[str] = re.compile(
     r"individually\s+as\s+(?:an?|the)\s+"
-    r"[\"'“‘]([A-Za-z][A-Za-z\s\-]{1,60})[.,]?[\"'”’]"
+    + NOT_AFTER_WORD + rf"{OPEN_QUOTE}({TERM_ANY})[.,]?{CLOSE_QUOTE}"
     r"[^\"'“”‘’]{0,80}?"
     r"collectively\s+as\s+(?:an?|the)\s+"
-    r"[\"'“‘]([A-Za-z][A-Za-z\s\-]{1,60})[.,]?[\"'”’]",
+    + NOT_AFTER_WORD + rf"{OPEN_QUOTE}({TERM_ANY})[.,]?{CLOSE_QUOTE}",
     re.IGNORECASE | re.MULTILINE,
 )
 
 # Parenthetical back-reference definitions.
 # e.g. the Borrower (as defined in Section 1.1)
 _PARENTHETICAL_BACKREF: re.Pattern[str] = re.compile(
-    r'the\s+([A-Z][A-Za-z\s\-]{1,60}?)\s*\(\s*as\s+defined\s+in\b',
+    rf'the\s+([A-Z][{TERM_CHARS}]{{1,60}}?)\s*\(\s*as\s+defined\s+in\b',
     re.MULTILINE,
 )
 
