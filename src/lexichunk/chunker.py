@@ -28,7 +28,7 @@ import unicodedata
 from collections import OrderedDict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Iterator, Optional
+from typing import Any, Iterator, Optional
 
 logger = logging.getLogger(__name__)
 

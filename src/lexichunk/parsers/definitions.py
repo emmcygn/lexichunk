@@ -9,11 +9,11 @@ from typing import Union
 
 from .._patterns import (
     CLOSE_QUOTE,
-    TERM_CHARS,
     NOT_AFTER_WORD,
     OPEN_QUOTE,
     TERM_ANY,
     TERM_ANY_SHORT,
+    TERM_CHARS,
     TERM_LOWER,
     TERM_UPPER,
 )

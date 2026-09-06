@@ -5,8 +5,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from ..exceptions import ParsingError
 from .._patterns import NOT_AFTER_WORD, TERM_UPPER
+from ..exceptions import ParsingError
 from ..models import DocumentSection
 
 _ROMAN = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
