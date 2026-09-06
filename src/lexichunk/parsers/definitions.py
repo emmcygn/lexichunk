@@ -340,7 +340,7 @@ class DefinitionsExtractor:
                 r"(\d+\.\d+\.\d+)\.?\s+\S"   # level 2
                 r"|(\d+\.\d+)\.?\s+\S"        # level 1
                 r"|(\d+)\.?\s+[A-Z]\S"        # level 0
-                r"|Schedule\s+\d+"            # level -1
+                r"|(Schedule\s+\d+)"          # level -1
                 r")",
                 re.MULTILINE,
             )
