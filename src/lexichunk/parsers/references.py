@@ -157,8 +157,120 @@ _RANGE_TAIL = re.compile(
 )
 
 # Upper bound on how many references a single range may expand to.  Guards
-# against pathological input like "Sections 1 to 100000".
-_MAX_RANGE_EXPANSION = 64
+# against pathological input like "Sections 1 to 100000", and bounds the blast
+# radius of any range the heuristics below still get wrong.
+_MAX_RANGE_EXPANSION = 20
+
+# The explicit range words.  When one of these joins the two bounds the phrase
+# is unambiguously a range and no further checks apply.
+_EXPLICIT_RANGE_RE = re.compile(r'\s+(?:to|through|thru)\s+', re.IGNORECASE)
+
+# Words that, immediately after the upper bound, show the second number was a
+# quantity or a date rather than a clause identifier: "clause 12 - 30 days",
+# "Clause 9 - 15 January 2025".
+_QUANTITY_FOLLOWERS = frozenset({
+    'day', 'days', 'week', 'weeks', 'month', 'months', 'year', 'years',
+    'hour', 'hours', 'minute', 'minutes', 'second', 'seconds',
+    'business', 'working', 'calendar', 'copy', 'copies', 'counterpart',
+    'counterparts', 'percent', 'per', 'cent',
+    'january', 'february', 'march', 'april', 'may', 'june', 'july',
+    'august', 'september', 'october', 'november', 'december',
+})
+
+_FIRST_WORD_RE = re.compile(r'[A-Za-z]+')
+
+# Number of alphabetic words inside an enclosing parenthesis that make it a
+# prose aside rather than a bare citation.
+_PAREN_PROSE_WORDS = 3
+
+
+def _paren_encloses_prose(text: str, start: int, end: int) -> bool:
+    """Return ``True`` when ``text[start:end]`` sits inside a prose aside.
+
+    A parenthesis that also carries several words of running text is an aside
+    ("(see clause 12 - which we discuss below - 30)"), and a dash inside one
+    is punctuation, not a range operator.
+
+    Args:
+        text: The text being scanned.
+        start: Start offset of the candidate range phrase.
+        end: End offset of the candidate range phrase.
+
+    Returns:
+        ``True`` when the phrase is inside such a parenthesis.
+    """
+    open_index = text.rfind('(', 0, start)
+    if open_index == -1 or ')' in text[open_index:start]:
+        return False
+    close_index = text.find(')', end)
+    if close_index == -1:
+        return False
+    inner = text[open_index + 1:close_index]
+    words = [word for word in re.findall(r'[A-Za-z]+', inner)]
+    return len(words) >= _PAREN_PROSE_WORDS
+
+
+def _is_range_operator(
+    text: str,
+    head_start: int,
+    head_raw: str,
+    range_match: re.Match[str],
+) -> bool:
+    """Return ``True`` when a matched range tail really joins two identifiers.
+
+    ``_RANGE_TAIL`` accepts both the explicit form (``"3 to 7"``) and the bare
+    dash (``"3 - 7"``).  The bare dash is also ordinary legal punctuation — a
+    parenthetical aside — so treating every one as a range operator fabricated
+    large numbers of plausible-looking references:
+
+    * ``"The notice period in clause 12 - 30 days - shall apply"`` produced 19
+      references, clauses 12 through 30;
+    * ``"Refer to Schedule 1 - 5 copies must be provided"`` produced 5
+      schedule references, where the ``5`` is a copy count;
+    * ``"Clause 9 - 15 January 2025 is the deadline"`` produced 7 references
+      from a date.
+
+    The explicit ``to``/``through``/``thru`` form is always accepted.  A bare
+    dash is accepted only when the citation is written the way a real range is
+    written — a plural label (``"clauses 3 - 5"``) or a tight, unspaced dash
+    (``"Clauses 3.2-3.4"``) — the upper bound is not followed by a quantity or
+    month word, and the phrase is not inside a parenthesised prose aside.
+    Same-shape and ascending-order checks live in
+    :meth:`ReferenceDetector._expand_range` and still apply on top of this.
+
+    Args:
+        text: The full text being scanned.
+        head_start: Offset where the head reference match began.
+        head_raw: The head match's own text (e.g. ``"clauses 3"``).
+        range_match: The matched range tail.
+
+    Returns:
+        ``True`` to treat the tail as a range operator.
+    """
+    joiner = range_match.group(0)[: range_match.start(1) - range_match.start()]
+    if _EXPLICIT_RANGE_RE.fullmatch(joiner):
+        return True
+
+    # A range needs a label to range over; a bare number head ("12 - 30") is
+    # never enough evidence.
+    label = _FIRST_WORD_RE.search(head_raw)
+    if label is None:
+        return False
+
+    plural_label = label.group(0).lower().endswith('s')
+    tight_dash = not any(character.isspace() for character in joiner)
+    if not (plural_label or tight_dash):
+        return False
+
+    following = _FIRST_WORD_RE.search(text, range_match.end())
+    if (
+        following is not None
+        and following.start() <= range_match.end() + 1
+        and following.group(0).lower() in _QUANTITY_FOLLOWERS
+    ):
+        return False
+
+    return not _paren_encloses_prose(text, head_start, range_match.end())
 
 
 def normalise_kind(label: str) -> str:
@@ -323,6 +435,10 @@ class ReferenceDetector:
 
                 # Ranges: "clauses 3 to 7", "Sections 2.1 through 2.4".
                 range_match = _RANGE_TAIL.match(text, tail_pos)
+                if range_match is not None and not _is_range_operator(
+                    text, match.start(), raw_text, range_match
+                ):
+                    range_match = None
                 if range_match is not None:
                     expanded = self._expand_range(
                         target_identifier, range_match.group(1)

@@ -567,3 +567,61 @@ class TestH3DocumentSectionClassification:
         clause = [c for c in chunks if c.hierarchy.title == "Execution of Services"]
         assert len(clause) == 1
         assert clause[0].document_section is DocumentSection.OPERATIVE
+
+
+class TestH4DashRangeFalsePositives:
+    """H4 — every bare ``-``/``–``/``—`` before a number was read as a range
+    operator, so an ordinary parenthetical dash fabricated large numbers of
+    plausible-looking cross-references.
+    """
+
+    @staticmethod
+    def _ids(sentence: str, jurisdiction: Jurisdiction = Jurisdiction.UK):
+        from lexichunk.parsers.references import detect_references
+
+        return [r.target_identifier for r in detect_references(sentence, jurisdiction)]
+
+    @pytest.mark.parametrize(
+        ("sentence", "expected"),
+        [
+            ("The notice period in clause 12 - 30 days - shall apply.", ["12"]),
+            ("The notice period in clause 12 \u2013 30 days \u2013 shall apply.", ["12"]),
+            ("Refer to Schedule 1 - 5 copies must be provided.", ["1"]),
+            ("Clause 9 \u2013 15 January 2025 is the deadline.", ["9"]),
+            ("Clause 4 - 6 months from the Effective Date.", ["4"]),
+            ("(see clause 3 - which we discuss below - 7)", ["3"]),
+        ],
+    )
+    def test_parenthetical_dash_is_not_a_range(self, sentence, expected) -> None:
+        assert self._ids(sentence) == expected
+
+    @pytest.mark.parametrize(
+        ("sentence", "expected"),
+        [
+            ("See clauses 3 to 5 for details.", ["3", "4", "5"]),
+            ("See clauses 3 - 5 for details.", ["3", "4", "5"]),
+            ("See clauses 3-5 for details.", ["3", "4", "5"]),
+            ("as set out in Clauses 3.2\u20133.4", ["3.2", "3.3", "3.4"]),
+            ("as set out in Clauses 3.2\u20143.4", ["3.2", "3.3", "3.4"]),
+            ("see Schedules 1 to 3", ["1", "2", "3"]),
+            ("see clauses 8 to 11", ["8", "9", "10", "11"]),
+        ],
+    )
+    def test_real_ranges_still_expand(self, sentence, expected) -> None:
+        assert self._ids(sentence) == expected
+
+    def test_dotted_through_range_still_expands(self) -> None:
+        assert self._ids(
+            "pursuant to Sections 2.1 through 2.4", Jurisdiction.US
+        ) == ["2.1", "2.2", "2.3", "2.4"]
+
+    def test_expansion_is_capped_at_twenty_members(self) -> None:
+        from lexichunk.parsers.references import _MAX_RANGE_EXPANSION
+
+        assert _MAX_RANGE_EXPANSION == 20
+        assert len(self._ids("see clauses 1 to 20")) == 20
+        assert self._ids("see clauses 1 to 21") == ["1"]
+
+    def test_bare_number_head_never_starts_a_dash_range(self) -> None:
+        """'never expand across a missing head' — no label, no range."""
+        assert "13" not in self._ids("The figure 12 - 30 was agreed.")
