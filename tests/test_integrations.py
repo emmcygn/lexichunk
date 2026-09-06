@@ -384,19 +384,22 @@ def test_llama_index_metadata_jurisdiction_value(llama_nodes):
 
 @llama_index_required
 def test_llama_index_get_nodes_from_documents(llama_parser):
-    """get_nodes_from_documents accepts a mock document with a .text attribute."""
+    """get_nodes_from_documents accepts a real llama_index Document."""
+    from llama_index.core.schema import Document as LIDocument
 
-    class _MockDocument:
-        text = SAMPLE_UK
-
-    nodes = llama_parser.get_nodes_from_documents([_MockDocument()])
+    nodes = llama_parser.get_nodes_from_documents([LIDocument(text=SAMPLE_UK)])
     assert isinstance(nodes, list)
     assert len(nodes) > 0
 
 
 @llama_index_required
 def test_llama_index_get_nodes_from_documents_bad_object(llama_parser):
-    """get_nodes_from_documents raises AttributeError for an incompatible object."""
+    """get_nodes_from_documents raises AttributeError for an incompatible object.
+
+    LegalNodeParser now subclasses the real llama_index NodeParser, whose
+    get_nodes_from_documents() builds a {doc.id_: doc} map before parsing —
+    an object without an `.id_` attribute fails there.
+    """
 
     class _BadDocument:
         pass
