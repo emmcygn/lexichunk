@@ -27,19 +27,22 @@ import concurrent.futures.process
 import hashlib
 import logging
 import os
+import pickle
 import re
 import sys
 import threading
 import time
 import unicodedata
+from bisect import bisect_left, bisect_right
 from collections import OrderedDict
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Iterator, Optional
+from typing import Any, Callable, Iterator, Literal, Optional, overload
 
 logger = logging.getLogger(__name__)
 
-from .enrichment.clause_type import ClauseTypeClassifier
+from .documents import build_document
+from .enrichment.clause_type import ClassificationResult, ClauseTypeClassifier
 from .enrichment.context import ContextEnricher
 from .exceptions import ConfigurationError, InputError
 from .metrics import PipelineMetrics, StageMetric
@@ -52,12 +55,21 @@ from .models import (
     HierarchyNode,
     Jurisdiction,
     LegalChunk,
+    Section,
 )
+from .offsets import OffsetMap, sanitize_with_map
 from .parsers.definitions import DefinitionsExtractor
 from .parsers.references import ReferenceDetector, resolve_references
-from .parsers.structure import StructureParser
+from .parsers.structure import ParsedClause, StructureParser
 from .strategies.clause_aware import ClauseAwareChunker
 from .strategies.fallback import FallbackChunker
+
+#: Signature of the optional low-confidence classification hook.  It is
+#: handed the chunk and the keyword scorer's own
+#: :class:`~lexichunk.enrichment.clause_type.ClassificationResult`, and
+#: returns a replacement :class:`~lexichunk.models.ClauseType` or ``None``
+#: to keep the keyword verdict.
+ClassificationHook = Callable[[LegalChunk, ClassificationResult], Optional[ClauseType]]
 
 
 class LegalChunker:
@@ -88,7 +100,18 @@ class LegalChunker:
             definitions to each chunk via ``defined_terms_context``.
             Defaults to ``True``.
         include_context_header: When ``True``, populate ``context_header`` on
-            every chunk.  Defaults to ``True``.
+            every chunk.  Defaults to ``True``.  This is a *separate* field
+            and does not affect ``content``; see ``include_ancestor_headers``
+            for that.
+        include_ancestor_headers: Controls what ``chunk.content`` contains.
+            When ``True`` (the default), ``content`` is the chunk's span with
+            its ancestor headings prepended, so a retrieved sub-clause still
+            says which clause it came from — and ``content`` is therefore
+            **not** ``sanitized_text[char_start:char_end]``.  When ``False``,
+            ``content`` is exactly that slice and ``original_header`` is
+            empty, which is what you want when the offsets drive highlighting
+            or answer-span mapping in the source document.  Either way the
+            offsets themselves are correct; only ``content`` differs.
         document_id: Optional document identifier embedded in every chunk and
             in the context header.  Must be ``None`` or a ``str``; invalid
             values raise :class:`~lexichunk.exceptions.ConfigurationError`
@@ -115,6 +138,30 @@ class LegalChunker:
             Defaults to ``True``.
         max_cache_size: Maximum number of documents held in that cache.
             Eviction is least-recently-used.  Defaults to 128.
+        classification_hook: Optional callable
+            ``(chunk, result) -> ClauseType | None`` invoked after Stage 4
+            for every chunk the keyword scorer was unsure about — this is
+            the seam for an LLM (or a bespoke model) that you only want to
+            pay for on the hard cases.  It receives the chunk and the
+            scorer's own
+            :class:`~lexichunk.enrichment.clause_type.ClassificationResult`,
+            including the per-clause-type ``scores`` mapping.  Return
+            ``None`` to keep the keyword verdict; return a
+            :class:`~lexichunk.models.ClauseType` to replace
+            ``clause_type`` and set ``classification_source`` to
+            ``"hook"``.  ``classification_confidence`` is left as the
+            keyword scorer computed it, so the number stays comparable
+            across a corpus.  Must be picklable to be used with
+            ``chunk_batch(workers>1)``; a lambda or closure raises
+            :class:`~lexichunk.exceptions.ConfigurationError` up front
+            rather than breaking the worker pool.
+        classification_hook_threshold: Confidence *strictly below* which a
+            chunk is offered to *classification_hook*.  Defaults to 0.5;
+            ``0.0`` never fires the hook, ``1.0`` offers every chunk.
+            Note that ``classification_confidence`` is a saturation-scaled
+            margin, not a calibrated probability — see
+            :class:`~lexichunk.enrichment.clause_type.ClassificationResult`
+            before picking a value.
 
     Example::
 
@@ -148,12 +195,15 @@ class LegalChunker:
         min_chunk_size: int = 64,
         include_definitions: bool = True,
         include_context_header: bool = True,
+        include_ancestor_headers: bool = True,
         document_id: Optional[str] = None,
         chars_per_token: int = 4,
         extra_abbreviations: list[str] | None = None,
         extra_clause_signals: dict[ClauseType, list[str]] | None = None,
         enable_definition_cache: bool = True,
         max_cache_size: int = 128,
+        classification_hook: ClassificationHook | None = None,
+        classification_hook_threshold: float = 0.5,
     ) -> None:
         # Normalise jurisdiction: Jurisdiction enum, then a stripped/lowered
         # str looked up first against the enum, then the registry.  A
@@ -194,6 +244,7 @@ class LegalChunker:
             max_cache_size=max_cache_size,
             include_definitions=include_definitions,
             include_context_header=include_context_header,
+            include_ancestor_headers=include_ancestor_headers,
             enable_definition_cache=enable_definition_cache,
             extra_abbreviations=extra_abbreviations,
             extra_clause_signals=extra_clause_signals,
@@ -203,6 +254,7 @@ class LegalChunker:
         self._chars_per_token = chars_per_token
         self._include_definitions = include_definitions
         self._include_context_header = include_context_header
+        self._include_ancestor_headers = include_ancestor_headers
         if document_id is not None and not isinstance(document_id, str):
             raise ConfigurationError(
                 f"document_id must be a string or None, got {type(document_id).__name__}"
@@ -212,6 +264,10 @@ class LegalChunker:
         self._extra_clause_signals = validated_signals
         self._enable_definition_cache = enable_definition_cache
         self._max_cache_size = max_cache_size
+        self._classification_hook = _validate_classification_hook(
+            classification_hook, classification_hook_threshold
+        )
+        self._classification_hook_threshold = classification_hook_threshold
         self._definition_cache: OrderedDict[str, dict[str, DefinedTerm]] = OrderedDict()
         self._cache_lock = threading.Lock()
         self._last_cross_ref_stats: dict[str, int | float] = {}
@@ -281,11 +337,51 @@ class LegalChunker:
         """
         return LegalChunker._sanitize_input(text)
 
+    @staticmethod
+    def sanitize_with_map(text: str) -> tuple[str, OffsetMap]:
+        """Sanitise *text* and return the offset map back to the raw input.
+
+        Same output string as :meth:`sanitize`, plus an
+        :class:`~lexichunk.offsets.OffsetMap` that converts between
+        sanitised offsets (what every ``LegalChunk.char_start`` /
+        ``char_end`` refers to) and offsets into the string you passed in.
+
+        Use this when you need to point at the original file — highlighting
+        a chunk in a source viewer, citing back into a PDF text layer,
+        producing a redline against the untouched bytes.  If you only want
+        the offsets on the chunks themselves, pass ``raw_offsets=True`` to
+        :meth:`chunk` instead and read ``raw_char_start``/``raw_char_end``.
+
+        Args:
+            text: Raw input text.
+
+        Returns:
+            ``(sanitised_text, offset_map)``.
+
+        Raises:
+            TypeError: If *text* is not a ``str``.
+
+        Example::
+
+            sanitised, offsets = LegalChunker.sanitize_with_map(raw)
+            chunk = chunker.chunk(raw)[0]
+            start, end = offsets.to_raw_span(chunk.char_start, chunk.char_end)
+            assert LegalChunker.sanitize(raw[start:end]) == \\
+                sanitised[chunk.char_start:chunk.char_end]
+        """
+        return sanitize_with_map(text)
+
     # ------------------------------------------------------------------
     # Primary public API
     # ------------------------------------------------------------------
 
-    def chunk(self, text: str, document_id: Optional[str] = None) -> list[LegalChunk]:
+    def chunk(
+        self,
+        text: str,
+        document_id: Optional[str] = None,
+        *,
+        raw_offsets: bool = False,
+    ) -> list[LegalChunk]:
         """Chunk a legal document into enriched :class:`~lexichunk.models.LegalChunk` objects.
 
         Runs the full pipeline:
@@ -303,6 +399,13 @@ class LegalChunker:
             document_id: Override ``document_id`` for this call.  Falls back
                 to the value passed to ``__init__``.  Must be ``None`` or a
                 ``str``.
+            raw_offsets: When ``True``, also populate ``raw_char_start`` and
+                ``raw_char_end`` on every chunk with offsets into *text* as
+                you passed it in, before sanitisation stripped the BOM,
+                folded CRLF, dropped null bytes and applied NFC.  They stay
+                at their ``-1`` sentinel otherwise.  See
+                :meth:`sanitize_with_map` for the mapping this uses and for
+                the run-boundary semantics it guarantees.
 
         Returns:
             List of :class:`~lexichunk.models.LegalChunk` objects in document
@@ -319,11 +422,17 @@ class LegalChunker:
                 Both subclass ``ValueError``, so a bare
                 ``except ValueError`` catches either.
         """
-        chunks, _ = self._run_pipeline(text, document_id, collect_metrics=False)
+        chunks, _ = self._run_pipeline(
+            text, document_id, collect_metrics=False, raw_offsets=raw_offsets
+        )
         return chunks
 
     def chunk_with_metrics(
-        self, text: str, document_id: Optional[str] = None
+        self,
+        text: str,
+        document_id: Optional[str] = None,
+        *,
+        raw_offsets: bool = False,
     ) -> tuple[list[LegalChunk], PipelineMetrics]:
         """Chunk a legal document and return pipeline metrics.
 
@@ -337,11 +446,15 @@ class LegalChunker:
             text: Full legal document as a plain-text string.
             document_id: Override ``document_id`` for this call.  Falls back
                 to the value passed to ``__init__``.
+            raw_offsets: As for :meth:`chunk` — populate
+                ``raw_char_start``/``raw_char_end`` on every chunk.
 
         Returns:
             A ``(chunks, metrics)`` tuple.
         """
-        chunks, metrics = self._run_pipeline(text, document_id, collect_metrics=True)
+        chunks, metrics = self._run_pipeline(
+            text, document_id, collect_metrics=True, raw_offsets=raw_offsets
+        )
         # metrics is guaranteed non-None when collect_metrics=True; cast for
         # type checkers without relying on assert (stripped by python -O).
         return chunks, metrics  # type: ignore[return-value]
@@ -355,6 +468,7 @@ class LegalChunker:
         text: str,
         document_id: Optional[str],
         collect_metrics: bool,
+        raw_offsets: bool = False,
     ) -> tuple[list[LegalChunk], PipelineMetrics | None]:
         """Run the full chunking pipeline.
 
@@ -363,6 +477,8 @@ class LegalChunker:
             document_id: Override document ID for this call.
             collect_metrics: When ``True``, time each stage and return
                 :class:`PipelineMetrics`.
+            raw_offsets: When ``True``, track the sanitisation offset map and
+                populate ``raw_char_start``/``raw_char_end`` on every chunk.
 
         Returns:
             ``(chunks, metrics)`` — *metrics* is ``None`` when
@@ -391,7 +507,11 @@ class LegalChunker:
                 f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
             )
 
-        text = self._sanitize_input(text)
+        offset_map: OffsetMap | None = None
+        if raw_offsets:
+            text, offset_map = sanitize_with_map(text)
+        else:
+            text = self._sanitize_input(text)
 
         if not text or not text.strip():
             self._last_cross_ref_stats = {"total": 0, "resolved": 0, "rate": 1.0}
@@ -425,7 +545,6 @@ class LegalChunker:
                 f"document_id must be a string or None, got {type(document_id).__name__}"
             )
         doc_id = document_id if document_id is not None else self._document_id
-        fallback_used = False
 
         # ------------------------------------------------------------------
         # Stage 1: Structure parsing
@@ -436,6 +555,7 @@ class LegalChunker:
             logger.debug("Stage 1: structure_parsing — start")
             t0 = time.perf_counter()
         clauses = self._structure_parser.parse(text)
+        heading_candidates_rejected = self._structure_parser.last_rejected_headings
         if collect_metrics:
             elapsed = (time.perf_counter() - t0) * 1000
             logger.debug(
@@ -443,6 +563,210 @@ class LegalChunker:
                 len(clauses), elapsed,
             )
             stage_metrics.append(StageMetric("structure_parsing", elapsed, len(clauses)))
+
+        return self._run_stages(
+            text,
+            clauses,
+            doc_id,
+            collect_metrics=collect_metrics,
+            pipeline_start=pipeline_start,
+            stage_metrics=stage_metrics,
+            input_chars=input_chars,
+            heading_candidates_rejected=heading_candidates_rejected,
+            raw_span=offset_map.to_raw_span if offset_map is not None else None,
+        )
+
+    # ------------------------------------------------------------------
+    # Pre-parsed structure entry point
+    # ------------------------------------------------------------------
+
+    @overload
+    def chunk_documents(
+        self,
+        sections: Sequence[Section] | Sequence[ParsedClause],
+        *,
+        document_id: Optional[str] = ...,
+        return_metrics: Literal[False] = ...,
+    ) -> list[LegalChunk]: ...
+
+    @overload
+    def chunk_documents(
+        self,
+        sections: Sequence[Section] | Sequence[ParsedClause],
+        *,
+        document_id: Optional[str] = ...,
+        return_metrics: Literal[True],
+    ) -> tuple[list[LegalChunk], PipelineMetrics]: ...
+
+    def chunk_documents(
+        self,
+        sections: Sequence[Section] | Sequence[ParsedClause],
+        *,
+        document_id: Optional[str] = None,
+        return_metrics: bool = False,
+    ) -> list[LegalChunk] | tuple[list[LegalChunk], PipelineMetrics]:
+        """Chunk a document whose structure you already have.
+
+        Runs stages 2–8 — chunking, cross-reference detection,
+        classification, context headers, defined terms, resolution — on
+        structure supplied by an *external* parser, skipping lexichunk's own
+        line-based heading detection entirely.
+
+        This is the "after Docling, not instead of Docling" path.  A PDF's
+        own layout, or a DOCX's own outline, records where the headings were;
+        flattening that to text and re-detecting headings throws the
+        information away and then guesses at it.  When you have it, hand it
+        over.
+
+        Input is either a sequence of :class:`~lexichunk.models.Section`
+        records — the usual case, and what
+        :mod:`lexichunk.ingestion` produces — or a sequence of ready-made
+        :class:`~lexichunk.parsers.structure.ParsedClause` objects, for a
+        caller who has written a full parser of their own.  The two must not
+        be mixed in one call.
+
+        A document text is reconstructed from the sections, with a header
+        line per section and a blank line between them, and each clause's
+        ``content`` is the exact slice of it that the clause owns.  Every
+        invariant ``chunk()`` guarantees therefore still holds: chunk bodies
+        are literal slices, spans tile without overlap, ``max_chunk_size`` is
+        a hard cap.  ``chunk.char_start``/``char_end`` index that
+        reconstructed text, **not** your original source.  To get back to the
+        source, give each section a ``char_start``/``char_end`` — when all of
+        them carry both, ``raw_char_start``/``raw_char_end`` are populated on
+        every chunk.
+
+        Args:
+            sections: The structure to chunk, in document order.
+            document_id: Override ``document_id`` for this call.  Falls back
+                to the value passed to ``__init__``.
+            return_metrics: When ``True``, return
+                ``(chunks, PipelineMetrics)`` instead of just the chunks.
+                A flag rather than a second ``chunk_with_metrics_documents``
+                method: the metrics are the same object
+                :meth:`chunk_with_metrics` returns, and the call already
+                takes keyword-only arguments, so a flag keeps one entry point
+                instead of two names that would have to stay in step.
+                ``PipelineMetrics.clause_count`` is the number of sections
+                you supplied and ``heading_candidates_rejected`` is ``0``,
+                because no heading detection ran.
+
+        Returns:
+            The chunks, or ``(chunks, metrics)`` when *return_metrics* is
+            ``True``.
+
+        Raises:
+            InputError: If *sections* is not a sequence, is empty, mixes
+                record types, contains an invalid record, or *document_id*
+                is not ``None``/``str``.
+
+        Example::
+
+            from lexichunk import LegalChunker
+            from lexichunk.ingestion import from_markdown
+
+            chunker = LegalChunker(jurisdiction="uk")
+            chunks = chunker.chunk_documents(from_markdown(markdown_text))
+        """
+        if document_id is not None and not isinstance(document_id, str):
+            raise InputError(
+                f"document_id must be a string or None, got "
+                f"{type(document_id).__name__}"
+            )
+        doc_id = document_id if document_id is not None else self._document_id
+
+        pipeline_start = time.perf_counter() if return_metrics else 0.0
+        stage_metrics: list[StageMetric] = []
+
+        # Every caller-supplied string is sanitised *before* the document is
+        # assembled, so the reconstruction is sanitised by construction and
+        # each clause's content is still an exact slice of it. Sanitising the
+        # assembled text instead would shift offsets out from under the
+        # clauses that were built from the unsanitised pieces.
+        text, clauses, source_spans = build_document(
+            sections,
+            self._structure_parser.classify_document_section,
+            self._sanitize_input,
+        )
+        if len(text) > self._MAX_INPUT_CHARS:
+            raise InputError(
+                f"Reconstructed document too large ({len(text)} chars). "
+                f"Maximum supported: {self._MAX_INPUT_CHARS} chars."
+            )
+        if self._sanitize_input(text) != text:  # pragma: no cover - defensive
+            raise InputError(
+                "The reconstructed document is not stable under sanitisation, "
+                "which would break the exact-slice offset invariant. This "
+                "means a section's text composes with its neighbour's under "
+                "Unicode NFC; please report it with the offending sections."
+            )
+
+        if return_metrics:
+            stage_metrics.append(
+                StageMetric("structure_parsing", 0.0, len(clauses))
+            )
+
+        chunks, metrics = self._run_stages(
+            text,
+            clauses,
+            doc_id,
+            collect_metrics=return_metrics,
+            pipeline_start=pipeline_start,
+            stage_metrics=stage_metrics,
+            input_chars=len(text),
+            heading_candidates_rejected=0,
+            raw_span=source_spans,
+        )
+        if return_metrics:
+            return chunks, metrics  # type: ignore[return-value]
+        return chunks
+
+    def _run_stages(
+        self,
+        text: str,
+        clauses: list[ParsedClause],
+        doc_id: Optional[str],
+        *,
+        collect_metrics: bool,
+        pipeline_start: float,
+        stage_metrics: list[StageMetric],
+        input_chars: int,
+        heading_candidates_rejected: int,
+        raw_span: Callable[[int, int], tuple[int, int]] | None = None,
+    ) -> tuple[list[LegalChunk], PipelineMetrics | None]:
+        """Run pipeline stages 2–8 over an already-parsed clause list.
+
+        Split out of :meth:`_run_pipeline` so that :meth:`chunk_documents`
+        can supply structure from an external parser (Docling, unstructured,
+        a markdown converter) and get exactly the same downstream treatment
+        — chunking, cross-references, classification, context headers,
+        defined terms, resolution — without lexichunk's own line-based
+        heading detection ever running.
+
+        Args:
+            text: The document text *clauses* index into.  Chunk bodies are
+                sliced from it directly, so the clauses' ``char_start`` and
+                ``content`` must agree with it.
+            clauses: Parsed clauses in document order.
+            doc_id: The resolved document identifier, or ``None``.
+            collect_metrics: Time each stage and build
+                :class:`PipelineMetrics`.
+            pipeline_start: ``time.perf_counter()`` at pipeline entry.
+            stage_metrics: Accumulator the earlier stages already wrote to.
+            input_chars: Character count of *text*.
+            heading_candidates_rejected: Stage 1's rejection count, or ``0``
+                when the structure parser was bypassed.
+            raw_span: Optional ``(start, end) -> (raw_start, raw_end)``
+                mapping used to populate ``raw_char_start``/``raw_char_end``.
+                :meth:`~lexichunk.offsets.OffsetMap.to_raw_span` for
+                :meth:`chunk`; a section-span lookup for
+                :meth:`chunk_documents`.
+
+        Returns:
+            ``(chunks, metrics)`` — *metrics* is ``None`` when
+            *collect_metrics* is ``False``.
+        """
+        fallback_used = False
 
         # ------------------------------------------------------------------
         # Stage 2: Chunking
@@ -477,6 +801,7 @@ class LegalChunker:
                 document_id=doc_id,
                 chars_per_token=self._chars_per_token,
                 extra_abbreviations=self._extra_abbreviations,
+                include_ancestor_headers=self._include_ancestor_headers,
             )
             chunks = chunker.chunk(clauses, text)
             merged_identifiers = chunker.last_merged_identifiers
@@ -518,6 +843,11 @@ class LegalChunker:
                     cross_ref_resolved=0,
                     input_chars=input_chars,
                     fallback_used=fallback_used,
+                    clause_count=len(clauses),
+                    top_level_clause_count=sum(
+                        1 for c in clauses if c.parent_uid is None
+                    ),
+                    heading_candidates_rejected=heading_candidates_rejected,
                 )
             return [], None
 
@@ -563,7 +893,9 @@ class LegalChunker:
         if collect_metrics:
             logger.debug("Stage 4: clause_type_classification — start")
             t0 = time.perf_counter()
-        self._clause_type_classifier.classify_all(chunks)
+        classifications = self._clause_type_classifier.classify_all_detailed(chunks)
+        if self._classification_hook is not None:
+            self._apply_classification_hook(chunks, classifications)
         if collect_metrics:
             classified = sum(1 for c in chunks if c.clause_type is not None)
             elapsed = (time.perf_counter() - t0) * 1000
@@ -688,6 +1020,12 @@ class LegalChunker:
             )
             stage_metrics.append(StageMetric("cross_reference_resolution", elapsed, resolved_count))
 
+        if raw_span is not None:
+            for chunk in chunks:
+                chunk.raw_char_start, chunk.raw_char_end = raw_span(
+                    chunk.char_start, chunk.char_end
+                )
+
         logger.debug(
             "Pipeline complete: %d chunks, %d defined terms",
             len(chunks), dt_count,
@@ -695,6 +1033,7 @@ class LegalChunker:
 
         metrics: PipelineMetrics | None = None
         if collect_metrics:
+            root_units = [c for c in clauses if c.parent_uid is None]
             metrics = PipelineMetrics(
                 total_duration_ms=(time.perf_counter() - pipeline_start) * 1000,
                 stage_metrics=tuple(stage_metrics),
@@ -704,9 +1043,75 @@ class LegalChunker:
                 cross_ref_resolved=resolved_count,
                 input_chars=input_chars,
                 fallback_used=fallback_used,
+                clause_count=len(clauses),
+                top_level_clause_count=len(root_units),
+                chunks_spanning_multiple_top_level_clauses=(
+                    _count_boundary_crossing_chunks(chunks, root_units)
+                ),
+                chunks_with_multiple_clauses=sum(
+                    1
+                    for identifiers in (merged_identifiers or {}).values()
+                    if len(identifiers) > 1
+                ),
+                chunks_below_min=sum(
+                    1 for c in chunks if c.token_count < self._min_chunk_size
+                ),
+                heading_candidates_rejected=heading_candidates_rejected,
+                chunks_unclassified=sum(
+                    1 for c in chunks if c.clause_type is ClauseType.UNKNOWN
+                ),
             )
 
         return chunks, metrics
+
+    def _apply_classification_hook(
+        self,
+        chunks: list[LegalChunk],
+        classifications: list[ClassificationResult],
+    ) -> None:
+        """Offer every low-confidence chunk to the ``classification_hook``.
+
+        Runs immediately after Stage 4, so the hook sees the keyword
+        scorer's verdict (and its per-type scores) but nothing downstream
+        has yet been derived from it — the context header generated in
+        Stage 5 reflects whatever the hook decided.
+
+        A chunk is offered when its ``classification_confidence`` is
+        **strictly below** ``classification_hook_threshold``.  Returning
+        ``None`` leaves the keyword result and its
+        ``classification_source`` of ``"keyword"`` untouched; returning a
+        :class:`~lexichunk.models.ClauseType` replaces ``clause_type`` and
+        stamps ``classification_source = "hook"``.  ``confidence`` is
+        deliberately *not* rewritten: it describes the keyword scorer's own
+        certainty, and overwriting it with a number the hook invented would
+        make the two incomparable across a corpus.
+
+        Args:
+            chunks: The chunks just classified, mutated in place.
+            classifications: The matching per-chunk results.
+
+        Raises:
+            ConfigurationError: If the hook returns something that is
+                neither ``None`` nor a :class:`ClauseType`.
+        """
+        hook = self._classification_hook
+        if hook is None:  # pragma: no cover - guarded by the caller
+            return
+        threshold = self._classification_hook_threshold
+        for chunk, result in zip(chunks, classifications):
+            if result.confidence >= threshold:
+                continue
+            outcome = hook(chunk, result)
+            if outcome is None:
+                continue
+            if not isinstance(outcome, ClauseType):
+                raise ConfigurationError(
+                    f"classification_hook must return a ClauseType or None, "
+                    f"got {type(outcome).__name__} ({outcome!r}) for chunk "
+                    f"{chunk.index}."
+                )
+            chunk.clause_type = outcome
+            chunk.classification_source = "hook"
 
     # ------------------------------------------------------------------
     # Additional public methods
@@ -783,7 +1188,11 @@ class LegalChunker:
         return self._structure_parser.parse_structure(text)
 
     def chunk_iter(
-        self, text: str, document_id: Optional[str] = None
+        self,
+        text: str,
+        document_id: Optional[str] = None,
+        *,
+        raw_offsets: bool = False,
     ) -> Iterator[LegalChunk]:
         """Yield chunks from a legal document one at a time.
 
@@ -795,11 +1204,15 @@ class LegalChunker:
         Args:
             text: Full legal document as a plain-text string.
             document_id: Override ``document_id`` for this call.
+            raw_offsets: As for :meth:`chunk` — populate
+                ``raw_char_start``/``raw_char_end`` on every chunk.
 
         Yields:
             :class:`~lexichunk.models.LegalChunk` objects in document order.
         """
-        yield from self.chunk(text, document_id=document_id)
+        yield from self.chunk(
+            text, document_id=document_id, raw_offsets=raw_offsets
+        )
 
     def clear_definition_cache(self) -> None:
         """Clear the definition extraction cache.
@@ -1038,6 +1451,8 @@ class LegalChunker:
                     f"with workers > 1. Custom jurisdiction registrations are "
                     f"not inherited by child processes. Use workers=1 instead."
                 )
+            if self._classification_hook is not None:
+                _require_picklable_hook(self._classification_hook)
             result = self._chunk_batch_parallel(pairs, effective_workers, skip_indices)
         else:
             result = self._chunk_batch_serial(pairs, skip_indices)
@@ -1092,12 +1507,15 @@ class LegalChunker:
             min_chunk_size=self._min_chunk_size,
             include_definitions=self._include_definitions,
             include_context_header=self._include_context_header,
+            include_ancestor_headers=self._include_ancestor_headers,
             document_id=self._document_id,
             chars_per_token=self._chars_per_token,
             extra_abbreviations=self._extra_abbreviations,
             extra_clause_signals=self._extra_clause_signals,
             enable_definition_cache=self._enable_definition_cache,
             max_cache_size=self._max_cache_size,
+            classification_hook=self._classification_hook,
+            classification_hook_threshold=self._classification_hook_threshold,
         )
 
         results: list[list[LegalChunk]] = [[] for _ in pairs]
@@ -1158,12 +1576,15 @@ class _ChunkerConfig:
     min_chunk_size: int
     include_definitions: bool
     include_context_header: bool
+    include_ancestor_headers: bool
     document_id: str | None
     chars_per_token: int
     extra_abbreviations: list[str] | None
     extra_clause_signals: dict[ClauseType, list[str]] | None
     enable_definition_cache: bool
     max_cache_size: int
+    classification_hook: ClassificationHook | None = None
+    classification_hook_threshold: float = 0.5
 
     def __post_init__(self) -> None:
         # Re-run the same validation LegalChunker.__init__ uses, so this
@@ -1177,9 +1598,13 @@ class _ChunkerConfig:
             max_cache_size=self.max_cache_size,
             include_definitions=self.include_definitions,
             include_context_header=self.include_context_header,
+            include_ancestor_headers=self.include_ancestor_headers,
             enable_definition_cache=self.enable_definition_cache,
             extra_abbreviations=self.extra_abbreviations,
             extra_clause_signals=self.extra_clause_signals,
+        )
+        _validate_classification_hook(
+            self.classification_hook, self.classification_hook_threshold
         )
 
 
@@ -1198,12 +1623,15 @@ def _chunk_single(
         min_chunk_size=config.min_chunk_size,
         include_definitions=config.include_definitions,
         include_context_header=config.include_context_header,
+        include_ancestor_headers=config.include_ancestor_headers,
         document_id=config.document_id,
         chars_per_token=config.chars_per_token,
         extra_abbreviations=config.extra_abbreviations,
         extra_clause_signals=config.extra_clause_signals,
         enable_definition_cache=config.enable_definition_cache,
         max_cache_size=config.max_cache_size,
+        classification_hook=config.classification_hook,
+        classification_hook_threshold=config.classification_hook_threshold,
     )
     return chunker.chunk(text, document_id=doc_id)
 
@@ -1221,6 +1649,7 @@ def _validate_config(
     max_cache_size: object,
     include_definitions: object,
     include_context_header: object,
+    include_ancestor_headers: object,
     enable_definition_cache: object,
     extra_abbreviations: object,
     extra_clause_signals: object,
@@ -1242,6 +1671,7 @@ def _validate_config(
             longer silently clamped to 1 when out of range).
         include_definitions: Must be a ``bool``.
         include_context_header: Must be a ``bool``.
+        include_ancestor_headers: Must be a ``bool``.
         enable_definition_cache: Must be a ``bool``.
         extra_abbreviations: ``None`` or a ``list``/``tuple`` of non-empty
             ``str``.
@@ -1281,6 +1711,7 @@ def _validate_config(
     for name, value in (
         ("include_definitions", include_definitions),
         ("include_context_header", include_context_header),
+        ("include_ancestor_headers", include_ancestor_headers),
         ("enable_definition_cache", enable_definition_cache),
     ):
         if not isinstance(value, bool):
@@ -1336,6 +1767,72 @@ def _validate_config(
     return validated_abbreviations, validated_signals
 
 
+def _validate_classification_hook(
+    hook: object, threshold: object
+) -> ClassificationHook | None:
+    """Validate the ``classification_hook`` pair and return the hook.
+
+    Args:
+        hook: ``None`` or a callable taking ``(chunk, result)``.
+        threshold: A ``float``/``int`` in ``[0.0, 1.0]``.
+
+    Returns:
+        The hook, unchanged.
+
+    Raises:
+        ConfigurationError: If *hook* is not callable, or *threshold* is not
+            a number in ``[0.0, 1.0]``.
+    """
+    if isinstance(threshold, bool) or not isinstance(threshold, (int, float)):
+        raise ConfigurationError(
+            f"classification_hook_threshold must be a float, got "
+            f"{type(threshold).__name__}"
+        )
+    if not 0.0 <= float(threshold) <= 1.0:
+        raise ConfigurationError(
+            f"classification_hook_threshold ({threshold}) must be in [0.0, 1.0]"
+        )
+    if hook is None:
+        return None
+    if not callable(hook):
+        raise ConfigurationError(
+            f"classification_hook must be callable or None, got "
+            f"{type(hook).__name__}"
+        )
+    return hook  # type: ignore[return-value]
+
+
+def _require_picklable_hook(hook: ClassificationHook) -> None:
+    """Fail fast when a hook cannot survive the trip to a worker process.
+
+    ``chunk_batch(workers>1)`` runs each document in a child process, so the
+    hook has to be pickled along with the rest of the configuration.  A
+    lambda, a local closure, or a bound method of an unpicklable object all
+    fail — and the default failure mode is a
+    :class:`~concurrent.futures.process.BrokenProcessPool` raised from deep
+    inside the pool, or worse, a per-document ``BatchError`` that reads like
+    the *documents* were bad.  Checking up front turns that into one clear
+    :class:`~lexichunk.exceptions.ConfigurationError` naming the actual fix.
+
+    Args:
+        hook: The configured classification hook.
+
+    Raises:
+        ConfigurationError: If the hook cannot be pickled.
+    """
+    try:
+        pickle.dumps(hook)
+    except Exception as exc:  # noqa: BLE001 - re-raised as ConfigurationError
+        name = getattr(hook, "__qualname__", repr(hook))
+        raise ConfigurationError(
+            f"classification_hook {name!r} cannot be pickled "
+            f"({type(exc).__name__}: {exc}), so it cannot be used with "
+            f"chunk_batch(workers>1) — each document is processed in a child "
+            f"process. Use a module-level function (or a picklable callable "
+            f"class) instead of a lambda or a closure, or pass workers=1."
+        ) from exc
+
+
 def _iteration_error(items: list[Any], exc: Exception) -> BatchError:
     """Build the synthetic :class:`BatchError` for a raising input iterable.
 
@@ -1353,6 +1850,41 @@ def _iteration_error(items: list[Any], exc: Exception) -> BatchError:
         error=f"Input iterable raised after {len(items)} item(s): {exc}",
         error_type=type(exc).__qualname__,
     )
+
+
+def _count_boundary_crossing_chunks(
+    chunks: list[LegalChunk], root_units: list[ParsedClause]
+) -> int:
+    """Count chunks whose span straddles two root structural units.
+
+    A *root unit* is a parsed clause with no parent — the synthetic
+    preamble, each top-level clause, each Schedule.  Their
+    ``[char_start, char_end)`` spans tile the document without overlap
+    (a clause only closes when a same-or-more-senior header arrives), so a
+    chunk overlapping two of them has merged across a boundary the
+    hierarchy says is real.
+
+    Args:
+        chunks: The emitted chunks, in document order.
+        root_units: The parsed clauses with ``parent_uid is None``, in
+            document order.
+
+    Returns:
+        The number of offending chunks — expected to be ``0``.
+    """
+    if len(root_units) < 2:
+        return 0
+    starts = [unit.char_start for unit in root_units]
+    crossing = 0
+    for chunk in chunks:
+        if chunk.char_end <= chunk.char_start:
+            continue
+        # Number of unit boundaries strictly inside the chunk's own span.
+        first = bisect_right(starts, chunk.char_start)
+        last = bisect_left(starts, chunk.char_end)
+        if last > first:
+            crossing += 1
+    return crossing
 
 
 def _container_key(chunk: LegalChunk) -> str:

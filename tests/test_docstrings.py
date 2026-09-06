@@ -9,11 +9,36 @@ behaviour drifting away from what is written.
 from __future__ import annotations
 
 import inspect
+import re
+from pathlib import Path
 
 import pytest
 
 import lexichunk
 from lexichunk import LegalChunker
+
+_SRC_ROOT = Path(lexichunk.__file__).resolve().parent
+
+
+def _has_sphinx_doc_comment(name: str) -> bool:
+    """Return ``True`` if ``name`` is a module-level alias with a ``#:`` comment.
+
+    A ``TypeAlias`` such as ``ClassificationHook`` is a plain assignment at
+    runtime, so it cannot carry a ``__doc__``.  The documented convention for
+    those is Sphinx's ``#:`` comment block directly above the assignment,
+    which is what this looks for — so an alias export is still required to be
+    documented, just in the only place the language allows.
+    """
+    assignment = re.compile(rf"^{re.escape(name)}(?::[^=]+)? *=", re.MULTILINE)
+    for path in _SRC_ROOT.rglob("*.py"):
+        source = path.read_text(encoding="utf-8")
+        match = assignment.search(source)
+        if match is None:
+            continue
+        preceding = source[: match.start()].splitlines()
+        if preceding and preceding[-1].lstrip().startswith("#:"):
+            return True
+    return False
 
 
 def _public_names() -> list[str]:
@@ -36,6 +61,12 @@ def test_package_has_module_docstring() -> None:
 def test_public_export_has_docstring(name: str) -> None:
     """Every name in ``lexichunk.__all__`` is documented."""
     obj = getattr(lexichunk, name)
+    if not (inspect.isclass(obj) or inspect.isfunction(obj) or inspect.ismodule(obj)):
+        # A type alias cannot hold a __doc__; require the ``#:`` convention.
+        assert _has_sphinx_doc_comment(name), (
+            f"lexichunk.{name} is an alias with no '#:' documentation comment"
+        )
+        return
     doc = inspect.getdoc(obj)
     assert doc and doc.strip(), f"lexichunk.{name} has no docstring"
 
@@ -68,6 +99,7 @@ def test_legal_chunker_surface_is_stable() -> None:
     assert _public_methods() == [
         "chunk",
         "chunk_batch",
+        "chunk_documents",
         "chunk_iter",
         "chunk_with_metrics",
         "clear_definition_cache",
@@ -77,4 +109,5 @@ def test_legal_chunker_surface_is_stable() -> None:
         "jurisdiction",
         "parse_structure",
         "sanitize",
+        "sanitize_with_map",
     ]

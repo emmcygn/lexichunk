@@ -2,7 +2,7 @@
 
 import logging
 
-from .chunker import LegalChunker
+from .chunker import ClassificationHook, LegalChunker
 from .enrichment.clause_type import ClassificationResult
 from .exceptions import (
     ConfigurationError,
@@ -16,6 +16,7 @@ from .jurisdiction import (
     unregister_jurisdiction,
 )
 from .metrics import PipelineMetrics, StageMetric
+from .offsets import OffsetMap, sanitize_with_map
 
 # Library hygiene: don't emit "no handlers found" warnings for consumers who
 # haven't configured logging. See docs/architecture.md "Logging and
@@ -32,12 +33,15 @@ from .models import (
     Jurisdiction,
     JurisdictionPatterns,
     LegalChunk,
+    Section,
 )
 
 __version__ = "0.9.0"
 __all__ = [
     "LegalChunker",
+    "ClassificationHook",
     "LegalChunk",
+    "Section",
     "HierarchyNode",
     "CrossReference",
     "ClassificationResult",
@@ -50,6 +54,8 @@ __all__ = [
     "BatchError",
     "PipelineMetrics",
     "StageMetric",
+    "OffsetMap",
+    "sanitize_with_map",
     "register_jurisdiction",
     "unregister_jurisdiction",
     "registered_jurisdictions",

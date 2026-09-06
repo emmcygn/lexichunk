@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from typing import Optional
 
@@ -12,6 +13,8 @@ from ..models import (
     Jurisdiction,
     LegalChunk,
 )
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Default abbreviation list — tokens whose trailing dot must NOT trigger a
@@ -123,6 +126,7 @@ def sentence_boundary_positions(
 
 
 from ..utils import approx_tokens as _approx_tokens
+from ._cascade import split_to_fit
 
 # ---------------------------------------------------------------------------
 # Module-level convenience function
@@ -242,29 +246,24 @@ class FallbackChunker:
         if not text or not text.strip():
             return []
 
-        sentences = [
-            part
-            for sentence, offset in self._split_sentences(text)
-            for part in self._split_oversized_sentence(sentence, offset)
-        ]
-        if not sentences:
+        units = self._unit_spans(text)
+        if not units:
             return []
 
-        # Accumulate sentences into windows.
-        # Each window is represented as a list of (sentence, char_offset) pairs.
-        windows: list[list[tuple[str, int]]] = []
-        current_window: list[tuple[str, int]] = []
+        # Accumulate units into windows.  Each window is a list of spans.
+        windows: list[list[tuple[int, int]]] = []
+        current_window: list[tuple[int, int]] = []
 
-        for sentence, offset in sentences:
-            # If adding this sentence would push the window's *exact* slice
-            # over the cap — and the window already has content — flush first.
+        for unit in units:
+            # If adding this unit would push the window's *exact* slice over
+            # the cap — and the window already has content — flush first.
             if current_window:
-                prospective = current_window + [(sentence, offset)]
+                prospective = current_window + [unit]
                 if self._window_tokens(text, prospective) > self._max_chunk_size:
                     windows.append(current_window)
                     current_window = []
 
-            current_window.append((sentence, offset))
+            current_window.append(unit)
 
         # Flush the last window.
         if current_window:
@@ -274,7 +273,7 @@ class FallbackChunker:
         # last), and a merge is only performed when the combined window still
         # fits within max_chunk_size — so fixing an under-run can never create
         # an over-run.
-        merged_windows: list[list[tuple[str, int]]] = []
+        merged_windows: list[list[tuple[int, int]]] = []
         for window in windows:
             if merged_windows:
                 previous = merged_windows[-1]
@@ -327,44 +326,79 @@ class FallbackChunker:
     # Private helpers
     # ------------------------------------------------------------------
 
-    @staticmethod
-    def _window_span(window: list[tuple[str, int]]) -> tuple[int, int]:
-        """Return the ``(char_start, char_end)`` span covered by *window*."""
-        char_start = window[0][1]
-        last_sentence, last_offset = window[-1]
-        return char_start, last_offset + len(last_sentence)
+    def _unit_spans(self, text: str) -> list[tuple[int, int]]:
+        """Return the spans this chunker packs into windows.
 
-    def _window_tokens(self, text: str, window: list[tuple[str, int]]) -> int:
+        Two properties the raw sentence list does not have:
+
+        **They tile.** ``_split_sentences`` strips each sentence, so the
+        whitespace *between* two sentences belonged to neither and fell out
+        of the offsets entirely. Consecutive chunks were then one character
+        apart — a CUAD evaluation saw this on 21 of 150 contracts, always
+        exactly one character and always whitespace. Nothing substantive was
+        lost, but "the chunks tile the document" is an invariant callers
+        reasonably rely on, and a gold span straddling such a boundary fails
+        a containment check for a purely cosmetic reason. Each span
+        therefore runs to where the next one starts; only the document's own
+        leading and trailing whitespace stays outside.
+
+        **They fit.** A single sentence longer than ``max_chunk_size`` used
+        to be emitted whole, because this path had no splitter below "one
+        sentence". That is where the cap breaches on real filings came from
+        — 7 of 39 chunks over on one contract, worst at 1,220 tokens against
+        a limit of 512. Over-sized units go through the same cascade the
+        clause-aware path uses, so the cap now means the same thing on both.
+
+        Args:
+            text: The document text.
+
+        Returns:
+            Contiguous ``(start, end)`` spans, each within the cap.
+        """
+        sentences = self._split_sentences(text)
+        if not sentences:
+            return []
+
+        starts = [offset for _, offset in sentences]
+        last_text, last_offset = sentences[-1]
+        # Every span ends where the next begins; the final one ends at the
+        # last sentence's own end, so trailing document whitespace is not
+        # swept into a chunk.
+        ends = starts[1:] + [last_offset + len(last_text)]
+
+        spans: list[tuple[int, int]] = []
+        for start, end in zip(starts, ends):
+            if (
+                _approx_tokens(text[start:end], self._chars_per_token)
+                <= self._max_chunk_size
+            ):
+                spans.append((start, end))
+                continue
+            spans.extend(
+                (start + piece_start, start + piece_end)
+                for piece_start, piece_end in split_to_fit(
+                    text[start:end],
+                    max_tokens=self._max_chunk_size,
+                    chars_per_token=self._chars_per_token,
+                    identifier=f"<fallback sentence at offset {start}>",
+                    logger=logger,
+                )
+            )
+        return spans
+
+    @staticmethod
+    def _window_span(window: list[tuple[int, int]]) -> tuple[int, int]:
+        """Return the ``(char_start, char_end)`` span covered by *window*.
+
+        Sound because the spans are contiguous: the union of the window's
+        spans is exactly the range from the first start to the last end.
+        """
+        return window[0][0], window[-1][1]
+
+    def _window_tokens(self, text: str, window: list[tuple[int, int]]) -> int:
         """Approximate token count of the exact text slice *window* covers."""
         start, end = self._window_span(window)
         return _approx_tokens(text[start:end], self._chars_per_token)
-
-    def _split_oversized_sentence(
-        self,
-        sentence: str,
-        offset: int,
-    ) -> list[tuple[str, int]]:
-        """Split an oversized sentence at word boundaries with exact offsets."""
-        if _approx_tokens(sentence, self._chars_per_token) <= self._max_chunk_size:
-            return [(sentence, offset)]
-
-        words = list(re.finditer(r"\S+", sentence))
-        if not words:
-            return []
-
-        parts: list[tuple[str, int]] = []
-        part_start = words[0].start()
-        part_end = words[0].end()
-
-        for word in words[1:]:
-            candidate = sentence[part_start : word.end()]
-            if _approx_tokens(candidate, self._chars_per_token) > self._max_chunk_size:
-                parts.append((sentence[part_start:part_end], offset + part_start))
-                part_start = word.start()
-            part_end = word.end()
-
-        parts.append((sentence[part_start:part_end], offset + part_start))
-        return parts
 
     def _split_sentences(self, text: str) -> list[tuple[str, int]]:
         """Split text into sentences, returning ``(sentence, char_offset)`` pairs.

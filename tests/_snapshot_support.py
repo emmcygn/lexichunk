@@ -26,6 +26,10 @@ FIXTURE_CONFIGS: list[tuple[str, str, str]] = [
     ("us_msa", "us", "contract"),
     ("us_terms_of_service", "us", "terms_conditions"),
     ("eu_gdpr_excerpt", "eu", "contract"),
+    # Generated fixtures with hand-built gold annotations; see
+    # tests/test_gold_fixtures.py and tests/fixtures/generators/.
+    ("uk_pdf_extracted_agreement", "uk", "contract"),
+    ("us_msa_signed_with_exhibits", "us", "contract"),
 ]
 
 DEFAULT_MAX_CHUNK_SIZE = 512

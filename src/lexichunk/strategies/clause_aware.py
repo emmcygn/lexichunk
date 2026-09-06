@@ -11,7 +11,6 @@ token limit.
 from __future__ import annotations
 
 import logging
-import re
 from typing import Optional
 
 from ..models import (
@@ -22,6 +21,7 @@ from ..models import (
 )
 from ..parsers.structure import ParsedClause
 from ..utils import approx_tokens as _approx_tokens
+from ._cascade import split_to_fit
 from .fallback import (
     DEFAULT_ABBREVIATIONS,
     _compile_abbreviations,
@@ -29,31 +29,6 @@ from .fallback import (
 )
 
 logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-# Cascading splitter — boundary patterns, applied in order of preference.
-#
-# Level 0 is sentence-boundary detection (abbreviation-aware, shared with
-# FallbackChunker) and is handled separately because it needs the compiled
-# abbreviation pattern.  Levels 1..4 are these plain regexes.  Each match's
-# ``end()`` is the offset at which the *next* piece begins.
-# ---------------------------------------------------------------------------
-
-_SEMICOLON_BOUNDARY = re.compile(r'(?<=;)\s+')
-# "(a) ", "(iv) ", "(A) ", "1.1 " — the start of an enumerated sub-item.
-_ENUMERATOR_BOUNDARY = re.compile(r'\s+(?=\([A-Za-z]+\)|\d+\.\d)')
-_NEWLINE_BOUNDARY = re.compile(r'\n')
-_WHITESPACE_BOUNDARY = re.compile(r'\s+')
-
-_CASCADE_PATTERNS: tuple[re.Pattern[str], ...] = (
-    _SEMICOLON_BOUNDARY,
-    _ENUMERATOR_BOUNDARY,
-    _NEWLINE_BOUNDARY,
-    _WHITESPACE_BOUNDARY,
-)
-
-# Index of the last cascade level (0 = sentences, then _CASCADE_PATTERNS).
-_LAST_CASCADE_LEVEL = len(_CASCADE_PATTERNS)
 
 # Longest a clause's opening line may be, in words, for that line to read as a
 # bare heading rather than as body text that starts on the header line.
@@ -129,6 +104,10 @@ class ClauseAwareChunker:
         extra_abbreviations: Additional abbreviations (without the trailing
             dot) whose full stop must not be treated as a sentence boundary by
             the cascading splitter.
+        include_ancestor_headers: When ``True`` (the default), each chunk's
+            ``content`` is its span with the ancestor headings prepended, and
+            the prefix counts against ``max_chunk_size``.  When ``False``,
+            ``content`` is exactly ``original_text[char_start:char_end]``.
     """
 
     def __init__(
@@ -139,12 +118,14 @@ class ClauseAwareChunker:
         document_id: Optional[str] = None,
         chars_per_token: int = 4,
         extra_abbreviations: list[str] | None = None,
+        include_ancestor_headers: bool = True,
     ) -> None:
         self._jurisdiction = jurisdiction
         self._max_chunk_size = max_chunk_size
         self._min_chunk_size = min_chunk_size
         self._document_id = document_id
         self._chars_per_token = chars_per_token
+        self._include_ancestor_headers = include_ancestor_headers
         self._abbrev_pattern = _compile_abbreviations(
             DEFAULT_ABBREVIATIONS, extra_abbreviations
         )
@@ -526,91 +507,33 @@ class ClauseAwareChunker:
     ) -> list[tuple[int, int]]:
         """Split *text* into spans that each fit within ``max_chunk_size``.
 
-        Boundary types are tried in order of decreasing semantic quality, and
-        each level is applied **only** to the pieces that are still over the
-        limit after the previous level:
-
-        0. sentence boundaries (abbreviation-aware — the same detector
-           :class:`~lexichunk.strategies.fallback.FallbackChunker` uses, so
-           ``extra_abbreviations`` applies here too);
-        1. semicolon boundaries (``"…; "``) — the common shape of a long
-           legal proviso that contains no ``.``/``!``/``?`` at all;
-        2. enumerator boundaries — ``(a)``, ``(iv)``, ``1.1``;
-        3. newlines;
-        4. a hard word window.
+        Thin wrapper over :func:`~lexichunk.strategies._cascade.split_to_fit`,
+        which both chunking strategies share so that the cap means the same
+        thing on either path.  The only work done here is supplying this
+        chunker's abbreviation-aware sentence boundaries, so that
+        ``extra_abbreviations`` applies to clause splitting too.
 
         Args:
             text: The text to split.
-            prefix_chars: Number of characters that will be prepended to every
-                resulting piece (the ancestor-header prefix).  Counted against
-                the budget so the *final* ``token_count`` respects the cap.
-            identifier: Clause identifier, used only in the warning logged when
-                a piece is genuinely indivisible.
+            prefix_chars: Characters that will be prepended to every resulting
+                piece (the ancestor-header prefix).  Counted against the
+                budget so the *final* ``token_count`` respects the cap.
+            identifier: Clause identifier, used only in the warning logged
+                when a run has to be cut inside a word.
 
         Returns:
             A list of ``(start, end)`` offsets into *text*, contiguous and in
             order, that exactly tile ``[0, len(text))``.
         """
-        if not text:
-            return [(0, 0)]
-
-        sentence_cuts = sentence_boundary_positions(text, self._abbrev_pattern)
-        warned = False
-
-        def tokens(start: int, end: int) -> int:
-            return max(1, (prefix_chars + end - start) // self._chars_per_token)
-
-        def cuts_for(level: int, start: int, end: int) -> list[int]:
-            if level == 0:
-                return [p for p in sentence_cuts if start < p < end]
-            pattern = _CASCADE_PATTERNS[level - 1]
-            return [
-                m.end()
-                for m in pattern.finditer(text, start, end)
-                if start < m.end() < end
-            ]
-
-        def finalise(start: int, end: int, level: int) -> list[tuple[int, int]]:
-            if tokens(start, end) <= self._max_chunk_size:
-                return [(start, end)]
-            return split(start, end, level + 1)
-
-        def split(start: int, end: int, level: int) -> list[tuple[int, int]]:
-            nonlocal warned
-            if tokens(start, end) <= self._max_chunk_size:
-                return [(start, end)]
-            if level > _LAST_CASCADE_LEVEL:
-                if not warned:
-                    warned = True
-                    logger.warning(
-                        "Indivisible text run of %d chars in clause %r exceeds "
-                        "max_chunk_size (%d tokens); emitting it oversized",
-                        end - start,
-                        identifier or "<unknown>",
-                        self._max_chunk_size,
-                    )
-                return [(start, end)]
-
-            positions = cuts_for(level, start, end)
-            if not positions:
-                return split(start, end, level + 1)
-
-            pieces: list[tuple[int, int]] = []
-            current_start = start
-            current_end = start
-            for boundary in [*positions, end]:
-                if (
-                    current_end > current_start
-                    and tokens(current_start, boundary) > self._max_chunk_size
-                ):
-                    pieces.extend(finalise(current_start, current_end, level))
-                    current_start = current_end
-                current_end = boundary
-            if current_end > current_start:
-                pieces.extend(finalise(current_start, current_end, level))
-            return pieces
-
-        return split(0, len(text), 0)
+        return split_to_fit(
+            text,
+            max_tokens=self._max_chunk_size,
+            chars_per_token=self._chars_per_token,
+            sentence_cuts=sentence_boundary_positions(text, self._abbrev_pattern),
+            prefix_chars=prefix_chars,
+            identifier=identifier,
+            logger=logger,
+        )
 
     # ------------------------------------------------------------------
     # Oversized clause splitting
@@ -788,7 +711,16 @@ class ClauseAwareChunker:
         group: list[ParsedClause],
         clause_map: dict[str, ParsedClause],
     ) -> str:
-        """Return the ancestor-header prefix *group* will be emitted with."""
+        """Return the ancestor-header prefix *group* will be emitted with.
+
+        Gating the prefix *here* rather than at the point it is concatenated
+        is deliberate: the same call feeds the size accounting in
+        :meth:`_group_fits` and :meth:`_split_group`, so with the prefix
+        disabled the budget must stop reserving room for it too. Otherwise
+        chunks would come out smaller than requested for no visible reason.
+        """
+        if not self._include_ancestor_headers:
+            return ""
         return self._content_prefix(
             self._labelling(group),
             clause_map,
@@ -954,8 +886,10 @@ class ClauseAwareChunker:
 
         hierarchy_path = self._build_hierarchy_path(dominant, clause_map)
 
-        # Build original_header for this chunk's own clause.
-        if dominant.level == -99:
+        # Build original_header for this chunk's own clause.  With ancestor
+        # headers disabled the caller has asked for content to be nothing but
+        # the span, so no reconstructed header text is reported at all.
+        if dominant.level == -99 or not self._include_ancestor_headers:
             original_header = ""
         elif dominant.title:
             original_header = f"{dominant.identifier} {dominant.title}".strip()

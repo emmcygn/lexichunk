@@ -621,7 +621,30 @@ class ClauseTypeClassifier:
         Returns:
             The same list with classification fields populated on every chunk.
         """
+        self.classify_all_detailed(chunks)
+        return chunks
+
+    def classify_all_detailed(
+        self, chunks: list[LegalChunk]
+    ) -> list[ClassificationResult]:
+        """Classify *chunks* in-place and return the full per-chunk results.
+
+        Identical to :meth:`classify_all` in what it writes onto each chunk,
+        but it also hands back the :class:`ClassificationResult` for each —
+        including the per-clause-type ``scores`` mapping, which the chunk
+        itself has nowhere to carry.  This is what a
+        ``classification_hook`` is given, so a caller deciding whether to
+        pay for an LLM call can see *why* the keyword scorer was unsure and
+        not merely that it was.
+
+        Args:
+            chunks: List of :class:`~lexichunk.models.LegalChunk` objects.
+
+        Returns:
+            One :class:`ClassificationResult` per chunk, in the same order.
+        """
         n = max(len(chunks) - 1, 1)
+        results: list[ClassificationResult] = []
         for i, chunk in enumerate(chunks):
             relative_position = i / n
             result = self.classify_detailed(
@@ -633,4 +656,5 @@ class ClauseTypeClassifier:
             chunk.clause_type = result.clause_type
             chunk.classification_confidence = result.confidence
             chunk.secondary_clause_type = result.secondary_clause_type
-        return chunks
+            results.append(result)
+        return results

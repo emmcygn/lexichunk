@@ -5,10 +5,38 @@ from datetime import timedelta
 from pathlib import Path
 
 import pytest
+from hypothesis import HealthCheck, settings
 
 from lexichunk.jurisdiction import registered_jurisdictions, unregister_jurisdiction
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+# ---------------------------------------------------------------------------
+# Hypothesis
+# ---------------------------------------------------------------------------
+#
+# A property test that draws different examples on every run is a test whose
+# failures cannot be reproduced and whose passes mean less than they look
+# like they do: CI goes green because today's seed missed the bug. Both
+# knobs below exist for that.
+#
+# ``derandomize`` seeds generation from the test itself, so a given commit
+# always draws the same examples on every machine and every run. ``database``
+# is disabled because the local ``.hypothesis`` directory otherwise replays
+# previously-failing examples first — helpful when debugging interactively,
+# but it means two checkouts of the same commit run different tests.
+#
+# ``settings(...)`` decorators on individual tests inherit anything they do
+# not set, so a module asking for ``max_examples=30`` still gets determinism
+# from here.
+settings.register_profile(
+    "lexichunk",
+    derandomize=True,
+    database=None,
+    deadline=None,
+    suppress_health_check=[HealthCheck.too_slow, HealthCheck.data_too_large],
+)
+settings.load_profile("lexichunk")
 
 
 # ---------------------------------------------------------------------------

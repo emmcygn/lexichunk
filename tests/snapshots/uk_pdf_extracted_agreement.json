@@ -1,0 +1,1431 @@
+[
+  {
+    "char_end": 602,
+    "char_start": 0,
+    "classification_confidence": 1.0,
+    "clause_type": "preamble",
+    "content_head": "'SERVICES AGREEMENT\\n\\nThis Agreement is made on 1 March 2024 between Atlas Managed'",
+    "content_sha256": "3aa44ed8669427f861d1a363a1303c51bb793f47d26f8dbf6cc4b61387d594f4",
+    "context_header": "[Section: preamble] [Type: Preamble] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "preamble",
+    "hierarchy_path": "preamble",
+    "index": 0,
+    "original_header": "",
+    "secondary_clause_type": null,
+    "token_count": 150
+  },
+  {
+    "char_end": 2528,
+    "char_start": 602,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'1. Definitions and Interpretation\\n\\n1.1 Definitions\\n\\nIn this Agreement, the follo'",
+    "content_sha256": "3d9536adfb1b31b7744e11155d3af1fd6c9868a9a9c0fa694347ebec2de51c73",
+    "context_header": "[Section: 1 — Definitions and Interpretation > 1.1 — Definitions] [Type: Definitions] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "Schedule 2",
+        "target_chunk_index": 53,
+        "target_identifier": "2"
+      },
+      {
+        "raw_text": "Schedule 1",
+        "target_chunk_index": 50,
+        "target_identifier": "1"
+      },
+      {
+        "raw_text": "clause 11",
+        "target_chunk_index": 36,
+        "target_identifier": "11"
+      }
+    ],
+    "defined_terms_used": [
+      "Business Day",
+      "Charges",
+      "Commencement Date",
+      "Confidential Information",
+      "Customer",
+      "Deliverables",
+      "Force Majeure Event",
+      "Intellectual Property Rights",
+      "Personal Data",
+      "Services",
+      "Supplier",
+      "Term"
+    ],
+    "document_section": "definitions",
+    "hierarchy_path": "1 — Definitions and Interpretation > 1.1 — Definitions",
+    "index": 1,
+    "original_header": "1.1 Definitions",
+    "secondary_clause_type": null,
+    "token_count": 481
+  },
+  {
+    "char_end": 3494,
+    "char_start": 2528,
+    "classification_confidence": 1.0,
+    "clause_type": "definitions",
+    "content_head": "'1 Definitions and Interpretation\\n1.2 Interpretation\\n\\nIn this Agreement, unless t'",
+    "content_sha256": "8dadaf0aa3b9c8ccc7b6577ee194ff5a52986a7d936d59dd6b5f963606463267",
+    "context_header": "[Section: 1 — Definitions and Interpretation > 1.2 — Interpretation] [Type: Definitions] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [],
+    "document_section": "definitions",
+    "hierarchy_path": "1 — Definitions and Interpretation > 1.2 — Interpretation",
+    "index": 2,
+    "original_header": "1.2 Interpretation",
+    "secondary_clause_type": null,
+    "token_count": 249
+  },
+  {
+    "char_end": 4001,
+    "char_start": 3494,
+    "classification_confidence": 0.083,
+    "clause_type": "termination",
+    "content_head": "'2. Commencement and Term\\n\\n2.1 Commencement\\n\\nThis Agreement shall commence on the'",
+    "content_sha256": "e8cc93e83061816f61b2ee40ba9bed435ae34c9d050f3ac23002200ffb3b4f43",
+    "context_header": "[Section: 2 — Commencement and Term > 2.1 — Commencement] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 11",
+        "target_chunk_index": 36,
+        "target_identifier": "11"
+      },
+      {
+        "raw_text": "Schedule 2",
+        "target_chunk_index": 53,
+        "target_identifier": "2"
+      }
+    ],
+    "defined_terms_used": [
+      "Commencement Date",
+      "Services",
+      "Supplier",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "2 — Commencement and Term > 2.1 — Commencement",
+    "index": 3,
+    "original_header": "2.1 Commencement",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 126
+  },
+  {
+    "char_end": 4514,
+    "char_start": 4001,
+    "classification_confidence": 0.2,
+    "clause_type": "notices",
+    "content_head": "'2 Commencement and Term\\n2.2 Term and Renewal\\n\\nThe Term shall continue for an ini'",
+    "content_sha256": "2a348e8df41166e16ed0f5dc91956b7785820e5b29ebcd048d9009677b623b86",
+    "context_header": "[Section: 2 — Commencement and Term > 2.2 — Term and Renewal] [Type: Notices] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 2.2",
+        "target_chunk_index": 4,
+        "target_identifier": "2.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Charges",
+      "Commencement Date",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "2 — Commencement and Term > 2.2 — Term and Renewal",
+    "index": 4,
+    "original_header": "2.2 Term and Renewal",
+    "secondary_clause_type": "termination",
+    "token_count": 134
+  },
+  {
+    "char_end": 4936,
+    "char_start": 4514,
+    "classification_confidence": 0.5,
+    "clause_type": "amendment",
+    "content_head": "'2 Commencement and Term\\n2.3 Extension of Term\\n\\nThe parties may agree in writing '",
+    "content_sha256": "a0254c987bea40e7b250e5be599e07a81490148ade7ec812b8c6b613ea4fe799",
+    "context_header": "[Section: 2 — Commencement and Term > 2.3 — Extension of Term] [Type: Amendment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "2 — Commencement and Term > 2.3 — Extension of Term",
+    "index": 5,
+    "original_header": "2.3 Extension of Term",
+    "secondary_clause_type": null,
+    "token_count": 111
+  },
+  {
+    "char_end": 5529,
+    "char_start": 4936,
+    "classification_confidence": 0.462,
+    "clause_type": "services",
+    "content_head": "'3. Supplier Obligations\\n\\n3.1 General Obligations\\n\\nThe Supplier shall provide the'",
+    "content_sha256": "981b6aca74c796f69d17a8f1de5b2c802d073c61dfaa97d12ef99718a0ee7585",
+    "context_header": "[Section: 3 — Supplier Obligations > 3.1 — General Obligations] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Supplier Obligations > 3.1 — General Obligations",
+    "index": 6,
+    "original_header": "3.1 General Obligations",
+    "secondary_clause_type": "insurance",
+    "token_count": 148
+  },
+  {
+    "char_end": 5892,
+    "char_start": 5529,
+    "classification_confidence": 0.375,
+    "clause_type": "services",
+    "content_head": "'3 Supplier Obligations\\n3.2 Standard of Performance\\n\\nThe Supplier shall use reaso'",
+    "content_sha256": "d3e9ea8449742156b27ee764f691a68970ce87f51e798b0bc09558d59f58cf11",
+    "context_header": "[Section: 3 — Supplier Obligations > 3.2 — Standard of Performance] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "Schedule 1",
+        "target_chunk_index": 50,
+        "target_identifier": "1"
+      },
+      {
+        "raw_text": "clause 4.1",
+        "target_chunk_index": 11,
+        "target_identifier": "4.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Supplier Obligations > 3.2 — Standard of Performance",
+    "index": 7,
+    "original_header": "3.2 Standard of Performance",
+    "secondary_clause_type": "covenants",
+    "token_count": 96
+  },
+  {
+    "char_end": 6199,
+    "char_start": 5892,
+    "classification_confidence": 0.25,
+    "clause_type": "confidentiality",
+    "content_head": "'3 Supplier Obligations\\n3.3 Personnel and Subcontracting\\n\\nThe Supplier may subcon'",
+    "content_sha256": "5280a225025d987374b61b4f9ce4cda2a681cc282b86ed2742a7ed08843d452b",
+    "context_header": "[Section: 3 — Supplier Obligations > 3.3 — Personnel and Subcontracting] [Type: Confidentiality] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Supplier Obligations > 3.3 — Personnel and Subcontracting",
+    "index": 8,
+    "original_header": "3.3 Personnel and Subcontracting",
+    "secondary_clause_type": null,
+    "token_count": 82
+  },
+  {
+    "char_end": 7041,
+    "char_start": 6199,
+    "classification_confidence": 1.0,
+    "clause_type": "audit",
+    "content_head": "'3 Supplier Obligations\\n3.4 Audit Rights\\n\\nThe Customer may, on giving the Supplie'",
+    "content_sha256": "85fc14202f18f1a887dba2849e922ca4b6b3f317c3e975971c1ad55de0d2327d",
+    "context_header": "[Section: 3 — Supplier Obligations > 3.4 — Audit Rights] [Type: Audit] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 3.4",
+        "target_chunk_index": 9,
+        "target_identifier": "3.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Supplier Obligations > 3.4 — Audit Rights",
+    "index": 9,
+    "original_header": "3.4 Audit Rights",
+    "secondary_clause_type": null,
+    "token_count": 216
+  },
+  {
+    "char_end": 7583,
+    "char_start": 7041,
+    "classification_confidence": 0.0,
+    "clause_type": "unknown",
+    "content_head": "'3 Supplier Obligations\\n3.5 Business Continuity and Disaster Recovery\\n\\nThe Suppli'",
+    "content_sha256": "c77537d595791f9dcc657ee58249c49060df0e2fbde041203c3af3a18d724bfd",
+    "context_header": "[Section: 3 — Supplier Obligations > 3.5 — Business Continuity and Disaster Recovery] [Type: Unknown] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "3 — Supplier Obligations > 3.5 — Business Continuity and Disaster Recovery",
+    "index": 10,
+    "original_header": "3.5 Business Continuity and Disaster Recovery",
+    "secondary_clause_type": null,
+    "token_count": 141
+  },
+  {
+    "char_end": 8119,
+    "char_start": 7583,
+    "classification_confidence": 0.75,
+    "clause_type": "services",
+    "content_head": "'4. Customer Obligations\\n\\n4.1 Cooperation and Access\\n\\nThe Customer shall provide '",
+    "content_sha256": "d1a37e3dde55096ab98254a2193d365421aa6aac46cd7a78b5b14b7bddd8e6d9",
+    "context_header": "[Section: 4 — Customer Obligations] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "Schedule 1",
+        "target_chunk_index": 50,
+        "target_identifier": "1"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "4 — Customer Obligations",
+    "index": 11,
+    "original_header": "4 Customer Obligations",
+    "secondary_clause_type": null,
+    "token_count": 134
+  },
+  {
+    "char_end": 8467,
+    "char_start": 8119,
+    "classification_confidence": 0.333,
+    "clause_type": "covenants",
+    "content_head": "'4 Customer Obligations\\n4.3 Delay by the Customer\\n\\n\\nPage 4 of 42\\nCONFIDENTIAL — P'",
+    "content_sha256": "1b958545ba334bb7a3579be42832a60fe78e2421282a14a3884e6057be0ca8de",
+    "context_header": "[Section: 4 — Customer Obligations > 4.3 — Delay by the Customer] [Type: Covenants] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "4 — Customer Obligations > 4.3 — Delay by the Customer",
+    "index": 12,
+    "original_header": "4.3 Delay by the Customer",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 92
+  },
+  {
+    "char_end": 8969,
+    "char_start": 8467,
+    "classification_confidence": 0.333,
+    "clause_type": "covenants",
+    "content_head": "'4 Customer Obligations\\n4.4 Changes to Customer Requirements\\n\\nIf the Customer req'",
+    "content_sha256": "d665b23826d2c32714fb0fbd2a5ec90f5e64bc0483733f4aa14f5d48892bc4a8",
+    "context_header": "[Section: 4 — Customer Obligations > 4.4 — Changes to Customer Requirements] [Type: Covenants] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 4.4",
+        "target_chunk_index": 13,
+        "target_identifier": "4.4"
+      },
+      {
+        "raw_text": "Schedule 1",
+        "target_chunk_index": 50,
+        "target_identifier": "1"
+      }
+    ],
+    "defined_terms_used": [
+      "Charges",
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "4 — Customer Obligations > 4.4 — Changes to Customer Requirements",
+    "index": 13,
+    "original_header": "4.4 Changes to Customer Requirements",
+    "secondary_clause_type": "payment",
+    "token_count": 131
+  },
+  {
+    "char_end": 9465,
+    "char_start": 8969,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'5. Charges and Payment\\n\\n5.1 Charges\\n\\nThe Customer shall pay the Charges to the S'",
+    "content_sha256": "94158fc074ac8104713a51706d09dee46022ac29362ee47a05f3fd2c0ba47fe1",
+    "context_header": "[Section: 5 — Charges and Payment] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "Schedule\n2",
+        "target_chunk_index": 53,
+        "target_identifier": "2"
+      },
+      {
+        "raw_text": "paragraph 2",
+        "target_chunk_index": 3,
+        "target_identifier": "2"
+      }
+    ],
+    "defined_terms_used": [
+      "Charges",
+      "Customer",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "5 — Charges and Payment",
+    "index": 14,
+    "original_header": "5 Charges and Payment",
+    "secondary_clause_type": null,
+    "token_count": 124
+  },
+  {
+    "char_end": 9962,
+    "char_start": 9465,
+    "classification_confidence": 0.714,
+    "clause_type": "payment",
+    "content_head": "'5 Charges and Payment\\n5.3 Late Payment\\n\\nIf the Customer fails to pay any undispu'",
+    "content_sha256": "211dcdd2b6e4cb37141ec29d0d7534168292be7efcfb1d87a2858af0d3dbd724",
+    "context_header": "[Section: 5 — Charges and Payment > 5.3 — Late Payment] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Charges",
+      "Customer",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "5 — Charges and Payment > 5.3 — Late Payment",
+    "index": 15,
+    "original_header": "5.3 Late Payment",
+    "secondary_clause_type": "governing_law",
+    "token_count": 129
+  },
+  {
+    "char_end": 10301,
+    "char_start": 9962,
+    "classification_confidence": 0.714,
+    "clause_type": "confidentiality",
+    "content_head": "'6. Confidentiality\\n\\n\\nPage 5 of 42\\nCONFIDENTIAL — Project Atlas Services Agreemen'",
+    "content_sha256": "3f2c058a336f91ecd8ff01c210857ba32cfbd9c8ab0aac3eea95b73f1194224d",
+    "context_header": "[Section: 6 — Confidentiality] [Type: Confidentiality] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Confidential Information",
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "6 — Confidentiality",
+    "index": 16,
+    "original_header": "6 Confidentiality",
+    "secondary_clause_type": "covenants",
+    "token_count": 84
+  },
+  {
+    "char_end": 10639,
+    "char_start": 10301,
+    "classification_confidence": 1.0,
+    "clause_type": "confidentiality",
+    "content_head": "'6 Confidentiality\\n6.2 Permitted Disclosures\\n\\nA party may disclose Confidential I'",
+    "content_sha256": "78dd6eb01c69cd76d88e835606d77610998ed8907bb2eb2d3be38692865e287e",
+    "context_header": "[Section: 6 — Confidentiality > 6.2 — Permitted Disclosures] [Type: Confidentiality] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 6.1",
+        "target_chunk_index": 16,
+        "target_identifier": "6.1"
+      },
+      {
+        "raw_text": "clause 6",
+        "target_chunk_index": 16,
+        "target_identifier": "6"
+      }
+    ],
+    "defined_terms_used": [
+      "Confidential Information"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "6 — Confidentiality > 6.2 — Permitted Disclosures",
+    "index": 17,
+    "original_header": "6.2 Permitted Disclosures",
+    "secondary_clause_type": null,
+    "token_count": 89
+  },
+  {
+    "char_end": 10918,
+    "char_start": 10639,
+    "classification_confidence": 0.778,
+    "clause_type": "confidentiality",
+    "content_head": "'6 Confidentiality\\n6.3 Duration of Obligations\\n\\nThe obligations in this clause 6 '",
+    "content_sha256": "fb9ef11bc0abb5c1efb7905d5856827750c3a67101341a2c3d821a8cecf96217",
+    "context_header": "[Section: 6 — Confidentiality > 6.3 — Duration of Obligations] [Type: Confidentiality] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 6",
+        "target_chunk_index": 16,
+        "target_identifier": "6"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "6 — Confidentiality > 6.3 — Duration of Obligations",
+    "index": 18,
+    "original_header": "6.3 Duration of Obligations",
+    "secondary_clause_type": "termination",
+    "token_count": 74
+  },
+  {
+    "char_end": 11339,
+    "char_start": 10918,
+    "classification_confidence": 0.833,
+    "clause_type": "confidentiality",
+    "content_head": "'6 Confidentiality\\n6.4 Compelled Disclosure\\n\\nIf a party is required by law, regul'",
+    "content_sha256": "f9e3a4a0ab5e616c35230d282c497362f6967e1a4e4b551a07c0c3cf718e7f42",
+    "context_header": "[Section: 6 — Confidentiality > 6.4 — Compelled Disclosure] [Type: Confidentiality] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Confidential Information"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "6 — Confidentiality > 6.4 — Compelled Disclosure",
+    "index": 19,
+    "original_header": "6.4 Compelled Disclosure",
+    "secondary_clause_type": "governing_law",
+    "token_count": 109
+  },
+  {
+    "char_end": 11624,
+    "char_start": 11339,
+    "classification_confidence": 0.714,
+    "clause_type": "confidentiality",
+    "content_head": "\"6 Confidentiality\\n6.5 Publicity\\n\\nNeither party shall use the other party's name,\"",
+    "content_sha256": "021c1a09e2e3f83dd850b36ba612e607f51dddfa70bf03f304e81394bf370e32",
+    "context_header": "[Section: 6 — Confidentiality > 6.5 — Publicity] [Type: Confidentiality] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "6 — Confidentiality > 6.5 — Publicity",
+    "index": 20,
+    "original_header": "6.5 Publicity",
+    "secondary_clause_type": "intellectual_property",
+    "token_count": 75
+  },
+  {
+    "char_end": 12010,
+    "char_start": 11624,
+    "classification_confidence": 0.875,
+    "clause_type": "data_protection",
+    "content_head": "'7. Data Protection\\n\\n7.1 Data Processing\\n\\nTo the extent that the Supplier process'",
+    "content_sha256": "2239a4db37f349e52b1a584fc49066950bea25519ba8a6c1cd1a69a8ec76a892",
+    "context_header": "[Section: 7 — Data Protection > 7.1 — Data Processing] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Personal Data",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Data Protection > 7.1 — Data Processing",
+    "index": 21,
+    "original_header": "7.1 Data Processing",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 96
+  },
+  {
+    "char_end": 12304,
+    "char_start": 12010,
+    "classification_confidence": 1.0,
+    "clause_type": "data_protection",
+    "content_head": "'7 Data Protection\\n7.2 Security Measures\\n\\nThe Supplier shall implement appropriat'",
+    "content_sha256": "eb487a1300bc2b986399052c400cca21bcfd93140345b4ff484e4299aa6da3fb",
+    "context_header": "[Section: 7 — Data Protection > 7.2 — Security Measures] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Personal Data",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Data Protection > 7.2 — Security Measures",
+    "index": 22,
+    "original_header": "7.2 Security Measures",
+    "secondary_clause_type": null,
+    "token_count": 78
+  },
+  {
+    "char_end": 12569,
+    "char_start": 12304,
+    "classification_confidence": 0.778,
+    "clause_type": "data_protection",
+    "content_head": "'7 Data Protection\\n7.3 Sub-Processors\\n\\nThe Supplier shall not engage any sub-proc'",
+    "content_sha256": "4fbd26e752c1a07fcfca1837e4e6e48f6115fde899fee59c2eaff4959a4ba919",
+    "context_header": "[Section: 7 — Data Protection > 7.3 — Sub-Processors] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 7.2",
+        "target_chunk_index": 22,
+        "target_identifier": "7.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Personal Data",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Data Protection > 7.3 — Sub-Processors",
+    "index": 23,
+    "original_header": "7.3 Sub-Processors",
+    "secondary_clause_type": "covenants",
+    "token_count": 70
+  },
+  {
+    "char_end": 12916,
+    "char_start": 12569,
+    "classification_confidence": 1.0,
+    "clause_type": "data_protection",
+    "content_head": "'7 Data Protection\\n7.3 Sub-Processors\\n(a) Notice of Engagement\\n\\nThe Supplier shal'",
+    "content_sha256": "313cca84dff1053768f65a4624fb61cdc32da44ea78e4d5a9ae0a6d9d98e11b8",
+    "context_header": "[Section: 7 — Data Protection > 7.3 — Sub-Processors > (a) — Notice of Engagement] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Personal Data",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Data Protection > 7.3 — Sub-Processors > (a) — Notice of Engagement",
+    "index": 24,
+    "original_header": "(a) Notice of Engagement",
+    "secondary_clause_type": null,
+    "token_count": 96
+  },
+  {
+    "char_end": 13296,
+    "char_start": 12916,
+    "classification_confidence": 1.0,
+    "clause_type": "data_protection",
+    "content_head": "'7 Data Protection\\n7.3 Sub-Processors\\n(b) Sub-Processor Liability\\n\\nThe Supplier r'",
+    "content_sha256": "4fc1fa0b15a7449a56694add498b67760408e60c3a4cf534e08ddf0343046bec",
+    "context_header": "[Section: 7 — Data Protection > 7.3 — Sub-Processors > (b) — Sub-Processor Liability] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 7.3",
+        "target_chunk_index": 23,
+        "target_identifier": "7.3"
+      },
+      {
+        "raw_text": "clause 7.2",
+        "target_chunk_index": 22,
+        "target_identifier": "7.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Personal Data",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Data Protection > 7.3 — Sub-Processors > (b) — Sub-Processor Liability",
+    "index": 25,
+    "original_header": "(b) Sub-Processor Liability",
+    "secondary_clause_type": null,
+    "token_count": 104
+  },
+  {
+    "char_end": 13819,
+    "char_start": 13296,
+    "classification_confidence": 0.636,
+    "clause_type": "data_protection",
+    "content_head": "'7 Data Protection\\n7.4 International Transfers\\n\\nThe Supplier shall not transfer P'",
+    "content_sha256": "ffe840a66bd11429f062507e25e5acf02e274b349436d2b9402412173262c012",
+    "context_header": "[Section: 7 — Data Protection > 7.4 — International Transfers] [Type: Data Protection] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause\n7.3(b)",
+        "target_chunk_index": 23,
+        "target_identifier": "7.3(b)"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Personal Data",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "7 — Data Protection > 7.4 — International Transfers",
+    "index": 26,
+    "original_header": "7.4 International Transfers",
+    "secondary_clause_type": "covenants",
+    "token_count": 135
+  },
+  {
+    "char_end": 14365,
+    "char_start": 13819,
+    "classification_confidence": 0.667,
+    "clause_type": "intellectual_property",
+    "content_head": "'8. Intellectual Property\\n\\n8.1 Ownership\\n\\nPage 7 of 42\\nCONFIDENTIAL — Project Atl'",
+    "content_sha256": "1859735a65033c5f90cf1fcfb588986f8f4fb8a9444727ccb1f5291595a40006",
+    "context_header": "[Section: 8 — Intellectual Property] [Type: Intellectual Property] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 8",
+        "target_chunk_index": 27,
+        "target_identifier": "8"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Deliverables",
+      "Services",
+      "Supplier",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "8 — Intellectual Property",
+    "index": 27,
+    "original_header": "8 Intellectual Property",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 136
+  },
+  {
+    "char_end": 14640,
+    "char_start": 14365,
+    "classification_confidence": 0.714,
+    "clause_type": "intellectual_property",
+    "content_head": "'8 Intellectual Property\\n8.3 Third Party Rights\\n\\nThe Supplier warrants that the D'",
+    "content_sha256": "6e78459c8cd16a0b02d4705d453f8318078a317f818c6622fc7c1f4ca7f053c1",
+    "context_header": "[Section: 8 — Intellectual Property > 8.3 — Third Party Rights] [Type: Intellectual Property] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Deliverables",
+      "Intellectual Property Rights",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "8 — Intellectual Property > 8.3 — Third Party Rights",
+    "index": 28,
+    "original_header": "8.3 Third Party Rights",
+    "secondary_clause_type": "warranties",
+    "token_count": 74
+  },
+  {
+    "char_end": 14961,
+    "char_start": 14640,
+    "classification_confidence": 0.25,
+    "clause_type": "intellectual_property",
+    "content_head": "'9. Indemnities\\n\\n9.1 Supplier Indemnity\\n\\nThe Supplier shall indemnify the Custome'",
+    "content_sha256": "7ca2b1192c75b0a9f97d5eedd56a70e6dc07950f393b9a284cf6477b4a90bd8d",
+    "context_header": "[Section: 9 — Indemnities > 9.1 — Supplier Indemnity] [Type: Intellectual Property] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 10",
+        "target_chunk_index": 33,
+        "target_identifier": "10"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Deliverables",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "9 — Indemnities > 9.1 — Supplier Indemnity",
+    "index": 29,
+    "original_header": "9.1 Supplier Indemnity",
+    "secondary_clause_type": "indemnification",
+    "token_count": 80
+  },
+  {
+    "char_end": 15483,
+    "char_start": 14961,
+    "classification_confidence": 0.125,
+    "clause_type": "indemnification",
+    "content_head": "'9 Indemnities\\n9.2 Customer Indemnity\\n\\nThe Customer shall indemnify the Supplier '",
+    "content_sha256": "18c85f8bd75c30775844294b9550d3d71ccce40de62ae9cc68a46ee3441adde3",
+    "context_header": "[Section: 9 — Indemnities > 9.2 — Customer Indemnity] [Type: Indemnification] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 6.1",
+        "target_chunk_index": 16,
+        "target_identifier": "6.1"
+      },
+      {
+        "raw_text": "clause 9.1",
+        "target_chunk_index": 29,
+        "target_identifier": "9.1"
+      },
+      {
+        "raw_text": "clause 9.2",
+        "target_chunk_index": 30,
+        "target_identifier": "9.2"
+      },
+      {
+        "raw_text": "clause 9",
+        "target_chunk_index": 29,
+        "target_identifier": "9"
+      },
+      {
+        "raw_text": "clause 9.3(b)",
+        "target_chunk_index": 30,
+        "target_identifier": "9.3(b)"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Deliverables",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "9 — Indemnities > 9.2 — Customer Indemnity",
+    "index": 30,
+    "original_header": "9.2 Customer Indemnity",
+    "secondary_clause_type": "services",
+    "token_count": 134
+  },
+  {
+    "char_end": 16097,
+    "char_start": 15483,
+    "classification_confidence": 0.556,
+    "clause_type": "indemnification",
+    "content_head": "'9 Indemnities\\n9.3 Conduct of Claims\\n(a) Notification\\n\\nThe party seeking indemnif'",
+    "content_sha256": "4f6604e81a1554fdd3fe1947cebe1cd3a2c176b8424a1601b81c2f9b25c45feb",
+    "context_header": "[Section: 9 — Indemnities > 9.3 — Conduct of Claims > (a) — Notification] [Type: Indemnification] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "9 — Indemnities > 9.3 — Conduct of Claims > (a) — Notification",
+    "index": 31,
+    "original_header": "(a) Notification",
+    "secondary_clause_type": "covenants",
+    "token_count": 162
+  },
+  {
+    "char_end": 16581,
+    "char_start": 16097,
+    "classification_confidence": 0.75,
+    "clause_type": "indemnification",
+    "content_head": "'9 Indemnities\\n9.4 Exclusions from Indemnities\\n\\nNeither party shall be liable to '",
+    "content_sha256": "379ead7ab805dca038404373c57b96d0d4cd0de9415bfe581f8dadf648ddb999",
+    "context_header": "[Section: 9 — Indemnities > 9.4 — Exclusions from Indemnities] [Type: Indemnification] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 9.1",
+        "target_chunk_index": 29,
+        "target_identifier": "9.1"
+      },
+      {
+        "raw_text": "clause 9.2",
+        "target_chunk_index": 30,
+        "target_identifier": "9.2"
+      },
+      {
+        "raw_text": "clause\n9",
+        "target_chunk_index": 29,
+        "target_identifier": "9"
+      },
+      {
+        "raw_text": "clause 10",
+        "target_chunk_index": 33,
+        "target_identifier": "10"
+      },
+      {
+        "raw_text": "clause 10.2",
+        "target_chunk_index": 34,
+        "target_identifier": "10.2"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "9 — Indemnities > 9.4 — Exclusions from Indemnities",
+    "index": 32,
+    "original_header": "9.4 Exclusions from Indemnities",
+    "secondary_clause_type": null,
+    "token_count": 124
+  },
+  {
+    "char_end": 16859,
+    "char_start": 16581,
+    "classification_confidence": 1.0,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'10. Limitation of Liability\\n\\n10.1 Exclusions\\n\\nSubject to clause 10.3, neither pa'",
+    "content_sha256": "0be1622f44720fac4d86648462ee13bc78a19830b08814efb1c65b5c2a46a612",
+    "context_header": "[Section: 10 — Limitation of Liability > 10.1 — Exclusions] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 10.3",
+        "target_chunk_index": 35,
+        "target_identifier": "10.3"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "10 — Limitation of Liability > 10.1 — Exclusions",
+    "index": 33,
+    "original_header": "10.1 Exclusions",
+    "secondary_clause_type": null,
+    "token_count": 69
+  },
+  {
+    "char_end": 17178,
+    "char_start": 16859,
+    "classification_confidence": 0.733,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'10 Limitation of Liability\\n10.2 Financial Cap\\n\\nSubject to clause 10.3, the total'",
+    "content_sha256": "d3762fafb53d3a309830b349a20dc801fc153b3342cceb895b5c58c68fbd211f",
+    "context_header": "[Section: 10 — Limitation of Liability > 10.2 — Financial Cap] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 10.3",
+        "target_chunk_index": 35,
+        "target_identifier": "10.3"
+      }
+    ],
+    "defined_terms_used": [
+      "Charges"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "10 — Limitation of Liability > 10.2 — Financial Cap",
+    "index": 34,
+    "original_header": "10.2 Financial Cap",
+    "secondary_clause_type": "payment",
+    "token_count": 86
+  },
+  {
+    "char_end": 17508,
+    "char_start": 17178,
+    "classification_confidence": 0.75,
+    "clause_type": "limitation_of_liability",
+    "content_head": "'10 Limitation of Liability\\n10.3 Unlimited Liability\\n\\nNothing in this Agreement s'",
+    "content_sha256": "17f08ce3689ce56489bc03bd4f0e373277159d117c2d7bd541e3d368efba318b",
+    "context_header": "[Section: 10 — Limitation of Liability > 10.3 — Unlimited Liability] [Type: Limitation Of Liability] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "10 — Limitation of Liability > 10.3 — Unlimited Liability",
+    "index": 35,
+    "original_header": "10.3 Unlimited Liability",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 89
+  },
+  {
+    "char_end": 17768,
+    "char_start": 17508,
+    "classification_confidence": 0.714,
+    "clause_type": "termination",
+    "content_head": "'11. Termination\\n\\n11.1 Termination for Convenience\\n\\nEither party may terminate th'",
+    "content_sha256": "998595a6831e4e992a2e5d39aa00a22654a37fe1bb1fd1a04f65ef29369857e4",
+    "context_header": "[Section: 11 — Termination > 11.1 — Termination for Convenience] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Commencement Date"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "11 — Termination > 11.1 — Termination for Convenience",
+    "index": 36,
+    "original_header": "11.1 Termination for Convenience",
+    "secondary_clause_type": "notices",
+    "token_count": 65
+  },
+  {
+    "char_end": 18056,
+    "char_start": 17768,
+    "classification_confidence": 0.714,
+    "clause_type": "termination",
+    "content_head": "'11 Termination\\n11.2 Termination for Cause\\n\\nEither party may terminate this Agree'",
+    "content_sha256": "b54f118ea30b4a5cc0e1a2a0b0ae036b8aa25ecda7a99977c9e9d842c365e6bb",
+    "context_header": "[Section: 11 — Termination > 11.2 — Termination for Cause] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "11 — Termination > 11.2 — Termination for Cause",
+    "index": 37,
+    "original_header": "11.2 Termination for Cause",
+    "secondary_clause_type": "notices",
+    "token_count": 75
+  },
+  {
+    "char_end": 18346,
+    "char_start": 18056,
+    "classification_confidence": 0.714,
+    "clause_type": "termination",
+    "content_head": "'11 Termination\\n11.3 Consequences of Termination\\n\\nOn termination or expiry of thi'",
+    "content_sha256": "46d2a123a131d8ee1a80884861ab571843e30c7c95f8f5e187690e3d39d9b4d0",
+    "context_header": "[Section: 11 — Termination > 11.3 — Consequences of Termination] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 6",
+        "target_chunk_index": 16,
+        "target_identifier": "6"
+      }
+    ],
+    "defined_terms_used": [
+      "Charges",
+      "Confidential Information",
+      "Customer"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "11 — Termination > 11.3 — Consequences of Termination",
+    "index": 38,
+    "original_header": "11.3 Consequences of Termination",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 76
+  },
+  {
+    "char_end": 18698,
+    "char_start": 18346,
+    "classification_confidence": 0.556,
+    "clause_type": "force_majeure",
+    "content_head": "'11 Termination\\n11.4 Force Majeure\\n\\nNeither party shall be liable for any failure'",
+    "content_sha256": "ec1820302034e20075af0f4bfa8da6fd470333998e5a9e4ca2c1906f5829c87b",
+    "context_header": "[Section: 11 — Termination > 11.4 — Force Majeure] [Type: Force Majeure] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Force Majeure Event"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "11 — Termination > 11.4 — Force Majeure",
+    "index": 39,
+    "original_header": "11.4 Force Majeure",
+    "secondary_clause_type": "termination",
+    "token_count": 91
+  },
+  {
+    "char_end": 19080,
+    "char_start": 18698,
+    "classification_confidence": 0.625,
+    "clause_type": "termination",
+    "content_head": "'11 Termination\\n11.5 Transitional Assistance\\n\\nOn termination or expiry of this Ag'",
+    "content_sha256": "1f1f9f50dc2e62e161ba869a5137951aa9f01597f100af46a858f7212610b483",
+    "context_header": "[Section: 11 — Termination > 11.5 — Transitional Assistance] [Type: Termination] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "11 — Termination > 11.5 — Transitional Assistance",
+    "index": 40,
+    "original_header": "11.5 Transitional Assistance",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 99
+  },
+  {
+    "char_end": 19646,
+    "char_start": 19080,
+    "classification_confidence": 0.909,
+    "clause_type": "governing_law",
+    "content_head": "'12. Governing Law and Jurisdiction\\n\\n12.1 Governing Law\\n\\nThis Agreement, and any '",
+    "content_sha256": "cc6b63ca71c9bbe4fd2a663e9b15abea04e845e8f932f58678409f5e8dbcd083",
+    "context_header": "[Section: 12 — Governing Law and Jurisdiction] [Type: Governing Law] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "12 — Governing Law and Jurisdiction",
+    "index": 41,
+    "original_header": "12 Governing Law and Jurisdiction",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 141
+  },
+  {
+    "char_end": 20164,
+    "char_start": 19646,
+    "classification_confidence": 0.5,
+    "clause_type": "covenants",
+    "content_head": "'13. Anti-Bribery and Compliance\\n\\n13.1 Anti-Bribery\\n\\nEach party shall comply with'",
+    "content_sha256": "a02c5df0a461988b67be56f2f6edca4b07515356fe9c42436f34df8073e1042e",
+    "context_header": "[Section: 13 — Anti-Bribery and Compliance > 13.1 — Anti-Bribery] [Type: Covenants] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 13.1",
+        "target_chunk_index": 42,
+        "target_identifier": "13.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "13 — Anti-Bribery and Compliance > 13.1 — Anti-Bribery",
+    "index": 42,
+    "original_header": "13.1 Anti-Bribery",
+    "secondary_clause_type": null,
+    "token_count": 129
+  },
+  {
+    "char_end": 20651,
+    "char_start": 20164,
+    "classification_confidence": 0.333,
+    "clause_type": "covenants",
+    "content_head": "'13 Anti-Bribery and Compliance\\n13.2 Sanctions and Export Control\\n\\nNeither party '",
+    "content_sha256": "28572104e6021c71f3c0bc98dd87af4f27df038a9cf33b2a03b1c40a4ba4f82b",
+    "context_header": "[Section: 13 — Anti-Bribery and Compliance > 13.2 — Sanctions and Export Control] [Type: Covenants] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 13.2",
+        "target_chunk_index": 43,
+        "target_identifier": "13.2"
+      }
+    ],
+    "defined_terms_used": [
+      "Services"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "13 — Anti-Bribery and Compliance > 13.2 — Sanctions and Export Control",
+    "index": 43,
+    "original_header": "13.2 Sanctions and Export Control",
+    "secondary_clause_type": "warranties",
+    "token_count": 129
+  },
+  {
+    "char_end": 20947,
+    "char_start": 20651,
+    "classification_confidence": 0.75,
+    "clause_type": "services",
+    "content_head": "'13 Anti-Bribery and Compliance\\n13.3 Compliance Training\\n\\nThe Supplier shall ensu'",
+    "content_sha256": "bc426b9e3ec67f9fedc1870d141d4e9c2f4ed00687188d11d6531afea8d315d6",
+    "context_header": "[Section: 13 — Anti-Bribery and Compliance > 13.3 — Compliance Training] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 13",
+        "target_chunk_index": 42,
+        "target_identifier": "13"
+      },
+      {
+        "raw_text": "clause 3.4",
+        "target_chunk_index": 9,
+        "target_identifier": "3.4"
+      }
+    ],
+    "defined_terms_used": [
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "13 — Anti-Bribery and Compliance > 13.3 — Compliance Training",
+    "index": 44,
+    "original_header": "13.3 Compliance Training",
+    "secondary_clause_type": null,
+    "token_count": 81
+  },
+  {
+    "char_end": 21492,
+    "char_start": 20947,
+    "classification_confidence": 0.7,
+    "clause_type": "insurance",
+    "content_head": "'14. Insurance\\n\\n14.1 Insurance Obligations\\n\\nThe Supplier shall maintain, at its o'",
+    "content_sha256": "ca10098aad9637004068a3e391128be58735e04c4426fb7e0d0d9a3a3e242874",
+    "context_header": "[Section: 14 — Insurance > 14.1 — Insurance Obligations] [Type: Insurance] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Services",
+      "Supplier",
+      "Term"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "14 — Insurance > 14.1 — Insurance Obligations",
+    "index": 45,
+    "original_header": "14.1 Insurance Obligations",
+    "secondary_clause_type": "termination",
+    "token_count": 136
+  },
+  {
+    "char_end": 22060,
+    "char_start": 21492,
+    "classification_confidence": 0.526,
+    "clause_type": "insurance",
+    "content_head": "'14 Insurance\\n14.2 Evidence of Insurance\\n\\nThe Supplier shall, within ten Business'",
+    "content_sha256": "b380388c226af26693fa820848ff1bad6d5cd5fc6bdc124eef2284772bf828f1",
+    "context_header": "[Section: 14 — Insurance > 14.2 — Evidence of Insurance] [Type: Insurance] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 14.1",
+        "target_chunk_index": 45,
+        "target_identifier": "14.1"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Supplier"
+    ],
+    "document_section": "operative",
+    "hierarchy_path": "14 — Insurance > 14.2 — Evidence of Insurance",
+    "index": 46,
+    "original_header": "14.2 Evidence of Insurance",
+    "secondary_clause_type": "boilerplate",
+    "token_count": 145
+  },
+  {
+    "char_end": 22608,
+    "char_start": 22060,
+    "classification_confidence": 1.0,
+    "clause_type": "dispute_resolution",
+    "content_head": "'15. Dispute Resolution and Escalation\\n\\n15.1 Escalation Procedure\\n\\nIf a dispute a'",
+    "content_sha256": "fe6a7545720bdae15e45e0a1a68417d634507aafc82f16c3f538c0680124c8e8",
+    "context_header": "[Section: 15 — Dispute Resolution and Escalation > 15.1 — Escalation Procedure] [Type: Dispute Resolution] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "15 — Dispute Resolution and Escalation > 15.1 — Escalation Procedure",
+    "index": 47,
+    "original_header": "15.1 Escalation Procedure",
+    "secondary_clause_type": null,
+    "token_count": 137
+  },
+  {
+    "char_end": 23071,
+    "char_start": 22608,
+    "classification_confidence": 0.75,
+    "clause_type": "dispute_resolution",
+    "content_head": "'15 Dispute Resolution and Escalation\\n15.2 Mediation\\n\\nIf a dispute referred under'",
+    "content_sha256": "6d009967e2201c00c6a8693c7d2d692b3ca3d17bf645380bb1632b2599ca7cc5",
+    "context_header": "[Section: 15 — Dispute Resolution and Escalation > 15.2 — Mediation] [Type: Dispute Resolution] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 15.1",
+        "target_chunk_index": 47,
+        "target_identifier": "15.1"
+      },
+      {
+        "raw_text": "clause 15.2",
+        "target_chunk_index": 48,
+        "target_identifier": "15.2"
+      },
+      {
+        "raw_text": "clause 12.2",
+        "target_chunk_index": 41,
+        "target_identifier": "12.2"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "15 — Dispute Resolution and Escalation > 15.2 — Mediation",
+    "index": 48,
+    "original_header": "15.2 Mediation",
+    "secondary_clause_type": "covenants",
+    "token_count": 125
+  },
+  {
+    "char_end": 23367,
+    "char_start": 23071,
+    "classification_confidence": 1.0,
+    "clause_type": "dispute_resolution",
+    "content_head": "'15 Dispute Resolution and Escalation\\n15.3 Continued Performance\\n\\nEach party shal'",
+    "content_sha256": "c7a2ef1f18c766621f47a1fdfb29197a675eca7e0f182614cb35ba61be55d039",
+    "context_header": "[Section: 15 — Dispute Resolution and Escalation > 15.3 — Continued Performance] [Type: Dispute Resolution] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "clause 15.1",
+        "target_chunk_index": 47,
+        "target_identifier": "15.1"
+      },
+      {
+        "raw_text": "clause 15.2",
+        "target_chunk_index": 48,
+        "target_identifier": "15.2"
+      }
+    ],
+    "defined_terms_used": [],
+    "document_section": "operative",
+    "hierarchy_path": "15 — Dispute Resolution and Escalation > 15.3 — Continued Performance",
+    "index": 49,
+    "original_header": "15.3 Continued Performance",
+    "secondary_clause_type": null,
+    "token_count": 83
+  },
+  {
+    "char_end": 24232,
+    "char_start": 23367,
+    "classification_confidence": 0.552,
+    "clause_type": "services",
+    "content_head": "'Schedule 1 — Services Description\\n\\nPage 12 of 42\\nCONFIDENTIAL — Project Atlas Se'",
+    "content_sha256": "02ce673f53de561ca17b6669cb32783a810a54cd60c11d9e511c68b65f00f488",
+    "context_header": "[Section: Schedule 1 — Services Description] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "Schedule 1",
+        "target_chunk_index": 50,
+        "target_identifier": "1"
+      },
+      {
+        "raw_text": "clause 1.1",
+        "target_chunk_index": 1,
+        "target_identifier": "1.1"
+      },
+      {
+        "raw_text": "Schedule 2",
+        "target_chunk_index": 53,
+        "target_identifier": "2"
+      }
+    ],
+    "defined_terms_used": [
+      "Charges",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "Schedule 1 — Services Description",
+    "index": 50,
+    "original_header": "Schedule 1 Services Description",
+    "secondary_clause_type": "notices",
+    "token_count": 216
+  },
+  {
+    "char_end": 24555,
+    "char_start": 24232,
+    "classification_confidence": 1.0,
+    "clause_type": "services",
+    "content_head": "'Schedule 1 Services Description\\n4. Reporting\\n\\nThe Supplier shall provide the Cus'",
+    "content_sha256": "7662a3eee81137b8ff54c2c42b7da45ab0f69c6c86cd78b5d4156dfd675ae891",
+    "context_header": "[Section: Schedule 1 — Services Description > 4 — Reporting] [Type: Services] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "Schedule 1",
+        "target_chunk_index": 50,
+        "target_identifier": "1"
+      }
+    ],
+    "defined_terms_used": [
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "Schedule 1 — Services Description > 4 — Reporting",
+    "index": 51,
+    "original_header": "4 Reporting",
+    "secondary_clause_type": null,
+    "token_count": 88
+  },
+  {
+    "char_end": 24863,
+    "char_start": 24555,
+    "classification_confidence": 0.375,
+    "clause_type": "payment",
+    "content_head": "'Schedule 1 Services Description\\n5. Service Credits\\n\\nIf the Supplier fails to ach'",
+    "content_sha256": "8fc80ea9c6186f830d00c80831df00dce3891c6d93dc6e7d266d3a8e89cb0ecf",
+    "context_header": "[Section: Schedule 1 — Services Description > 5 — Service Credits] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Charges",
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "Schedule 1 — Services Description > 5 — Service Credits",
+    "index": 52,
+    "original_header": "5 Service Credits",
+    "secondary_clause_type": "services",
+    "token_count": 85
+  },
+  {
+    "char_end": 25591,
+    "char_start": 24863,
+    "classification_confidence": 0.889,
+    "clause_type": "payment",
+    "content_head": "'Schedule 2 — Charges and Payment Schedule\\n\\n1. Charges\\n\\nThe annual Charges for th'",
+    "content_sha256": "38a07c25e3ff721397b9b6f512d996710f23dce761b360ac8a1c7ac088385ff3",
+    "context_header": "[Section: Schedule 2 — Charges and Payment Schedule] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [
+      {
+        "raw_text": "Schedule 2",
+        "target_chunk_index": 53,
+        "target_identifier": "2"
+      },
+      {
+        "raw_text": "Schedule\n\n1",
+        "target_chunk_index": 50,
+        "target_identifier": "1"
+      },
+      {
+        "raw_text": "clause 5.2",
+        "target_chunk_index": 14,
+        "target_identifier": "5.2"
+      },
+      {
+        "raw_text": "paragraph 3",
+        "target_chunk_index": 53,
+        "target_identifier": "3"
+      }
+    ],
+    "defined_terms_used": [
+      "Charges",
+      "Commencement Date",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "Schedule 2 — Charges and Payment Schedule",
+    "index": 53,
+    "original_header": "Schedule 2 Charges and Payment Schedule",
+    "secondary_clause_type": "confidentiality",
+    "token_count": 182
+  },
+  {
+    "char_end": 25988,
+    "char_start": 25591,
+    "classification_confidence": 1.0,
+    "clause_type": "payment",
+    "content_head": "'Schedule 2 Charges and Payment Schedule\\n4. Expenses\\n\\nThe Charges do not include '",
+    "content_sha256": "6e3c5b4289779dc4a40f689cc3e445132513cbc4614d7a270eee64e62befbaf7",
+    "context_header": "[Section: Schedule 2 — Charges and Payment Schedule > 4 — Expenses] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Charges",
+      "Customer",
+      "Services",
+      "Supplier"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "Schedule 2 — Charges and Payment Schedule > 4 — Expenses",
+    "index": 54,
+    "original_header": "4 Expenses",
+    "secondary_clause_type": null,
+    "token_count": 109
+  },
+  {
+    "char_end": 26458,
+    "char_start": 25988,
+    "classification_confidence": 0.75,
+    "clause_type": "payment",
+    "content_head": "'Schedule 2 Charges and Payment Schedule\\n5. Disputed Invoices\\n\\nIf the Customer di'",
+    "content_sha256": "dfcc0973dae119156e6bb7e55e0bb0f8d93187fdd0d9deaeece90deddba0b86f",
+    "context_header": "[Section: Schedule 2 — Charges and Payment Schedule > 5 — Disputed Invoices] [Type: Payment] [Jurisdiction: UK]",
+    "cross_references": [],
+    "defined_terms_used": [
+      "Charges",
+      "Customer",
+      "Supplier"
+    ],
+    "document_section": "schedules",
+    "hierarchy_path": "Schedule 2 — Charges and Payment Schedule > 5 — Disputed Invoices",
+    "index": 55,
+    "original_header": "5 Disputed Invoices",
+    "secondary_clause_type": "covenants",
+    "token_count": 127
+  }
+]

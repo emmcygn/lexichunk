@@ -96,7 +96,25 @@ Read this before adopting it.
 - **Offsets index the sanitised text, not your original string.**
   `char_start`/`char_end` refer to the text after BOM stripping, CRLF→LF
   normalisation and Unicode NFC normalisation. Call
-  `LegalChunker.sanitize(text)` and slice *that* string.
+  `LegalChunker.sanitize(text)` and slice *that* string, or pass
+  `raw_offsets=True` and read `raw_char_start`/`raw_char_end`.
+- **`chunk.content` is not `text[char_start:char_end]` by default.** It is
+  that span with the ancestor headings prepended, so a retrieved `(b)` still
+  says which clause it belongs to. Pass `include_ancestor_headers=False` if
+  you need exact-slice equality — the offsets and chunk boundaries are
+  identical either way. `include_context_header` does *not* control this; it
+  governs the separate `context_header` field.
+- **Cross-reference resolution does not read the words around a reference.**
+  "paragraph 2 of Schedule 2", written from the main body, resolves to
+  top-level clause 2 rather than into the schedule.
+- **Lettered sub-clauses are not resolution targets under their parent's
+  number.** `clause 7.3(b)` is detected, and `target_identifier` is correct,
+  but it resolves to clause 7.3 rather than to the `(b)` beneath it.
+- **Some documents classify entirely as `UNKNOWN`** — two contracts in a
+  150-contract CUAD sample, both short and unusually formatted. That is the
+  classifier declining rather than misfiring;
+  `PipelineMetrics.chunks_unclassified` makes it visible without iterating
+  the chunks.
 - **Ambiguous cross-references stay unresolved.** When two chunks are equally
   plausible targets and neither the document section nor the top-level
   ancestor breaks the tie, `target_chunk_index` stays `None`. A wrong pointer
@@ -104,8 +122,9 @@ Read this before adopting it.
 - **`token_count` is an estimate**, `len(content) // chars_per_token` with
   `chars_per_token=4` by default. It is not a tokenizer count; if you need
   exact budgeting, measure with your own tokenizer. `max_chunk_size` is
-  enforced against that estimate, and an indivisible word longer than the
-  budget is emitted whole.
+  enforced against that estimate as a hard cap: a run that offers no
+  sentence, semicolon, enumerator, newline or word boundary inside the budget
+  is cut mid-word, and that is logged once at `WARNING`.
 - **Definitions are document-scoped heuristics.** `defined_terms_context`
   holds definitions detected in the supplied text — not authoritative
   meanings from legislation, case law, another agreement or an incorporated
@@ -118,7 +137,10 @@ Read this before adopting it.
 - **Output is retrieval metadata, not legal advice.** Preserve and display
   source evidence, unresolved references and extraction provenance rather
   than presenting parsed output as legal validation.
-- **No calibrated accuracy number yet.** The companion
+- **No calibrated *retrieval* accuracy number yet.** Structural parse
+  accuracy is measured against gold annotations — see
+  [Measured accuracy](#measured-accuracy) — but end-to-end retrieval quality
+  is not. The companion
   [legal-rag-eval][evalharness] harness reports the current honest position:
   on 5 fixtures and 22 queries lexichunk retrieves more annotated-relevant
   chunks than a 512-character `RecursiveCharacterTextSplitter`; the gap is
@@ -137,6 +159,39 @@ retriever or a relevance evaluation.
 
 For evaluation scope, comparison criteria and production-readiness guidance,
 see [Evaluating lexichunk](docs/adoption-guide.md).
+
+---
+
+## Measured accuracy
+
+Two fixtures ship with hand-built gold annotations whose structure was
+declared *before* the document text was generated from it, so the answer key
+was never read back from the parser. Reproduce with
+`python -m pytest tests/test_gold_fixtures.py -s`.
+
+| | UK, PDF-extracted (26 KB) | US, signed MSA (22 KB) |
+| --- | --- | --- |
+| Heading recall / precision | 100% / 100% | 100% / 100% |
+| Top-level boundary recall / precision | 100% / 100% | 100% / 100% |
+| Chunks straddling two top-level clauses | 0 | 0 |
+| Defined-term recall | 100% | 100% |
+| Cross-reference recall | 100% | 100% |
+| Cross-reference target precision | 94.8% | 100% |
+
+Both fixtures are adversarial. The UK one is an agreement as a naive PDF text
+extractor leaves it: a running header and footer every 45 lines, greedy
+78-column hard wrapping that splits cross-references across line breaks, and a
+soft-hyphenated word. The US one is a signed MSA whose ARTICLE titles sit on a
+second heading line, whose exhibits come *after* the signature block, and
+which says "survive execution" in an operative clause a long way before the
+real execution block.
+
+These are structural parse metrics, not retrieval metrics — see the bullet on
+retrieval accuracy above.
+
+Throughput on real filings, measured on 150 CUAD contracts (US SEC exhibits):
+median 0.042 s per contract, worst case 0.84 s on a 292,000-character
+co-development agreement.
 
 ---
 
@@ -499,12 +554,81 @@ response = index.as_query_engine().query("What are the indemnification obligatio
 
 Tested against langchain-core 1.6.2 and llama-index-core 0.14.24.
 
-<!-- A1: ingestion section -->
-<!-- The ingestion work package inserts its section here: chunk_documents(),
-     ingestion adapters (from_docling / from_unstructured / from_markdown),
-     the raw-offset back-map (sanitize_with_map, raw_char_start/raw_char_end),
-     structure metrics on PipelineMetrics, and the classification_hook.
-     Do not delete this marker until that branch has merged. -->
+---
+
+## Ingestion: reuse the structure your converter already found
+
+`chunk()` detects headings from the text itself. When an upstream converter
+has already recovered the document's structure from its layout, hand
+lexichunk that structure instead — it is better than anything line-based can
+recover from flattened text.
+
+<!-- lexichunk-doctest: skip (needs the optional `docling` converter and a PDF on disk) -->
+
+```python
+from docling.document_converter import DocumentConverter
+
+from lexichunk import LegalChunker
+from lexichunk.ingestion import from_docling
+
+result = DocumentConverter().convert("msa.pdf")
+chunks = LegalChunker(jurisdiction="uk").chunk_documents(
+    from_docling(result.document, jurisdiction="uk")
+)
+```
+
+`chunk_documents()` runs the whole pipeline *except* heading detection.
+Markdown needs no extra dependency at all:
+
+```python
+from lexichunk import LegalChunker
+from lexichunk.ingestion import from_markdown
+
+markdown = """# Services Agreement
+
+## 1. Definitions
+
+"Services" means the services described in Schedule 1.
+
+## 2. Supply of the Services
+
+The Supplier shall provide the Services in accordance with clause 1.
+"""
+
+chunks = LegalChunker(jurisdiction="uk").chunk_documents(
+    from_markdown(markdown, jurisdiction="uk")
+)
+print(chunks[0].hierarchy_path)
+```
+
+| Adapter | Takes | Install |
+| --- | --- | --- |
+| `from_docling` | a `DoclingDocument` | the `docling` extra |
+| `from_unstructured` | `unstructured` elements | nothing extra — duck-typed |
+| `from_markdown` | a Markdown string | nothing extra |
+
+lexichunk still has zero mandatory dependencies: importing
+`lexichunk.ingestion` never imports `docling_core` or `unstructured`.
+
+See [docs/ingestion.md](docs/ingestion.md) and
+[examples/docling_pipeline.py](examples/docling_pipeline.py).
+
+### Offsets into your original string
+
+`char_start`/`char_end` index the sanitised text. Pass `raw_offsets=True` to
+also get `raw_char_start`/`raw_char_end`, which index the exact string you
+passed in:
+
+```python
+from lexichunk import LegalChunker
+
+chunker = LegalChunker(jurisdiction="uk")
+chunks = chunker.chunk(contract_text, raw_offsets=True)
+
+for chunk in chunks[:3]:
+    print(contract_text[chunk.raw_char_start : chunk.raw_char_end][:60])
+```
+
 
 ---
 
@@ -609,13 +733,18 @@ print(chunker.cross_ref_stats)
 
 ## Testing and quality
 
-The suite is 1611 tests at 96.5% statement coverage, with a 92% gate in CI.
+The suite is 2145 tests at 96.9% statement coverage, with a 92% gate in CI.
 
 - **Snapshot tests** (`tests/test_snapshots.py`) pin the full chunk output for
-  five fixtures — a UK service agreement, UK terms and conditions, a US MSA,
-  US terms of service and a GDPR excerpt — against golden JSON in
-  `tests/snapshots/`. Any behaviour change shows up as a reviewable diff.
-  Regenerate with `pytest --update-snapshots`, then read the diff.
+  seven fixtures — a UK service agreement, UK terms and conditions, a US MSA,
+  US terms of service, a GDPR excerpt, a PDF-extracted UK agreement and a
+  signed US MSA with exhibits — against golden JSON in `tests/snapshots/`.
+  Any behaviour change shows up as a reviewable diff. Regenerate with
+  `pytest --update-snapshots`, then read the diff.
+- **Gold-fixture accuracy** (`tests/test_gold_fixtures.py`) scores the parse
+  against hand-built annotations declared before the fixture text was
+  generated from them — see [Measured accuracy](#measured-accuracy).
+  `-s` prints the table.
 - **Invariant suite** (`tests/test_invariants.py`) asserts cross-cutting
   properties that no single stage owns: offsets stay inside the sanitised
   text and never overlap, `max_chunk_size` is a hard cap, every
@@ -630,7 +759,14 @@ The suite is 1611 tests at 96.5% statement coverage, with a 92% gate in CI.
   package with pathological inputs.
 - **Heading regression** (`tests/test_heading_regression.py`) is a
   table-driven set of realistic headings that must be detected and
-  heading-shaped lines that must not be.
+  heading-shaped lines that must not be;
+  `tests/test_heading_shapes.py` pins the per-line `detect_level` shapes
+  underneath that gate.
+- **Ingestion and offset suites** (`tests/test_ingestion.py`,
+  `tests/test_chunk_documents.py`, `tests/test_offset_map.py`) cover the
+  externally-parsed-structure path and the raw-offset back-map.
+- **Random invariants** (`tests/test_random_invariants.py`) re-check the
+  cross-cutting invariants over Hypothesis-generated whole documents.
 - **README examples** (`tests/test_readme_examples.py`) executes every Python
   block in this file, so the documentation cannot drift from the API.
 - **Benchmarks** (`benchmarks/`) run in CI with `--benchmark-disable` so they

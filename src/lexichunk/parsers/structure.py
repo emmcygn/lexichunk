@@ -339,6 +339,15 @@ _UK_POSTCODE_RE = re.compile(
     r'\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b', re.IGNORECASE
 )
 
+# A wholly numeric identifier — "1", "1.1", "1.1.1".  These are the shapes
+# that carry no keyword ("Section", "ARTICLE", "Schedule") to vouch for
+# them, so they are the ones a wrapped sentence can imitate; see rule (f).
+_BARE_NUMERIC_ID_RE = re.compile(r'\d+(?:\.\d+)*')
+
+# Punctuation that ends the preceding line's sentence, and so tells rule (f)
+# that the numbered line below it starts something new.
+_SENTENCE_END = ('.', '!', '?', ':', ';')
+
 
 def _is_title_shaped(remainder: str) -> bool:
     """Return ``True`` when *remainder* reads as a heading title, not prose.
@@ -850,6 +859,32 @@ class StructureParser:
             for c in clauses
         ]
 
+    def classify_document_section(
+        self, identifier: str, title: str, level: int
+    ) -> DocumentSection:
+        """Classify a heading into a :class:`DocumentSection`.
+
+        The public entry point to the same rules :meth:`parse` applies to
+        each heading it finds, for callers that already have structure from
+        somewhere else — :meth:`~lexichunk.chunker.LegalChunker.chunk_documents`
+        uses it to classify externally-parsed sections so they land in the
+        same buckets a natively-parsed document would.
+
+        Note this classifies one heading *in isolation*: the inheritance
+        rule (a clause inside a Schedule is part of the schedules however
+        neutrally its own heading reads) is applied by the caller, which is
+        the only place that knows the ancestry.
+
+        Args:
+            identifier: The clause identifier (e.g. ``"1"``, ``"Article I"``).
+            title: The heading text, or the empty string.
+            level: The numeric hierarchy level.
+
+        Returns:
+            A :class:`~lexichunk.models.DocumentSection` member.
+        """
+        return self._detect_document_section(identifier, title, level)
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -924,7 +959,7 @@ class StructureParser:
             result = self._detect_level(line)
             if result is None:
                 continue
-            if not self._is_plausible_heading(lines, idx, result):
+            if not self._is_plausible_heading(lines, idx, result, header_map):
                 rejected += 1
                 continue
 
@@ -956,6 +991,7 @@ class StructureParser:
         lines: list[str],
         idx: int,
         result: tuple[int, str],
+        accepted: dict[int, tuple[int, str]] | None = None,
     ) -> bool:
         """Return ``True`` when ``lines[idx]`` really looks like a heading.
 
@@ -993,11 +1029,24 @@ class StructureParser:
           title-cased, unpunctuated — out of those two rules.  A remainder
           opening with a quote is exempt from the length test: that is the
           numbered-definition layout ``1. "Term" means …``.
+        * **Bare-numeric headings** (``1``, ``1.1``, ``1.1.1`` — no
+          ``Section``/``ARTICLE``/``Schedule`` keyword to vouch for them)
+          must *open* a block: the previous line has to be blank, end a
+          sentence, or itself be an accepted heading.  A numbered line that
+          merely continues the previous one is a wrapped sentence, not a
+          clause — ``"… terminate before the effective date in accordance
+          with Section"`` wrapping onto ``"7.2. Continued use of the
+          Platform …"`` is the canonical case, and it costs a real clause
+          body if believed.
 
         Args:
             lines: The document's lines.
             idx: Index of the candidate line.
             result: The ``(level, identifier)`` proposed by ``detect_level``.
+            accepted: Headings accepted so far, keyed by line index.  Only
+                indices below *idx* are populated, which is all rule (f)
+                needs.  ``None`` disables that rule, so a direct call for a
+                single line behaves as it did before the rule existed.
 
         Returns:
             ``True`` to accept the heading, ``False`` to reject it.
@@ -1015,19 +1064,38 @@ class StructureParser:
         # Text after the identifier; used by rules (d) and (e) below.
         remainder = _remainder_after_identifier(line, identifier)
 
-        # (b) Container levels must start at column 0, follow a blank line, or
-        #     follow a line that ended a sentence.  The third alternative was
-        #     added because a real "Schedule 2" heading is routinely typed
-        #     directly under the last line of the preceding clause with no
-        #     blank line between them; rejecting it collapses the entire
-        #     schedule into the clause above.
-        if level in (-1, -2):
-            starts_at_column_0 = not line[:1].isspace()
-            previous = lines[idx - 1].rstrip() if idx > 0 else ''
-            blank_before = idx > 0 and not previous.strip()
-            terminated_before = previous.endswith(('.', '!', '?', ':', ';'))
-            if not (starts_at_column_0 or blank_before or terminated_before):
-                return False
+        # A heading opens a block; a wrapped sentence continues one.  The
+        # evidence is the line above: blank, finished, or itself a heading.
+        # Used by rules (b) and (f) below.
+        previous = lines[idx - 1].rstrip() if idx > 0 else ''
+        opens_block = (
+            idx == 0
+            or not previous.strip()
+            or previous.endswith(_SENTENCE_END)
+            or (accepted is not None and (idx - 1) in accepted)
+        )
+
+        # (b) *Every* heading opens a block.  A line that merely continues the
+        #     sentence above it is a wrapped fragment, whatever it starts
+        #     with, and believing it is expensive: the rest of the document
+        #     is re-parented under a clause that does not exist there.
+        #
+        #     This rule used to apply only to containers, and to accept any
+        #     line starting at column 0 — which is no evidence at all in text
+        #     hard-wrapped out of a PDF, where *every* line starts at column
+        #     0.  The two gold fixtures are full of the cases that exposed
+        #     it: "... the payment terms set out in paragraph 2 of" wrapping
+        #     onto "Schedule 2."; "... its obligations under" wrapping onto
+        #     "Section 2.04."; "... invoiced in accordance with" wrapping
+        #     onto "Section 3.02."; an ALL-CAPS liability cap wrapping onto
+        #     "SECTION 8.01 OR SECTION 8.02, A BREACH OF ARTICLE V, ...".
+        #
+        #     The "previous line was itself a heading" alternative is what
+        #     keeps the layouts that have no blank line and no full stop: a
+        #     real "Schedule 2" typed under the heading above it, and "1.1"
+        #     stacked directly under "1. Definitions".
+        if not opens_block:
+            return False
 
         # (c) ALL-CAPS level-0 fallback.
         if _is_allcaps_fallback(stripped, level, identifier):
@@ -1255,8 +1323,30 @@ def parse_structure(
     return StructureParser(jurisdiction, doc_type=doc_type).parse(text)
 
 
+def is_allcaps_fallback(line: str, level: int, identifier: str) -> bool:
+    """Whether a ``detect_level`` match came from the ALL-CAPS fallback branch.
+
+    The US and EU rules end with a branch that accepts any standalone
+    ALL-CAPS line as a level-0 heading and hands the whole line back as the
+    identifier.  That match carries no *numbering* information — it says only
+    "this line is shouty" — so a caller that already knows the heading's
+    depth from elsewhere (an ingestion adapter reading a converter's own
+    outline) should ignore it and keep the depth it has.
+
+    Args:
+        line: The stripped candidate line.
+        level: The level ``detect_level`` proposed.
+        identifier: The identifier ``detect_level`` proposed.
+
+    Returns:
+        ``True`` when the match is the ALL-CAPS fallback.
+    """
+    return _is_allcaps_fallback(line, level, identifier)
+
+
 __all__ = [
     "ParsedClause",
     "StructureParser",
+    "is_allcaps_fallback",
     "parse_structure",
 ]

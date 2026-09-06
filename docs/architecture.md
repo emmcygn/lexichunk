@@ -106,6 +106,28 @@ The core pipeline uses only Python stdlib and `re`. This keeps the install size 
 
 `JurisdictionPatterns` is a `@runtime_checkable` Protocol, not an abstract class. Users add jurisdictions by creating any object with the required attributes and calling `register_jurisdiction()` — no inheritance needed.
 
+### Choosing a jurisdiction (and why there is no `"auto"`)
+
+Pass the jurisdiction the document is drafted under: `us` for a US agreement,
+`uk` for a UK one, `eu` for an EU instrument. That advice used to be wrong for
+US contracts, which is worth stating plainly because the workaround circulated:
+the `us` profile once required a literal `Section` or `ARTICLE` marker, so on
+US SEC filings — whose dominant style is bare `1. Definitions.` / `1.1` — `uk`
+recovered structure that `us` missed, and "use `uk` for US contracts" was
+genuinely the better advice. It no longer is. Both profiles now recognise the
+same bare-decimal numbering, and `us` adds `ARTICLE N`, `Section N.NN`,
+`Exhibit A` and letter-named attachments on top.
+
+A `jurisdiction="auto"` that sniffs the numbering style was considered and not
+built. Its whole value was papering over that gap. With the gap closed, the
+three profiles differ mainly in what they add — Roman-numeral articles and
+exhibits for `us`, `Chapter`/`Annex`/`Recital` for `eu` — so sampling heading
+lines to guess between them buys little and introduces a silent, per-document
+mode change that is unpleasant to debug when it guesses wrong. If your corpus
+is genuinely mixed, run the one you expect and watch
+`top_level_clause_count` and `fallback_used`; those say more than a guess
+would.
+
 ### Two-Pass Cross-References
 
 Cross-references are detected in Stage 3 (before chunking boundaries are final) and resolved in Stage 7 (after all chunks have identifiers). This two-pass design ensures resolution works even when a reference points forward in the document.
@@ -132,6 +154,55 @@ print(f"Total: {metrics.total_duration_ms:.1f}ms, {metrics.chunk_count} chunks")
 for stage in metrics.stage_metrics:
     print(f"  {stage.name}: {stage.duration_ms:.1f}ms ({stage.item_count} items)")
 ```
+
+### Structure-quality metrics
+
+Timings tell you the pipeline ran. These fields tell you whether it
+*understood this contract* — the question that actually matters when you point
+lexichunk at a new corpus and cannot eyeball 4,000 documents.
+
+| Field | Meaning | How to read it |
+| --- | --- | --- |
+| `clause_count` | `ParsedClause` objects from Stage 1, including the synthetic preamble. | Near-zero on a document you expect to be structured means the extraction layer, not the contract, changed. |
+| `top_level_clause_count` | Root structural units — parsed clauses with no parent (preamble, each top-level clause, each Schedule/Article). | The document's own outline size. Compare `chunk_count` against it. |
+| `chunks_spanning_multiple_top_level_clauses` | Chunks whose `[char_start, char_end)` overlaps more than one root unit. | **0 by design.** The clause-aware chunker never merges two container-level groups, so anything else is an over-merge putting two unrelated clauses behind one embedding. Assert on it in CI. |
+| `chunks_with_multiple_clauses` | Chunks that gathered more than one *distinct* clause identifier. | Informational. Sub-clause grouping is how `min_chunk_size` is honoured without crossing hierarchy. The pieces of one over-sized clause are not counted — they share an identifier. |
+| `chunks_below_min` | Chunks under `min_chunk_size` tokens. | Expected to be non-zero: `min_chunk_size` is a preference, hierarchy is a fact. A short, structurally isolated clause is emitted short rather than folded into a neighbour. |
+| `heading_candidates_rejected` | Lines `detect_level` proposed as headings that the plausibility gate then vetoed. | Table-of-contents entries, running headers, wrapped ALL-CAPS paragraphs, fee-schedule list items. A jump against a comparable document points at the extraction layer. |
+| `chunks_unclassified` | Chunks whose `clause_type` is `UNKNOWN` — the classifier declining rather than guessing. | Some are normal (a signature block, a fee table). `chunks_unclassified == chunk_count` is the one worth alerting on: the document carries *no* clause metadata at all. A CUAD evaluation saw that on 2 of 150 contracts, both short and unusually formatted. Read it next to `fallback_used`. |
+| `fallback_used` | The sentence-level `FallbackChunker` ran because Stage 1 found no structure. | On a numbered contract this means detection failed outright. |
+
+```python
+chunks, metrics = chunker.chunk_with_metrics(text)
+
+assert metrics.chunks_spanning_multiple_top_level_clauses == 0
+print(
+    f"{metrics.clause_count} clauses "
+    f"({metrics.top_level_clause_count} top-level) -> "
+    f"{metrics.chunk_count} chunks; "
+    f"{metrics.chunks_with_multiple_clauses} grouped, "
+    f"{metrics.chunks_below_min} short, "
+    f"{metrics.heading_candidates_rejected} heading candidates rejected, "
+    f"{metrics.chunks_unclassified} unclassified"
+)
+```
+
+Reference values for the bundled fixtures at the default 512/64 sizes.
+The last two are generated fixtures with hand-built gold annotations —
+see `tests/test_gold_fixtures.py`. `us_msa_signed_with_exhibits` rejects
+17 heading candidates because it is a signed agreement full of ALL-CAPS
+liability text and wrapped `Section N.NN` references; that number being
+high is the gate working, not failing.
+
+| Fixture | clauses | top-level | chunks | spanning | grouped | below min | rejected | unclassified |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `uk_service_agreement` | 113 | 11 | 51 | 0 | 32 | 4 | 1 | 1 |
+| `uk_terms_conditions` | 71 | 11 | 32 | 0 | 21 | 2 | 1 | 0 |
+| `us_msa` | 74 | 12 | 50 | 0 | 17 | 2 | 14 | 0 |
+| `us_terms_of_service` | 80 | 12 | 48 | 0 | 17 | 0 | 6 | 1 |
+| `eu_gdpr_excerpt` | 37 | 3 | 10 | 0 | 8 | 1 | 2 | 1 |
+| `uk_pdf_extracted_agreement` | 91 | 18 | 56 | 0 | 22 | 0 | 3 | 1 |
+| `us_msa_signed_with_exhibits` | 63 | 13 | 44 | 0 | 18 | 1 | 17 | 1 |
 
 ## Logging and observability
 
@@ -169,6 +240,50 @@ not per-call results, so reading them from one thread while another thread is
 mid-`chunk()` call is racy. When you need statistics tied to a specific call
 (e.g. from concurrent callers), use `chunk_with_metrics()` and read the
 returned `PipelineMetrics` object instead of the instance-level properties.
+
+## `content` and the offsets: what a chunk actually holds
+
+`char_start` and `char_end` mark a clause's own text in the **sanitised**
+document. `content` is that slice **with the ancestor headings prepended**:
+
+```
+char_start ────────────────────────────────► char_end
+              │ Section 4.2 Payment terms. Customer shall pay ...
+              ▼
+content = "ARTICLE IV — Fees\nSection 4.2\n" + sanitized[char_start:char_end]
+          └──────── prepended, outside the span ────────┘
+```
+
+So by default `content != sanitized_text[char_start:char_end]`. This is
+deliberate — a retrieved `(b)` that does not say which clause it belongs to
+is much harder to use — but it is a trap for anything that trusts both
+fields at once. Measured on 60 real CUAD contracts, 51% of chunks (1,244 of
+2,422) carried such a prefix, on 43% of contracts.
+
+Two exits:
+
+| You want | Use |
+|---|---|
+| `content` to be exactly the span | `LegalChunker(include_ancestor_headers=False)` |
+| the heading context, and the literal span occasionally | keep the default, slice the source yourself |
+
+With `include_ancestor_headers=False`, `content ==
+sanitized_text[char_start:char_end]` exactly and `original_header` is empty.
+Chunk **boundaries do not move** when you flip the flag — only what is
+prepended at each boundary changes — so nothing positional needs re-deriving.
+The prefix also stops counting against `max_chunk_size`, which is why the
+flag is honoured in the size accounting and not merely at the point the
+strings are joined.
+
+`include_context_header` does **not** control any of this. That flag governs
+the separate `context_header` field (`[Section: ...] [Type: ...]
+[Jurisdiction: ...]`), which is never part of `content`.
+
+Finally, the offsets index the *sanitised* text, not the raw text passed in.
+For offsets into the raw input, pass `raw_offsets=True` and read
+`raw_char_start` / `raw_char_end`.
+
+---
 
 ## Performance baseline
 

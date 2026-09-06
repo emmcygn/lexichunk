@@ -187,14 +187,108 @@ class HierarchyNode:
 
 
 @dataclass
+class Section:
+    """One structural unit handed to lexichunk by an *external* parser.
+
+    This is the input type for
+    :meth:`~lexichunk.chunker.LegalChunker.chunk_documents`.  Where
+    :meth:`~lexichunk.chunker.LegalChunker.chunk` has to *find* clause
+    boundaries in a wall of text, a caller who already ran Docling,
+    ``unstructured``, or their own converter over the source knows exactly
+    where the headings were — and that knowledge is usually better than
+    anything line-based detection can recover from the flattened text.
+    ``Section`` is how they hand it over.
+
+    **``text`` is the body, not the heading.**  The heading is carried
+    separately in ``identifier`` and ``title``, exactly as an upstream
+    parser reports it (a Docling ``SectionHeaderItem`` and the ``TextItem``
+    objects beneath it).  ``chunk_documents`` reconstructs a document by
+    emitting a header line built from ``identifier``/``title`` followed by
+    ``text``, so putting the heading in ``text`` as well duplicates it.
+
+    Attributes:
+        identifier: The section's own label — ``"5.2"``, ``"Article IV"``,
+            ``"Schedule 1"``, or, for an unnumbered heading, the heading
+            text itself.  May be left empty when *title* is set, in which
+            case the title is used as the identifier.
+        title: Heading text after the identifier (``"Payment Terms"``), or
+            ``None``.
+        text: The section's body text, excluding its own heading and
+            excluding any nested subsection's text (nest those as their own
+            ``Section`` records).
+        level: Hierarchy level, following the same scale the built-in
+            jurisdictions use — negative for containers (``-1`` Schedule,
+            ``-2`` Exhibit), ``0`` top-level clause or Article, ``1``
+            subsection, ``2`` sub-subsection, ``3`` alpha sub-clause, ``4``
+            roman sub-clause.  Only the *ordering* matters: a section
+            nests under the nearest preceding section with a strictly
+            smaller level.
+        parent_identifier: Identifier of the enclosing section.  Optional —
+            when ``None``, the parent is inferred from *level* using the
+            same stack discipline the structure parser uses.  Supply it when
+            your source has explicit parentage and you would rather not rely
+            on levels alone.
+        char_start: Optional offset of this section's body in the caller's
+            own source text (whatever the upstream parser read).  When every
+            section carries both offsets, ``chunk_documents`` populates
+            ``raw_char_start``/``raw_char_end`` on the resulting chunks, so
+            a chunk can be pointed back at the original file.
+        char_end: Exclusive counterpart to *char_start*.
+    """
+
+    identifier: str
+    title: Optional[str]
+    text: str
+    level: int
+    parent_identifier: Optional[str] = None
+    char_start: Optional[int] = None
+    char_end: Optional[int] = None
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a plain, ``json.dumps``-able dict representation."""
+        return {
+            "identifier": self.identifier,
+            "title": self.title,
+            "text": self.text,
+            "level": self.level,
+            "parent_identifier": self.parent_identifier,
+            "char_start": self.char_start,
+            "char_end": self.char_end,
+        }
+
+
+@dataclass
 class LegalChunk:
     """A single chunk of legal text with full metadata.
 
-    **Offset invariant**: ``char_start`` and ``char_end`` mark the span of this
-    clause's own text in the *original* (sanitised) document.  The ``content``
-    field may additionally prepend ancestor header lines for retrieval context,
-    so ``content`` is typically a superset of
-    ``original_text[char_start:char_end]``.
+    **``content`` is not the span, by default.** ``char_start``/``char_end``
+    mark this clause's own text in the *sanitised* document, and ``content``
+    is that slice **with the ancestor headings prepended** — so a retrieved
+    ``(b)`` still says which clause it belongs to.  ``content`` is therefore
+    normally a superset of ``sanitized_text[char_start:char_end]``, not equal
+    to it.  Measured on 60 real CUAD contracts, 51% of chunks (1,244 of
+    2,422) carried such a prefix.
+
+    This trips up anything that trusts both fields at once: highlighting a
+    retrieved passage in the source, mapping an answer span back to a page,
+    or de-duplicating against the original.  Two ways out, depending on what
+    you need:
+
+    * ``LegalChunker(include_ancestor_headers=False)`` — then ``content ==
+      sanitized_text[char_start:char_end]`` exactly, and ``original_header``
+      is empty.
+    * keep the default and slice the source yourself when you need the
+      literal span; the offsets are always correct and always index the
+      sanitised text.
+
+    Note that ``include_context_header`` does **not** control this.  That
+    flag governs the separate ``context_header`` field (``[Section: ...]
+    [Type: ...]``), which is never part of ``content``.
+
+    **Offset invariant**: the offsets are monotonic, in bounds, and index the
+    sanitised text — not the raw text the caller passed in.  For offsets into
+    the raw text, pass ``raw_offsets=True`` and read ``raw_char_start`` /
+    ``raw_char_end``.
 
     **Mutation**: the mutable container fields (``cross_references``,
     ``defined_terms_used``, ``defined_terms_context``) belong to this chunk
@@ -240,6 +334,16 @@ class LegalChunk:
     token_count: int = 0
     original_header: str = ""
 
+    # Provenance of ``clause_type``: ``"keyword"`` for the built-in scorer,
+    # ``"hook"`` when a ``classification_hook`` overrode it.
+    classification_source: str = "keyword"
+
+    # Offsets into the *raw* text the caller passed in, before sanitisation.
+    # ``-1`` means "not computed" — populate them by passing
+    # ``raw_offsets=True`` to :meth:`~lexichunk.chunker.LegalChunker.chunk`.
+    raw_char_start: int = -1
+    raw_char_end: int = -1
+
     def __post_init__(self) -> None:
         """Enforce per-chunk structural invariants.
 
@@ -276,6 +380,21 @@ class LegalChunk:
                 f"LegalChunk.cross_ref_resolved ({self.cross_ref_resolved}) "
                 f"cannot exceed cross_ref_total ({self.cross_ref_total})"
             )
+        # Raw offsets are optional: -1/-1 means "not computed". When they
+        # *are* computed they obey the same ordering rule as the sanitised
+        # pair, and both must be populated together.
+        raw_unset = self.raw_char_start == -1 and self.raw_char_end == -1
+        if not raw_unset:
+            if self.raw_char_start < 0 or self.raw_char_end < 0:
+                raise ParsingError(
+                    f"LegalChunk raw offsets must both be >= 0 or both be -1, "
+                    f"got ({self.raw_char_start}, {self.raw_char_end})"
+                )
+            if self.raw_char_end < self.raw_char_start:
+                raise ParsingError(
+                    f"LegalChunk.raw_char_end ({self.raw_char_end}) must be >= "
+                    f"raw_char_start ({self.raw_char_start})"
+                )
 
     @property
     def jurisdiction_value(self) -> str:
@@ -334,6 +453,9 @@ class LegalChunk:
             "char_end": self.char_end,
             "token_count": self.token_count,
             "original_header": self.original_header,
+            "classification_source": self.classification_source,
+            "raw_char_start": self.raw_char_start,
+            "raw_char_end": self.raw_char_end,
         }
 
     @classmethod
@@ -475,6 +597,9 @@ class LegalChunk:
             char_end=d.get("char_end", 0),
             token_count=d.get("token_count", 0),
             original_header=d.get("original_header", ""),
+            classification_source=d.get("classification_source", "keyword"),
+            raw_char_start=d.get("raw_char_start", -1),
+            raw_char_end=d.get("raw_char_end", -1),
         )
 
 

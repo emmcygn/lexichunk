@@ -371,6 +371,12 @@ def test_fallback_splits_at_real_sentences():
 
 
 def test_fallback_splits_oversized_sentence_at_word_boundaries():
+    """A run-on sentence over the cap is split, losslessly, at word boundaries.
+
+    The fallback path's spans tile the document, so the pieces reassemble
+    with a bare ``"".join`` — the whitespace between two units belongs to
+    the earlier one rather than falling outside every chunk.
+    """
     text = "alpha bravo charlie delta echo foxtrot golf hotel india juliet"
     chunker = FallbackChunker(
         jurisdiction=Jurisdiction.UK,
@@ -383,10 +389,22 @@ def test_fallback_splits_oversized_sentence_at_word_boundaries():
     assert len(chunks) > 1
     assert all(chunk.token_count <= 5 for chunk in chunks)
     assert all(chunk.content == text[chunk.char_start : chunk.char_end] for chunk in chunks)
-    assert " ".join(chunk.content for chunk in chunks) == text
+    assert "".join(chunk.content for chunk in chunks) == text
+    # Every cut landed on whitespace, i.e. no word was broken in half.
+    for previous, following in zip(chunks, chunks[1:]):
+        assert previous.content[-1].isspace() or following.content[0].isspace()
 
 
-def test_fallback_preserves_indivisible_word_over_budget():
+def test_fallback_splits_an_indivisible_word_over_budget_to_honour_the_cap():
+    """``max_chunk_size`` is a hard cap even with no boundary to split on.
+
+    A single token longer than the budget offers the cascade no sentence,
+    semicolon, enumerator, newline or word boundary, so the last resort is a
+    fixed character window — logged at ``WARNING`` because the cut lands
+    mid-word by construction. The clause-aware path has always behaved this
+    way; the fallback path used to emit the run whole and breach the cap.
+    The pieces still tile the input exactly.
+    """
     text = "x" * 25
     chunker = FallbackChunker(
         jurisdiction=Jurisdiction.UK,
@@ -396,9 +414,10 @@ def test_fallback_preserves_indivisible_word_over_budget():
 
     chunks = chunker.chunk(text)
 
-    assert len(chunks) == 1
-    assert chunks[0].content == text
-    assert chunks[0].token_count > 5
+    assert len(chunks) > 1
+    assert all(chunk.token_count <= 5 for chunk in chunks)
+    assert "".join(chunk.content for chunk in chunks) == text
+    assert all(chunk.content == text[chunk.char_start : chunk.char_end] for chunk in chunks)
 
 
 # ---------------------------------------------------------------------------
