@@ -718,6 +718,12 @@ print(metrics.total_duration_ms, metrics.chunk_count, metrics.fallback_used)
 for stage in metrics.stage_metrics:
     print(stage.name, stage.duration_ms, stage.item_count)
 
+# Structure quality — is the parse trustworthy for this document?
+print(metrics.clause_count, metrics.top_level_clause_count)
+print(metrics.chunks_spanning_multiple_top_level_clauses)  # should be 0
+print(metrics.heading_candidates_rejected)
+print(metrics.chunks_unclassified)  # == chunk_count means no clause metadata
+
 # Lazy iteration, and the exact string the offsets index into
 sanitised = LegalChunker.sanitize(contract_text)
 for chunk in chunker.chunk_iter(contract_text):
@@ -733,7 +739,7 @@ print(chunker.cross_ref_stats)
 
 ## Testing and quality
 
-The suite is 2145 tests at 96.9% statement coverage, with a 92% gate in CI.
+The suite is 2151 tests at 96.9% statement coverage, with a 92% gate in CI.
 
 - **Snapshot tests** (`tests/test_snapshots.py`) pin the full chunk output for
   seven fixtures — a UK service agreement, UK terms and conditions, a US MSA,
