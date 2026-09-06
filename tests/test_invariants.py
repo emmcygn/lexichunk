@@ -127,35 +127,11 @@ def test_no_empty_content(case_id: str, jurisdiction: str, doc_type: str, text: 
 # 2. char_start <= char_end, offsets non-decreasing by index, no overlap.
 # ---------------------------------------------------------------------------
 
-_OVERLAP_XFAIL = {
-    "uk_service_agreement": (
-        "a standalone parent-clause chunk (own content precedes its first "
-        "child header, not merged away by min_chunk_size) is emitted with "
-        "char_end taken from ParsedClause.char_end, which spans the whole "
-        "subtree including descendants — so the parent chunk's span overlaps "
-        "its first child chunk's span"
-    ),
-    "uk_terms_conditions": (
-        "same root cause as uk_service_agreement: parent-clause chunk "
-        "char_end spans the full descendant subtree, overlapping the first "
-        "child chunk"
-    ),
-    "us_msa": (
-        "same root cause as uk_service_agreement: parent-clause chunk "
-        "char_end spans the full descendant subtree, overlapping the first "
-        "child chunk"
-    ),
-    "us_terms_of_service": (
-        "same root cause as uk_service_agreement: parent-clause chunk "
-        "char_end spans the full descendant subtree, overlapping the first "
-        "child chunk"
-    ),
-    "eu_gdpr_excerpt": (
-        "same root cause as uk_service_agreement: parent-clause chunk "
-        "char_end spans the full descendant subtree, overlapping the first "
-        "child chunk"
-    ),
-}
+# FIXED (work package G2): a chunk's char_end is now the end of the clause's
+# *own* text (ClauseAwareChunker._own_end) instead of ParsedClause.char_end,
+# which spanned the whole descendant subtree.  Parent chunks no longer overlap
+# their first child.
+_OVERLAP_XFAIL: dict[str, str] = {}
 
 
 @pytest.mark.parametrize("case_id,jurisdiction,doc_type,text", _params(_OVERLAP_XFAIL))
@@ -187,26 +163,11 @@ def test_offset_ordering_and_no_overlap(
 #    superset" invariant).
 # ---------------------------------------------------------------------------
 
-_SUPERSET_XFAIL = {
-    name: (
-        "ClauseAwareChunker._group_to_chunk joins merged clauses' raw "
-        "content with an extra '\\n' separator and prepends ancestor "
-        "headers followed by their own '\\n', neither of which is present "
-        "verbatim at that position in the source text — so the sanitised "
-        "clause span is not reproduced byte-for-byte inside `content` "
-        "(blank-line count differs) and the substring check fails"
-    )
-    for name in (
-        "uk_service_agreement",
-        "uk_terms_conditions",
-        "us_msa",
-        "us_terms_of_service",
-        "eu_gdpr_excerpt",
-        "crlf_bom",
-        "semicolon_5kb_clause",
-        "short_uk_three_clauses",
-    )
-}
+# FIXED (work package G2): a chunk body is now the exact slice
+# sanitised[char_start:char_end] rather than a '\n'.join reconstruction, in the
+# merge, split and fallback paths alike.  `content` is that body with the
+# ancestor headers prepended, so the span is reproduced byte-for-byte.
+_SUPERSET_XFAIL: dict[str, str] = {}
 
 
 @pytest.mark.parametrize("case_id,jurisdiction,doc_type,text", _params(_SUPERSET_XFAIL))
@@ -228,25 +189,12 @@ def test_content_is_superset_of_span(
 # 4. token_count <= max_chunk_size for every chunk.
 # ---------------------------------------------------------------------------
 
-_TOKEN_COUNT_XFAIL = {
-    "semicolon_5kb_clause": (
-        "_split_oversized_clause only splits on sentence-terminating "
-        "punctuation ([.!?]); a clause whose only internal separators are "
-        "semicolons has no split point, so the whole ~5KB clause is emitted "
-        "as one chunk whose token_count exceeds max_chunk_size"
-    ),
-    "uk_service_agreement": (
-        "_merge_small_clauses merges a below-min_chunk_size group forward "
-        "into the next group without re-checking the combined group's token "
-        "count against max_chunk_size, so a merged chunk can end up slightly "
-        "over the limit (514 > 512)"
-    ),
-    "uk_terms_conditions": (
-        "same root cause as uk_service_agreement: _merge_small_clauses does "
-        "not re-check max_chunk_size after merging a small group forward "
-        "(517 > 512)"
-    ),
-}
+# FIXED (work package G2): max_chunk_size is now a hard cap.  Oversized clauses
+# go through a cascading splitter (sentences → semicolons → enumerators →
+# newlines → hard word window), merges re-check the combined size, and
+# ClauseAwareChunker._enforce_max re-splits anything still over the limit after
+# merging — counting the ancestor-header prefix against the budget.
+_TOKEN_COUNT_XFAIL: dict[str, str] = {}
 
 
 @pytest.mark.parametrize("case_id,jurisdiction,doc_type,text", _params(_TOKEN_COUNT_XFAIL))
