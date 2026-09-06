@@ -40,6 +40,29 @@ _SKIP_TERMS_LOWER: frozenset[str] = frozenset(t.lower() for t in _SKIP_TERMS)
 # Regex matching a blank line (zero or more spaces, then newline).
 _BLANK_LINE: re.Pattern[str] = re.compile(r"^\s*$", re.MULTILINE)
 
+# A standalone ALL-CAPS line starting a new operative section.  A definition
+# body must stop before one even when no blank line separates them: the last
+# definition of a section otherwise ran straight into the heading below it
+# ("Charlie" -> "the third letter. GOVERNING LAW This Agreement is governed
+# by ...").
+_ALLCAPS_LINE_AHEAD: re.Pattern[str] = re.compile(
+    r"\n[ \t]*(?=[A-Z][A-Z \t&/-]{2,}[ \t]*(?:\n|$))"
+)
+
+# A clause-entry marker ("1.2", "(a)", "(iv)") left dangling at the end of a
+# captured definition body.  When definitions are separated by a single
+# newline rather than a blank line, the next entry's own marker sits between
+# the end of this definition and the quote that opens the next term, so it is
+# captured as part of this definition's text ("the first thing. 1.2").
+#
+# The leading ``\n`` is load-bearing: it is what distinguishes that dangling
+# marker from a number that legitimately ends the sentence, as in
+# ``"Gamma" shall have the meaning set forth in Section 3.`` — so this is
+# applied to the raw slice, before newlines are collapsed to spaces.
+_TRAILING_CLAUSE_LABEL: re.Pattern[str] = re.compile(
+    r"\n[ \t]*(?:\d+(?:\.\d+)*\.?|\([a-z]\)|\([ivxlc]+\))[ \t]*\Z"
+)
+
 # How far back a "hereinafter" definition looks for its body.
 _HEREINAFTER_LOOKBACK: int = 500
 
@@ -686,7 +709,19 @@ class DefinitionsExtractor:
         if blank_then_header:
             stop = min(stop, blank_then_header.start())
 
-        body = remaining[:stop].strip()
+        # 4. A standalone ALL-CAPS line — an operative heading typed directly
+        #    under the last definition of a section, with no blank line.
+        allcaps_ahead = _ALLCAPS_LINE_AHEAD.search(remaining)
+        if allcaps_ahead:
+            stop = min(stop, allcaps_ahead.start())
+
+        # 5. Drop a dangling next-entry marker.  Stop condition 1 ends the
+        #    body at the quote that opens the *next* term, so when entries are
+        #    separated by a single newline instead of a blank line that
+        #    entry's own number ("1.2", "(b)") sits inside this body.  Done on
+        #    the raw slice, because the newline before the marker is what
+        #    tells it apart from a sentence-final number.
+        body = _TRAILING_CLAUSE_LABEL.sub("", remaining[:stop].rstrip()).strip()
         # Collapse internal runs of whitespace / newlines to a single space
         # so the definition is returned as a clean single-line string.
         body = re.sub(r"\s+", " ", body)

@@ -850,3 +850,62 @@ class TestH7DefinedTermCharacterClass:
             patterns.definition.search(probe) is not None
             or patterns.definition.search(probe_single) is not None
         )
+
+
+class TestH8DefinitionBodyBoundaries:
+    """H8 — a definition body only stopped at a blank line followed by a
+    clause header, so entries separated by a single newline (a common
+    DOCX-to-text export shape) ran into each other.
+    """
+
+    SINGLE_NEWLINE_DOC = (
+        "1. DEFINITIONS\n"
+        '1.1 "Alpha" means the first thing.\n'
+        '1.2 "Level 2 Data" means personal data of the second level.\n'
+        '1.3 "Bravo" means the third thing.\n'
+    )
+
+    def _terms(self, document: str) -> dict:
+        return DefinitionsExtractor(Jurisdiction.UK).extract(document)
+
+    def test_every_entry_is_extracted(self) -> None:
+        terms = self._terms(self.SINGLE_NEWLINE_DOC)
+        assert set(terms) == {"Alpha", "Level 2 Data", "Bravo"}
+
+    def test_no_definition_swallows_the_next_entry(self) -> None:
+        terms = self._terms(self.SINGLE_NEWLINE_DOC)
+        assert terms["Alpha"].definition == "the first thing."
+        assert terms["Level 2 Data"].definition == (
+            "personal data of the second level."
+        )
+        assert terms["Bravo"].definition == "the third thing."
+        for term, defined in terms.items():
+            assert "means" not in defined.definition, (
+                f"{term!r} ran into the next entry: {defined.definition!r}"
+            )
+
+    def test_last_definition_stops_at_an_allcaps_heading(self) -> None:
+        terms = self._terms(
+            "1. DEFINITIONS\n\n"
+            '1.1 "Charlie" means the third letter.\n'
+            "GOVERNING LAW\n\n"
+            "This Agreement is governed by English law.\n"
+        )
+        assert terms["Charlie"].definition == "the third letter."
+
+    def test_a_sentence_final_number_is_not_stripped(self) -> None:
+        """The dangling-marker trim must not eat 'Section 3.'."""
+        terms = self._terms(
+            '"Gamma" shall have the meaning set forth in Section 3.\n'
+            '"business day" means any day other than a Saturday.\n'
+        )
+        assert terms["Gamma"].definition == "set forth in Section 3."
+
+    def test_an_enumerated_definition_body_is_preserved(self) -> None:
+        terms = self._terms(
+            "1. DEFINITIONS\n\n"
+            '1.1 "Services" means:\n(a) hosting services;\n(b) support services.\n'
+            "\n\n2. Other\n\nBody text.\n"
+        )
+        assert "hosting services" in terms["Services"].definition
+        assert "support services" in terms["Services"].definition
