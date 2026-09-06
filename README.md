@@ -193,6 +193,27 @@ Throughput on real filings, measured on 150 CUAD contracts (US SEC exhibits):
 median 0.042 s per contract, worst case 0.84 s on a 292,000-character
 co-development agreement.
 
+### External benchmarks
+
+Measured against public, third-party-labelled datasets by the companion
+harness ([legal-rag-eval](https://github.com/emmcygn/legal-rag-eval),
+`docs/external_evals.md`, reproducible with `make evals`). Numbers below were
+taken at commit `b99eb10`, before this release's bare-decimal US heading fix,
+so the US structure-recall figure is a floor.
+
+| Question | Result |
+| --- | --- |
+| Keyword clause classifier accuracy (LEDGAR, 3,955 test provisions, 100 classes mapped to 31) | **39.6%** accuracy, **42.5%** macro-F1; majority class 21.6%; a supervised TF-IDF + logistic regression reaches 90.8% |
+| Is `classification_confidence` calibrated? | No. Directionally informative (Spearman 0.375) but not monotonic; expected calibration error 0.113. Use it to rank, not to threshold |
+| Do chunk boundaries keep gold answer spans intact (CUAD, 100 contracts, 2,458 spans)? | **83.7%** vs **72.1%** for `RecursiveCharacterTextSplitter` at the same mean chunk length. Raw containment at `max_chunk_size=512` is 98.1%, but most of that is chunk length |
+| Does the parser find structure on real SEC filings? | At `b99eb10`, only 14% of contracts yielded five or more top-level clauses under the `us` profile because bare `1. / 1.1` numbering was not recognised. Fixed in 0.9.0; re-measurement pending |
+| Does it crash on real filings? | No. Zero exceptions across 150 contracts |
+
+The classifier number is the honest headline: the keyword scorer is useful as
+a coarse filter and clearly worse than a small supervised model. A hook for
+routing low-confidence chunks to your own classifier is described under
+[Additional API](#additional-api).
+
 ---
 
 ## Installation
