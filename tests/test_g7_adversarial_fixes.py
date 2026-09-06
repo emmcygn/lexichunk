@@ -274,3 +274,181 @@ class TestC1LangChainIdCollisions:
 
         out = self._splitter().split_documents(gen())
         assert len({d.id for d in out}) == len(out)
+
+
+REALISTIC_HEADINGS = [
+    # The 16 titles the adversarial pass showed being swallowed outright.
+    "Business Continuity",
+    "Business Ethics and Anti-Bribery",
+    "Days of Service",
+    "Hours of Business",
+    "Hours of Work",
+    "Working Time Regulations",
+    "Working Practices",
+    "Working Capital Adjustment",
+    "Year End Accounts",
+    "Month-End Reporting",
+    "Month End Reporting",
+    "Calendar of Events",
+    "Calendar Year Adjustment",
+    "Minute Books",
+    "May Not Be Assigned",
+    "May Assign",
+    # Nine ordinary headings that already worked, kept as a control.
+    "Definitions",
+    "Confidentiality",
+    "Governing Law",
+    "Limitation of Liability",
+    "Termination",
+    "Notices",
+    "Force Majeure",
+    "Data Protection",
+    "Intellectual Property",
+]
+
+PROSE_LINES_THAT_ARE_NOT_HEADINGS = [
+    "3 Business Days after receipt of an invoice.",
+    "5 Working Days from the date on which the invoice is received.",
+    "30 days after the date of the notice given under this clause.",
+    "January 2024 is the Effective Date of this Agreement.",
+]
+
+
+class TestH1HeadingGateFalseNegatives:
+    """H1 — a real heading rejected by the plausibility gate is not merely
+    mis-levelled: its whole clause body is absorbed into the previous clause,
+    with no chunk, no ``hierarchy_path`` and no way to retrieve it by title.
+    15 of these 25 realistic contract headings vanished before the fix.
+    """
+
+    @staticmethod
+    def _document(title: str) -> str:
+        return (
+            "AGREEMENT\n\n"
+            "1. Preliminary\n\n"
+            "Some preliminary body text goes here for context.\n\n"
+            f"2. {title}\n\n"
+            "The body of this clause is here and continues for a sentence.\n\n"
+            "3. Final\n\n"
+            "Final body text.\n"
+        )
+
+    @pytest.mark.parametrize("title", REALISTIC_HEADINGS)
+    def test_realistic_heading_is_detected(self, title: str) -> None:
+        from lexichunk.parsers.structure import StructureParser
+
+        clauses = StructureParser(Jurisdiction.UK).parse(self._document(title))
+        assert title in [c.title for c in clauses]
+
+    @pytest.mark.parametrize("title", REALISTIC_HEADINGS)
+    def test_realistic_heading_becomes_its_own_top_level_clause(
+        self, title: str
+    ) -> None:
+        from lexichunk.parsers.structure import StructureParser
+
+        clauses = StructureParser(Jurisdiction.UK).parse(self._document(title))
+        match = [c for c in clauses if c.title == title]
+        assert len(match) == 1
+        assert match[0].level == 0
+        assert match[0].identifier == "2"
+
+    @pytest.mark.parametrize("line", PROSE_LINES_THAT_ARE_NOT_HEADINGS)
+    def test_numeric_prose_is_still_rejected(self, line: str) -> None:
+        """The loosened rules must not start promoting body prose."""
+        from lexichunk.parsers.structure import StructureParser
+
+        document = (
+            "AGREEMENT\n\n1. Payment\n\n"
+            "The Client shall pay each invoice within\n"
+            f"{line}\n\n2. Term\n\nOne year.\n"
+        )
+        clauses = StructureParser(Jurisdiction.UK).parse(document)
+        assert [c.identifier for c in clauses if c.level == 0] == ["1", "2"]
+
+    def test_nine_word_allcaps_heading_survives(self) -> None:
+        """``_MAX_ALLCAPS_WORDS`` was 8, dropping this common US heading."""
+        from lexichunk.parsers.structure import StructureParser
+
+        document = (
+            "PRELIMINARY MATTERS\n\nSome body text here.\n\n"
+            "REPRESENTATIONS AND WARRANTIES OF THE SELLER AND THE COMPANY\n\n"
+            "The Seller represents and warrants as follows.\n"
+        )
+        clauses = StructureParser(Jurisdiction.US).parse(document)
+        assert any(
+            c.identifier == "REPRESENTATIONS AND WARRANTIES OF THE SELLER AND THE COMPANY"
+            for c in clauses
+        )
+
+    def test_long_but_short_worded_numbered_heading_survives(self) -> None:
+        """A numbered heading whose title is <= 8 words is a heading even when
+        it exceeds ``_MAX_NUMERIC_HEADING_REMAINDER`` or ends in a period."""
+        from lexichunk.parsers.structure import StructureParser
+
+        title = "Limitation of Liability and Exclusion of Consequential Loss"
+        document = (
+            "AGREEMENT\n\n1. Scope\n\nBody text.\n\n"
+            f"2. {title}\n\nThe liability of each party is limited.\n"
+        )
+        clauses = StructureParser(Jurisdiction.UK).parse(document)
+        assert title in [c.title for c in clauses]
+
+
+class TestH2HeadingGateFalsePositives:
+    """H2 — numbered list items and postal addresses were promoted to
+    top-level clauses, injecting bogus entries into the hierarchy.
+    """
+
+    @pytest.mark.parametrize(
+        "amount", ["GBP 5,000", "\u00a35,000", "$5,000", "USD 5,000", "\u20ac5.000"]
+    )
+    def test_currency_list_item_is_not_a_clause(self, amount: str) -> None:
+        from lexichunk.parsers.structure import StructureParser
+
+        document = (
+            "AGREEMENT\n\n5. Fees\n\nThe fees payable are as follows.\n\n"
+            f"2. {amount} per month for hosting services.\n\n"
+            "6. Term\n\nOne year.\n"
+        )
+        clauses = StructureParser(Jurisdiction.UK).parse(document)
+        assert [c.identifier for c in clauses if c.level == 0] == ["5", "6"]
+
+    @pytest.mark.parametrize("postcode", ["SW1H 0BD", "EC1A 1BB", "M1 1AE", "B33 8TH"])
+    def test_postal_address_line_is_not_a_clause(self, postcode: str) -> None:
+        from lexichunk.parsers.structure import StructureParser
+
+        document = (
+            "AGREEMENT\n\n5. Notices\n\nAny notice shall be sent to:\n\n"
+            f"50 Broadway, London, {postcode}. VAT number: GB 312 4487 90.\n\n"
+            "6. Governing Law\n\nEnglish law applies.\n"
+        )
+        clauses = StructureParser(Jurisdiction.UK).parse(document)
+        assert [c.identifier for c in clauses if c.level == 0] == ["5", "6"]
+
+
+class TestH1ContainerHeadingAfterTerminalPunctuation:
+    """H1 — a container heading typed directly under the last line of the
+    preceding clause (no blank line) used to be rejected, collapsing the whole
+    schedule into that clause.
+    """
+
+    def test_schedule_after_a_full_stop_is_a_container(self) -> None:
+        from lexichunk.parsers.structure import StructureParser
+
+        document = (
+            "AGREEMENT\n\n1. Scope\n\nThe scope is set out below.\n"
+            "  Schedule 1\n\n1. Service Levels\n\nLevels are here.\n"
+        )
+        clauses = StructureParser(Jurisdiction.UK).parse(document)
+        assert any(c.level == -1 for c in clauses)
+
+    def test_indented_mid_sentence_schedule_is_still_rejected(self) -> None:
+        from lexichunk.parsers.structure import StructureParser
+
+        document = (
+            "AGREEMENT\n\n1. Scope\n\nThe parties agree that paragraph 2 of\n"
+            "  Schedule 2 governs data retention for the term\n"
+            "  of this Agreement.\n\n2. Term\n\nOne year.\n"
+        )
+        clauses = StructureParser(Jurisdiction.UK).parse(document)
+        assert not [c for c in clauses if c.level == -1]

@@ -289,7 +289,11 @@ _OPENING_QUOTES = '"\u201c\u2018\''
 _PAGE_RE = re.compile(r'PAGE\b')
 
 # Maximum number of words an ALL-CAPS fallback heading may contain.
-_MAX_ALLCAPS_WORDS = 8
+# Raised from 8 to 10 so genuine US-style headings such as
+# "REPRESENTATIONS AND WARRANTIES OF THE SELLER AND THE COMPANY" (9 words)
+# survive.  A rejected heading collapses a whole clause into its predecessor,
+# which is a worse outcome than an occasional extra heading.
+_MAX_ALLCAPS_WORDS = 10
 
 # A numeric top-level heading whose remainder is longer than this *and* ends
 # like a sentence is body text, not a heading.
@@ -307,6 +311,71 @@ _UNIT_WORDS = frozenset({
     'january', 'february', 'march', 'april', 'may', 'june', 'july',
     'august', 'september', 'october', 'november', 'december',
 })
+
+# Maximum number of words in the title of a numbered heading for the
+# "reads as a title, not prose" test below.
+_MAX_HEADING_TITLE_WORDS = 8
+
+# Lower-case words that appear inside perfectly ordinary title-case headings
+# ("Days of Service", "Business Ethics and Anti-Bribery", "May Not Be
+# Assigned").  Anything lower-case and *not* in this set marks the remainder
+# as running prose rather than a title.
+_TITLE_FUNCTION_WORDS = frozenset({
+    'a', 'an', 'and', 'as', 'at', 'by', 'for', 'from', 'in', 'into', 'no',
+    'not', 'of', 'on', 'or', 'per', 'the', 'to', 'under', 'upon', 'via',
+    'with', 'without',
+})
+
+# A currency amount immediately after the clause number — "2. GBP 5,000 per
+# month for hosting" — is a numbered list item inside a Fees clause, never a
+# clause heading.
+_MONEY_LEAD_RE = re.compile(
+    r'^(?:[£$€¥]|GBP|USD|EUR|JPY)\s*[\d.,]', re.IGNORECASE
+)
+
+# A UK postcode anywhere on the line marks it as part of a postal address
+# (the tail of a Notices clause), not as a heading.
+_UK_POSTCODE_RE = re.compile(
+    r'\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b', re.IGNORECASE
+)
+
+
+def _is_title_shaped(remainder: str) -> bool:
+    """Return ``True`` when *remainder* reads as a heading title, not prose.
+
+    Used to decide whether the numbered-clause prose rules should fire.  A
+    title is short, carries no terminal punctuation, contains no digits, and
+    is written in title case — every word either capitalised or one of a
+    small set of lower-case function words.
+
+    ``"Business Continuity"``, ``"Days of Service"`` and ``"May Not Be
+    Assigned"`` are title-shaped; ``"Business Days after receipt of an
+    invoice."``, ``"January 2024 is the Effective Date"`` and ``"GBP 5,000
+    per month for hosting services."`` are not.
+
+    Args:
+        remainder: The text following the clause identifier on a header line.
+
+    Returns:
+        ``True`` if the text reads as a title.
+    """
+    if not remainder or remainder.endswith(('.', ';', ':', ',')):
+        return False
+    words = remainder.split()
+    if len(words) > _MAX_HEADING_TITLE_WORDS:
+        return False
+    for word in words:
+        core = word.strip('.,;:()[]{}"\'‘’“”-–—')
+        if not core:
+            continue
+        if any(character.isdigit() for character in core):
+            return False
+        if core[0].isupper():
+            continue
+        if core.lower() in _TITLE_FUNCTION_WORDS:
+            continue
+        return False
+    return True
 
 # Single-letter sub-clause labels that are both a valid alpha label and a
 # valid Roman numeral, mapped to the alpha label that must immediately
@@ -829,18 +898,25 @@ class StructureParser:
           middle of a sentence (``"Article I, Section 3.01 through 3.04,
           Article IV, ..."`` in a survival clause), not a heading.
         * **Containers** (levels ``-1``/``-2``: Schedule, Exhibit, Annex,
-          Chapter) must either start at column 0 or follow a blank line;
-          this rejects a word-wrapped ``"     Schedule 2."`` inside a
-          clause, which would otherwise re-parent the rest of the document.
+          Chapter) must start at column 0, follow a blank line, or follow a
+          line that ended a sentence; this rejects a word-wrapped
+          ``"     Schedule 2."`` mid-sentence inside a clause, which would
+          otherwise re-parent the rest of the document.
         * **ALL-CAPS fallback headings** must follow a blank line, contain
-          at most eight words, not be page furniture (``CONFIDENTIAL``,
+          at most ten words, not be page furniture (``CONFIDENTIAL``,
           ``TABLE OF CONTENTS``, ``PAGE 3 OF 12`` …), and not continue an
           ALL-CAPS paragraph that was left unterminated on the previous
           non-blank line.
-        * **Numeric top-level clauses** must not read as prose — a long
-          remainder ending in ``.``/``;``, or one starting with a unit or
-          month word (``3 Business Days …``), is body text.  A remainder
-          opening with a quote is exempt from the prose test: that is the
+        * **Numeric top-level clauses** are rejected when the text after the
+          number is a currency amount (``2. GBP 5,000 per month …`` — a Fees
+          list item) or the line carries a postcode (the tail of a Notices
+          clause's postal address).  They are also rejected when they read as
+          prose *and* are not title-shaped: a long remainder ending in
+          ``.``/``;``, or one starting with a unit or month word
+          (``3 Business Days …``).  ``_is_title_shaped`` is what keeps
+          ``"2. Business Continuity"`` and ``"4. Days of Service"`` — short,
+          title-cased, unpunctuated — out of those two rules.  A remainder
+          opening with a quote is exempt from the length test: that is the
           numbered-definition layout ``1. "Term" means …``.
 
         Args:
@@ -864,11 +940,18 @@ class StructureParser:
         # Text after the identifier; used by rules (d) and (e) below.
         remainder = _remainder_after_identifier(line, identifier)
 
-        # (b) Container levels must be blank-separated or start at column 0.
+        # (b) Container levels must start at column 0, follow a blank line, or
+        #     follow a line that ended a sentence.  The third alternative was
+        #     added because a real "Schedule 2" heading is routinely typed
+        #     directly under the last line of the preceding clause with no
+        #     blank line between them; rejecting it collapses the entire
+        #     schedule into the clause above.
         if level in (-1, -2):
             starts_at_column_0 = not line[:1].isspace()
-            blank_before = idx > 0 and not lines[idx - 1].strip()
-            if not (starts_at_column_0 or blank_before):
+            previous = lines[idx - 1].rstrip() if idx > 0 else ''
+            blank_before = idx > 0 and not previous.strip()
+            terminated_before = previous.endswith(('.', '!', '?', ':', ';'))
+            if not (starts_at_column_0 or blank_before or terminated_before):
                 return False
 
         # (c) ALL-CAPS level-0 fallback.
@@ -885,21 +968,40 @@ class StructureParser:
         # (d) Numeric top-level clause.
         if level == 0 and identifier.isdigit():
             if remainder:
-                first_word = remainder.split()[0].strip('.,;:()').lower()
-                if first_word in _UNIT_WORDS:
-                    return False
                 upper = remainder.upper()
                 if upper in _ALLCAPS_DENYLIST or _PAGE_RE.match(upper):
                     return False
-                # A numbered definition entry (`1. "Term" means ...`) is
-                # long and semicolon-terminated but *is* a heading, so
-                # the prose test does not apply to it.
-                if (
-                    remainder[0] not in _OPENING_QUOTES
-                    and len(remainder) > _MAX_NUMERIC_HEADING_REMAINDER
-                    and remainder.endswith(('.', ';'))
-                ):
+                # A currency amount straight after the number is a numbered
+                # list item inside a Fees clause ("2. GBP 5,000 per month"),
+                # not clause 2 of the agreement.
+                if _MONEY_LEAD_RE.match(remainder):
                     return False
+                # A postcode on the line makes it part of a postal address —
+                # the tail of a Notices clause, not a new clause.
+                if _UK_POSTCODE_RE.search(stripped):
+                    return False
+                # The two prose rules below only fire when the remainder does
+                # *not* read as a heading title.  Both used to fire on shape
+                # alone and swallowed real headings: "2. Business Continuity"
+                # was rejected because "business" is a unit word, and any
+                # legitimate heading longer than 80 characters ending in a
+                # full stop was rejected as a sentence.  A rejected heading
+                # is not merely mis-levelled — its whole clause body is
+                # absorbed into the previous clause, with no chunk, no
+                # hierarchy_path and no way to retrieve it by its own title.
+                if not _is_title_shaped(remainder):
+                    first_word = remainder.split()[0].strip('.,;:()').lower()
+                    if first_word in _UNIT_WORDS:
+                        return False
+                    # A numbered definition entry (`1. "Term" means ...`) is
+                    # long and semicolon-terminated but *is* a heading, so
+                    # the prose test does not apply to it.
+                    if (
+                        remainder[0] not in _OPENING_QUOTES
+                        and len(remainder) > _MAX_NUMERIC_HEADING_REMAINDER
+                        and remainder.endswith(('.', ';'))
+                    ):
+                        return False
 
         # (e) A heading's text never *continues* the previous line: a
         #     remainder that opens with a comma is a wrapped sentence

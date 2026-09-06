@@ -604,7 +604,7 @@
   {
     "char_end": 13481,
     "char_start": 13066,
-    "classification_confidence": 0.714,
+    "classification_confidence": 0.588,
     "clause_type": "termination",
     "content_head": "'8 Term and termination\\n8.3 Either party may terminate these Terms immediately by'",
     "content_sha256": "5987cb1f4e8ab2207bae8134764731f12f62e001da62e5ef50a961de147f2fbe",
@@ -783,12 +783,12 @@
     "token_count": 96
   },
   {
-    "char_end": 16871,
+    "char_end": 16948,
     "char_start": 16148,
     "classification_confidence": 0.25,
     "clause_type": "termination",
     "content_head": "'10 General\\n10.5 CloudVault may update these Terms from time to time by posting r'",
-    "content_sha256": "4e1c2ec0943949ea03b8cbeb149fec1da7436c55a9df5fa9a9b3600592fa966d",
+    "content_sha256": "ecea0e6f671de33ba9b2606ce2584e49c5c2c10b66979064f1f6ff864dc0559e",
     "context_header": "[Section: 10 — General > 10.5 — CloudVault may update these Terms from time to time by posting revised Terms on its] [Type: Termination] [Jurisdiction: UK]",
     "cross_references": [
       {
@@ -808,23 +808,6 @@
     "index": 31,
     "original_header": "10.5 CloudVault may update these Terms from time to time by posting revised Terms on its",
     "secondary_clause_type": null,
-    "token_count": 183
-  },
-  {
-    "char_end": 16948,
-    "char_start": 16871,
-    "classification_confidence": 0.0,
-    "clause_type": "unknown",
-    "content_head": "'     50 Broadway, London, SW1H 0BL. VAT registration number: GB 312 4487 90.\\n'",
-    "content_sha256": "3a8e6596ba72bb129cb936b9ac38df962c6a0a4e9ee301b8cbf9cd37e73987ff",
-    "context_header": "[Section: 50 — Broadway, London, SW1H 0BL. VAT registration number: GB 312 4487 90.] [Type: Unknown] [Jurisdiction: UK]",
-    "cross_references": [],
-    "defined_terms_used": [],
-    "document_section": "operative",
-    "hierarchy_path": "50 — Broadway, London, SW1H 0BL. VAT registration number: GB 312 4487 90.",
-    "index": 32,
-    "original_header": "50 Broadway, London, SW1H 0BL. VAT registration number: GB 312 4487 90.",
-    "secondary_clause_type": null,
-    "token_count": 19
+    "token_count": 202
   }
 ]
