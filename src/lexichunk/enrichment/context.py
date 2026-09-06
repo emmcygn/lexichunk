@@ -1,10 +1,12 @@
 """Context header generator for the Contextual Retrieval pattern.
 
 Generates structured context headers that describe each ``LegalChunk``'s
-location and type within a legal document.  Prepending these headers to
-chunk content before embedding significantly improves retrieval quality by
-giving the embedding model the broader document context that a human reader
-would infer from the surrounding text.
+location and type within a legal document.  The intent of prepending one to
+the chunk content before embedding is to give the embedding model the
+document context a human reader would infer from the surrounding text.  This
+package does not measure the retrieval effect of doing so — see the
+evaluation harness linked from the README for what has and has not been
+measured.
 
 Typical usage::
 
