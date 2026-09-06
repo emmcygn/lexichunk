@@ -14,7 +14,7 @@ and why.
 This branch prepares the `0.9.1` patch release. Its fixes are not available
 from PyPI until the corresponding release is published.
 
-The core package has **zero required dependencies**. Pure Python, stdlib and
+The core package has **zero required dependencies**: pure Python, stdlib and
 `re` only. The optional `llama-index` extra pulls a transitive NLTK version
 covered by an open advisory; [SECURITY.md](SECURITY.md#optional-dependency-advisory)
 records the advisory and the scoped assessment.

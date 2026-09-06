@@ -41,7 +41,7 @@ def test_publish_releases_the_artifact_integration_ci_verified():
     """
     publish = _workflow("publish.yml")
 
-    assert publish.count("actions/download-artifact") == 2, (
+    assert publish.count("actions/download-artifact@v8") == 2, (
         "both publish jobs must download the verified distributions"
     )
     assert "name: python-distributions" in publish
@@ -50,7 +50,7 @@ def test_publish_releases_the_artifact_integration_ci_verified():
     )
 
     integrations = _workflow("integrations.yml")
-    assert "actions/upload-artifact" in integrations
+    assert "actions/upload-artifact@v7" in integrations
     assert "name: python-distributions" in integrations
     assert "if-no-files-found: error" in integrations
 
@@ -76,6 +76,42 @@ def test_every_workflow_declares_least_privilege_permissions():
     for name in ("ci.yml", "integrations.yml", "publish.yml"):
         workflow = _workflow(name)
         assert "permissions:\n  contents: read" in workflow, name
+
+
+def test_actions_are_pinned_to_maintained_majors():
+    """Every third-party action runs on a runtime GitHub still supports.
+
+    `actions/checkout@v4`, `setup-python@v5` and the v4 artifact actions all
+    run on Node 20, which the runner now warns about. The bump to these
+    majors moved them onto Node 24; a revert would reintroduce the warning
+    and, once Node 20 is removed, a failing release.
+    """
+    expected = {
+        "ci.yml": ("actions/checkout@v7", "actions/setup-python@v7"),
+        "integrations.yml": (
+            "actions/checkout@v7",
+            "actions/setup-python@v7",
+            "actions/upload-artifact@v7",
+        ),
+        "publish.yml": (
+            "actions/checkout@v7",
+            "actions/setup-python@v7",
+            "actions/download-artifact@v8",
+            # The PyPI publisher is released off a moving branch, not majors.
+            "pypa/gh-action-pypi-publish@release/v1",
+        ),
+    }
+    for name, pins in expected.items():
+        workflow = _workflow(name)
+        for pin in pins:
+            assert pin in workflow, f"{name} must pin {pin}"
+        for stale in (
+            "actions/checkout@v4",
+            "actions/setup-python@v5",
+            "actions/upload-artifact@v4",
+            "actions/download-artifact@v4",
+        ):
+            assert stale not in workflow, f"{name} still uses deprecated {stale}"
 
 
 def test_coverage_gate_is_pinned_in_ci():
