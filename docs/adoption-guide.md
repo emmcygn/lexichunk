@@ -1,6 +1,6 @@
-# Adoption guide: evaluate the fit before shipping
+# Evaluating lexichunk
 
-## The useful, narrow job
+## Scope
 
 lexichunk is a local, rule-based preprocessing component for teams that already
 have legal documents as text and want clause-aware chunks, hierarchy, definition
@@ -57,8 +57,8 @@ were checked on 6 September 2026; record dependency versions in your experiment.
 | Docling | Provides document-based hierarchical chunking and tokenizer-aware hybrid splitting/merging, with contextualized serialization. [Documentation](https://docling-project.github.io/docling/concepts/chunking/) | Compare for layout-aware ingestion and real tokenizer budgets; it may also provide upstream text extraction. |
 | lexichunk | Legal numbering profiles, definition context, reference metadata, local execution, and a dependency-free core. | Test whether these legal-specific signals solve failures in your documents at acceptable integration and maintenance cost. |
 
-Our proposed differentiator is inspectable legal-specific structure with a small
-local core, **not** universal superiority over generic or document-aware chunkers.
+lexichunk focuses on inspectable, legal-specific structure with a small local
+core; it does not claim universal superiority over generic or document-aware chunkers.
 If your main failure is OCR, table reconstruction, access control, or semantic
 ranking, fix that stage first rather than expecting a different chunker to solve
 it. If a simpler baseline meets your requirements, prefer the simpler system.
@@ -101,7 +101,7 @@ tool. It is not a semantic retrieval benchmark, a production cost measurement,
 or evidence of legal correctness. Its source-only mode does not measure the value
 of definition or cross-reference expansion.
 
-## Production decision gates
+## Production readiness
 
 Proceed beyond a pilot only when the owning team accepts documented failure
 rates on independently reviewed documents, can trace citations back to immutable
@@ -110,6 +110,5 @@ version controls in the surrounding application. Define rollback behavior and
 rerun the frozen evaluation when extraction, dependencies, chunking, ranking, or
 generation changes.
 
-Those are adoption requirements, not checks that this repository claims to have
-completed for your organization. A shareable beta should make these limits easy
-to discover rather than hide them behind a single benchmark percentage.
+These are adoption requirements, not checks this repository claims to have
+completed for your organization.

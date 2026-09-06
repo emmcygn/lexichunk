@@ -40,6 +40,5 @@ If your change intentionally alters chunker output, regenerate them with:
 pytest --update-snapshots
 ```
 
-**Always review the resulting JSON diff and explain it in the PR** — a
-snapshot update is only acceptable when the change is intentional and the
-diff has been inspected line by line, not merely to make a failing test pass.
+Review the resulting JSON diff and explain intentional output changes in the
+pull request. Do not update snapshots solely to make a failing test pass.

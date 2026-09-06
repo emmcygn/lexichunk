@@ -1,6 +1,6 @@
 # lexichunk
 
-**Intelligent legal document chunking for RAG pipelines.**
+**Clause-aware legal document chunking for RAG pipelines.**
 
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License: MIT](https://img.shields.io/github/license/emmcygn/lexichunk)
@@ -11,7 +11,7 @@ the GitHub source repository.
 
 ---
 
-## The Problem
+## Why clause-aware chunking
 
 General-purpose chunkers treat legal text like generic prose. On contracts and terms & conditions, this produces five specific failure modes that degrade RAG retrieval quality.
 
@@ -377,8 +377,8 @@ lexical-selection example that returns a clause, its contract-defined terms,
 and source offsets. It is intentionally narrow and is not a general legal
 retriever or relevance evaluation.
 
-For adoption scope, buy-versus-build considerations, and customer validation
-gates, see the [adoption guide](docs/adoption-guide.md).
+For evaluation scope, comparison criteria, and production-readiness guidance,
+see [Evaluating lexichunk](docs/adoption-guide.md).
 
 ---
 
