@@ -52,6 +52,16 @@ git, not against a published package.
   `CONTRIBUTING.md` — review the diff before committing).
 - `tests/test_invariants.py` — cross-cutting, Hypothesis-backed invariant
   tests that run independently of any single stage's unit tests.
+- `tests/test_readme_examples.py` executes every Python block in `README.md`,
+  so documented code cannot drift from the API; `tests/test_docstrings.py`
+  requires a docstring on every public export and pins the `LegalChunker`
+  public surface; `tests/test_heading_regression.py` is a flat, table-driven
+  set of 25 realistic headings that must be detected and the heading-shaped
+  lines (postal addresses, currency amounts, dates, durations,
+  table-of-contents entries) that must not be.
+- Two derandomised Hypothesis profiles in `tests/conftest.py` (`dev` and
+  `ci`), so a property-based failure reproduces from the same commit on any
+  machine. CI selects `ci` via `HYPOTHESIS_PROFILE`.
 - `LegalTextSplitter.split_documents()` and `.transform_documents()` for
   chunking already-loaded LangChain `Document` objects, preserving caller
   metadata (lexichunk's own keys win on collision); `create_documents()` now
