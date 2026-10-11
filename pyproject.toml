@@ -47,7 +47,7 @@ dev = [
     "pytest-benchmark>=4.0",
     "mypy>=1.0",
     "hypothesis>=6.0",
-    "ruff==0.16.6",
+    "ruff==0.16.10",
 ]
 all = [
     "langchain-core>=0.2.0,<2",
